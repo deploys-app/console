@@ -3,11 +3,27 @@
 	import api from '$lib/api'
 	import format from '$lib/format'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
+	import { onDestroy } from 'svelte'
 
-	let deployments = null
+	let list = null
+	let hasPending
+	let pendingTimeout
 
-	project.subscribe(async () => {
-		deployments = await api.deployment.list({ project: $project })
+	project.subscribe(() => {
+		reloadList()
+	})
+
+	async function reloadList () {
+		list = await api.deployment.list({ project: $project })
+		hasPending = list.some((x) => x.status === 'pending')
+
+		if (hasPending) {
+			pendingTimeout = setTimeout(() => reloadList(), 2000)
+		}
+	}
+
+	onDestroy(() => {
+		clearTimeout(pendingTimeout)
 	})
 </script>
 
@@ -39,12 +55,12 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if deployments == null}
+			{#if list == null}
 				<td colspan="6" class="_tal-ct">
 					Loading...
 				</td>
 			{:else}
-				{#each deployments as it}
+				{#each list as it}
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />

@@ -1,13 +1,29 @@
 <script>
+	import { onDestroy } from 'svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 
 	let list = null
+	let hasPending
+	let pendingTimeout
 
-	project.subscribe(async () => {
+	project.subscribe(() => {
+		reloadList()
+	})
+
+	async function reloadList () {
 		list = await api.disk.list({ project: $project })
+		hasPending = list.some((x) => x.status === 'pending')
+
+		if (hasPending) {
+			pendingTimeout = setTimeout(() => reloadList(), 2000)
+		}
+	}
+
+	onDestroy(() => {
+		clearTimeout(pendingTimeout)
 	})
 </script>
 
