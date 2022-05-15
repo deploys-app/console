@@ -80,5 +80,11 @@ export default {
 			const result = await invoke('route.list', { project })
 			return result.items
 		}
+	},
+	workloadIdentity: {
+		list: async ({ project }) => {
+			const result = await invoke('workloadidentity.list', { project })
+			return result.list
+		}
 	}
 }

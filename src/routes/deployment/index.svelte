@@ -2,7 +2,7 @@
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
-	import StatusIcon from '$lib/components/StatusIcon.svelte'
+	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 
 	let deployments = null
 
@@ -47,7 +47,7 @@
 				{#each deployments as it}
 					<tr>
 						<td>
-							<StatusIcon action={it.action} status={it.status} url={it.statusUrl} />
+							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
 							{#if it.action === 'pause'}
 								<i class="fas fa-pause _cl-warning-500 _mgh-12px"></i>
 							{:else if it.status === 'success'}
