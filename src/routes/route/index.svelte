@@ -1,11 +1,12 @@
 <script>
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 
-	let routes = null
+	let list = null
 
 	project.subscribe(async () => {
-		routes = await api.route.list({ project: $project })
+		list = await api.route.list({ project: $project })
 	})
 
 	function deleteRoute (route) {
@@ -14,9 +15,7 @@
 </script>
 
 <h6>Routes</h6>
-
 <br>
-
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
@@ -41,12 +40,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if routes == null}
-				<tr>
-					<td colspan="4" class="_tal-ct">Loading...</td>
-				</tr>
+			{#if list == null}
+				<LoadingRow span="4" />
 			{:else}
-				{#each routes as it}
+				{#each list as it}
 					<tr>
 						<td>
 							<a class="moon-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>

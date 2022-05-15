@@ -1,8 +1,9 @@
 <script>
+	import StatusIcon from '$lib/components/StatusIcon.svelte'
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
-	import StatusIcon from '$lib/components/StatusIcon.svelte'
 
 	let list = null
 
@@ -12,9 +13,7 @@
 </script>
 
 <h6>Workload Identities</h6>
-
 <br>
-
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
@@ -35,9 +34,7 @@
 			</thead>
 			<tbody>
 			{#if list == null}
-				<tr>
-					<td class="_tal-ct" colspan="3">Loading...</td>
-				</tr>
+				<LoadingRow span="3" />
 			{:else}
 				{#each list as it}
 					<tr>

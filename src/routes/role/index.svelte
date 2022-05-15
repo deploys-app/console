@@ -1,4 +1,5 @@
 <script>
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
@@ -16,9 +17,7 @@
 </script>
 
 <h6>Roles</h6>
-
 <br>
-
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
@@ -41,9 +40,7 @@
 			</thead>
 			<tbody>
 			{#if list == null}
-				<td colspan="5" class="_tal-ct">
-					Loading...
-				</td>
+				<LoadingRow span="5" />
 			{:else}
 				{#each list as it}
 					<tr>

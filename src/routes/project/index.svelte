@@ -3,9 +3,7 @@
 </script>
 
 <h6>Projects</h6>
-
 <br>
-
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">

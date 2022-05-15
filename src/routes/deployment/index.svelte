@@ -1,9 +1,10 @@
 <script>
+	import { onDestroy } from 'svelte'
+	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
-	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
-	import { onDestroy } from 'svelte'
 
 	let list = null
 	let hasPending
@@ -28,9 +29,7 @@
 </script>
 
 <h6>Deployments</h6>
-
 <br>
-
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
@@ -56,9 +55,7 @@
 			</thead>
 			<tbody>
 			{#if list == null}
-				<td colspan="6" class="_tal-ct">
-					Loading...
-				</td>
+				<LoadingRow span="6" />
 			{:else}
 				{#each list as it}
 					<tr>

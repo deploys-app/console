@@ -1,9 +1,10 @@
 <script>
 	import { onDestroy } from 'svelte'
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
-	import StatusIcon from '$lib/components/StatusIcon.svelte'
 
 	let list = null
 	let hasPending
@@ -29,9 +30,7 @@
 </script>
 
 <h6>Pull Secrets</h6>
-
 <br>
-
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
@@ -55,11 +54,7 @@
 			</thead>
 			<tbody>
 			{#if list == null}
-				<tr>
-					<td colspan="4" class="_tal-ct">
-						Loading...
-					</td>
-				</tr>
+				<LoadingRow span="4" />
 			{:else}
 				{#each list as it}
 					<tr>

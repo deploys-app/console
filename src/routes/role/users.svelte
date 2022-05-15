@@ -1,6 +1,6 @@
 <script>
-	import { project } from '$lib/stores'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import { project } from '$lib/stores'
 	import api from '$lib/api'
 
 	let list = null
