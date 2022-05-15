@@ -74,5 +74,11 @@ export default {
 			const result = await invoke('deployment.list', { project })
 			return result.deployments
 		}
+	},
+	route: {
+		list: async ({ project }) => {
+			const result = await invoke('route.list', { project })
+			return result.items
+		}
 	}
 }
