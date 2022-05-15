@@ -86,5 +86,11 @@ export default {
 			const result = await invoke('workloadidentity.list', { project })
 			return result.list
 		}
+	},
+	disk: {
+		list: async ({ project }) => {
+			const result = await invoke('disk.list', { project })
+			return result.list
+		}
 	}
 }
