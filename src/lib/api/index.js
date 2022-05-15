@@ -95,5 +95,8 @@ export default {
 	},
 	pullSecret: {
 		list: ({ project }) => invoke('pullsecret.list', { project })
+	},
+	role: {
+		list: ({ project }) => invoke('role.list', { project })
 	}
 }
