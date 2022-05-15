@@ -13,8 +13,8 @@
 			customClass: {
 				confirmButton: 'moon-button _cl-white -danger _mgr-16px',
 				cancelButton: 'moon-button -negative -tertiary',
-				actions: '_mgt-24px',
-			},
+				actions: '_mgt-24px'
+			}
 		})
 		if (!result.value) {
 			return

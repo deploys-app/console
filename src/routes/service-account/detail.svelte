@@ -45,7 +45,11 @@
 			await api.serviceAccount.createKey({ project: $project, id })
 			await fetchDetail()
 		} catch (e) {
-			// TODO: implement error modal
+			window.dispatchEvent(new CustomEvent('error', {
+				detail: {
+					error: e
+				}
+			}))
 		} finally {
 			loadingCreateKey = false
 		}
