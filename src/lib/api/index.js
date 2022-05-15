@@ -99,5 +99,8 @@ export default {
 	role: {
 		list: ({ project }) => invoke('role.list', { project }),
 		users: ({ project }) => invoke('role.users', { project })
+	},
+	serviceAccount: {
+		list: ({ project }) => invoke('serviceaccount.list', { project }),
 	}
 }
