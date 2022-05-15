@@ -1,0 +1,306 @@
+$components-colors: (
+	'secondary',
+	'positive',
+	'negative',
+);
+
+%base-button {
+	$height-button-small: 2.25rem;
+	$font-size-button-small: 0.875rem;
+
+	$height-button-big: 3.25rem;
+	$font-size-button-big: 1.25rem;
+
+	position: relative;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	min-height: 2.875rem;
+	padding: 0.5rem 1.5rem;
+
+	font-family: var(--font-family-secondary);
+	font-weight: 600;
+	font-size: 1rem;
+	line-height: 100%;
+
+	border: none;
+	border-radius: 3px;
+
+    transition: all var(--timing-faster) ease-in-out;
+
+    box-shadow: var(--raised-z8);
+
+	user-select: none;
+	cursor: pointer;
+	outline: none;
+
+	&.-pill {
+		border-radius: 999px;
+	}
+
+	&.-small {
+		min-height: $height-button-small;
+		font-size: $font-size-button-small;
+	}
+
+	&.-big {
+		min-height: $height-button-big;
+		font-size: $font-size-button-big;
+	}
+
+	&.-loading {
+		color: transparent;
+
+		&:after {
+			content: "";
+			position: absolute;
+			left: 0;
+			right: 0;
+			height: 1rem;
+			width: 1rem;
+			margin: auto;
+			border: 2px solid;
+			border-radius: 999px;
+			animation: spinAround 0.48s infinite linear;
+		}
+	}
+
+	&.-fluid {
+		width: 100%;
+	}
+}
+
+.#{$prefix}button {
+	@extend %base-button;
+
+	color: var(--color-light-primary);
+	background-color: var(--color-primary-500);
+
+	&:focus {
+		box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
+	}
+
+	&:hover {
+		background-color: var(--color-primary-600);
+	}
+
+	&.-loading {
+		color: transparent;
+
+		&:after {
+			border-right-color: var(--color-light-primary);
+			border-top-color: var(--color-light-primary);
+		}
+	}
+
+	@each $key, $value in $components-colors {
+		&.-#{$key} {
+			color: var(--color-light-primary);
+			background-color: var(--color-#{$key}-500);
+
+			&:focus {
+				box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
+			}
+
+			&:hover {
+				background-color: var(--color-#{$key}-600);
+			}
+
+			&.-loading {
+				color: transparent;
+
+				&:after {
+					border-right-color: var(--color-light-primary);
+					border-top-color: var(--color-light-primary);
+				}
+			}
+
+			&.-secondary {
+				color: var(--color-#{$key}-600);
+				background: transparent;
+
+				&:hover {
+					background-color: var(--color-#{$key}-100);
+				}
+
+				&.-loading {
+					color: transparent;
+
+					&:after {
+						border-right-color: var(--color-#{$key}-600);
+						border-top-color: var(--color-#{$key}-600);
+					}
+				}
+			}
+
+			&.-tertiary {
+				color: var(--color-#{$key}-600);
+				border: none;
+				background: transparent;
+				box-shadow: none;
+
+				&:hover {
+					background-color: var(--color-#{$key}-200);
+				}
+
+				&.-loading {
+					color: transparent;
+
+					&:after {
+						border-right-color: var(--color-#{$key}-600);
+						border-top-color: var(--color-#{$key}-600);
+					}
+				}
+			}
+		}
+
+		&.-white {
+			color: var(--color-primary-600);
+			background-color: white;
+
+			&:focus {
+				box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
+			}
+
+			&:hover {
+				background-color: var(--color-gray-100);
+			}
+
+			&.-loading {
+				color: transparent;
+
+				&:after {
+					border-right-color: var(--color-primary-600);
+					border-top-color: var(--color-primary-600);
+				}
+			}
+
+			&.-secondary {
+				color: white;
+				background: transparent;
+				border: 1px solid white;
+
+				&:hover {
+					background-color: transparent;
+				}
+
+				&:focus {
+					box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
+				}
+
+				&.-loading {
+					color: transparent;
+
+					&:after {
+						border-right-color: white;
+						border-top-color: white;
+					}
+				}
+			}
+
+			&.-tertiary {
+				color: var(--color-primary-600);
+				border: none;
+				background: transparent;
+
+				&:hover {
+					background-color: var(--color-gray-100);
+				}
+
+				&.-loading {
+					color: transparent;
+
+					&:after {
+						border-right-color: var(--color-primary-600);
+						border-top-color: var(--color-primary-600);
+					}
+				}
+			}
+		}
+	}
+
+	&.-secondary {
+		color: var(--color-primary-500);
+		border: 1px solid var(--color-gray-300);
+		background: transparent;
+
+		&:hover {
+			background-color: var(--color-gray-100);
+		}
+
+		&.-disabled {
+			color: var(--color-gray-400);
+			border: 1px solid var(--color-gray-300);
+			background-color: transparent;
+
+			&:hover {
+				background-color: transparent;
+			}
+		}
+
+		&.-loading {
+			color: transparent;
+
+			&:after {
+				border-right-color: var(--color-primary-600);
+				border-top-color: var(--color-primary-600);
+			}
+		}
+
+		&.-disabled {
+			&.-loading {
+				&:after {
+					border-right-color: var(--color-gray-500);
+					border-top-color: var(--color-gray-500);
+				}
+			}
+		}
+	}
+
+	&.-disabled {
+		background-color: var(--color-gray-200);
+		cursor: not-allowed;
+
+		&:not(.-loading) {
+			color: var(--color-gray-500);
+		}
+
+		&.-loading {
+			&:after {
+				border-right-color: var(--color-gray-500);
+				border-top-color: var(--color-gray-500);
+			}
+		}
+
+		&:hover {
+			background-color: var(--color-gray-300);
+		}
+	}
+}
+
+@keyframes spinAround {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(359deg); }
+}
+
+.moon-input {
+	&.moon-input-icon-wrap {
+		position: relative;
+		width: fit-content;
+		user-select: none;
+
+		input {
+			padding-right: 35px;
+		}
+
+		.moon-input-icon {
+			position: absolute;
+			top: 50%;
+			right: 25px;
+			transform: translateY(-50%);
+			z-index: 1;
+		}
+	}
+}

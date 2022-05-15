@@ -1,0 +1,18 @@
+.#{$prefix}sidebar {
+    width: var(--width-sidebar, 300px);
+    min-height: 100vh;
+
+    background-color: var(--color-neutral-600);
+    box-shadow: var(--raised-z10);
+}
+
+.site-logo {
+    margin: 0 auto;
+    width: 100px;
+
+    img {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+    }
+}

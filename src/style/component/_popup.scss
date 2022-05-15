@@ -1,0 +1,7 @@
+.#{$prefix}popup {
+    position: absolute;
+    z-index: 1;
+
+    box-shadow: var(--raised-z11);
+    min-width: 256px // move to local ?;
+}

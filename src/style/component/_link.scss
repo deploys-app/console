@@ -1,0 +1,85 @@
+$components-colors: (
+	'secondary',
+);
+
+.#{$prefix}link {
+	position: relative;
+
+	color: var(--color-primary-500);
+
+	text-decoration: none;
+
+	cursor: pointer;
+	outline: none;
+	transition: all 160ms ease-in-out;
+
+	svg, path {
+		transition: fill var(--timing-normal) ease-in-out;
+		fill: var(--color-primary-500);
+	}
+
+	&:before, &:after {
+		pointer-events: none;
+		backface-visibility: hidden;
+	}
+
+	&:hover, &:focus, &.-active {
+		color: var(--color-primary-600);
+
+		svg, path {
+			fill: var(--color-primary-600);
+		}
+	}
+
+	&.-fancy {
+		border-radius: 3px;
+
+		&:after {
+			position: absolute;
+			opacity: 0;
+
+			content: '';
+
+			left: 0;
+			bottom: 0;
+
+			display: block;
+
+			width: 100%;
+			height: 1px;
+
+			background-color: var(--color-primary-400);
+			transition: all 160ms ease-in-out;
+		}
+
+		&:hover, &:focus, &.-active {
+			background-color: var(--color-primary-100);
+
+			&:after {
+				opacity: 1;
+			}
+		}
+	}
+
+	&:not(.-fancy):focus {
+		text-decoration: underline;
+	}
+
+	@each $key in $components-colors {
+		&.-#{$key} {
+			color: var(--color-#{$key}-500);
+
+			svg, path {
+				fill: var(--color-#{$key}-500);
+			}
+
+			&:hover, &:focus, &.-active {
+				color: var(--color-#{$key}-600);
+
+				svg, path {
+					fill: var(--color-#{$key}-600);
+				}
+			}
+		}
+	};
+}

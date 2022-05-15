@@ -1,0 +1,59 @@
+.nav.nav-tabs {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+	flex: 1;
+
+	@include mq('md') {
+		flex-direction: row;
+	}
+
+	.nav-item {
+		line-height: 1;
+
+		@include mq('md') {
+			margin-right: 20px;
+		}
+
+		.nav-link {
+			display: flex;
+			line-height: 1;
+			text-align: center;
+			color: #b9c0d3;
+			padding: 12px 0;
+			border-top: none;
+			border-right: none;
+			border-left: none;
+			border-bottom: 2px solid #383e5d;
+			justify-content: center;
+
+			@include mq('lg') {
+				justify-content: flex-start;
+				padding: 12px 10px;
+			}
+		}
+
+		.nav-link.active {
+			border-top: none;
+			border-right: none;
+			border-left: none;
+			border-bottom: 2px solid #19d895;
+			color: #19d895;
+		}
+	}
+}
+
+.nav-tabs .nav-link {
+	border: 1px solid transparent;
+	border-top-left-radius: 0.25rem;
+	border-top-right-radius: 0.25rem;
+}
+
+.nav-tabs-wrap {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+}

@@ -1,0 +1,65 @@
+$components-colors: (
+	'secondary',
+	'positive',
+	'negative',
+);
+
+.#{$prefix}icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2rem;
+    height: 2rem;
+
+  	border: 0;
+    background-color: var(--color-primary-500);
+    color: white;
+
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+
+    box-shadow: var(--raised-z8);
+
+    transition: all var(--timing-faster) ease;
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: var(--raised-z13);
+    }
+
+    @each $key, $value in $components-colors {
+		&.-#{$key} {
+            background-color: var(--color-#{$key}-500);
+
+            &:hover {
+                background-color: var(--color-#{$key}-600);
+            }
+        }
+    }
+}
+
+.#{$prefix}icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    color: white;
+
+    border-radius: 50%;
+
+    font-size: 1.25rem;
+
+    cursor: pointer;
+
+    transition: all var(--timing-faster) ease;
+    backface-visibility: hidden;
+
+    &:hover {
+        background: rgba(190, 197, 255, 0.075);
+    }
+}

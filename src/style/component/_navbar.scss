@@ -1,0 +1,12 @@
+.#{$prefix}navbar {
+    display: flex;
+
+    width: 100%;
+    height: var(--height-navbar, 20rem);
+
+    background-color: var(--color-neutral-600);
+
+    // border-bottom: 1px solid var(--color-neutral-500);
+
+    box-shadow: var(--raised-z10);
+}

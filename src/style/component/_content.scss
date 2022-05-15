@@ -1,0 +1,45 @@
+pre {
+	position: relative;
+	border: none;
+	padding: 20px;
+	border-radius: 3px;
+	margin-bottom: 30px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	background-color: var(--color-neutral-900);
+
+	.copy {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: var(--color-neutral-900);
+		padding: 6px 10px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		user-select: none;
+		border: 0;
+		color: var(--color-light-primary);
+		outline: 0;
+
+		&:hover {
+			background-color: var(--color-neutral-900);
+		}
+
+		&:hover:active {
+			background-color: var(--color-neutral-900);
+		}
+	}
+
+	code {
+		white-space: pre-wrap;
+		display: block;
+		background-color: var(--color-neutral-900);
+	}
+
+	&.pre-scoll {
+		min-height: 800px;
+		max-height: 800px;
+		overflow-y: auto;
+	}
+}

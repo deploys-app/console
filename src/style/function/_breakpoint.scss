@@ -1,0 +1,28 @@
+@function breakpoint-min($name, $breakpoints: $breakpoints) {
+	$min: map-get($breakpoints, $name);
+	@return if($min !=0, $min, null);
+}
+
+@mixin mq($name, $breakpoints: $breakpoints) {
+	$min: breakpoint-min($name, $breakpoints);
+
+	@if $min {
+		@media (min-width: $min) {
+			@content;
+		}
+	} @else {
+		@content;
+	}
+}
+
+@mixin mqmw($name, $breakpoints: $breakpoints) {
+	$max: breakpoint-min($name, $breakpoints);
+
+	@if $max {
+		@media (max-width: $max) {
+			@content;
+		}
+	} @else {
+		@content;
+	}
+}

@@ -1,0 +1,61 @@
+@import 'theme';
+@import 'reset';
+
+@import 'atomic/all';
+@import 'utility/all';
+@import 'layout/all';
+@import 'component/all';
+
+.sidebar-menus {
+    .menu-item {
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: .75rem;
+
+        justify-content: start;
+        align-items: center;
+
+        padding: .75rem 1rem;
+
+        font-size: var(--font-size-300);
+        color: var(--color-light-secondary);
+
+        cursor: pointer;
+
+        &:hover {
+            background: var(--color-neutral-800);
+        }
+
+        &.is-active {
+            color: var(--color-light-primary);
+            background: var(--color-neutral-800);
+        }
+    }
+
+    .menu-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+.u-raised-z1 {
+    box-shadow: var(--raised-z12);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-light-primary);;
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-neutral-500) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}

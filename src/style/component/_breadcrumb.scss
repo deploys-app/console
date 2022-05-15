@@ -1,0 +1,21 @@
+.#{$prefix}breadcrumb {
+	display: inline-flex;
+
+	> * {
+		&:not(:last-child) {
+			margin-right: .875rem;
+		}
+
+		&:not(:last-child):after {
+			content: '/';
+			display: inline-block;
+
+			margin-left: .5rem;
+            color: var(--color-light-secondary);
+		}
+
+		> * {
+			display: inline-block;
+		}
+	}
+}
