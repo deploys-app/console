@@ -9,13 +9,15 @@
 	import { profile, projects, project } from '$lib/stores'
 
 	let init
-	let active
+	let showSidebar
 
 	page.subscribe(($page) => {
 		const p = $page.url.searchParams.get('project')
 		if (p !== $project) {
 			project.set(p)
 		}
+
+		showSidebar = false
 	})
 
 	onMount(async () => {
@@ -49,18 +51,19 @@
 	})
 </script>
 
+<svelte:window
+	on:sidebar:toggle={() => showSidebar = !showSidebar} />
+
 <div>
 	{#if init}
 		<div class="app-layout"
-			class:is-shown-sidebar={active}>
-		<!--	@toggle-sidebar.window="active = !active"-->
+			class:is-shown-sidebar={showSidebar}>
 			<div class="navbar-wrapper">
 				<Navbar />
 			</div>
 
 			<div class="sidebar-wrapper">
-				<div class="sidebar-backdrop"></div>
-		<!--		on:click="$dispatch('toggle-sidebar')"-->
+				<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
 				<Sidebar />
 			</div>
 

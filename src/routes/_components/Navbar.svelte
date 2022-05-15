@@ -1,13 +1,10 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import gravatarUrl from 'gravatar-url'
 	import { goto } from '$app/navigation'
 	import api from '$lib/api'
 	import { profile } from '$lib/stores'
 
 	let active
-
-	const dispatch = createEventDispatcher()
 
 	export function open () {
 		active = true
@@ -22,7 +19,7 @@
 	}
 
 	function toggleSidebar () {
-		dispatch('toggle-sidebar')
+		window.dispatchEvent(new Event('sidebar:toggle'))
 	}
 
 	function signOut () {
