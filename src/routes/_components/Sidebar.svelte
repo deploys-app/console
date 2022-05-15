@@ -6,6 +6,11 @@
 	function setProject (sid) {
 		const q = new URLSearchParams($page.url.search)
 		q.set('project', sid)
+
+		if ($project) {
+			goto(`?${q.toString()}`)
+			return
+		}
 		goto(`/?${q.toString()}`)
 	}
 </script>
