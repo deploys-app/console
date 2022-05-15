@@ -5,10 +5,15 @@
 
 	let list = null
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadList()
+	}
+
+	async function reloadList () {
 		const result = await api.role.users({ project: $project })
 		list = result.users
-	})
+	}
 </script>
 
 <h6>Users</h6>

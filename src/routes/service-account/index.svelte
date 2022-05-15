@@ -7,10 +7,15 @@
 
 	let list = null
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadList()
+	}
+
+	async function reloadList () {
 		const result = await api.serviceAccount.list({ project: $project })
 		list = result.serviceAccounts
-	})
+	}
 </script>
 
 <h6>Service Accounts</h6>

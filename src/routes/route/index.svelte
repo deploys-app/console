@@ -6,9 +6,14 @@
 
 	let list = null
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadList()
+	}
+
+	async function reloadList () {
 		list = await api.route.list({ project: $project })
-	})
+	}
 
 	function deleteRoute (route) {
 		console.log(route)

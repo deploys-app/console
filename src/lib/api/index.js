@@ -102,5 +102,9 @@ export default {
 	},
 	serviceAccount: {
 		list: ({ project }) => invoke('serviceaccount.list', { project }),
+		get: ({ project, id }) => invoke('serviceaccount.get', { project, id }),
+		delete: ({ project, id }) => invoke('serviceaccount.delete', { project, id }),
+		createKey: ({ project, id }) => invoke('serviceaccount.createKey', { project, id }),
+		deleteKey: ({ project, id, secret }) => invoke('serviceaccount.deleteKey', { project, id, secret }),
 	}
 }

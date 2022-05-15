@@ -11,9 +11,10 @@
 	let hasPending
 	let pendingTimeout
 
-	project.subscribe(() => {
+	$: {
+		$project
 		reloadList()
-	})
+	}
 
 	async function reloadList () {
 		list = await api.disk.list({ project: $project })

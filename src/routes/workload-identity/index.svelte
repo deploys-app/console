@@ -8,9 +8,14 @@
 
 	let list = null
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadList()
+	}
+
+	async function reloadList () {
 		list = await api.workloadIdentity.list({ project: $project })
-	})
+	}
 </script>
 
 <h6>Workload Identities</h6>

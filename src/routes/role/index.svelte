@@ -7,10 +7,15 @@
 
 	let list = null
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadList()
+	}
+
+	async function reloadList () {
 		const result = await api.role.list({ project: $project })
 		list = result.roles
-	})
+	}
 
 	function roleCanUpdate (sid) {
 		return sid !== 'owner'

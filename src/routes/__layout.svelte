@@ -2,7 +2,8 @@
 	import '../style/main.scss'
 	import Navbar from './_components/Navbar.svelte'
 	import Sidebar from './_components/Sidebar.svelte'
-	import { onMount } from 'svelte'
+	import ConfirmModal from './_components/ConfirmModal.svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import api from '$lib/api'
@@ -11,7 +12,7 @@
 	let init
 	let showSidebar
 
-	page.subscribe(($page) => {
+	const page$ = page.subscribe(($page) => {
 		const p = $page.url.searchParams.get('project')
 		if (p !== $project) {
 			project.set(p)
@@ -49,6 +50,10 @@
 			await goto(`https://api.deploys.app/auth?callback=${$page.url}&state=${state}`)
 		}
 	})
+
+	onDestroy(() => {
+		page$()
+	})
 </script>
 
 <svelte:window
@@ -73,6 +78,8 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmModal />
 
 <style>
 	:root {

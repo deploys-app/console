@@ -6,7 +6,12 @@
 
 	let billing
 
-	project.subscribe(async () => {
+	$: {
+		$project
+		reloadData()
+	}
+
+	async function reloadData () {
 		billing = null
 
 		if (!$project) {
@@ -26,7 +31,7 @@
 			disk: (usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
 			replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
 		}
-	})
+	}
 </script>
 
 <h6>Dashboard</h6>

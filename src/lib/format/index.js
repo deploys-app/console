@@ -18,6 +18,9 @@ export default {
 		return `${m[1]} ${m[2]}B`
 	},
 	datetime (v) {
+		if (!v) {
+			return ''
+		}
 		return dayjs(v).format('YYYY-MM-DD HH:mm:ss')
 	}
 }

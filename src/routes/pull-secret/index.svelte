@@ -11,9 +11,10 @@
 	let hasPending
 	let pendingTimeout
 
-	project.subscribe(() => {
+	$: {
+		$project
 		reloadList()
-	})
+	}
 
 	async function reloadList () {
 		const result = await api.pullSecret.list({ project: $project })
