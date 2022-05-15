@@ -4,23 +4,21 @@
 	import Sidebar from './_components/Sidebar.svelte'
 	import ConfirmModal from './_components/ConfirmModal.svelte'
 	import ErrorModal from './_components/ErrorModal.svelte'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import api from '$lib/api'
-	import { profile, projects, project } from '$lib/stores'
+	import { profile, projects } from '$lib/stores'
 
 	let init
 	let showSidebar
 
-	const page$ = page.subscribe(($page) => {
-		const p = $page.url.searchParams.get('project')
-		if (p !== $project) {
-			project.set(p)
+	$: {
+		$page
+		if (showSidebar) {
+			showSidebar = false
 		}
-
-		showSidebar = false
-	})
+	}
 
 	onMount(async () => {
 		const state = $page.url.searchParams.get('state')
@@ -43,18 +41,20 @@
 		try {
 			profile.set(await api.me.get())
 			projects.set(await api.project.list() || [])
-			project.set($page.url.searchParams.get('project') || '')
+			api.setOnUnauth(() => {
+				signIn()
+			})
 			init = true
 		} catch (e) {
-			const state = api.randomState(crypto)
-			localStorage.setItem('__auth_state', state)
-			await goto(`https://api.deploys.app/auth?callback=${$page.url}&state=${state}`)
+			signIn()
 		}
 	})
 
-	onDestroy(() => {
-		page$()
-	})
+	function signIn () {
+		const state = api.randomState(crypto)
+		localStorage.setItem('__auth_state', state)
+		goto(`https://api.deploys.app/auth?callback=${$page.url}&state=${state}`)
+	}
 </script>
 
 <svelte:window

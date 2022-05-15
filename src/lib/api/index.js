@@ -6,7 +6,7 @@ const endpoint = 'https://api.deploys.app'
 
 let _token = ''
 
-async function invoke (fn, args = {}) {
+async function _invoke (fn, args = {}) {
 	const response = await fetch(`${endpoint}/${fn}`, {
 		method: 'POST',
 		body: JSONBig.stringify(args),
@@ -15,14 +15,26 @@ async function invoke (fn, args = {}) {
 			'authorization': _token ? `Bearer ${_token}` : undefined
 		}
 	})
-	const body = jsonBig.parse(await response.text())
+	return jsonBig.parse(await response.text())
+}
+
+let onUnauth
+
+async function invoke (fn, args) {
+	const body = await _invoke(fn, args)
 	if (!body.ok) {
+		if (body.error?.message === 'api: unauthorized') {
+			onUnauth && onUnauth()
+		}
 		throw new Error(body.error)
 	}
 	return body.result
 }
 
 export default {
+	setOnUnauth: (callback) => {
+		onUnauth = callback
+	},
 	loadToken: (storage) => {
 		_token = storage.getItem('__token') || ''
 	},

@@ -1,4 +1,6 @@
 <script>
+	import { onDestroy, onMount } from 'svelte'
+	import { goto } from '$app/navigation'
 	import api from '$lib/api'
 	import { project, projectInfo } from '$lib/stores'
 
@@ -6,15 +8,11 @@
 
 	let billing
 
-	$: {
-		$project
-		reloadData()
-	}
-
 	async function reloadData () {
 		billing = null
 
 		if (!$project) {
+			await goto('/project')
 			return
 		}
 
@@ -32,6 +30,16 @@
 			replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
 		}
 	}
+
+	let project$
+	onMount(() => {
+		project$ = project.subscribe(() => {
+			reloadData()
+		})
+	})
+	onDestroy(() => {
+		project$ && project$()
+	})
 </script>
 
 <h6>Dashboard</h6>
