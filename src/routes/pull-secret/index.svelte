@@ -1,6 +1,7 @@
 <script>
 	import { onDestroy } from 'svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
@@ -69,11 +70,7 @@
 						<td>{it.createdBy}</td>
 					</tr>
 				{:else}
-					<tr>
-						<td colspan="4" class="_tal-ct">
-							No data
-						</td>
-					</tr>
+					<NoDataRow span="4" />
 				{/each}
 			{/if}
 			</tbody>

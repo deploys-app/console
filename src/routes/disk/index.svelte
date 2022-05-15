@@ -2,6 +2,7 @@
 	import { onDestroy } from 'svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
@@ -74,9 +75,7 @@
 						</td>
 					</tr>
 				{:else}
-					<tr>
-						<td colspan="5" class="_tal-ct">No data</td>
-					</tr>
+					<NoDataRow span="5" />
 				{/each}
 			{/if}
 			</tbody>

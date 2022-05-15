@@ -1,6 +1,7 @@
 <script>
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import format from '$lib/format'
@@ -48,9 +49,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 					</tr>
 				{:else}
-					<tr>
-						<td class="_tal-ct" colspan="3">No data</td>
-					</tr>
+					<NoDataRow span="3" />
 				{/each}
 			{/if}
 			</tbody>

@@ -1,4 +1,5 @@
 <script>
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { projects } from '$lib/stores'
 </script>
 
@@ -57,9 +58,7 @@
 					</td>
 				</tr>
 			{:else}
-				<tr>
-					<td class="_tal-ct" colspan="4">No data</td>
-				</tr>
+				<NoDataRow span="4" />
 			{/each}
 			</tbody>
 		</table>
