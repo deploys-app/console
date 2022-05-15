@@ -1,13 +1,16 @@
 <script>
+	import { setContext } from 'svelte'
 	import { page } from '$app/stores'
 	import { project } from '$lib/stores'
 	import api from '$lib/api'
 	import Header from './_components/Header.svelte'
+	import { writable } from 'svelte/store'
 
 	const location = $page.url.searchParams.get('location')
 	const name = $page.url.searchParams.get('name')
 
-	let detail
+	const detail = writable(null)
+	setContext('deployment', detail)
 
 	$: {
 		$project
@@ -15,11 +18,12 @@
 	}
 
 	async function reloadDetail () {
-		detail = await api.deployment.get({ project: $project, location, name })
+		const result = await api.deployment.get({ project: $project, location, name })
+		detail.set(result)
 	}
 </script>
 
-{#if detail == null}
+{#if $detail == null}
 	Loading...
 {:else}
 	<div>
@@ -28,14 +32,14 @@
 				<a href={`/deployment?project=${$project}`} class="moon-link"><h6>Deployments</h6></a>
 			</li>
 			<li>
-				<h6>{detail.name}</h6>
+				<h6>{$detail.name}</h6>
 			</li>
 		</ul>
 	</div>
 	<br>
 	<div class="moon-panel _dp-g _gg-24px">
-		<Header detail={detail} />
+		<Header detail={$detail} />
 
-		<slot detail={detail} />
+		<slot />
 	</div>
 {/if}
