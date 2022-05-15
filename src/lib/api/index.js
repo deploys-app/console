@@ -92,5 +92,8 @@ export default {
 			const result = await invoke('disk.list', { project })
 			return result.list
 		}
+	},
+	pullSecret: {
+		list: ({ project }) => invoke('pullsecret.list', { project })
 	}
 }
