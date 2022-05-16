@@ -34,6 +34,7 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
+	import { browser } from '$app/env'
 
 	export let profile
 	export let projects
@@ -50,9 +51,11 @@
 		}
 	}
 
-	api.setOnUnauth(() => {
-		goto('/auth/signin')
-	})
+	if (browser) {
+		api.setOnUnauth(() => {
+			goto('/auth/signin')
+		})
+	}
 </script>
 
 <svelte:window
@@ -61,7 +64,7 @@
 <div class="app-layout"
 	class:is-shown-sidebar={showSidebar}>
 	<div class="navbar-wrapper">
-		<Navbar />
+		<Navbar {profile} />
 	</div>
 
 	<div class="sidebar-wrapper">

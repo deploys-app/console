@@ -11,6 +11,12 @@
 				redirect: `?${q.toString()}`
 			}
 		}
+		if (!pageProject) {
+			return {
+				status: 302,
+				redirect: `/project`
+			}
+		}
 
 		return {
 			stuff: {

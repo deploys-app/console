@@ -34,10 +34,6 @@ export default {
 	setOnUnauth: (callback) => {
 		onUnauth = callback
 	},
-	signOut: (goto) => {
-		// const url = `${endpoint}/auth/signout?token=${}&callback=https://www.deploys.app/`
-		// return goto(url)
-	},
 	me: {
 		get: (fetch) => invoke('me.get', {}, fetch),
 		authorized: ({ projectId, project, permissions }) => invoke('me.authorized', { projectId, project, permissions })
