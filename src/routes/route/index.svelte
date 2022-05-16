@@ -1,19 +1,31 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const routes = await api.invoke('route.list', { project }, fetch)
+		if (!routes.ok) {
+			return {
+				status: 500,
+				error: `routes: ${routes.error.message}`
+			}
+		}
+		return {
+			props: {
+				routes: routes.result.items || []
+			}
+		}
+	}
+</script>
+
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { project } from '$lib/stores'
-	import api from '$lib/api'
+	import { navigating, page } from '$app/stores'
 
-	let list = null
+	export let routes
 
-	$: {
-		$project
-		reloadList()
-	}
-
-	async function reloadList () {
-		list = await api.route.list({ project: $project })
-	}
+	$: project = $page.stuff.project
 
 	function deleteRoute (route) {
 		console.log(route)
@@ -25,13 +37,11 @@
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/route/create?project=${$project}`}>
+			<a class="moon-button -small" href={`/route/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
-
-	<!--{{template "flash-error" .Page.Flash.Values "Errors"}}-->
 
 	<div class="moon-table-container">
 		<table class="moon-table">
@@ -46,10 +56,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="4" />
 			{:else}
-				{#each list as it}
+				{#each routes as it}
 					<tr>
 						<td>
 							<a class="moon-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>

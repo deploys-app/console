@@ -577,6 +577,7 @@ __metadata:
     sass: ^1.51.0
     svelte: ^3.44.0
     svelte-check: ^2.2.6
+    svelte-kit-cookie-session: ^2.1.4
     svelte-preprocess: ^4.10.6
     sweetalert2: ^11.4.14
     typescript: ~4.6.2
@@ -2376,6 +2377,13 @@ __metadata:
   peerDependencies:
     svelte: ">=3.19.0"
   checksum: 87c339d753befeca4efc694064e1b32306f0e0db8e14929b1fb0479a40166c6de799d870f6b84cfcaee43098c6c2a8fd4211f2f72b569414da5b3b28aefda4df
+  languageName: node
+  linkType: hard
+
+"svelte-kit-cookie-session@npm:^2.1.4":
+  version: 2.1.4
+  resolution: "svelte-kit-cookie-session@npm:2.1.4"
+  checksum: 1211707d446d84b64a2fdd5a3a4fcd5b2452e1aea36b1b1852ccebc26c168a4639fa4324af81718e2438a41477fd2fb972d5f07e3ac3aa8a385c84be457a005a
   languageName: node
   linkType: hard
 

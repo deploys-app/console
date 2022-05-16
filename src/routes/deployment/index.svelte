@@ -1,33 +1,53 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const deployments = await api.invoke('deployment.list', { project }, fetch)
+		if (!deployments.ok) {
+			return {
+				status: 500,
+				error: `deployments: ${deployments.error.message}`
+			}
+		}
+		return {
+			props: {
+				deployments: deployments.result.deployments || []
+			},
+			dependencies: ['deployments']
+		}
+	}
+</script>
+
 <script>
 	import { onDestroy } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { project } from '$lib/stores'
-	import api from '$lib/api'
+	import { browser } from '$app/env'
+	import { navigating, page } from '$app/stores'
+	import { invalidate } from '$app/navigation'
 	import format from '$lib/format'
 
-	let list = null
-	let hasPending
+	export let deployments
+
 	let pendingTimeout
 
+	$: project = $page.stuff.project
 	$: {
-		$project
-		reloadList()
-	}
-
-	async function reloadList () {
-		list = await api.deployment.list({ project: $project })
-		hasPending = list.some((x) => x.status === 'pending')
-
-		if (hasPending) {
-			pendingTimeout = setTimeout(() => reloadList(), 2000)
+		if (browser) {
+			let hasPending = deployments.some((x) => x.status === 'pending')
+			if (hasPending) {
+				pendingTimeout = setTimeout(() => invalidate('deployments'), 2000)
+			}
 		}
 	}
 
-	onDestroy(() => {
-		clearTimeout(pendingTimeout)
-	})
+	if (browser) {
+		onDestroy(() => {
+			clearTimeout(pendingTimeout)
+		})
+	}
 </script>
 
 <h6>Deployments</h6>
@@ -35,7 +55,7 @@
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/deployment/deploy?project=${$project}`}>
+			<a class="moon-button -small" href={`/deployment/deploy?project=${project}`}>
                 Create
             </a>
 		</div>
@@ -56,10 +76,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="6" />
 			{:else}
-				{#each list as it}
+				{#each deployments as it}
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
@@ -91,7 +111,7 @@
 							<!--{{template "status-icon" .Status}}-->
 							<!--{{end}}-->
 							<!--{{end}}-->
-							<a class="moon-link" href={`/deployment/metrics?project=${$project}&location=${it.location}&name=${it.name}`}>
+							<a class="moon-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

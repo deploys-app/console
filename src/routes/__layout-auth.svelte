@@ -1,16 +1,46 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ fetch }) {
+		const me = await api.invoke('me.get', {}, fetch)
+		if (!me.ok && me.error?.unauth) {
+			return {
+				status: 302,
+				redirect: '/auth/signin'
+			}
+		}
+		const projects = await api.invoke('project.list', {}, fetch)
+		if (!projects.ok) {
+			return {
+				status: 500,
+				error: projects.error?.message
+			}
+		}
+		return {
+			props: {
+				profile: me.result,
+				projects: projects.result.projects || []
+			}
+		}
+	}
+</script>
+
 <script>
 	import '../style/main.scss'
 	import Navbar from './_components/Navbar.svelte'
 	import Sidebar from './_components/Sidebar.svelte'
 	import ConfirmModal from './_components/ConfirmModal.svelte'
 	import ErrorModal from './_components/ErrorModal.svelte'
-	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import api from '$lib/api'
-	import { profile, projects } from '$lib/stores'
+	import * as stores from '$lib/stores'
 
-	let init
+	export let profile
+	export let projects
+
+	stores.profile.set(profile)
+	stores.projects.set(projects)
+
 	let showSidebar
 
 	$: {
@@ -20,64 +50,28 @@
 		}
 	}
 
-	onMount(async () => {
-		const state = $page.url.searchParams.get('state')
-		const code = $page.url.searchParams.get('code')
-
-		if (state === localStorage.getItem('__auth_state') && code) {
-			api.setToken(localStorage, code)
-		}
-		localStorage.removeItem('__auth_state')
-
-		if (state || code) {
-			const q = new URLSearchParams($page.url.search)
-			q.delete('state')
-			q.delete('code')
-			await goto(`?${q.toString()}`)
-		}
-
-		api.loadToken(localStorage)
-
-		try {
-			profile.set(await api.me.get())
-			projects.set(await api.project.list() || [])
-			api.setOnUnauth(() => {
-				signIn()
-			})
-			init = true
-		} catch (e) {
-			signIn()
-		}
+	api.setOnUnauth(() => {
+		goto('/auth/signin')
 	})
-
-	function signIn () {
-		const state = api.randomState(crypto)
-		localStorage.setItem('__auth_state', state)
-		goto(`https://api.deploys.app/auth?callback=${$page.url}&state=${state}`)
-	}
 </script>
 
 <svelte:window
 	on:sidebar:toggle={() => showSidebar = !showSidebar} />
 
-<div>
-	{#if init}
-		<div class="app-layout"
-			class:is-shown-sidebar={showSidebar}>
-			<div class="navbar-wrapper">
-				<Navbar />
-			</div>
+<div class="app-layout"
+	class:is-shown-sidebar={showSidebar}>
+	<div class="navbar-wrapper">
+		<Navbar />
+	</div>
 
-			<div class="sidebar-wrapper">
-				<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
-				<Sidebar />
-			</div>
+	<div class="sidebar-wrapper">
+		<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
+		<Sidebar />
+	</div>
 
-			<div class="content-wrapper">
-				<slot />
-			</div>
-		</div>
-	{/if}
+	<div class="content-wrapper">
+		<slot />
+	</div>
 </div>
 
 <ConfirmModal />
