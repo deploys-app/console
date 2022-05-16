@@ -1,7 +1,7 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import { handleSession } from 'svelte-kit-cookie-session'
 
-const sessionSecret = import.meta.env.VITE_SESSION_SECRET
+const sessionSecret = process.env.SESSION_SECRET
 
 export function getSession ({ locals }) {
 	return {
