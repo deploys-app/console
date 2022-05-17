@@ -19,7 +19,6 @@ export async function get ({ locals, url }) {
 	q.set('state', state)
 
 	locals.state = state
-	console.log('set locals.state to', locals.state)
 
 	return {
 		status: 302,
