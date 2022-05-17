@@ -16,6 +16,9 @@
 		}
 
 		return {
+			stuff: {
+				menu: 'dashboard'
+			},
 			props: {
 				usage: usage.result,
 				price: price.result

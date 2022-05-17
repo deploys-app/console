@@ -11,6 +11,9 @@
 			}
 		}
 		return {
+			stuff: {
+				menu: 'role.users'
+			},
 			props: {
 				users: users.result.users || []
 			}
