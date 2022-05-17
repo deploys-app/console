@@ -1,7 +1,7 @@
 const endpoint = 'https://api.deploys.app'
 
 export async function post ({ locals, params, request }) {
-	const token = locals.session.data?.token
+	const token = locals.token
 
 	const resp = await fetch(`${endpoint}/${params.fn}`, {
 		method: 'POST',

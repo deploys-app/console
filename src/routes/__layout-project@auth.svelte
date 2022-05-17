@@ -19,9 +19,25 @@
 		}
 
 		return {
+			props: {
+				project: pageProject,
+			},
 			stuff: {
 				project: pageProject
 			}
+		}
+	}
+</script>
+
+<script>
+	import Cookie from 'js-cookie'
+	import { browser } from '$app/env'
+
+	export let project
+
+	$: {
+		if (browser) {
+			Cookie.set('project', project, { expires: 7 })
 		}
 	}
 </script>

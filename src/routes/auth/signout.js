@@ -1,7 +1,7 @@
 const landing = 'https://www.deploys.app/'
 
 export async function post ({ locals }) {
-	const token = locals.session.data?.token
+	const token = locals.token
 
 	if (token) {
 		const q = new URLSearchParams()

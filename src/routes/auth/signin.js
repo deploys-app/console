@@ -1,10 +1,11 @@
-import crypto from 'crypto'
+import { webcrypto } from 'node:crypto'
+
+const crypto = webcrypto
 
 function randomState () {
-	return crypto.randomBytes(16).toString('hex')
-	// const x = new Uint8Array(16)
-	// crypto.getRandomValues(x)
-	// return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
+	const x = new Uint8Array(16)
+	crypto.getRandomValues(x)
+	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
 export async function get ({ locals, url }) {
@@ -17,11 +18,8 @@ export async function get ({ locals, url }) {
 	q.set('callback', callback.toString())
 	q.set('state', state)
 
-	locals.session.data = {
-		state,
-		token: ''
-	}
-	console.log(`https://api.deploys.app/auth?${q.toString()}`)
+	locals.state = state
+	console.log('set locals.state to', locals.state)
 
 	return {
 		status: 302,

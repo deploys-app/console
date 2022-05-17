@@ -7,12 +7,7 @@ const config = {
 		sass: true
 	}),
 	kit: {
-		adapter: adapter({ platform: 'node' }),
-		vite: {
-			optimizeDeps: {
-				exclude: ['svelte-kit-cookie-session']
-			}
-		}
+		adapter: adapter()
 	}
 }
 
