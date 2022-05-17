@@ -1,21 +1,32 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const roles = await api.invoke('role.list', { project }, fetch)
+		if (!roles.ok) {
+			return {
+				status: 500,
+				error: `roles: ${roles.error.message}`
+			}
+		}
+		return {
+			props: {
+				roles: roles.result.roles || []
+			}
+		}
+	}
+</script>
+
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { project } from '$lib/stores'
-	import api from '$lib/api'
 	import format from '$lib/format'
+	import { navigating, page } from '$app/stores'
 
-	let list = null
+	export let roles
 
-	$: {
-		$project
-		reloadList()
-	}
-
-	async function reloadList () {
-		const result = await api.role.list({ project: $project })
-		list = result.roles
-	}
+	$: project = $page.stuff.project
 
 	function roleCanUpdate (sid) {
 		return sid !== 'owner'
@@ -27,7 +38,7 @@
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/role/create?project=${$project}`}>
+			<a class="moon-button -small" href={`/role/create?project=${project}`}>
                 Create
             </a>
 		</div>
@@ -45,14 +56,14 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="5" />
 			{:else}
-				{#each list as it}
+				{#each roles as it}
 					<tr>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href={`/role/create?project=${$project}&role=${it.role}`} class="moon-link">
+								<a href={`/role/create?project=${project}&role=${it.role}`} class="moon-link">
 									<strong>{it.role}</strong>
 								</a>
 							{:else}
@@ -65,7 +76,7 @@
 						<td>
 							<div class="table-action-container">
 								{#if roleCanUpdate(it.role)}
-									<a href={`/role/create?project=${$project}&role=${it.role}`}>
+									<a href={`/role/create?project=${project}&role=${it.role}`}>
 										<div class="moon-icon-button -secondary">
 											<i class="fas fa-pen"></i>
 										</div>

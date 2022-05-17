@@ -1,34 +1,53 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const pullSecrets = await api.invoke('pullsecret.list', { project }, fetch)
+		if (!pullSecrets.ok) {
+			return {
+				status: 500,
+				error: `pullSecrets: ${pullSecrets.error.message}`
+			}
+		}
+		return {
+			props: {
+				pullSecrets: pullSecrets.result.pullSecrets || []
+			},
+			dependencies: ['pullSecrets']
+		}
+	}
+</script>
+
 <script>
 	import { onDestroy } from 'svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import { project } from '$lib/stores'
-	import api from '$lib/api'
 	import format from '$lib/format'
+	import { navigating, page } from '$app/stores'
+	import { browser } from '$app/env'
+	import { invalidate } from '$app/navigation'
 
-	let list = null
-	let hasPending
+	export let pullSecrets
+
+	$: project = $page.stuff.project
+
 	let pendingTimeout
-
 	$: {
-		$project
-		reloadList()
-	}
-
-	async function reloadList () {
-		const result = await api.pullSecret.list({ project: $project })
-		list = result.pullSecrets
-		hasPending = list.some((x) => x.status === 'pending')
-
-		if (hasPending) {
-			pendingTimeout = setTimeout(() => reloadList(), 2000)
+		if (browser) {
+			let hasPending = pullSecrets.some((x) => x.status === 'pending')
+			if (hasPending) {
+				pendingTimeout = setTimeout(() => invalidate('pullSecrets'), 2000)
+			}
 		}
 	}
 
-	onDestroy(() => {
-		clearTimeout(pendingTimeout)
-	})
+	if (browser) {
+		onDestroy(() => {
+			clearTimeout(pendingTimeout)
+		})
+	}
 </script>
 
 <h6>Pull Secrets</h6>
@@ -36,13 +55,11 @@
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/pull-secret/create?project=${$project}`}>
+			<a class="moon-button -small" href={`/pull-secret/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
-
-	<!--{{template "flash-error" .Page.Flash.Values "Errors"}}-->
 
 	<div class="moon-table-container">
 		<table class="moon-table">
@@ -55,14 +72,14 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="4" />
 			{:else}
-				{#each list as it}
+				{#each pullSecrets as it}
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="moon-link" href={`/pull-secret/detail?project=${$project}&location=${it.location}&name=${it.name}`}>
+							<a class="moon-link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

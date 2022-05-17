@@ -1,19 +1,30 @@
-<script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
-	import { project } from '$lib/stores'
+<script context="module">
 	import api from '$lib/api'
 
-	let list = null
-
-	$: {
-		$project
-		reloadList()
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const users = await api.invoke('role.users', { project }, fetch)
+		if (!users.ok) {
+			return {
+				status: 500,
+				error: `users: ${users.error.message}`
+			}
+		}
+		return {
+			props: {
+				users: users.result.users || []
+			}
+		}
 	}
+</script>
 
-	async function reloadList () {
-		const result = await api.role.users({ project: $project })
-		list = result.users
-	}
+<script>
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import { navigating, page } from '$app/stores'
+
+	export let users
+
+	$: project = $page.stuff.project
 </script>
 
 <h6>Users</h6>
@@ -21,7 +32,7 @@
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/role/bind?project=${$project}`}>
+			<a class="moon-button -small" href={`/role/bind?project=${project}`}>
 				Add
 			</a>
 		</div>
@@ -37,10 +48,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="3" />
 			{:else}
-				{#each list as it}
+				{#each users as it}
 					<tr>
 						<td>{it.email}</td>
 						<td>
@@ -49,7 +60,7 @@
 							{/each}
 						</td>
 						<td>
-							<a href={`role/bind?project=${$project}&email=${it.email}`}>
+							<a href={`role/bind?project=${project}&email=${it.email}`}>
 								<div class="moon-icon-button -secondary">
 									<i class="fas fa-pen"></i>
 								</div>

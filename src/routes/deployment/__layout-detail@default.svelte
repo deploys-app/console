@@ -1,45 +1,59 @@
-<script>
-	import { setContext } from 'svelte'
-	import { page } from '$app/stores'
-	import { project } from '$lib/stores'
+<script context="module">
 	import api from '$lib/api'
-	import Header from './_components/Header.svelte'
-	import { writable } from 'svelte/store'
 
-	const location = $page.url.searchParams.get('location')
-	const name = $page.url.searchParams.get('name')
-
-	const detail = writable(null)
-	setContext('deployment', detail)
-
-	$: {
-		$project
-		reloadDetail()
-	}
-
-	async function reloadDetail () {
-		const result = await api.deployment.get({ project: $project, location, name })
-		detail.set(result)
+	export async function load ({ url, stuff, fetch }) {
+		const { project } = stuff
+		const location = url.searchParams.get('location')
+		const name = url.searchParams.get('name')
+		const deployment = await api.invoke('deployment.get', { project, location, name }, fetch)
+		if (!deployment.ok) {
+			return {
+				status: 500,
+				error: `deployment: ${deployment.error.message}`
+			}
+		}
+		return {
+			props: {
+				location,
+				name,
+				deployment: deployment.result
+			},
+			stuff: {
+				location,
+				name,
+				deployment: deployment.result
+			},
+			dependencies: ['deployment']
+		}
 	}
 </script>
 
-{#if $detail == null}
-	Loading...
-{:else}
-	<div>
-		<ul class="moon-breadcrumb">
-			<li>
-				<a href={`/deployment?project=${$project}`} class="moon-link"><h6>Deployments</h6></a>
-			</li>
-			<li>
-				<h6>{$detail.name}</h6>
-			</li>
-		</ul>
-	</div>
-	<br>
-	<div class="moon-panel _dp-g _gg-24px">
-		<Header detail={$detail} />
+<script>
+	import { setContext } from 'svelte'
+	import { page } from '$app/stores'
+	import Header from './_components/Header.svelte'
+	import { writable } from 'svelte/store'
 
-		<slot />
-	</div>
-{/if}
+	export let location
+	export let name
+	export let deployment
+
+	$: project = $page.stuff.project
+</script>
+
+<div>
+	<ul class="moon-breadcrumb">
+		<li>
+			<a href={`/deployment?project=${project}`} class="moon-link"><h6>Deployments</h6></a>
+		</li>
+		<li>
+			<h6>{deployment.name}</h6>
+		</li>
+	</ul>
+</div>
+<br>
+<div class="moon-panel _dp-g _gg-24px">
+	<Header {deployment} />
+
+	<slot />
+</div>

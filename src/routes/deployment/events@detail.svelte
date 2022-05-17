@@ -1,19 +1,45 @@
+<script context="module">
+	export function load ({ stuff }) {
+		const {
+			location,
+			name,
+			deployment
+		} = stuff
+
+		return {
+			props: {
+				location,
+				name,
+				deployment
+			}
+		}
+	}
+</script>
+
 <script>
-	import { getContext, onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import format from '$lib/format'
+	import { browser } from '$app/env'
 
-	const detail = getContext('deployment')
+	export let deployment
 
-	let list = []
+	let events = []
 
-	onMount(() => {
-		reloadEvents()
-	})
+	if (browser) {
+		let reloadInterval
+		onMount(async () => {
+			await reloadEvents()
+			reloadInterval = setInterval(() => reloadEvents(), 5000)
+		})
+		onDestroy(() => {
+			clearInterval(reloadInterval)
+		})
+	}
 
 	async function reloadEvents () {
-		const response = await fetch($detail.eventUrl)
+		const response = await fetch(deployment.eventUrl)
 		const result = await response.json()
-		list = result || []
+		events = result || []
 	}
 </script>
 
@@ -30,7 +56,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each list as it}
+		{#each events as it}
 			<tr class:row-error={it.type !== 'Normal'}>
 				<td>{format.datetime(it.lastSeen)}</td>
 				<td>{it.type}</td>

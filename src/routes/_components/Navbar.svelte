@@ -1,10 +1,10 @@
 <script>
 	import gravatarUrl from 'gravatar-url'
-	import { goto } from '$app/navigation'
-	import api from '$lib/api'
-	import { profile } from '$lib/stores'
+
+	export let profile
 
 	let active
+	let signOut
 
 	export function open () {
 		active = true
@@ -21,10 +21,6 @@
 	function toggleSidebar () {
 		window.dispatchEvent(new Event('sidebar:toggle'))
 	}
-
-	function signOut () {
-		api.signOut(goto)
-	}
 </script>
 
 <nav class="moon-navbar">
@@ -34,7 +30,7 @@
 
 	<div class="_mgl-at">
 		<div class="avatar" on:click|stopPropagation={toggle}>
-			<img src={gravatarUrl($profile?.email)} alt="profile" width="36" class="_bdrd-max">
+			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max">
 		</div>
 
 		<div class="moon-popup" class:is-active={active}>
@@ -44,10 +40,13 @@
                         Billing accounts
                     </a>
 				</li>
-				<li on:click={signOut}>
+				<li on:click={() => signOut.submit()}>
 					<div class="item">
 						Signout
 					</div>
+					<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
+                        <button>Sign Out</button>
+					</form>
 				</li>
 			</ul>
 		</div>

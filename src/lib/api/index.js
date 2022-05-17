@@ -2,17 +2,14 @@ import JSONBig from 'json-bigint'
 
 const jsonBig = JSONBig({ storeAsString: true })
 
-const endpoint = 'https://api.deploys.app'
+const endpoint = '/api'
 
-let _token = ''
-
-async function _invoke (fn, args = {}) {
+async function _invoke (fn, args, fetch) {
 	const response = await fetch(`${endpoint}/${fn}`, {
 		method: 'POST',
 		body: JSONBig.stringify(args),
 		headers: {
-			'content-type': 'application/json',
-			'authorization': _token ? `Bearer ${_token}` : undefined
+			'content-type': 'application/json'
 		}
 	})
 	return jsonBig.parse(await response.text())
@@ -20,40 +17,25 @@ async function _invoke (fn, args = {}) {
 
 let onUnauth
 
-async function invoke (fn, args) {
-	const body = await _invoke(fn, args)
+async function invoke (fn, args, fetch) {
+	const body = await _invoke(fn, args || {}, fetch)
 	if (!body.ok) {
 		if (body.error?.message === 'api: unauthorized') {
+			body.error.unauth = true
 			onUnauth && onUnauth()
 		}
-		throw new Error(body.error)
+		// throw new Error(body.error)
 	}
-	return body.result
+	return body
 }
 
 export default {
+	invoke,
 	setOnUnauth: (callback) => {
 		onUnauth = callback
 	},
-	loadToken: (storage) => {
-		_token = storage.getItem('__token') || ''
-	},
-	setToken: (storage, token) => {
-		// TODO: don't store token in localStorage when production
-		storage.setItem('__token', token || '')
-		_token = token
-	},
-	signOut: (goto) => {
-		const url = `${endpoint}/auth/signout?token=${_token}&callback=https://www.deploys.app/`
-		return goto(url)
-	},
-	randomState: (crypto) => {
-		const x = new Uint8Array(16)
-		crypto.getRandomValues(x)
-		return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
-	},
 	me: {
-		get: () => invoke('me.get'),
+		get: (fetch) => invoke('me.get', {}, fetch),
 		authorized: ({ projectId, project, permissions }) => invoke('me.authorized', { projectId, project, permissions })
 	},
 	project: {

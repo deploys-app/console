@@ -1,51 +1,49 @@
-<script>
-	import { onDestroy, onMount } from 'svelte'
-	import { goto } from '$app/navigation'
+<script context="module">
 	import api from '$lib/api'
-	import { project, projectInfo } from '$lib/stores'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const [usage, price] = await Promise.all([
+			api.invoke('project.usage', { project: project }, fetch),
+			api.invoke('billing.project', { project: project }, fetch)
+		])
+
+		if (!usage.ok || !price.ok) {
+			return {
+				status: 500,
+				error: `usage: ${usage.error.message}, price: ${price.error.message}}`
+			}
+		}
+
+		return {
+			props: {
+				usage: usage.result,
+				price: price.result
+			}
+		}
+	}
+</script>
+
+<script>
+	import { projectInfo } from '$lib/stores'
+
+	export let usage
+	export let price
 
 	const unitGiB = 1024 * 1024 * 1024
 
-	let billing
-
-	async function reloadData () {
-		billing = null
-
-		if (!$project) {
-			await goto('/project')
-			return
-		}
-
-		const [usage, price] = await Promise.all([
-			api.project.usage({ project: $project }),
-			api.billing.project({ project: $project })
-		])
-
-		billing = {
-			price: price.price.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-			cpu: usage.cpuUsage.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-			memory: (usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-			egress: (usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-			disk: (usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-			replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
-		}
+	$: billing = {
+		price: (+price.price).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		cpu: (+usage.cpuUsage).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		memory: (+usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		egress: (+usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		disk: (+usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		replica: (+usage.replica).toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
-
-	let project$
-	onMount(() => {
-		project$ = project.subscribe(() => {
-			reloadData()
-		})
-	})
-	onDestroy(() => {
-		project$ && project$()
-	})
 </script>
 
 <h6>Dashboard</h6>
-
 <br>
-
 <div class="lo-12 lo-6-md _gg-24px _alit-st">
 	<div class="moon-panel lo-12 _gg-24px">
 		<h6>

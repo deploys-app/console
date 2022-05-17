@@ -1,21 +1,32 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+		const serviceAccounts = await api.invoke('serviceaccount.list', { project }, fetch)
+		if (!serviceAccounts.ok) {
+			return {
+				status: 500,
+				error: `serviceAccounts: ${serviceAccounts.error.message}`
+			}
+		}
+		return {
+			props: {
+				serviceAccounts: serviceAccounts.result.serviceAccounts || []
+			}
+		}
+	}
+</script>
+
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { project } from '$lib/stores'
-	import api from '$lib/api'
 	import format from '$lib/format'
+	import { page, navigating } from '$app/stores'
 
-	let list = null
+	export let serviceAccounts
 
-	$: {
-		$project
-		reloadList()
-	}
-
-	async function reloadList () {
-		const result = await api.serviceAccount.list({ project: $project })
-		list = result.serviceAccounts
-	}
+	$: project = $page.stuff.project
 </script>
 
 <h6>Service Accounts</h6>
@@ -23,7 +34,7 @@
 <div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/service-account/create?project=${$project}`}>
+			<a class="moon-button -small" href={`/service-account/create?project=${project}`}>
 				Create
 			</a>
 		</div>
@@ -40,13 +51,13 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if list == null}
+			{#if $navigating}
 				<LoadingRow span="4" />
 			{:else}
-				{#each list as it}
+				{#each serviceAccounts as it}
 					<tr>
 						<td>
-							<a class="moon-link" href={`/service-account/detail?project=${$project}&id=${it.sid}`}>
+							<a class="moon-link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
 								{it.email}
 							</a>
 						</td>
@@ -54,7 +65,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
 							<div class="table-action-container">
-								<a href={`/service-account/create?project=${$project}&id=${it.sid}`}>
+								<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
 									<div class="moon-icon-button -secondary">
 										<i class="fas fa-pen"></i>
 									</div>
