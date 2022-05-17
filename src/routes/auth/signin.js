@@ -1,7 +1,3 @@
-import { webcrypto } from 'node:crypto'
-
-const crypto = webcrypto
-
 function randomState () {
 	const x = new Uint8Array(16)
 	crypto.getRandomValues(x)
