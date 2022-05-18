@@ -57,6 +57,7 @@
 		window.dispatchEvent(new CustomEvent('confirm', {
 			detail: {
 				title: `Delete "${pullSecret.name}" ?`,
+				yes: 'Delete',
 				callback: async () => {
 					const result = await api.invoke('pullsecret.delete', { project, location, name }, fetch)
 					if (!result.ok) {

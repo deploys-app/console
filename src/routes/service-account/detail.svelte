@@ -41,6 +41,7 @@
 		window.dispatchEvent(new CustomEvent('confirm', {
 			detail: {
 				title: `Delete "${serviceAccount.name}" service account`,
+				yes: 'Delete',
 				callback: async () => {
 					const result = await api.invoke('serviceaccount.delete', { project, id }, fetch)
 					if (!result.ok) {

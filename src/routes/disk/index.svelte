@@ -87,7 +87,7 @@
 						</td>
 						<td>{it.size} GiB</td>
 						<td>{it.location}</td>
-						<td>{format.datetime(it.createdAt)}}</td>
+						<td>{format.datetime(it.createdAt)}</td>
 						<td>
 							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
 								<div class="moon-icon-button -secondary">
