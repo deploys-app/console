@@ -91,13 +91,6 @@
 			<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
 			<div class="_dp-f">
 				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
-<!--				<form method="POST" action="{{route "pullsecret.delete"}}"-->
-<!--					data-confirm="Delete {pullSecret.name} ?" data-confirm-yes="Delete" data-confirm-danger>-->
-<!--					<input name="name" type="hidden" value="{{.Secret.Name}}">-->
-<!--				<input name="location" type="hidden" value="{{.Secret.Location}}">-->
-<!--				<input name="project" type="hidden" value="{{.Page.Project}}">-->
-<!--				<button class="moon-button -small -negative -tertiary">Delete</button>-->
-<!--				</form>-->
 			</div>
 		</div>
 	</div>
