@@ -1,35 +1,98 @@
 <script context="module">
-	export function load ({ stuff }) {
+	import api from '$lib/api'
+
+	export async function load ({ url, stuff, fetch }) {
 		const { project } = stuff
+		const id = url.searchParams.get('id')
+
+		let serviceAccount
+		if (id) {
+			serviceAccount = await api.invoke('serviceaccount.get', { project, id }, fetch)
+			if (!serviceAccount.ok) {
+				if (serviceAccount.error.message === 'api: service account not found') {
+					return {
+						status: 302,
+						redirect: '/service-account?project=${project}'
+					}
+				}
+				return {
+					status: 500,
+					error: `serviceAccount: ${serviceAccount.error.message}`
+				}
+			}
+		}
 
 		return {
 			props: {
-				project
+				id,
+				serviceAccount: serviceAccount?.result
 			}
 		}
 	}
 </script>
 
 <script>
-	export let project
+	import { page } from '$app/stores'
+	import { goto } from '$app/navigation'
 
-	let sid
-	let name
-	let desc
+	export let id
+	export let serviceAccount
+
+	$: project = $page.stuff.project
+
+	let sid = serviceAccount?.sid
+	let name = serviceAccount?.name
+	let desc = serviceAccount?.description
+	let saving
+
+	async function save () {
+		if (saving) {
+			return
+		}
+
+		saving = true
+		const fn = id ? 'serviceaccount.update' : 'serviceaccount.create'
+		try {
+			const result = await api.invoke(fn, { project, sid, name, description: desc }, fetch)
+			if (!result.ok) {
+				window.dispatchEvent(new CustomEvent('error', {
+					detail: {
+						error: result.error
+					}
+				}))
+				return
+			}
+			goto(`/service-account?project=${project}`)
+		} catch (e) {
+			window.dispatchEvent(new CustomEvent('error', {
+				detail: {
+					error: e
+				}
+			}))
+		} finally {
+			saving = false
+		}
+	}
 </script>
 
 <div>
 	<ul class="moon-breadcrumb">
-		<li>
-			<a href={`/service-account?project=${project}`} class="moon-link"><h6>Service Accounts</h6></a>
-		</li>
-<!--		<li>-->
-<!--			<a href="{{route "serviceaccount.detail" .Page.ProjectParam (param "id" .Form.SID)}}" class="moon-link"><h6>{{.Form.SID}}</h6></a>-->
-<!--		</li>-->
+		{#if id}
+			<li>
+				<a href={`/service-account?project=${project}&id=${id}`} class="moon-link"><h6>{serviceAccount.sid}</h6></a>
+			</li>
+		{:else}
+			<li>
+				<a href={`/service-account?project=${project}`} class="moon-link"><h6>Service Accounts</h6></a>
+			</li>
+		{/if}
 		<li>
 			<h6>
-<!--				Update-->
-				Create
+				{#if id}
+					Update
+				{:else}
+					Create
+				{/if}
 			</h6>
 		</li>
 	</ul>
@@ -41,32 +104,33 @@
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
-<!--				Update service account "{{.Form.SID}}"-->
-				Create service account
+				{#if id}
+					Update service account "{serviceAccount.sid}"
+				{:else}
+					Create service account
+				{/if}
 			</strong></h3>
 		</div>
 	</div>
 
 	<hr>
 
-	<form method="POST" class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<!--{{if .Update}}-->
-		<!--<input type="hidden" name="update" value="1">-->
-		<!--<input type="hidden" name="sid" value="{{.Form.SID}}">-->
-		<!--<div class="moon-field">-->
-		<!--	<label>Email</label>-->
-		<!--	<div class="moon-input">-->
-		<!--		<input value="{{.Form.Email}}" readonly>-->
-		<!--	</div>-->
-		<!--</div>-->
-		<!--{{else}}-->
-		<div class="moon-field">
-			<label for="input-sid">ID</label>
-			<div class="moon-input">
-				<input name="sid" id="input-sid" placeholder="ID" bind:value={sid}>
+	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+		{#if id}
+			<div class="moon-field">
+				<label for="input-email">Email</label>
+				<div class="moon-input">
+					<input id="input-email" value={serviceAccount.email} readonly>
+				</div>
 			</div>
-		</div>
-		<!--{{end}}-->
+		{:else}
+			<div class="moon-field">
+				<label for="input-sid">ID</label>
+				<div class="moon-input">
+					<input name="sid" id="input-sid" placeholder="ID" bind:value={sid}>
+				</div>
+			</div>
+		{/if}
 
 		<div class="moon-field">
 			<label for="input-name">Name</label>
@@ -82,6 +146,6 @@
 			</div>
 		</div>
 
-		<button class="moon-button _mgr-at">Save</button>
+		<button class="moon-button _mgr-at" class:-loading={saving} disabled={saving}>Save</button>
 	</form>
 </div>

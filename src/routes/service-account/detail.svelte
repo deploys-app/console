@@ -9,7 +9,7 @@
 			if (serviceAccount.error.message === 'api: service account not found') {
 				return {
 					status: 302,
-					redirect: '/service-account'
+					redirect: `/service-account?project=${project}`
 				}
 			}
 			return {
@@ -42,7 +42,7 @@
 			detail: {
 				title: `Delete "${serviceAccount.name}" service account`,
 				callback: async () => {
-					const result = await api.invoke('serviceAccount.delete', { project, id }, fetch)
+					const result = await api.invoke('serviceaccount.delete', { project, id }, fetch)
 					if (!result.ok) {
 						window.dispatchEvent(new CustomEvent('error', {
 							detail: {

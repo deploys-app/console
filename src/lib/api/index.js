@@ -20,11 +20,21 @@ let onUnauth
 async function invoke (fn, args, fetch) {
 	const body = await _invoke(fn, args || {}, fetch)
 	if (!body.ok) {
-		if (body.error?.message === 'api: unauthorized') {
-			body.error.unauth = true
-			onUnauth && onUnauth()
+		const msg = body.error?.message || ''
+		switch (msg) {
+			case 'api: unauthorized':
+				body.error.unauth = true
+				onUnauth && onUnauth()
+				break
+			case 'api: validate error':
+				body.error.validate = body.error.items
+				break
+			default:
+				if (msg.includes('api: ') && msg.includes('not found')) {
+					body.error.notFound = true
+				}
+				break
 		}
-		// throw new Error(body.error)
 	}
 	return body
 }

@@ -10,7 +10,7 @@
 			if (deployment.error.message === 'api: deployment not found') {
 				return {
 					status: 302,
-					redirect: '/deployment'
+					redirect: `/deployment?project=${project}`
 				}
 			}
 			return {
@@ -35,10 +35,8 @@
 </script>
 
 <script>
-	import { setContext } from 'svelte'
 	import { page } from '$app/stores'
 	import Header from './_components/Header.svelte'
-	import { writable } from 'svelte/store'
 
 	export let location
 	export let name

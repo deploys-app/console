@@ -5,15 +5,19 @@
 	async function open ({ error, callback }) {
 		let msg = error?.message || error
 
+		if (error.validate) {
+			msg = error.validate.join('<br>')
+		}
+
 		await Swal.fire({
 			title: 'Oops...',
-			text: msg,
+			html: msg,
 			icon: 'error',
 			customClass: {
 				actions: '_mgt-24px'
 			}
 		})
-		callback()
+		callback && callback()
 	}
 </script>
 
