@@ -22,7 +22,8 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import format from '$lib/format'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
+	import { loading } from '$lib/stores'
 
 	export let roles
 
@@ -56,7 +57,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="5" />
 			{:else}
 				{#each roles as it}
