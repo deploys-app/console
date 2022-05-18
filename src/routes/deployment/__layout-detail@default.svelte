@@ -7,6 +7,12 @@
 		const name = url.searchParams.get('name')
 		const deployment = await api.invoke('deployment.get', { project, location, name }, fetch)
 		if (!deployment.ok) {
+			if (deployment.error.message === 'api: deployment not found') {
+				return {
+					status: 302,
+					redirect: '/deployment'
+				}
+			}
 			return {
 				status: 500,
 				error: `deployment: ${deployment.error.message}`

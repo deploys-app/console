@@ -6,6 +6,12 @@
 		const id = url.searchParams.get('id')
 		const serviceAccount = await api.invoke('serviceaccount.get', { project, id }, fetch)
 		if (!serviceAccount.ok) {
+			if (serviceAccount.error.message === 'api: service account not found') {
+				return {
+					status: 302,
+					redirect: '/service-account'
+				}
+			}
 			return {
 				status: 500,
 				error: `serviceAccount: ${serviceAccount.error.message}`
