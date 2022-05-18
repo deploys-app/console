@@ -127,7 +127,7 @@
 			<div class="moon-field">
 				<label for="input-sid">ID</label>
 				<div class="moon-input">
-					<input name="sid" id="input-sid" placeholder="ID" bind:value={sid}>
+					<input id="input-sid" placeholder="ID" bind:value={sid}>
 				</div>
 			</div>
 		{/if}
@@ -135,14 +135,14 @@
 		<div class="moon-field">
 			<label for="input-name">Name</label>
 			<div class="moon-input">
-				<input id="input-name" name="name" placeholder="Name" required bind:value={name}>
+				<input id="input-name" placeholder="Name" required bind:value={name}>
 			</div>
 		</div>
 
 		<div class="moon-field">
 			<label for="input-description">Description</label>
 			<div class="moon-textarea">
-				<textarea id="input-description" rows="5" name="description" placeholder="Description" bind:value={desc}></textarea>
+				<textarea id="input-description" rows="5" placeholder="Description" bind:value={desc}></textarea>
 			</div>
 		</div>
 

@@ -1,0 +1,149 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const { project } = stuff
+
+		const locations = await api.invoke('location.list', { project }, fetch)
+		if (!locations.ok) {
+			return {
+				status: 500,
+				error: `locations: ${locations.error.message}`
+			}
+		}
+
+		return {
+			props: {
+				locations: locations.result.locations || []
+			}
+		}
+	}
+</script>
+
+<script>
+	import { page } from '$app/stores'
+	import { goto } from '$app/navigation'
+	import validUrl from 'valid-url'
+
+	export let locations
+
+	$: project = $page.stuff.project
+
+	let form = {
+		name: '',
+		location: '',
+		server: 'https://index.docker.io/v2/',
+		username: '',
+		password: ''
+	}
+
+	let saving
+	async function save () {
+		if (saving) {
+			return
+		}
+
+		saving = true
+		try {
+			if (!validUrl.isWebUri(form.server)) {
+				throw new Error('server must be an url')
+			}
+
+			const dockerConfig = {
+				auths: {
+					[form.server]: {
+						username: form.username,
+						password: form.password,
+						auth: btoa(`${form.username}:${form.password}`)
+					}
+				}
+			}
+			const result = await api.invoke('pullsecret.create', {
+				project,
+				location: form.location,
+				name: form.name,
+				value: btoa(JSON.stringify(dockerConfig))
+			}, fetch)
+			if (!result.ok) {
+				window.dispatchEvent(new CustomEvent('error', {
+					detail: {
+						error: result.error
+					}
+				}))
+				return
+			}
+			goto(`/pull-secret?project=${project}`)
+		} catch (e) {
+			window.dispatchEvent(new CustomEvent('error', {
+				detail: {
+					error: e
+				}
+			}))
+		} finally {
+			saving = false
+		}
+	}
+</script>
+
+<div>
+	<ul class="moon-breadcrumb">
+		<li>
+			<a href={`/pull-secret?project=${project}`} class="moon-link"><h6>Pull Secrets</h6></a>
+		</li>
+		<li>
+			<h6>Create</h6>
+		</li>
+	</ul>
+</div>
+<br>
+<div class="moon-panel _dp-g _gg-24px">
+	<div class="lo-12 _gg-12px">
+		<div class="_dp-f _alit-ct">
+			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Create pull secret</strong></h3>
+		</div>
+	</div>
+
+	<hr>
+
+	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+		<div class="moon-field">
+			<label for="input-name">Name</label>
+			<div class="moon-input">
+				<input id="input-name" placeholder="name" bind:value={form.name}>
+			</div>
+		</div>
+		<div class="moon-field _mgbt-20px">
+			<label for="input-location">Location</label>
+			<div class="moon-select">
+				<select id="input-location" bind:value={form.location} required>
+					<option value="" disabled selected>Select Location</option>
+					{#each locations as it}
+						<option value={it.id}>{it.id}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+		<div class="moon-field">
+			<label for="input-server">Server</label>
+			<div class="moon-input">
+				<input id="input-server" bind:value={form.server} placeholder="https://index.docker.io/v2/">
+			</div>
+		</div>
+		<div class="moon-field">
+			<label for="input-username">Username</label>
+			<div class="moon-input">
+				<input id="input-username" bind:value={form.username} placeholder="username or &quot;_json_key&quot;">
+			</div>
+		</div>
+		<div class="moon-field">
+			<label for="input-password">Password</label>
+			<div class="moon-input">
+				<input id="input-password" type="password" bind:value={form.password} placeholder="password or service account json">
+			</div>
+		</div>
+
+		<hr>
+
+		<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
+	</form>
+</div>

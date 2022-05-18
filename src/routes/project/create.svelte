@@ -60,7 +60,7 @@
 		<div class="moon-field">
 			<label for="input-project">ID</label>
 			<div class="moon-input">
-				<input name="sid" id="input-project" placeholder="Project ID" bind:value={sid}>
+				<input id="input-project" placeholder="Project ID" bind:value={sid}>
 <!--				<input name="sid" id="input-project" placeholder="Project ID" value="{{.Form.SID}}" {{if .Update}}readonly{{end}}>-->
 			</div>
 		</div>
@@ -68,14 +68,14 @@
 		<div class="moon-field">
 			<label for="input-name">Name</label>
 			<div class="moon-input">
-				<input name="name" id="input-name" placeholder="Project name" bind:value={name} required>
+				<input id="input-name" placeholder="Project name" bind:value={name} required>
 			</div>
 		</div>
 
 		<div class="moon-field _mgbt-20px">
 			<label for="input-billing-account">Billing Account</label>
 			<div class="moon-select">
-				<select name="billing_account" id="input-billing-account" bind:value={billingId} required>
+				<select id="input-billing-account" bind:value={billingId} required>
 					<option value="">Select Billing Account</option>
 					{#each billingAccounts as it}
 						<option value={it.id}>{it.name} ({it.id})</option>
