@@ -25,9 +25,10 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import format from '$lib/format'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
 	import { browser } from '$app/env'
 	import { invalidate } from '$app/navigation'
+	import { loading } from '$lib/stores'
 
 	export let pullSecrets
 
@@ -72,7 +73,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="4" />
 			{:else}
 				{#each pullSecrets as it}

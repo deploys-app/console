@@ -22,7 +22,8 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
+	import { loading } from '$lib/stores'
 	import format from '$lib/format'
 
 	export let workloadIdentities
@@ -51,7 +52,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="3" />
 			{:else}
 				{#each workloadIdentities as it}

@@ -23,7 +23,8 @@
 
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
+	import { loading } from '$lib/stores'
 
 	export let users
 
@@ -51,7 +52,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="3" />
 			{:else}
 				{#each users as it}

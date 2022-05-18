@@ -25,9 +25,10 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { browser } from '$app/env'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
 	import format from '$lib/format'
+	import { loading } from '$lib/stores'
 
 	export let deployments
 
@@ -76,7 +77,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="6" />
 			{:else}
 				{#each deployments as it}

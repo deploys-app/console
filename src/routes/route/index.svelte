@@ -21,7 +21,8 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { navigating, page } from '$app/stores'
+	import { page } from '$app/stores'
+	import { loading } from '$lib/stores'
 
 	export let routes
 
@@ -56,7 +57,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $navigating}
+			{#if $loading}
 				<LoadingRow span="4" />
 			{:else}
 				{#each routes as it}
