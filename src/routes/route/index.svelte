@@ -31,7 +31,6 @@
 	$: project = $page.stuff.project
 
 	function deleteRoute (route) {
-		console.log(route)
 		window.dispatchEvent(new CustomEvent('confirm', {
 			detail: {
 				title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,

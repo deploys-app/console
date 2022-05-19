@@ -16,7 +16,8 @@
 			},
 			props: {
 				users: users.result.users || []
-			}
+			},
+			dependencies: ['users']
 		}
 	}
 </script>
@@ -25,10 +26,36 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
+	import { invalidate } from '$app/navigation'
 
 	export let users
 
 	$: project = $page.stuff.project
+
+	function deleteUser (email) {
+		window.dispatchEvent(new CustomEvent('confirm', {
+			detail: {
+				title: `Delete user ${email} from project ${project} ?`,
+				yes: 'Delete',
+				callback: async () => {
+					const result = await api.invoke('role.bind', {
+						project,
+						email,
+						roles: []
+					}, fetch)
+					if (!result.ok) {
+						window.dispatchEvent(new CustomEvent('error', {
+							detail: {
+								error: result.error
+							}
+						}))
+						return
+					}
+					await invalidate('users')
+				}
+			}
+		}))
+	}
 </script>
 
 <h6>Users</h6>
@@ -64,11 +91,14 @@
 							{/each}
 						</td>
 						<td>
-							<a href={`role/bind?project=${project}&email=${it.email}`}>
+							<a href={`/role/bind?project=${project}&email=${it.email}`}>
 								<div class="moon-icon-button -secondary">
 									<i class="fas fa-pen"></i>
 								</div>
 							</a>
+							<button class="moon-icon-button -negative _mgl-16px" on:click={() => deleteUser(it.email)}>
+								<i class="fas fa-trash-alt"></i>
+							</button>
 						</td>
 					</tr>
 				{/each}
