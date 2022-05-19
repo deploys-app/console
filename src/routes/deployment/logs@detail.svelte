@@ -1,5 +1,51 @@
+<script context="module">
+	export function load ({ stuff }) {
+		const {
+			deployment
+		} = stuff
+
+		return {
+			props: {
+				deployment
+			}
+		}
+	}
+</script>
+
 <script>
-	export let detail
+	import { onDestroy, onMount } from 'svelte'
+
+	export let deployment
+
+	let source
+	let buffer
+	let text = ''
+	let interval
+
+	onMount(() => {
+		source = new EventSource(deployment.logUrl)
+		source.addEventListener('open', () => {
+			buffer = ''
+		})
+		source.addEventListener('message', (ev) => {
+			try {
+				const d = JSON.parse(ev.data)
+				buffer = `${d.pod} ${d.timestamp} ${d.log}\n` + buffer
+			} catch (err) {}
+		})
+		interval = setInterval(() => {
+			if (text !== buffer) {
+				text = buffer
+			}
+		}, 1000)
+	})
+
+	onDestroy(() => {
+		source?.close()
+		clearInterval(interval)
+	})
 </script>
 
 <h6><strong>Logs</strong></h6>
+<a class="moon-button -info -small _jtfs-fst" href={`${deployment.logUrl}&type=text&raw=1`} target="_blank">Stream Raw Logs</a>
+<pre class="_pdv-30px pre-scoll" id="js-logs">{text}</pre>

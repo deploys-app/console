@@ -1,15 +1,11 @@
 <script context="module">
 	export function load ({ stuff }) {
 		const {
-			location,
-			name,
 			deployment
 		} = stuff
 
 		return {
 			props: {
-				location,
-				name,
 				deployment
 			}
 		}
