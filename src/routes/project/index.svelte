@@ -1,6 +1,41 @@
 <script>
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { projects } from '$lib/stores'
+	import { invalidate } from '$app/navigation'
+	import api from '$lib/api'
+	import Swal from 'sweetalert2'
+
+	async function deleteItem (project) {
+		let result = await Swal.fire({
+			title: 'Are you sure ?',
+			text: `Type "${project}" to confirm!`,
+			icon: 'warning',
+			input: 'text',
+			showCancelButton: true,
+			buttonsStyling: false,
+			confirmButtonText: 'Delete',
+			customClass: {
+				confirmButton: 'moon-button _cl-white -danger _mgr-16px',
+				cancelButton: 'moon-button -negative -tertiary',
+				actions: '_mgt-24px'
+			},
+			preConfirm: (input) => input === project
+		})
+		if (!result.isConfirmed || !result.value) {
+			return
+		}
+
+		result = await api.invoke('project.delete', { project }, fetch)
+		if (!result.ok) {
+			window.dispatchEvent(new CustomEvent('error', {
+				detail: {
+					error: result.error
+				}
+			}))
+			return
+		}
+		await invalidate('projects')
+	}
 </script>
 
 <h6>Projects</h6>
@@ -17,49 +52,37 @@
 	<div class="moon-table-container">
 		<table class="moon-table -ruled">
 			<thead>
-			<tr>
-				<th>Name</th>
-				<th>ID</th>
-				<th>Number</th>
-				<th class="collapse _tal-r"></th>
-			</tr>
+				<tr>
+					<th>Name</th>
+					<th>ID</th>
+					<th>Number</th>
+					<th class="collapse _tal-r"></th>
+				</tr>
 			</thead>
 			<tbody>
-			{#each $projects as it}
-				<tr>
-					<td>
-						<a href={`/?project=${it.project}`} class="moon-link">
-							<strong>{it.name}</strong>
-						</a>
-					</td>
-					<td>{it.project}</td>
-					<td>{it.id}</td>
-					<td class="table-action-container">
-						<a href={`/project/create?project=${it.project}`}>
-							<div class="moon-icon-button -secondary">
-								<i class="fas fa-pen"></i>
-							</div>
-						</a>
-<!--						<form method="POST" action="{{route "project.delete"}}" x-data>-->
-<!--								<input type="hidden" name="id" value="{{.ID}}">-->
-<!--						<button-->
-<!--							class="moon-icon-button -negative" x-ref="button" data-title="{{.Name}}"-->
-<!--							data-projectid="{{.Project}}"-->
-<!--							@click.prevent="Spruce.emit('confirm', {-->
-<!--										title: 'Remove project ' + $refs.button.dataset.title,-->
-<!--										projectId: $refs.button.dataset.projectid,-->
-<!--										ok: 'Remove',-->
-<!--										okClass: '-negative',-->
-<!--										fn: () => $el.submit()-->
-<!--									})">-->
-<!--							<i class="fas fa-trash-alt"></i>-->
-<!--						</button>-->
-<!--						</form>-->
-					</td>
-				</tr>
-			{:else}
-				<NoDataRow span="4" />
-			{/each}
+				{#each $projects as it}
+					<tr>
+						<td>
+							<a href={`/?project=${it.project}`} class="moon-link">
+								<strong>{it.name}</strong>
+							</a>
+						</td>
+						<td>{it.project}</td>
+						<td>{it.id}</td>
+						<td class="table-action-container">
+							<a href={`/project/create?project=${it.project}`}>
+								<div class="moon-icon-button -secondary">
+									<i class="fas fa-pen"></i>
+								</div>
+							</a>
+							<button class="moon-icon-button -negative" on:click={() => deleteItem(it.project)}>
+								<i class="fas fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{:else}
+					<NoDataRow span="4" />
+				{/each}
 			</tbody>
 		</table>
 	</div>

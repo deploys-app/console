@@ -72,37 +72,37 @@
 	<div class="moon-table-container">
 		<table class="moon-table">
 			<thead>
-			<tr>
-				<th>Email</th>
-				<th>Roles</th>
-				<th></th>
-			</tr>
+				<tr>
+					<th>Email</th>
+					<th>Roles</th>
+					<th class="collapse _tal-r"></th>
+				</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span="3" />
-			{:else}
-				{#each users as it}
-					<tr>
-						<td>{it.email}</td>
-						<td>
-							{#each it.roles as r}
-								{r}<br>
-							{/each}
-						</td>
-						<td>
-							<a href={`/role/bind?project=${project}&email=${it.email}`}>
-								<div class="moon-icon-button -secondary">
-									<i class="fas fa-pen"></i>
-								</div>
-							</a>
-							<button class="moon-icon-button -negative _mgl-16px" on:click={() => deleteUser(it.email)}>
-								<i class="fas fa-trash-alt"></i>
-							</button>
-						</td>
-					</tr>
-				{/each}
-			{/if}
+				{#if $loading}
+					<LoadingRow span="3" />
+				{:else}
+					{#each users as it}
+						<tr>
+							<td>{it.email}</td>
+							<td>
+								{#each it.roles as r}
+									{r}<br>
+								{/each}
+							</td>
+							<td class="table-action-container">
+								<a href={`/role/bind?project=${project}&email=${it.email}`}>
+									<div class="moon-icon-button -secondary">
+										<i class="fas fa-pen"></i>
+									</div>
+								</a>
+								<button class="moon-icon-button -negative" on:click={() => deleteUser(it.email)}>
+									<i class="fas fa-trash-alt"></i>
+								</button>
+							</td>
+						</tr>
+					{/each}
+				{/if}
 			</tbody>
 		</table>
 	</div>

@@ -39,6 +39,8 @@
 </script>
 
 <script>
+	import { goto, invalidate } from '$app/navigation'
+
 	export let project
 	export let billingAccounts
 
@@ -69,7 +71,8 @@
 				}))
 				return
 			}
-			goto(`/?project=${form.sid}`)
+			await invalidate('projects')
+			await goto(`/?project=${form.sid}`)
 		} finally {
 			saving = false
 		}

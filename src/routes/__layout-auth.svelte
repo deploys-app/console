@@ -20,7 +20,8 @@
 			props: {
 				profile: me.result,
 				projects: projects.result.projects || []
-			}
+			},
+			dependencies: ['projects']
 		}
 	}
 </script>
