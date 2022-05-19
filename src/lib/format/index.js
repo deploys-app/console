@@ -31,5 +31,12 @@ export default {
     --role roles/iam.workloadIdentityUser \\
     --member "serviceAccount:${locationProject}.svc.id.goog[${namespace}/${name}-${project}]" \\${googleProject}
     ${gsa}`
+	},
+	deploymentType (t) {
+		return {
+			'WebService': 'Web Service',
+			'TCPService': 'TCP Service',
+			'InternalTCPService': 'Internal TCP Service'
+		}[t] || t
 	}
 }
