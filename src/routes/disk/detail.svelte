@@ -126,15 +126,15 @@
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-created-at">Created at</label>
+			<label for="input-created_at">Created at</label>
 			<div class="moon-input">
-				<span id="input-created-at">{format.datetime(disk.createdAt)}</span>
+				<span id="input-created_at">{format.datetime(disk.createdAt)}</span>
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-created-by">Created by</label>
+			<label for="input-created_by">Created by</label>
 			<div class="moon-input">
-				<span id="input-created-by">{disk.createdBy}</span>
+				<span id="input-created_by">{disk.createdBy}</span>
 			</div>
 		</div>
 	</div>

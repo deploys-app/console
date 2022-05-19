@@ -119,9 +119,9 @@
 		</div>
 
 		<div class="moon-field _mgbt-20px">
-			<label for="input-billing-account">Billing Account</label>
+			<label for="input-billing_account">Billing Account</label>
 			<div class="moon-select">
-				<select id="input-billing-account" bind:value={form.billingAccount} required>
+				<select id="input-billing_account" bind:value={form.billingAccount} required>
 					<option value="" selected disabled>Select Billing Account</option>
 					{#each billingAccounts as it}
 						<option value={it.id}>{it.name} ({it.id})</option>

@@ -157,15 +157,15 @@
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-created-at">Created At</label>
+			<label for="input-created_at">Created At</label>
 			<div class="moon-input">
-				<input type="text" id="input-created-at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
+				<input type="text" id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-created-by">Created By</label>
+			<label for="input-created_by">Created By</label>
 			<div class="moon-input">
-				<input type="text" id="input-created-by" value="{serviceAccount.createdBy}" readonly>
+				<input type="text" id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
 	</div>

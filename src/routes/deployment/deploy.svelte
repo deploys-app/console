@@ -389,7 +389,7 @@
 				<div class="moon-field">
 					<label for="input-disk_name">Name</label>
 					<div class="moon-select">
-						<select id="input-disk_name" name="disk_name" bind:value={form.diskName}>
+						<select id="input-disk_name" bind:value={form.diskName}>
 							<option value="">No Disk</option>
 							{#each disks as it}
 								<option value={it.name}>{it.name}</option>
@@ -564,13 +564,13 @@
 							<tr>
 								<td class="_mnw-128px">
 									<div class="moon-input">
-										<input name="mount-data-path" bind:value={it.k} placeholder="Path">
+										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
 								<td class="_pd-0px _pdl-12px">:</td>
 								<td class="_mnw-128px _pdl-12px">
 									<div class="moon-textarea">
-										<textarea name="mount-data-value" bind:value={it.v} placeholder="Data"></textarea>
+										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">

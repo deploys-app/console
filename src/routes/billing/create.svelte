@@ -112,23 +112,23 @@
 		<h4 class="_mgt-30px _mgbt-12px">Billing Information</h4>
 
 		<div class="moon-field">
-			<label for="input-tax-id">Tax ID</label>
+			<label for="input-tax_id">Tax ID</label>
 			<div class="moon-input">
-				<input id="input-tax-id" bind:value={form.taxId} required>
+				<input id="input-tax_id" bind:value={form.taxId} required>
 			</div>
 		</div>
 
 		<div class="moon-field">
-			<label for="input-tax-name">Name</label>
+			<label for="input-tax_name">Name</label>
 			<div class="moon-input">
-				<input id="input-tax-name" bind:value={form.taxName} required>
+				<input id="input-tax_name" bind:value={form.taxName} required>
 			</div>
 		</div>
 
 		<div class="moon-field">
-			<label for="input-tax-address">Address</label>
+			<label for="input-tax_address">Address</label>
 			<div class="moon-input">
-				<input id="input-tax-address" bind:value={form.taxAddress} required>
+				<input id="input-tax_address" bind:value={form.taxAddress} required>
 			</div>
 		</div>
 
