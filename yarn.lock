@@ -574,6 +574,7 @@ __metadata:
     eslint-config-prettier: ^8.3.0
     eslint-plugin-svelte3: ^4.0.0
     gravatar-url: ^4.0.1
+    highcharts: ^10.1.0
     js-cookie: ^3.0.1
     json-bigint: ^1.0.0
     prettier: ^2.5.1
@@ -1339,6 +1340,13 @@ __metadata:
   dependencies:
     function-bind: ^1.1.1
   checksum: b9ad53d53be4af90ce5d1c38331e712522417d017d5ef1ebd0507e07c2fbad8686fffb8e12ddecd4c39ca9b9b47431afbb975b8abf7f3c3b82c98e9aad052792
+  languageName: node
+  linkType: hard
+
+"highcharts@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "highcharts@npm:10.1.0"
+  checksum: 62b5e5ce33b93d31f18a1dc3192defa77aa12b19ee1809723bb4e206385e0ae7dbe31f2e4f8c4dc683c87550a9dcdd5ee760f3862845bfd2ca271ca0b54f4dd1
   languageName: node
   linkType: hard
 
