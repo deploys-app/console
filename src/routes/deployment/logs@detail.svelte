@@ -18,7 +18,7 @@
 	export let deployment
 
 	let source
-	let buffer
+	let buffer = ''
 	let text = ''
 	let interval
 
