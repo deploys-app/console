@@ -20,6 +20,7 @@
 	import { onDestroy, onMount } from 'svelte'
 	import format from '$lib/format'
 	import { browser } from '$app/env'
+	import NoDataRow from '../../lib/components/NoDataRow.svelte'
 
 	export let deployment
 
@@ -63,6 +64,8 @@
 				<td>{it.reason}</td>
 				<td>{it.message}</td>
 			</tr>
+		{:else}
+			<NoDataRow span="4" />
 		{/each}
 		</tbody>
 	</table>
