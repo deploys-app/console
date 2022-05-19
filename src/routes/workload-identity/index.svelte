@@ -13,7 +13,8 @@
 		return {
 			props: {
 				workloadIdentities: workloadIdentities.result.list || []
-			}
+			},
+			dependencies: ['workloadIdentities']
 		}
 	}
 </script>
@@ -25,10 +26,29 @@
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 	import format from '$lib/format'
+	import { browser } from '$app/env'
+	import { invalidate } from '$app/navigation'
+	import { onDestroy } from 'svelte'
 
 	export let workloadIdentities
 
 	$: project = $page.stuff.project
+
+	let pendingTimeout
+	$: {
+		if (browser) {
+			let hasPending = workloadIdentities.status === 'pending'
+			if (hasPending) {
+				pendingTimeout = setTimeout(() => invalidate('workloadIdentities'), 2000)
+			}
+		}
+	}
+
+	if (browser) {
+		onDestroy(() => {
+			clearTimeout(pendingTimeout)
+		})
+	}
 </script>
 
 <h6>Workload Identities</h6>
