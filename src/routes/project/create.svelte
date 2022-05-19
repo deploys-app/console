@@ -7,7 +7,6 @@
 		let projectInfo
 		if (project) {
 			projectInfo = await api.invoke('project.get', { project }, fetch)
-			console.log(projectInfo)
 			if (!projectInfo.ok) {
 				if (projectInfo.error.notFound) {
 					return {
