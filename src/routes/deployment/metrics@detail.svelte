@@ -135,6 +135,8 @@
 				break
 		}
 
+		!update && chart.series.forEach((x) => x.remove())
+
 		lines.forEach((l) => {
 			const lineName = prefix + l.name
 			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
@@ -181,7 +183,7 @@
 
 <div class="_dp-g _gg-16px _jtfct-fst">
 	<div class="moon-select">
-		<select bind:value={filter.range} on:change={fetchMetrics}>
+		<select bind:value={filter.range} on:change={() => fetchMetrics()}>
 			<option value="1h">1 Hour</option>
 			<option value="6h">6 Hours</option>
 			<option value="12h">12 Hours</option>
