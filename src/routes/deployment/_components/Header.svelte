@@ -1,10 +1,65 @@
 <script>
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import { page } from '$app/stores'
+	import { invalidate } from '$app/navigation'
+	import api from '$lib/api'
 
 	export let deployment
 
 	$: project = $page.stuff.project
+
+	$: canPause = deployment.status === 'success' && deployment.action === 1
+	$: canResume = deployment.status === 'success' && deployment.action === 3
+
+	function pause () {
+		window.dispatchEvent(new CustomEvent('confirm', {
+			detail: {
+				title: `Pause ${deployment.name} in ${deployment.location} ?`,
+				yes: 'Pause',
+				callback: async () => {
+					const result = await api.invoke('deployment.pause', {
+						project: deployment.project,
+						location: deployment.location,
+						name: deployment.name
+					}, fetch)
+					if (!result.ok) {
+						window.dispatchEvent(new CustomEvent('error', {
+							detail: {
+								error: result.error
+							}
+						}))
+						return
+					}
+					await invalidate('deployment')
+				}
+			}
+		}))
+	}
+
+	function resume () {
+		window.dispatchEvent(new CustomEvent('confirm', {
+			detail: {
+				title: `Resume ${deployment.name} in ${deployment.location} ?`,
+				yes: 'Resume',
+				callback: async () => {
+					const result = await api.invoke('deployment.resume', {
+						project: deployment.project,
+						location: deployment.location,
+						name: deployment.name
+					}, fetch)
+					if (!result.ok) {
+						window.dispatchEvent(new CustomEvent('error', {
+							detail: {
+								error: result.error
+							}
+						}))
+						return
+					}
+					await invalidate('deployment')
+				}
+			}
+		}))
+	}
 </script>
 
 <div class="lo-12 _gg-12px">
@@ -23,22 +78,20 @@
 				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
 				Deploy New Revision
 			</a>
-			<!--{{if .CanPause}}-->
-			<!--<form action="{{route "deployment.pause"}}" method="POST" data-confirm="Pause {{.Deployment.Name}}" data-confirm-yes="Pause">-->
-			<!--	<input name="project" type="hidden" value="{{.Page.Project}}">-->
-			<!--<input type="hidden" name="location" value="{{.Deployment.Location}}">-->
-			<!--<input type="hidden" name="name" value="{{.Deployment.Name}}">-->
-			<!--<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg"><i class="fas fa-pause"></i>&nbsp;&nbsp;Pause</button>-->
-			<!--</form>-->
-			<!--{{end}}-->
-			<!--{{if .CanResume}}-->
-			<!--<form action="{{route "deployment.resume"}}" method="POST" data-confirm="Resume {{.Deployment.Name}}" data-confirm-yes="Resume">-->
-			<!--		<input name="project" type="hidden" value="{{.Page.Project}}">-->
-			<!--<input type="hidden" name="location" value="{{.Deployment.Location}}">-->
-			<!--<input type="hidden" name="name" value="{{.Deployment.Name}}">-->
-			<!--<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg"><i class="fas fa-play"></i>&nbsp;&nbsp;Resume</button>-->
-			<!--</form>-->
-			<!--{{end}}-->
+			{#if canPause}
+				<div>
+					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={pause}>
+						<i class="fas fa-pause"></i>&nbsp;&nbsp;Pause
+					</button>
+				</div>
+			{/if}
+			{#if canResume}
+				<div>
+					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={resume}>
+						<i class="fas fa-play"></i>&nbsp;&nbsp;Resume
+					</button>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

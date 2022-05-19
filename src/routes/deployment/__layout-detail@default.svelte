@@ -7,7 +7,7 @@
 		const name = url.searchParams.get('name')
 		const deployment = await api.invoke('deployment.get', { project, location, name }, fetch)
 		if (!deployment.ok) {
-			if (deployment.error.message === 'api: deployment not found') {
+			if (deployment.error.notFound) {
 				return {
 					status: 302,
 					redirect: `/deployment?project=${project}`
@@ -20,8 +20,6 @@
 		}
 		return {
 			props: {
-				location,
-				name,
 				deployment: deployment.result
 			},
 			stuff: {
@@ -37,12 +35,29 @@
 <script>
 	import { page } from '$app/stores'
 	import Header from './_components/Header.svelte'
+	import { browser } from '$app/env'
+	import { invalidate } from '$app/navigation'
+	import { onDestroy } from 'svelte'
 
-	export let location
-	export let name
 	export let deployment
 
 	$: project = $page.stuff.project
+
+	let pendingTimeout
+	$: {
+		if (browser) {
+			let isPending = deployment.status === 'pending'
+			if (isPending) {
+				pendingTimeout = setTimeout(() => invalidate('deployment'), 2000)
+			}
+		}
+	}
+
+	if (browser) {
+		onDestroy(() => {
+			clearTimeout(pendingTimeout)
+		})
+	}
 </script>
 
 <div>

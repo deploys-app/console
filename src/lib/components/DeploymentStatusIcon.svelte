@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from 'svelte'
+	import { onDestroy } from 'svelte'
 
 	export let action
 	export let status
@@ -15,17 +15,23 @@
 	let podStatus
 	let iconClass
 	$: {
+		status
+		url
+		action
+		fetchPodStatus()
+	}
+	$: {
 		podStatus
 		iconClass = getIconClass()
 	}
 
 	function getIconClass () {
-		if (action === 3) { // action=pause
-			return 'fas fa-pause _cl-warning-500'
-		}
-
 		if (status !== 'success') {
 			return statusIconClass[status] || 'fas fa-minus _cl-light'
+		}
+
+		if (action === 3) { // action=pause
+			return 'fas fa-pause _cl-warning-500'
 		}
 
 		if (!podStatus) {
@@ -37,11 +43,27 @@
 		return 'fas fa-exclamation-triangle _cl-warning-500'
 	}
 
-	onMount(async () => {
+	let fetchPodStatusTimeout
+
+	async function fetchPodStatus () {
+		console.log('fetch pod status')
+		if (fetchPodStatusTimeout) {
+			clearTimeout(fetchPodStatusTimeout)
+			fetchPodStatusTimeout = null
+		}
+
 		try {
 			const response = await fetch(url)
 			podStatus = await response.json()
-		} catch (e) {}
+		} finally {
+			if (!podStatus || podStatus.ready !== podStatus.count) {
+				setTimeout(() => fetchPodStatus(), 5000)
+			}
+		}
+	}
+
+	onDestroy(() => {
+		fetchPodStatusTimeout && clearTimeout(fetchPodStatusTimeout)
 	})
 </script>
 
