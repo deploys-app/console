@@ -40,7 +40,6 @@
 
 	$: project = $page.stuff.project
 
-
 	let showPassword
 	let copyPassword
 	let copyPasswordClipboard
