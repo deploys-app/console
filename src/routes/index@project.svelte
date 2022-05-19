@@ -3,12 +3,13 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const [usage, price] = await Promise.all([
-			api.invoke('project.usage', { project: project }, fetch),
-			api.invoke('billing.project', { project: project }, fetch)
+		const [projectInfo, usage, price] = await Promise.all([
+			api.invoke('project.get', { project }, fetch),
+			api.invoke('project.usage', { project }, fetch),
+			api.invoke('billing.project', { project }, fetch)
 		])
 
-		if (!usage.ok || !price.ok) {
+		if (!projectInfo.ok || !usage.ok || !price.ok) {
 			return {
 				status: 500,
 				error: `usage: ${usage.error.message}, price: ${price.error.message}}`
@@ -20,6 +21,7 @@
 				menu: 'dashboard'
 			},
 			props: {
+				project: projectInfo.result,
 				usage: usage.result,
 				price: price.result
 			}
@@ -28,8 +30,7 @@
 </script>
 
 <script>
-	import { projectInfo } from '$lib/stores'
-
+	export let project
 	export let usage
 	export let price
 
@@ -57,19 +58,19 @@
 		<div class="moon-field">
 			<label for="input-project_name">Project Name</label>
 			<div class="moon-input">
-				<input id="input-project_name" type="text" readonly value={$projectInfo?.name}>
+				<input id="input-project_name" type="text" readonly value={project.name}>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-project_id">Project ID</label>
 			<div class="moon-input">
-				<input id="input-project_id" type="text" readonly value={$projectInfo?.project}>
+				<input id="input-project_id" type="text" readonly value={project.project}>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-project_number">Project Number</label>
 			<div class="moon-input">
-				<input id="input-project_number" type="text" readonly value={$projectInfo?.id}>
+				<input id="input-project_number" type="text" readonly value={project.id}>
 			</div>
 		</div>
 

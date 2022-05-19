@@ -17,6 +17,9 @@
 			}
 		}
 		return {
+			stuff: {
+				projects: projects.result.projects || []
+			},
 			props: {
 				profile: me.result,
 				projects: projects.result.projects || []
@@ -70,7 +73,7 @@
 
 	<div class="sidebar-wrapper">
 		<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
-		<Sidebar />
+		<Sidebar {projects} />
 	</div>
 
 	<div class="content-wrapper">

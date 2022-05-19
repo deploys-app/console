@@ -1,9 +1,22 @@
+<script context="module">
+	export function load ({ stuff }) {
+		const { projects } = stuff
+
+		return {
+			props: {
+				projects
+			}
+		}
+	}
+</script>
+
 <script>
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { projects } from '$lib/stores'
 	import { invalidate } from '$app/navigation'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
+
+	export let projects
 
 	async function deleteItem (project) {
 		let result = await Swal.fire({
@@ -60,7 +73,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each $projects as it}
+				{#each projects as it}
 					<tr>
 						<td>
 							<a href={`/?project=${it.project}`} class="moon-link">

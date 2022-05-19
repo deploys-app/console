@@ -1,7 +1,9 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { projects, project, projectInfo } from '$lib/stores'
+	import { project } from '$lib/stores'
+
+	export let projects
 
 	function setProject (sid) {
 		const q = new URLSearchParams($page.url.search)
@@ -27,8 +29,8 @@
 
 		<div class="moon-select">
 			<select on:change={(e) => setProject(e.target.value)}>
-				<option value="" disabled selected="{!$projectInfo}">&#45;&#45;PROJECT&#45;&#45;</option>
-				{#each $projects as it}
+				<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
+				{#each projects as it}
 					<option value={it.project} selected={$project === it.project}>{it.name}</option>
 				{/each}
 			</select>
