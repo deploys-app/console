@@ -88,10 +88,11 @@
 		}
 	}
 
-	async function deleteKey (secret) {
+	function deleteKey (secret) {
 		window.dispatchEvent(new CustomEvent('confirm', {
 			detail: {
 				title: 'Confirm delete key ?',
+				yes: 'Delete',
 				callback: async () => {
 					const result = await api.invoke('serviceaccount.deleteKey', { project: project, id, secret }, fetch)
 					if (!result.ok) {

@@ -1,5 +1,91 @@
+<script context="module">
+	import api from '$lib/api'
+
+	export async function load ({ stuff, fetch }) {
+		const {
+			project,
+			location,
+			name,
+			deployment
+		} = stuff
+
+		const revisions = await api.invoke('deployment.revisions', { project, location, name }, fetch)
+		if (!revisions.ok) {
+			return {
+				status: 500,
+				error: `revisions: ${revisions.error.message}`
+			}
+		}
+
+		return {
+			props: {
+				deployment,
+				revisions: revisions.result.items || []
+			}
+		}
+	}
+</script>
+
 <script>
-	export let detail
+	import format from '$lib/format'
+	import { goto } from '$app/navigation'
+
+	export let deployment
+	export let revisions
+
+	function rollback (toRevision) {
+		window.dispatchEvent(new CustomEvent('confirm', {
+			detail: {
+				title: `Rollback ${deployment.name} to revision ${toRevision}`,
+				yes: 'Rollback',
+				callback: async () => {
+					const result = await api.invoke('deployment.rollback', {
+						project: deployment.project,
+						location: deployment.location,
+						name: deployment.name,
+						revision: toRevision
+					}, fetch)
+					if (!result.ok) {
+						window.dispatchEvent(new CustomEvent('error', {
+							detail: {
+								error: result.error
+							}
+						}))
+						return
+					}
+					goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+				}
+			}
+		}))
+	}
 </script>
 
 <h6><strong>Revision</strong></h6>
+<div class="moon-table-container _wsp-nw">
+	<table class="moon-table">
+		<thead>
+		<tr>
+			<th>Revision</th>
+			<th>Image</th>
+			<th>Deployed At</th>
+			<th>Deployed By</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+		{#each revisions as it, index}
+			<tr>
+				<td>{it.revision}</td>
+				<td>{it.image}</td>
+				<td>{format.datetime(it.createdAt)}</td>
+				<td>{it.createdBy}</td>
+				<td>
+					{#if index > 0}
+						<button class="moon-button -tertiary -small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
+					{/if}
+				</td>
+			</tr>
+		{/each}
+		</tbody>
+	</table>
+</div>
