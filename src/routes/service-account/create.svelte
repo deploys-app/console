@@ -9,7 +9,7 @@
 		if (id) {
 			serviceAccount = await api.invoke('serviceaccount.get', { project, id }, fetch)
 			if (!serviceAccount.ok) {
-				if (serviceAccount.error.message === 'api: service account not found') {
+				if (serviceAccount.error.notFound) {
 					return {
 						status: 302,
 						redirect: '/service-account?project=${project}'
