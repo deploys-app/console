@@ -39,7 +39,6 @@
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
 	import { browser } from '$app/env'
-	import { onDestroy, onMount } from 'svelte';
 
 	export let profile
 	export let projects
@@ -48,19 +47,8 @@
 	stores.projects.set(projects)
 
 	let showSidebar
-	let page$
 
-	onMount(() => {
-		page$ = page.subscribe(() => {
-			if (showSidebar) {
-				showSidebar = false
-			}
-		})
-	})
-
-	onDestroy(() => {
-		page$ && page$()
-	})
+	$: $page, showSidebar = false
 
 	if (browser) {
 		api.setOnUnauth(() => {
