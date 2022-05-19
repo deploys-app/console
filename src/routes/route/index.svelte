@@ -13,7 +13,8 @@
 		return {
 			props: {
 				routes: routes.result.items || []
-			}
+			},
+			dependencies: ['routes']
 		}
 	}
 </script>
@@ -23,6 +24,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
+	import { invalidate } from '$app/navigation'
 
 	export let routes
 
@@ -30,6 +32,28 @@
 
 	function deleteRoute (route) {
 		console.log(route)
+		window.dispatchEvent(new CustomEvent('confirm', {
+			detail: {
+				title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
+				yes: 'Delete',
+				callback: async () => {
+					const result = await api.invoke('route.delete', {
+						project,
+						location: route.location,
+						name: route.name
+					}, fetch)
+					if (!result.ok) {
+						window.dispatchEvent(new CustomEvent('error', {
+							detail: {
+								error: result.error
+							}
+						}))
+						return
+					}
+					await invalidate('routes')
+				}
+			}
+		}))
 	}
 </script>
 
@@ -70,12 +94,6 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-<!--							<form method="POST" action="{{route "route.delete" $.Page.ProjectParam}}"-->
-<!--									  data-confirm="Remove route {{.Domain}}{{.Path}} in {{.Location}} ?"-->
-<!--									  data-confirm-yes="Remove" data-confirm-danger>-->
-<!--									<input type="hidden" name="domain" value="{{.Domain}}">-->
-<!--							<input type="hidden" name="path" value="{{.Path}}">-->
-<!--							<input type="hidden" name="location" value="{{.Location}}">-->
 							<button class="moon-icon-button -negative" on:click={() => deleteRoute(it)}>
 								<i class="fas fa-trash-alt"></i>
 							</button>

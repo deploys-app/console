@@ -46,7 +46,6 @@
 	let fetchPodStatusTimeout
 
 	async function fetchPodStatus () {
-		console.log('fetch pod status')
 		if (fetchPodStatusTimeout) {
 			clearTimeout(fetchPodStatusTimeout)
 			fetchPodStatusTimeout = null
