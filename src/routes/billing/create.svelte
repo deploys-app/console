@@ -1,15 +1,44 @@
 <script context="module">
 	import api from '$lib/api'
+
+	export async function load ({ url, fetch }) {
+		const id = url.searchParams.get('id')
+
+		let billingAccount
+		if (id) {
+			billingAccount = await api.invoke('billing.get', { id }, fetch)
+			if (!billingAccount.ok) {
+				if (billingAccount.error.notFound) {
+					return {
+						status: 302,
+						redirect: '/billing'
+					}
+				}
+				return {
+					status: 500,
+					error: `billingAccount: ${billingAccount.error.message}`
+				}
+			}
+		}
+
+		return {
+			props: {
+				billingAccount: billingAccount?.result
+			}
+		}
+	}
 </script>
 
 <script>
 	import { goto } from '$app/navigation'
 
+	export let billingAccount
+
 	let form = {
-		name: '',
-		taxId: '',
-		taxName: '',
-		taxAddress: ''
+		name: billingAccount?.name || '',
+		taxId: billingAccount?.taxId || '',
+		taxName: billingAccount?.taxName || '',
+		taxAddress: billingAccount?.taxAddress || ''
 	}
 
 	let saving
@@ -19,8 +48,10 @@
 		}
 
 		saving = true
+		const fn = billingAccount ? 'billing.update' : 'billing.create'
 		try {
-			const resp = await api.invoke('billing.create', {
+			const resp = await api.invoke(fn, {
+				id: billingAccount?.id || undefined,
 				name: form.name,
 				taxId: form.taxId,
 				taxName: form.taxName,
@@ -46,9 +77,18 @@
 		<li>
 			<a href="/billing" class="moon-link"><h6>Billing</h6></a>
 		</li>
-		<li>
-			<h6>Create</h6>
-		</li>
+		{#if billingAccount}
+			<li>
+				<a href={`/billing/detail?id=${billingAccount.id}`} class="moon-link"><h6>{billingAccount.name}</h6></a>
+			</li>
+			<li>
+				<h6>Update</h6>
+			</li>
+		{:else}
+			<li>
+				<h6>Create</h6>
+			</li>
+		{/if}
 	</ul>
 </div>
 
@@ -94,6 +134,6 @@
 
 		<hr>
 
-		<button class="moon-button _mgr-at">Save</button>
+		<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
 	</form>
 </div>

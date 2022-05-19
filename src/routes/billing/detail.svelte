@@ -1,7 +1,7 @@
 <script context="module">
 	import api from '$lib/api'
 
-	export async function load ({ url, stuff, fetch }) {
+	export async function load ({ url, fetch }) {
 		const id = url.searchParams.get('id')
 
 		const billingAccount = await api.invoke('billing.get', { id }, fetch)
@@ -9,7 +9,7 @@
 			if (billingAccount.error.notFound) {
 				return {
 					status: 302,
-					redirect: '/billing?project=${project}'
+					redirect: '/billing'
 				}
 			}
 			return {
