@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const users = await api.invoke('role.users', { project }, fetch)
-		if (!users.ok) {
+		if (!users.ok && !users.error.forbidden) {
 			return {
 				status: 500,
 				error: `users: ${users.error.message}`
@@ -15,7 +15,10 @@
 				menu: 'role.users'
 			},
 			props: {
-				users: users.result.users || []
+				permission: {
+					users: !users.error?.forbidden
+				},
+				users: users.result?.users || []
 			},
 			dependencies: ['users']
 		}
@@ -24,10 +27,12 @@
 
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 	import { invalidate } from '$app/navigation'
 
+	export let permission
 	export let users
 
 	$: project = $page.stuff.project
@@ -101,6 +106,8 @@
 								</button>
 							</td>
 						</tr>
+					{:else}
+						<NoDataRow span="3" forbidden={!permission.users} />
 					{/each}
 				{/if}
 			</tbody>

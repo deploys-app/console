@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const deployments = await api.invoke('deployment.list', { project }, fetch)
-		if (!deployments.ok) {
+		if (!deployments.ok && !deployments.error.forbidden) {
 			return {
 				status: 500,
 				error: `deployments: ${deployments.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				deployments: deployments.result.deployments || []
+				permission: {
+					deployments: !deployments.error?.forbidden
+				},
+				deployments: deployments.result?.deployments || []
 			},
 			dependencies: ['deployments']
 		}
@@ -30,6 +33,7 @@
 	import format from '$lib/format'
 	import { loading } from '$lib/stores'
 
+	export let permission
 	export let deployments
 
 	let pendingTimeout
@@ -107,7 +111,7 @@
 	<!--					<td>{it.createdBy}</td>-->
 					</tr>
 				{:else}
-					<NoDataRow span="6" />
+					<NoDataRow span="6" forbidden={!permission.deployments} />
 				{/each}
 			{/if}
 			</tbody>

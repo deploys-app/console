@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const roles = await api.invoke('role.list', { project }, fetch)
-		if (!roles.ok) {
+		if (!roles.ok && !roles.error.forbidden) {
 			return {
 				status: 500,
 				error: `roles: ${roles.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				roles: roles.result.roles || []
+				permission: {
+					roles: !roles.error?.forbidden
+				},
+				roles: roles.result?.roles || []
 			}
 		}
 	}
@@ -25,6 +28,7 @@
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 
+	export let permission
 	export let roles
 
 	$: project = $page.stuff.project
@@ -87,7 +91,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="5" />
+					<NoDataRow span="5" forbidden={!permission.roles} />
 				{/each}
 			{/if}
 			</tbody>

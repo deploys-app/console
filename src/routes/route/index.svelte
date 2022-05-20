@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const routes = await api.invoke('route.list', { project }, fetch)
-		if (!routes.ok) {
+		if (!routes.ok && !routes.error.forbidden) {
 			return {
 				status: 500,
 				error: `routes: ${routes.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				routes: routes.result.items || []
+				permission: {
+					routes: !routes.error?.forbidden
+				},
+				routes: routes.result?.items || []
 			},
 			dependencies: ['routes']
 		}
@@ -26,6 +29,7 @@
 	import { loading } from '$lib/stores'
 	import { invalidate } from '$app/navigation'
 
+	export let permission
 	export let routes
 
 	$: project = $page.stuff.project
@@ -58,7 +62,7 @@
 
 <h6>Routes</h6>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
 			<a class="moon-button -small" href={`/route/create?project=${project}`}>
@@ -99,7 +103,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" />
+					<NoDataRow span="4" forbidden={!permission.routes} />
 				{/each}
 			{/if}
 			</tbody>

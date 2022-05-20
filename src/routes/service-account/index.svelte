@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const serviceAccounts = await api.invoke('serviceaccount.list', { project }, fetch)
-		if (!serviceAccounts.ok) {
+		if (!serviceAccounts.ok && !serviceAccounts.error.forbidden) {
 			return {
 				status: 500,
 				error: `serviceAccounts: ${serviceAccounts.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				serviceAccounts: serviceAccounts.result.serviceAccounts || []
+				permission: {
+					serviceAccounts: !serviceAccounts.error?.forbidden
+				},
+				serviceAccounts: serviceAccounts.result?.serviceAccounts || []
 			}
 		}
 	}
@@ -25,6 +28,7 @@
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 
+	export let permission
 	export let serviceAccounts
 
 	$: project = $page.stuff.project
@@ -75,7 +79,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" />
+					<NoDataRow span="4" forbidden={!permission.serviceAccounts} />
 				{/each}
 			{/if}
 			</tbody>

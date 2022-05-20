@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const disks = await api.invoke('disk.list', { project }, fetch)
-		if (!disks.ok) {
+		if (!disks.ok && !disks.error.forbidden) {
 			return {
 				status: 500,
 				error: `disks: ${disks.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				disks: disks.result.list || []
+				permission: {
+					disks: !disks.error?.forbidden
+				},
+				disks: disks.result?.list || []
 			},
 			dependencies: ['disks']
 		}
@@ -30,6 +33,7 @@
 	import { invalidate } from '$app/navigation'
 	import { loading } from '$lib/stores'
 
+	export let permission
 	export let disks
 
 	$: project = $page.stuff.project
@@ -53,7 +57,7 @@
 
 <h6>Disks</h6>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
 			<a class="moon-button -small" href={`/disk/create?project=${project}`}>
@@ -97,7 +101,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="5" />
+					<NoDataRow span="5" forbidden={!permission.disks} />
 				{/each}
 			{/if}
 			</tbody>

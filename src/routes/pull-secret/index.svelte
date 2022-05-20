@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const pullSecrets = await api.invoke('pullsecret.list', { project }, fetch)
-		if (!pullSecrets.ok) {
+		if (!pullSecrets.ok && !pullSecrets.error.forbidden) {
 			return {
 				status: 500,
 				error: `pullSecrets: ${pullSecrets.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				pullSecrets: pullSecrets.result.pullSecrets || []
+				permission: {
+					pullSecrets: !pullSecrets.error?.forbidden
+				},
+				pullSecrets: pullSecrets.result?.pullSecrets || []
 			},
 			dependencies: ['pullSecrets']
 		}
@@ -30,6 +33,7 @@
 	import { invalidate } from '$app/navigation'
 	import { loading } from '$lib/stores'
 
+	export let permission
 	export let pullSecrets
 
 	$: project = $page.stuff.project
@@ -53,7 +57,7 @@
 
 <h6>Pull Secrets</h6>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="moon-panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
 			<a class="moon-button -small" href={`/pull-secret/create?project=${project}`}>
@@ -89,7 +93,7 @@
 						<td>{it.createdBy}</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" />
+					<NoDataRow span="4" forbidden={!permission.pullSecrets} />
 				{/each}
 			{/if}
 			</tbody>

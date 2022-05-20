@@ -29,7 +29,7 @@
 			},
 			props: {
 				permission: {
-					billing: usage.result && price.result
+					billing: !usage.error?.forbidden && !price.error?.forbidden
 				},
 				project: projectInfo.result,
 				usage: usage.result || {},

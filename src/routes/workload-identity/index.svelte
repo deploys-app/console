@@ -4,7 +4,7 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 		const workloadIdentities = await api.invoke('workloadidentity.list', { project }, fetch)
-		if (!workloadIdentities.ok) {
+		if (!workloadIdentities.ok && !workloadIdentities.error.forbidden) {
 			return {
 				status: 500,
 				error: `workloadIdentities: ${workloadIdentities.error.message}`
@@ -12,7 +12,10 @@
 		}
 		return {
 			props: {
-				workloadIdentities: workloadIdentities.result.list || []
+				permission: {
+					workloadIdentities: !workloadIdentities.error?.forbidden
+				},
+				workloadIdentities: workloadIdentities.result?.list || []
 			},
 			dependencies: ['workloadIdentities']
 		}
@@ -30,6 +33,7 @@
 	import { invalidate } from '$app/navigation'
 	import { onDestroy } from 'svelte'
 
+	export let permission
 	export let workloadIdentities
 
 	$: project = $page.stuff.project
@@ -87,7 +91,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 					</tr>
 				{:else}
-					<NoDataRow span="3" />
+					<NoDataRow span="3" forbidden={!permission.workloadIdentities} />
 				{/each}
 			{/if}
 			</tbody>
