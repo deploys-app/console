@@ -19,7 +19,7 @@
 		if (!projectInfo.ok || !usage.ok || !price.ok) {
 			return {
 				status: 500,
-				error: `usage: ${usage.error.message}, price: ${price.error.message}}`
+				error: `usage: ${usage.error.message}, price: ${price.error.message}`
 			}
 		}
 
