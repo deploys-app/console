@@ -643,3 +643,13 @@ $components-colors: (
 .#{$prefix}input>input[type=file] {
 	padding: 8px 12px;
 }
+
+input[type=number].-no-arrow {
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	-moz-appearance: textfield;
+}

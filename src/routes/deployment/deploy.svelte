@@ -73,7 +73,7 @@
 		image: deployment?.image || '',
 		pullSecret: deployment?.pullSecret || '',
 		workloadIdentity: deployment?.workloadIdentity || '',
-		port: deployment?.port || '',
+		port: deployment?.port || 8080,
 		protocol: deployment?.protocol || 'http',
 		command: deployment?.command || [],
 		args: deployment?.args || [],
@@ -316,7 +316,7 @@
 			<div class="moon-field">
 				<label for="input-port">Port</label>
 				<div class="moon-input">
-					<input id="input-port" placeholder="8080" bind:value={form.port}>
+					<input class="-no-arrow" id="input-port" placeholder="8080" type="number" bind:value={form.port}>
 				</div>
 			</div>
 		{/if}
