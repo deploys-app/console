@@ -62,6 +62,11 @@
 
 	$: project = $page.stuff.project
 
+	let permission = {
+		pullSecrets: true,
+		workloadIdentities: true,
+		disks: true,
+	}
 	let pullSecrets = []
 	let workloadIdentities = []
 	let disks = []
@@ -93,6 +98,10 @@
 	async function fetchPullSecrets () {
 		const resp = await api.invoke('pullsecret.list', { project, location: currentLocation.id }, fetch)
 		if (!resp.ok) {
+			if (resp.error.forbidden) {
+				permission.pullSecrets = false
+				return
+			}
 			window.dispatchEvent(new CustomEvent('error', {
 				detail: {
 					error: resp.error
@@ -107,6 +116,10 @@
 	async function fetchWorkloadIdentities () {
 		const resp = await api.invoke('workloadidentity.list', { project, location: currentLocation.id }, fetch)
 		if (!resp.ok) {
+			if (resp.error.forbidden) {
+				permission.workloadIdentities = false
+				return
+			}
 			window.dispatchEvent(new CustomEvent('error', {
 				detail: {
 					error: resp.error
@@ -121,6 +134,10 @@
 	async function fetchDisks () {
 		const resp = await api.invoke('disk.list', { project, location: currentLocation.id }, fetch)
 		if (!resp.ok) {
+			if (resp.error.forbidden) {
+				permission.disks = false
+				return
+			}
 			window.dispatchEvent(new CustomEvent('error', {
 				detail: {
 					error: resp.error
@@ -286,30 +303,50 @@
 			</div>
 		</div>
 
-		<div class="moon-field">
-			<label for="input-pull_secret">Pull Secret</label>
-			<div class="moon-select">
-				<select id="input-pull_secret" bind:value={form.pullSecret}>
-					<option value="">No Pull Secret</option>
-					{#each pullSecrets as it}
-						<option value={it.name}>{it.name}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-
-		{#if currentLocation?.features.workloadIdentity}
+		{#if permission.pullSecrets}
 			<div class="moon-field">
-				<label for="input-workload_identity">Workload Identity</label>
+				<label for="input-pull_secret">Pull Secret</label>
 				<div class="moon-select">
-					<select id="input-workload_identity" bind:value={form.workloadIdentity}>
-						<option value="">No Workload Identity</option>
-						{#each workloadIdentities as it}
+					<select id="input-pull_secret" bind:value={form.pullSecret}>
+						<option value="">No Pull Secret</option>
+						{#each pullSecrets as it}
 							<option value={it.name}>{it.name}</option>
 						{/each}
 					</select>
 				</div>
 			</div>
+		{:else}
+			<div class="moon-field">
+				<label for="input-pull_secret-text">Pull Secret</label>
+				<div class="moon-input">
+					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
+				</div>
+				<p class="_fs-200">* You don't have permission to list pull secrets</p>
+			</div>
+		{/if}
+
+		{#if currentLocation?.features.workloadIdentity}
+			{#if permission.workloadIdentities}
+				<div class="moon-field">
+					<label for="input-workload_identity">Workload Identity</label>
+					<div class="moon-select">
+						<select id="input-workload_identity" bind:value={form.workloadIdentity}>
+							<option value="">No Workload Identity</option>
+							{#each workloadIdentities as it}
+								<option value={it.name}>{it.name}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			{:else}
+				<div class="moon-field">
+					<label for="input-workload_identity-text">Workload Identity</label>
+					<div class="moon-input">
+						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
+					</div>
+					<p class="_fs-200">* You don't have permission to list workload identities</p>
+				</div>
+			{/if}
 		{/if}
 
 		{#if ['WebService', 'TCPService', 'InternalTCPService'].includes(form.type)}
@@ -386,17 +423,28 @@
 				<br>
 
 				<h6><strong>Disk</strong></h6>
-				<div class="moon-field">
-					<label for="input-disk_name">Name</label>
-					<div class="moon-select">
-						<select id="input-disk_name" bind:value={form.diskName}>
-							<option value="">No Disk</option>
-							{#each disks as it}
-								<option value={it.name}>{it.name}</option>
-							{/each}
-						</select>
+
+				{#if permission.disks}
+					<div class="moon-field">
+						<label for="input-disk_name">Name</label>
+						<div class="moon-select">
+							<select id="input-disk_name" bind:value={form.diskName}>
+								<option value="">No Disk</option>
+								{#each disks as it}
+									<option value={it.name}>{it.name}</option>
+								{/each}
+							</select>
+						</div>
 					</div>
-				</div>
+				{:else}
+					<div class="moon-field">
+						<label for="input-disk_name-text">Name</label>
+						<div class="moon-input">
+							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.diskName}>
+						</div>
+						<p class="_fs-200">* You don't have permission to list disks</p>
+					</div>
+				{/if}
 
 				{#if form.diskName}
 					<div class="moon-field">
