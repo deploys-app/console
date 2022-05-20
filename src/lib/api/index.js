@@ -26,6 +26,9 @@ async function invoke (fn, args, fetch) {
 				body.error.unauth = true
 				onUnauth && onUnauth()
 				break
+			case 'iam: forbidden':
+				body.error.forbidden = true
+				break
 			case 'api: validate error':
 				body.error.validate = body.error.items
 				break

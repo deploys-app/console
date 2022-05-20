@@ -1,5 +1,10 @@
-// import { webcrypto } from 'node:crypto'
-// const crypto = webcrypto
+// workaround for dev
+if (typeof crypto === 'undefined') {
+	var crypto
+	import('node:crypto').then((imp) => {
+		crypto = imp.webcrypto
+	})
+}
 
 function randomState () {
 	const x = new Uint8Array(16)
