@@ -8,7 +8,10 @@ export function init () {
 	}
 	inited = true
 
-	Highcharts.theme = {
+	Highcharts.setOptions({
+		accessibility: {
+			enabled: false
+		},
 		colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798bf', '#aaeeee', '#ff0066',
 			'#eeaaee', '#55bf3b', '#df5353', '#7798bf', '#aaeeee'],
 		chart: {
@@ -203,7 +206,5 @@ export function init () {
 		credits: {
 			enabled: false
 		}
-	}
-
-	Highcharts.setOptions(Highcharts.theme)
+	})
 }
