@@ -1,18 +1,21 @@
+let webcrypto
+
 // workaround for dev
 if (typeof crypto === 'undefined') {
-	var crypto
 	import('node:crypto')
 		.then((imp) => {
-			crypto = imp.webcrypto
+			webcrypto = imp.webcrypto
 		})
 		.catch(() => {
 			// don't throw error on compile time
 		})
+} else {
+	webcrypto = crypto
 }
 
 function randomState () {
 	const x = new Uint8Array(16)
-	crypto.getRandomValues(x)
+	webcrypto.getRandomValues(x)
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
