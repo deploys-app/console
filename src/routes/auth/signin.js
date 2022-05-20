@@ -1,9 +1,13 @@
 // workaround for dev
 if (typeof crypto === 'undefined') {
 	var crypto
-	import('node:crypto').then((imp) => {
-		crypto = imp.webcrypto
-	})
+	import('node:crypto')
+		.then((imp) => {
+			crypto = imp.webcrypto
+		})
+		.catch(() => {
+			// don't throw error on compile time
+		})
 }
 
 function randomState () {
