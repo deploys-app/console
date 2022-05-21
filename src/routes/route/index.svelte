@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const routes = await api.invoke('route.list', { project }, fetch)
+		const routes = await api.invoke('route.listv2', { project }, fetch)
 		if (!routes.ok && !routes.error.forbidden) {
 			return {
 				status: 500,
@@ -15,7 +15,7 @@
 				permission: {
 					routes: !routes.error?.forbidden
 				},
-				routes: routes.result?.items || []
+				routes: routes.result || []
 			},
 			dependencies: ['routes']
 		}
@@ -92,7 +92,7 @@
 						<td>
 							<a class="moon-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
 						</td>
-						<td>{it.deployment}</td>
+						<td>{it.target}</td>
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
