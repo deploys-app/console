@@ -71,26 +71,46 @@
 	let workloadIdentities = []
 	let disks = []
 
-	let form = {
+	let form = deployment ? {
+		location: deployment.location,
+		name: deployment.name,
+		type: deployment.type,
+		image: deployment.image,
+		pullSecret: deployment.pullSecret,
+		workloadIdentity: deployment.workloadIdentity,
+		port: deployment.port,
+		protocol: deployment.protocol,
+		command: deployment.command,
+		args: deployment.args,
+		schedule: deployment.schedule,
+		diskName: deployment.diskName,
+		diskMountPath: deployment.diskMountPath,
+		diskSubPath: deployment.diskSubPath,
+		minReplicas: deployment.minReplicas,
+		maxReplicas: deployment.maxReplicas,
+		memory: deployment.memory,
+		env: Object.entries(deployment.env || {}).map(([k, v]) => ({k, v})),
+		mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({k, v}))
+	} : {
 		location: deployment?.location || '',
-		name: deployment?.name || '',
-		type: deployment?.type || 'WebService',
-		image: deployment?.image || '',
-		pullSecret: deployment?.pullSecret || '',
-		workloadIdentity: deployment?.workloadIdentity || '',
-		port: deployment?.port || 8080,
-		protocol: deployment?.protocol || 'http',
-		command: deployment?.command || [],
-		args: deployment?.args || [],
-		schedule: deployment?.schedule || '',
-		diskName: deployment?.diskName || '',
-		diskMountPath: deployment?.diskMountPath || '',
-		diskSubPath: deployment?.diskSubPath || '',
-		minReplicas: deployment?.minReplicas || 1,
-		maxReplicas: deployment?.maxReplicas || 1,
-		memory: deployment?.memory || '0',
-		env: Object.entries(deployment?.env || {}).map(([k, v]) => ({k, v})),
-		mountData: Object.entries(deployment?.mountData || {}).map(([k, v]) => ({k, v}))
+		name: '',
+		type: 'WebService',
+		image: '',
+		pullSecret: '',
+		workloadIdentity: '',
+		port: 8080,
+		protocol: 'http',
+		command: [],
+		args: [],
+		schedule: '',
+		diskName: '',
+		diskMountPath: '',
+		diskSubPath: '',
+		minReplicas: 1,
+		maxReplicas: 1,
+		memory: '0',
+		env: [],
+		mountData: []
 	}
 
 	$: currentLocation = locations.find((x) => x.id === form.location)
