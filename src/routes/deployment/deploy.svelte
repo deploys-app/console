@@ -190,6 +190,7 @@
 			const resp = await api.invoke('deployment.deploy', {
 				project,
 				...form,
+				protocol: form.type === 'WebService' ? form.protocol : '',
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
 				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {})
 			}, fetch)
