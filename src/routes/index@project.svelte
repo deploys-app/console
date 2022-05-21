@@ -84,6 +84,12 @@
 				<input id="input-project_number" type="text" readonly value={project.id}>
 			</div>
 		</div>
+		<div class="moon-field">
+			<label for="input-project_number">Billing Account ID</label>
+			<div class="moon-input">
+				<input id="input-project_number" type="text" readonly value={project.billingAccount}>
+			</div>
+		</div>
 
 <!--		<hr>-->
 
