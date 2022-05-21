@@ -43,7 +43,8 @@
 					const result = await api.invoke('route.delete', {
 						project,
 						location: route.location,
-						name: route.name
+						domain: route.domain,
+						path: route.path
 					}, fetch)
 					if (!result.ok) {
 						window.dispatchEvent(new CustomEvent('error', {
