@@ -4,7 +4,7 @@
 	export async function load ({ url, stuff, fetch }) {
 		const { project } = stuff
 		const id = url.searchParams.get('id')
-		const serviceAccount = await api.invoke('serviceaccount.get', { project, id }, fetch)
+		const serviceAccount = await api.invoke('serviceAccount.get', { project, id }, fetch)
 		if (!serviceAccount.ok) {
 			if (serviceAccount.error.message === 'api: service account not found') {
 				return {
@@ -43,7 +43,7 @@
 				title: `Delete "${serviceAccount.name}" service account`,
 				yes: 'Delete',
 				callback: async () => {
-					const result = await api.invoke('serviceaccount.delete', { project, id }, fetch)
+					const result = await api.invoke('serviceAccount.delete', { project, id }, fetch)
 					if (!result.ok) {
 						window.dispatchEvent(new CustomEvent('error', {
 							detail: {
@@ -67,7 +67,7 @@
 
 		try {
 			loadingCreateKey = true
-			const result = await api.invoke('serviceaccount.createKey', { project: project, id }, fetch)
+			const result = await api.invoke('serviceAccount.createKey', { project: project, id }, fetch)
 			if (!result.ok) {
 				window.dispatchEvent(new CustomEvent('error', {
 					detail: {
@@ -94,7 +94,7 @@
 				title: 'Confirm delete key ?',
 				yes: 'Delete',
 				callback: async () => {
-					const result = await api.invoke('serviceaccount.deleteKey', { project: project, id, secret }, fetch)
+					const result = await api.invoke('serviceAccount.deleteKey', { project: project, id, secret }, fetch)
 					if (!result.ok) {
 						window.dispatchEvent(new CustomEvent('error', {
 							detail: {

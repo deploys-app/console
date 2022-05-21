@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const pullSecrets = await api.invoke('pullsecret.list', { project }, fetch)
+		const pullSecrets = await api.invoke('pullSecret.list', { project }, fetch)
 		if (!pullSecrets.ok && !pullSecrets.error.forbidden) {
 			return {
 				status: 500,

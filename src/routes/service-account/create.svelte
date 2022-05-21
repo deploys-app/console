@@ -7,7 +7,7 @@
 
 		let serviceAccount
 		if (id) {
-			serviceAccount = await api.invoke('serviceaccount.get', { project, id }, fetch)
+			serviceAccount = await api.invoke('serviceAccount.get', { project, id }, fetch)
 			if (!serviceAccount.ok) {
 				if (serviceAccount.error.notFound) {
 					return {
@@ -51,7 +51,7 @@
 		}
 
 		saving = true
-		const fn = id ? 'serviceaccount.update' : 'serviceaccount.create'
+		const fn = id ? 'serviceAccount.update' : 'serviceAccount.create'
 		try {
 			const result = await api.invoke(fn, { project, sid, name, description: desc }, fetch)
 			if (!result.ok) {

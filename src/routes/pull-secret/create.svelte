@@ -58,7 +58,7 @@
 					}
 				}
 			}
-			const result = await api.invoke('pullsecret.create', {
+			const result = await api.invoke('pullSecret.create', {
 				project,
 				location: form.location,
 				name: form.name,

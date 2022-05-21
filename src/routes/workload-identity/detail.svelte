@@ -8,7 +8,7 @@
 
 		const [locationData, workloadIdentity] = await Promise.all([
 			api.invoke('location.get', { project, id: location }, fetch),
-			api.invoke('workloadidentity.get', { project, location, name }, fetch)
+			api.invoke('workloadIdentity.get', { project, location, name }, fetch)
 		])
 
 		if (!locationData.ok || !workloadIdentity.ok) {
@@ -62,7 +62,7 @@
 				title: `Delete "${workloadIdentity.name}" ?`,
 				yes: 'Delete',
 				callback: async () => {
-					const result = await api.invoke('workloadidentity.delete', {
+					const result = await api.invoke('workloadIdentity.delete', {
 						project,
 						location: workloadIdentity.location,
 						name: workloadIdentity.name

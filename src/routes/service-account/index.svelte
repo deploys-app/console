@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const serviceAccounts = await api.invoke('serviceaccount.list', { project }, fetch)
+		const serviceAccounts = await api.invoke('serviceAccount.list', { project }, fetch)
 		if (!serviceAccounts.ok && !serviceAccounts.error.forbidden) {
 			return {
 				status: 500,

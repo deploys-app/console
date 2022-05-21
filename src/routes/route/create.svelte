@@ -32,10 +32,16 @@
 		domain: '',
 		path: '',
 		location: '',
-		target: ''
+		targetPrefix: '',
+		targetValue: ''
 	}
 
 	$: currentLocation = locations.find((x) => x.id === form.location)
+	$: targetPlaceholder = {
+		'redirect://': 'https://example.com',
+		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
+		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew',
+	}[form.targetPrefix] || ''
 
 	let deployments = []
 
@@ -67,12 +73,12 @@
 
 		saving = true
 		try {
-			const resp = await api.invoke('route.create', {
+			const resp = await api.invoke('route.createV2', {
 				project,
 				location: form.location,
 				domain: form.domain,
 				path: form.path,
-				deployment: form.target
+				target: `${form.targetPrefix}${form.targetValue}`
 			}, fetch)
 			if (!resp.ok) {
 				window.dispatchEvent(new CustomEvent('error', {
@@ -131,17 +137,41 @@
 				</select>
 			</div>
 		</div>
+
 		<div class="moon-field _mgbt-20px">
-			<label for="input-target">Deployments</label>
+			<label for="input-target_prefix">Type</label>
 			<div class="moon-select">
-				<select id="input-target" bind:value={form.target} required>
-					<option value="" selected disabled>Select Deployment</option>
-					{#each deployments as it}
-						<option value={it}>{it}</option>
-					{/each}
+				<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
+					<option value="" selected disabled>Select Type</option>
+					<option value="deployment://">Deployment</option>
+					<option value="redirect://">Redirect</option>
+					<option value="ipfs://">IPFS</option>
+					<option value="ipns://">IPNS</option>
+					<option value="dnslink://">DNSLink</option>
 				</select>
 			</div>
 		</div>
+
+		{#if form.targetPrefix === 'deployment://'}
+			<div class="moon-field _mgbt-20px">
+				<label for="input-target_deployment">Deployments</label>
+				<div class="moon-select">
+					<select id="input-target_deployment" bind:value={form.targetValue} required>
+						<option value="" selected disabled>Select Deployment</option>
+						{#each deployments as it}
+							<option value={it}>{it}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+		{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
+			<div class="moon-field _mgbt-20px">
+				<label for="input-target_value">Value</label>
+				<div class="moon-input">
+					<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
+				</div>
+			</div>
+		{/if}
 		<hr>
 
 		<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>

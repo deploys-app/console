@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const workloadIdentities = await api.invoke('workloadidentity.list', { project }, fetch)
+		const workloadIdentities = await api.invoke('workloadIdentity.list', { project }, fetch)
 		if (!workloadIdentities.ok && !workloadIdentities.error.forbidden) {
 			return {
 				status: 500,

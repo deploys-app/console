@@ -42,7 +42,7 @@
 
 		saving = true
 		try {
-			const result = await api.invoke('workloadidentity.create', {
+			const result = await api.invoke('workloadIdentity.create', {
 				project,
 				location: form.location,
 				name: form.name,

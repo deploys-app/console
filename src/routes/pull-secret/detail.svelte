@@ -5,7 +5,7 @@
 		const { project } = stuff
 		const location = url.searchParams.get('location')
 		const name = url.searchParams.get('name')
-		const pullSecret = await api.invoke('pullsecret.get', { project, location, name }, fetch)
+		const pullSecret = await api.invoke('pullSecret.get', { project, location, name }, fetch)
 		if (!pullSecret.ok) {
 			if (pullSecret.error.notFound) {
 				return {
@@ -58,7 +58,7 @@
 				title: `Delete "${pullSecret.name}" ?`,
 				yes: 'Delete',
 				callback: async () => {
-					const result = await api.invoke('pullsecret.delete', { project, location, name }, fetch)
+					const result = await api.invoke('pullSecret.delete', { project, location, name }, fetch)
 					if (!result.ok) {
 						window.dispatchEvent(new CustomEvent('error', {
 							detail: {

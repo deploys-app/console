@@ -116,7 +116,7 @@
 	$: currentLocation = locations.find((x) => x.id === form.location)
 
 	async function fetchPullSecrets () {
-		const resp = await api.invoke('pullsecret.list', { project, location: currentLocation.id }, fetch)
+		const resp = await api.invoke('pullSecret.list', { project, location: currentLocation.id }, fetch)
 		if (!resp.ok) {
 			if (resp.error.forbidden) {
 				permission.pullSecrets = false
@@ -134,7 +134,7 @@
 	}
 
 	async function fetchWorkloadIdentities () {
-		const resp = await api.invoke('workloadidentity.list', { project, location: currentLocation.id }, fetch)
+		const resp = await api.invoke('workloadIdentity.list', { project, location: currentLocation.id }, fetch)
 		if (!resp.ok) {
 			if (resp.error.forbidden) {
 				permission.workloadIdentities = false

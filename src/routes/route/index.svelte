@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const routes = await api.invoke('route.listv2', { project }, fetch)
+		const routes = await api.invoke('route.listV2', { project }, fetch)
 		if (!routes.ok && !routes.error.forbidden) {
 			return {
 				status: 500,
