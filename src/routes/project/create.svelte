@@ -58,11 +58,17 @@
 
 		saving = true
 		try {
-			const resp = await api.invoke('project.create', {
-				sid: form.sid,
-				name: form.name,
-				billingAccount: form.billingAccount
-			}, fetch)
+			const resp = project
+				? await api.invoke('project.update', {
+					project: form.sid,
+					name: form.name,
+					billingAccount: form.billingAccount
+				}, fetch)
+				: await api.invoke('project.create', {
+					sid: form.sid,
+					name: form.name,
+					billingAccount: form.billingAccount
+				}, fetch)
 			if (!resp.ok) {
 				window.dispatchEvent(new CustomEvent('error', {
 					detail: {
