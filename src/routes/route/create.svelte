@@ -111,13 +111,13 @@
 		<div class="moon-field">
 			<label for="input-domain">Domain</label>
 			<div class="moon-input">
-				<input id="input-domain" value={form.domain}>
+				<input id="input-domain" bind:value={form.domain}>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-path">Path</label>
 			<div class="moon-input">
-				<input id="input-path" value={form.path}>
+				<input id="input-path" bind:value={form.path}>
 			</div>
 		</div>
 		<div class="moon-field _mgbt-20px">
