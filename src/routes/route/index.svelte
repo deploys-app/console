@@ -77,7 +77,7 @@
 			<thead>
 			<tr>
 				<th>Route</th>
-				<th>Deployment</th>
+				<th>Target</th>
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
