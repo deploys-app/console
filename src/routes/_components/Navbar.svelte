@@ -36,7 +36,7 @@
 		<div class="moon-popup" class:is-active={active}>
 			<ul class="user-menu">
 				<li>
-					<a class="item _dp-b" href="/billing" on:click={close}>
+					<a sveltekit:prefetch class="item _dp-b" href="/billing" on:click={close}>
                         Billing accounts
                     </a>
 				</li>
