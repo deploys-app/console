@@ -65,7 +65,7 @@
 
 			setChartSeries(chart.cpuUsage.chart, 'usage', resp.result.cpuUsage, update)
 			setChartSeries(chart.memory.chart, 'usage', resp.result.memoryUsage, update)
-			setChartSeries(chart.memory.chart, 'allocated', resp.result.memory, update)
+			setChartSeries(chart.memory.chart, 'allocated', resp.result.memory, true)
 			chart.requests.chart && setChartSeries(chart.requests.chart, '', resp.result.requests, update)
 			setChartSeries(chart.egress.chart, '', resp.result.egress, update)
 		} finally {
