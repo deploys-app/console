@@ -3,7 +3,7 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const routes = await api.invoke('route.listV2', { project }, fetch)
+		const routes = await api.invoke('route.list', { project }, fetch)
 		if (!routes.ok && !routes.error.forbidden) {
 			return {
 				status: 500,
@@ -15,7 +15,7 @@
 				permission: {
 					routes: !routes.error?.forbidden
 				},
-				routes: routes.result || []
+				routes: routes.result
 			},
 			dependencies: ['routes']
 		}
@@ -88,7 +88,7 @@
 			{#if $loading}
 				<LoadingRow span="4" />
 			{:else}
-				{#each routes as it}
+				{#each routes?.items || [] as it}
 					<tr>
 						<td>
 							<a class="moon-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
