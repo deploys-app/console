@@ -15,13 +15,6 @@ const cookieOptions = {
 	secret: import.meta.env.PROD
 }
 
-const cookieProjectOptions = {
-	maxAge: 60 * 60 * 24 * 7,
-	sameSite: 'lax',
-	path: '/',
-	secret: import.meta.env.PROD
-}
-
 const cookieRemoveOptions = {
 	httpOnly: true,
 	maxAge: -1,
@@ -31,12 +24,16 @@ const cookieRemoveOptions = {
 }
 
 async function handleCookie ({ event, resolve }) {
-	const { request, locals } = event
+	const { request, locals, url } = event
 	const cs = cookie.parse(request.headers.get('cookie') || '')
 
 	locals.token = cs.token || ''
 	locals.project = cs.project || ''
 	locals.state = cs.state
+
+	if (url.pathname.startsWith('/api/')) {
+		return resolve(event)
+	}
 
 	const resp = await resolve(event)
 
@@ -51,6 +48,11 @@ async function handleCookie ({ event, resolve }) {
 
 function storeProject ({ event, resolve }) {
 	const { url, locals } = event
+
+	if (url.pathname.startsWith('/api/')) {
+		return resolve(event)
+	}
+
 	const project = url.searchParams.get('project')
 	if (project && project !== locals.project) {
 		locals.project = project
