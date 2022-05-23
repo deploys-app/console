@@ -47,7 +47,7 @@
 	<ul class="sidebar-menus">
 		{#if $project}
 			<li>
-				<a href={`/?project=${$project}`} title="Dashboard">
+				<a sveltekit:prefetch href={`/?project=${$project}`} title="Dashboard">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'dashboard'}>
 						<span class="menu-icon">
 							<i class="fas fa-columns"></i>
@@ -57,7 +57,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/deployment?project=${$project}`} title="Deployments">
+				<a sveltekit:prefetch href={`/deployment?project=${$project}`} title="Deployments">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'deployment'}>
 						<span class="menu-icon">
 							<i class="fas fa-rocket"></i>
@@ -67,7 +67,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/route?project=${$project}`} title="Routes">
+				<a sveltekit:prefetch href={`/route?project=${$project}`} title="Routes">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'route'}>
 						<span class="menu-icon">
 							<i class="fas fa-router"></i>
@@ -77,7 +77,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/workload-identity?project=${$project}`} title="Workload Identities">
+				<a sveltekit:prefetch href={`/workload-identity?project=${$project}`} title="Workload Identities">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'workload-identity'}>
 						<span class="menu-icon">
 							<i class="fas fa-network-wired"></i>
@@ -87,7 +87,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/disk?project=${$project}`} title="Disks">
+				<a sveltekit:prefetch href={`/disk?project=${$project}`} title="Disks">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'disk'}>
 						<span class="menu-icon">
 							<i class="fas fa-hdd"></i>
@@ -97,7 +97,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/pull-secret?project=${$project}`} title="Pull Secrets">
+				<a sveltekit:prefetch href={`/pull-secret?project=${$project}`} title="Pull Secrets">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'pull-secret'}>
 						<span class="menu-icon">
 							<i class="fas fa-key"></i>
@@ -107,7 +107,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/role?project=${$project}`} title="Roles">
+				<a sveltekit:prefetch href={`/role?project=${$project}`} title="Roles">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'role'}>
 						<span class="menu-icon">
 							<i class="fas fa-user-tag"></i>
@@ -117,7 +117,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/role/users?project=${$project}`} title="Users">
+				<a sveltekit:prefetch href={`/role/users?project=${$project}`} title="Users">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'role.users'}>
 						<span class="menu-icon">
 							<i class="fas fa-users"></i>
@@ -127,7 +127,7 @@
 				</a>
 			</li>
 			<li>
-				<a href={`/service-account?project=${$project}`} title="Users">
+				<a sveltekit:prefetch href={`/service-account?project=${$project}`} title="Users">
 					<div class="menu-item" class:is-active={$page.stuff.menu === 'service-account'}>
 						<span class="menu-icon">
 							<i class="fas fa-user-lock"></i>
