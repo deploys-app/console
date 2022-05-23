@@ -101,19 +101,19 @@
 <div class="nav-tabs-wrap _fdrt-cl _fdrt-r-md">
 	<ul class="nav nav-tabs _mgbt-20px _mgbt-0px-lg _w-100pct">
 		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/metrics'} href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Metric</a>
+			<a sveltekit:prefetch class="nav-link" class:active={$page.url.pathname === '/deployment/metrics'} href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Metric</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/detail'} href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Details</a>
+			<a sveltekit:prefetch class="nav-link" class:active={$page.url.pathname === '/deployment/detail'} href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Details</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/revision'} href={`/deployment/revision?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Revision</a>
+			<a sveltekit:prefetch class="nav-link" class:active={$page.url.pathname === '/deployment/revision'} href={`/deployment/revision?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Revision</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/logs'} href={`/deployment/logs?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Logs</a>
+			<a sveltekit:prefetch class="nav-link" class:active={$page.url.pathname === '/deployment/logs'} href={`/deployment/logs?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Logs</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/events'} href={`/deployment/events?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Events</a>
+			<a sveltekit:prefetch class="nav-link" class:active={$page.url.pathname === '/deployment/events'} href={`/deployment/events?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Events</a>
 		</li>
 	</ul>
 </div>
