@@ -128,19 +128,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.19":
-  version: 1.0.0-next.19
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.19"
+"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.20":
+  version: 1.0.0-next.20
+  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.20"
   dependencies:
-    esbuild: ^0.14.21
-    worktop: 0.8.0-next.13
-  checksum: 5ff638c75b3ef7ffc51ed166b62a049e9eef20fafb032139beac0d2fc6e6f4968dee240b336a3c723d731caf03dc0957bb6ae3d1c432bf46486c5fecc7335985
+    esbuild: ^0.14.29
+    worktop: 0.8.0-next.14
+  checksum: 9670e21c6a11abd04cac84e3cbacb2853db61daacc771566c740b818273ec506f67e3788df1db1721731427130cdc7d73d73dd7ebce9115761acc0a6815ea3d6
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.340":
-  version: 1.0.0-next.340
-  resolution: "@sveltejs/kit@npm:1.0.0-next.340"
+"@sveltejs/kit@npm:=1.0.0-next.343":
+  version: 1.0.0-next.343
+  resolution: "@sveltejs/kit@npm:1.0.0-next.343"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.44
     chokidar: ^3.5.3
@@ -150,7 +150,7 @@ __metadata:
     svelte: ^3.44.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 95a3b2976fb4f7ce5aa5f49d1a40bd8500aac6c343fd88b6906fe427416a2903c5bfe79bed15e51742d10648c91c547d18216058ecac7c6d54089f294d018b88
+  checksum: 4686effe669bda4d6cbe4ea76c94bc65b7fc2469d729e5d13aba13855eb02a4981a7417cce6c24b096292ced563d6ac5b439ad7cf2d62bc3745a926daf325626
   languageName: node
   linkType: hard
 
@@ -515,8 +515,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sveltejs/adapter-cloudflare": =1.0.0-next.19
-    "@sveltejs/kit": =1.0.0-next.340
+    "@sveltejs/adapter-cloudflare": =1.0.0-next.20
+    "@sveltejs/kit": =1.0.0-next.343
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.2
@@ -804,7 +804,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.14.21, esbuild@npm:^0.14.27":
+"esbuild@npm:^0.14.27, esbuild@npm:^0.14.29":
   version: 0.14.39
   resolution: "esbuild@npm:0.14.39"
   dependencies:
@@ -2603,13 +2603,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"worktop@npm:0.8.0-next.13":
-  version: 0.8.0-next.13
-  resolution: "worktop@npm:0.8.0-next.13"
+"worktop@npm:0.8.0-next.14":
+  version: 0.8.0-next.14
+  resolution: "worktop@npm:0.8.0-next.14"
   dependencies:
     mrmime: ^1.0.0
     regexparam: ^2.0.0
-  checksum: 6939db42f0e4b15118d9445e802a286afa633d9aa549f5001066a371ffc793e70e986347aa90edc94cf68fbe98952f4ece341317a3dea719dc94e0e649abb358
+  checksum: a52ce8df2d4c32602b685813a53c833243fb18a6bf5bf750d4b28dcba5848181b6a08ecb21a165e886d3e36aea7073b701f6f73cabd513372cec1b95ced3bd9f
   languageName: node
   linkType: hard
 
