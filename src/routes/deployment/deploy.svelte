@@ -174,7 +174,7 @@
 		workloadIdentities = []
 		disks = []
 
-		await $tick()
+		await tick()
 		if (!currentLocation) {
 			return
 		}
