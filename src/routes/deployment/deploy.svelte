@@ -55,6 +55,7 @@
 	import format from '$lib/format'
 	import { onMount, tick } from 'svelte'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let locations
 	export let quota
@@ -122,11 +123,7 @@
 				permission.pullSecrets = false
 				return
 			}
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: resp.error
-				}
-			}))
+			modal.error({ error: resp.error })
 			return
 		}
 		pullSecrets = resp.result.pullSecrets || []
@@ -140,11 +137,7 @@
 				permission.workloadIdentities = false
 				return
 			}
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: resp.error
-				}
-			}))
+			modal.error({ error: resp.error })
 			return
 		}
 		workloadIdentities = resp.result.list || []
@@ -158,11 +151,7 @@
 				permission.disks = false
 				return
 			}
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: resp.error
-				}
-			}))
+			modal.error({ error: resp.error })
 			return
 		}
 		disks = resp.result.list || []
@@ -216,11 +205,7 @@
 				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {})
 			}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/deployment/detail?project=${project}&location=${form.location}&name=${form.name}`)

@@ -40,6 +40,7 @@
 
 <script>
 	import { goto, invalidate } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let project
 	export let billingAccounts
@@ -70,11 +71,7 @@
 					billingAccount: form.billingAccount
 				}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			await invalidate('projects')

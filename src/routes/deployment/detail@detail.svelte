@@ -30,6 +30,7 @@
 	import ClipboardJS from 'clipboard'
 	import format from '$lib/format'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let deployment
 	export let location
@@ -48,28 +49,22 @@
 	})
 
 	function deleteItem () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete "${deployment.name}" ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('deployment.delete', {
-						project: deployment.project,
-						location: deployment.location,
-						name: deployment.name
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					goto(`/deployment?project=${deployment.project}`)
+		modal.confirm({
+			title: `Delete "${deployment.name}" ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('deployment.delete', {
+					project: deployment.project,
+					location: deployment.location,
+					name: deployment.name
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				goto(`/deployment?project=${deployment.project}`)
 			}
-		}))
+		})
 	}
 </script>
 

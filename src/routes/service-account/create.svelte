@@ -34,6 +34,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let id
 	export let serviceAccount
@@ -53,22 +54,14 @@
 		saving = true
 		const fn = id ? 'serviceAccount.update' : 'serviceAccount.create'
 		try {
-			const result = await api.invoke(fn, { project, sid, name, description: desc }, fetch)
-			if (!result.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: result.error
-					}
-				}))
+			const resp = await api.invoke(fn, { project, sid, name, description: desc }, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/service-account?project=${project}`)
 		} catch (e) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: e
-				}
-			}))
+			modal.error({ error: e })
 		} finally {
 			saving = false
 		}

@@ -31,6 +31,7 @@
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 	import { invalidate } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let permission
 	export let users
@@ -38,28 +39,22 @@
 	$: project = $page.stuff.project
 
 	function deleteUser (email) {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete user ${email} from project ${project} ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('role.bind', {
-						project,
-						email,
-						roles: []
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await invalidate('users')
+		modal.confirm({
+			title: `Delete user ${email} from project ${project} ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('role.bind', {
+					project,
+					email,
+					roles: []
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await invalidate('users')
 			}
-		}))
+		})
 	}
 </script>
 

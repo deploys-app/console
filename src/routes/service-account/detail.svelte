@@ -31,31 +31,26 @@
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/stores'
 	import format from '$lib/format'
+	import modal from '$lib/modal'
 
 	export let id
 	export let serviceAccount
 
 	$: project = $page.stuff.project
 
-	async function deleteItem () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete "${serviceAccount.name}" service account`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('serviceAccount.delete', { project, id }, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await goto(`/service-account?project=${project}`)
+	function deleteItem () {
+		modal.confirm({
+			title: `Delete "${serviceAccount.name}" service account`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('serviceAccount.delete', { project, id }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await goto(`/service-account?project=${project}`)
 			}
-		}))
+		})
 	}
 
 	let loadingCreateKey
@@ -67,46 +62,32 @@
 
 		try {
 			loadingCreateKey = true
-			const result = await api.invoke('serviceAccount.createKey', { project: project, id }, fetch)
-			if (!result.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: result.error
-					}
-				}))
+			const resp = await api.invoke('serviceAccount.createKey', { project: project, id }, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
 				return
 			}
 			await invalidate('serviceAccount/keys')
 		} catch (e) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: e
-				}
-			}))
+			modal.error({ error: e })
 		} finally {
 			loadingCreateKey = false
 		}
 	}
 
 	function deleteKey (secret) {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: 'Confirm delete key ?',
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('serviceAccount.deleteKey', { project: project, id, secret }, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await invalidate('serviceAccount/keys')
+		modal.confirm({
+			title: 'Confirm delete key ?',
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('serviceAccount.deleteKey', { project: project, id, secret }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await invalidate('serviceAccount/keys')
 			}
-		}))
+		})
 	}
 </script>
 

@@ -23,6 +23,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let locations
 
@@ -51,11 +52,7 @@
 
 		const resp = await api.invoke('deployment.list', { project }, fetch)
 		if (!resp.ok) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: resp.error
-				}
-			}))
+			modal.error({ error: resp.error })
 			return
 		}
 		const list = resp.result.deployments || []
@@ -81,11 +78,7 @@
 				target: `${form.targetPrefix}${form.targetValue}`
 			}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/route?project=${project}`)

@@ -3,6 +3,7 @@
 	import { page } from '$app/stores'
 	import { invalidate } from '$app/navigation'
 	import api from '$lib/api'
+	import modal from '$lib/modal'
 
 	export let deployment
 
@@ -12,53 +13,41 @@
 	$: canResume = deployment.status === 'success' && deployment.action === 3
 
 	function pause () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Pause ${deployment.name} in ${deployment.location} ?`,
-				yes: 'Pause',
-				callback: async () => {
-					const result = await api.invoke('deployment.pause', {
-						project: deployment.project,
-						location: deployment.location,
-						name: deployment.name
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await invalidate('deployment')
+		modal.confirm({
+			title: `Pause ${deployment.name} in ${deployment.location} ?`,
+			yes: 'Pause',
+			callback: async () => {
+				const resp = await api.invoke('deployment.pause', {
+					project: deployment.project,
+					location: deployment.location,
+					name: deployment.name
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await invalidate('deployment')
 			}
-		}))
+		})
 	}
 
 	function resume () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Resume ${deployment.name} in ${deployment.location} ?`,
-				yes: 'Resume',
-				callback: async () => {
-					const result = await api.invoke('deployment.resume', {
-						project: deployment.project,
-						location: deployment.location,
-						name: deployment.name
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await invalidate('deployment')
+		modal.confirm({
+			title: `Resume ${deployment.name} in ${deployment.location} ?`,
+			yes: 'Resume',
+			callback: async () => {
+				const resp = await api.invoke('deployment.resume', {
+					project: deployment.project,
+					location: deployment.location,
+					name: deployment.name
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await invalidate('deployment')
 			}
-		}))
+		})
 	}
 </script>
 

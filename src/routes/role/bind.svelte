@@ -42,6 +42,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let roles
 	export let email
@@ -77,11 +78,7 @@
 				roles: form.roles
 			}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			await goto(`/role/users?project=${project}`)
