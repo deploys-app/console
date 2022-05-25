@@ -45,6 +45,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let locations
 	export let location
@@ -68,27 +69,19 @@
 		saving = true
 		const fn = disk ? 'disk.update' : 'disk.create'
 		try {
-			const result = await api.invoke(fn, {
+			const resp = await api.invoke(fn, {
 				project,
 				location: form.location,
 				name: form.name,
 				size: form.size
 			}, fetch)
-			if (!result.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: result.error
-					}
-				}))
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/disk?project=${project}`)
 		} catch (e) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: e
-				}
-			}))
+			modal.error({ error: e })
 		} finally {
 			saving = false
 		}

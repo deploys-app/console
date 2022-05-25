@@ -24,6 +24,7 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import validUrl from 'valid-url'
+	import modal from '$lib/modal'
 
 	export let locations
 
@@ -58,27 +59,19 @@
 					}
 				}
 			}
-			const result = await api.invoke('pullSecret.create', {
+			const resp = await api.invoke('pullSecret.create', {
 				project,
 				location: form.location,
 				name: form.name,
 				value: btoa(JSON.stringify(dockerConfig))
 			}, fetch)
-			if (!result.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: result.error
-					}
-				}))
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/pull-secret?project=${project}`)
 		} catch (e) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: e
-				}
-			}))
+			modal.error({ error: e })
 		} finally {
 			saving = false
 		}

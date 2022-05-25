@@ -41,6 +41,7 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '../../lib/components/NoDataRow.svelte'
+	import modal from '$lib/modal'
 
 	export let role
 	export let permissions
@@ -54,24 +55,18 @@
 	$: project = $page.stuff.project
 
 	function deleteItem () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete ${role.role} and its users ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('role.delete', { project, role: role.role }, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					goto(`/role?project=${project}`)
+		modal.confirm({
+			title: `Delete ${role.role} and its users ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('role.delete', { project, role: role.role }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				goto(`/role?project=${project}`)
 			}
-		}))
+		})
 	}
 
 	function addPermission (permission) {
@@ -97,11 +92,7 @@
 				...form
 			}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/role?project=${project}`)

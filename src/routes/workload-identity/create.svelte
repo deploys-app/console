@@ -23,6 +23,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let locations
 
@@ -42,18 +43,14 @@
 
 		saving = true
 		try {
-			const result = await api.invoke('workloadIdentity.create', {
+			const resp = await api.invoke('workloadIdentity.create', {
 				project,
 				location: form.location,
 				name: form.name,
 				gsa: form.gsa
 			}, fetch)
-			if (!result.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: result.error
-					}
-				}))
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
 				return
 			}
 			goto(`/workload-identity?project=${project}`)

@@ -29,34 +29,29 @@
 <script>
 	import format from '$lib/format'
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let deployment
 	export let revisions
 
 	function rollback (toRevision) {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Rollback ${deployment.name} to revision ${toRevision}`,
-				yes: 'Rollback',
-				callback: async () => {
-					const result = await api.invoke('deployment.rollback', {
-						project: deployment.project,
-						location: deployment.location,
-						name: deployment.name,
-						revision: toRevision
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+		modal.confirm({
+			title: `Rollback ${deployment.name} to revision ${toRevision}`,
+			yes: 'Rollback',
+			callback: async () => {
+				const resp = await api.invoke('deployment.rollback', {
+					project: deployment.project,
+					location: deployment.location,
+					name: deployment.name,
+					revision: toRevision
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
 			}
-		}))
+		})
 	}
 </script>
 

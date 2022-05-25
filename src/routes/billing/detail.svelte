@@ -28,28 +28,23 @@
 
 <script>
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let billingAccount
 
 	function deleteItem () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete "${billingAccount.name}" ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('billing.delete', { id: billingAccount.id }, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					goto('/billing')
+		modal.confirm({
+			title: `Delete "${billingAccount.name}" ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('billing.delete', { id: billingAccount.id }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				goto('/billing')
 			}
-		}))
+		})
 	}
 </script>
 

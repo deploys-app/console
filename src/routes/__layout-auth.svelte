@@ -33,8 +33,6 @@
 	import '../style/main.scss'
 	import Navbar from './_components/Navbar.svelte'
 	import Sidebar from './_components/Sidebar.svelte'
-	import ConfirmModal from './_components/ConfirmModal.svelte'
-	import ErrorModal from './_components/ErrorModal.svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
@@ -75,9 +73,6 @@
 		<slot />
 	</div>
 </div>
-
-<ConfirmModal />
-<ErrorModal />
 
 <style>
 	:root {

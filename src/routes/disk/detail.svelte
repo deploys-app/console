@@ -38,6 +38,7 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { browser } from '$app/env'
 	import { goto, invalidate } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let location
 	export let name
@@ -61,25 +62,19 @@
 		})
 	}
 
-	async function deleteItem () {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete "${name}" ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('disk.delete', { project, location, name }, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await goto(`/disk?project=${project}`)
+	function deleteItem () {
+		modal.confirm({
+			title: `Delete "${name}" ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('disk.delete', { project, location, name }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await goto(`/disk?project=${project}`)
 			}
-		}))
+		})
 	}
 </script>
 

@@ -15,6 +15,7 @@
 	import { invalidate } from '$app/navigation'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
+	import modal from '$lib/modal'
 
 	export let projects
 
@@ -38,13 +39,9 @@
 			return
 		}
 
-		result = await api.invoke('project.delete', { project }, fetch)
-		if (!result.ok) {
-			window.dispatchEvent(new CustomEvent('error', {
-				detail: {
-					error: result.error
-				}
-			}))
+		const resp = await api.invoke('project.delete', { project }, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
 			return
 		}
 		await invalidate('projects')

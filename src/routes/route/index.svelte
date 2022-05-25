@@ -28,6 +28,7 @@
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
 	import { invalidate } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let permission
 	export let routes
@@ -35,29 +36,23 @@
 	$: project = $page.stuff.project
 
 	function deleteRoute (route) {
-		window.dispatchEvent(new CustomEvent('confirm', {
-			detail: {
-				title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
-				yes: 'Delete',
-				callback: async () => {
-					const result = await api.invoke('route.delete', {
-						project,
-						location: route.location,
-						domain: route.domain,
-						path: route.path
-					}, fetch)
-					if (!result.ok) {
-						window.dispatchEvent(new CustomEvent('error', {
-							detail: {
-								error: result.error
-							}
-						}))
-						return
-					}
-					await invalidate('routes')
+		modal.confirm({
+			title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
+			yes: 'Delete',
+			callback: async () => {
+				const resp = await api.invoke('route.delete', {
+					project,
+					location: route.location,
+					domain: route.domain,
+					path: route.path
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
 				}
+				await invalidate('routes')
 			}
-		}))
+		})
 	}
 </script>
 

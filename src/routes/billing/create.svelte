@@ -31,6 +31,7 @@
 
 <script>
 	import { goto } from '$app/navigation'
+	import modal from '$lib/modal'
 
 	export let billingAccount
 
@@ -58,11 +59,7 @@
 				taxAddress: form.taxAddress
 			}, fetch)
 			if (!resp.ok) {
-				window.dispatchEvent(new CustomEvent('error', {
-					detail: {
-						error: resp.error
-					}
-				}))
+				modal.error({ error: resp.error })
 				return
 			}
 			goto('/billing')
