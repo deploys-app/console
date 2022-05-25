@@ -128,19 +128,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.20":
-  version: 1.0.0-next.20
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.20"
+"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.21":
+  version: 1.0.0-next.21
+  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.21"
   dependencies:
     esbuild: ^0.14.29
     worktop: 0.8.0-next.14
-  checksum: 9670e21c6a11abd04cac84e3cbacb2853db61daacc771566c740b818273ec506f67e3788df1db1721731427130cdc7d73d73dd7ebce9115761acc0a6815ea3d6
+  checksum: 6db2b563de47a79fdbd2516d5df93cb13d09a387d0ef64a1c2d65d6c3af282be1126540228675b1ba2e83c9845cfc9ff0b813e1acbe7e17f209efea46f98365e
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.343":
-  version: 1.0.0-next.343
-  resolution: "@sveltejs/kit@npm:1.0.0-next.343"
+"@sveltejs/kit@npm:=1.0.0-next.344":
+  version: 1.0.0-next.344
+  resolution: "@sveltejs/kit@npm:1.0.0-next.344"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.44
     chokidar: ^3.5.3
@@ -150,7 +150,7 @@ __metadata:
     svelte: ^3.44.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 4686effe669bda4d6cbe4ea76c94bc65b7fc2469d729e5d13aba13855eb02a4981a7417cce6c24b096292ced563d6ac5b439ad7cf2d62bc3745a926daf325626
+  checksum: 1587c193df46a06fb1ece4e8c3b320bb924141eba3c0845ba57b79945573477a8388bcff199d86ad2a3ef6af891eccc3492e9246d678142bb9246e041daac46e
   languageName: node
   linkType: hard
 
@@ -515,8 +515,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sveltejs/adapter-cloudflare": =1.0.0-next.20
-    "@sveltejs/kit": =1.0.0-next.343
+    "@sveltejs/adapter-cloudflare": =1.0.0-next.21
+    "@sveltejs/kit": =1.0.0-next.344
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.2
@@ -533,8 +533,8 @@ __metadata:
     svelte: ^3.48.0
     svelte-check: ^2.7.1
     svelte-preprocess: ^4.10.6
-    sweetalert2: ^11.4.15
-    typescript: ~4.6.4
+    sweetalert2: ^11.4.17
+    typescript: ~4.7.2
     valid-url: ^1.0.9
   languageName: unknown
   linkType: soft
@@ -2412,10 +2412,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.4.15":
-  version: 11.4.15
-  resolution: "sweetalert2@npm:11.4.15"
-  checksum: 3a829e26e5904b49f1464076600298cf3608318d4cc0af1efca03bd6bccec5bf1dc08e05f21d8870a3e666ef030fa8cc9e118153cc4798cc034e0f25f726cb84
+"sweetalert2@npm:^11.4.17":
+  version: 11.4.17
+  resolution: "sweetalert2@npm:11.4.17"
+  checksum: 362dbbe9a590f4525f2e60d6277288017ef301425c5df63d26809a8b471acc33c155e2e956b62f70db84276654a5de62d19439332771f1841233cbdd61caade2
   languageName: node
   linkType: hard
 
@@ -2479,7 +2479,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:*, typescript@npm:~4.6.4":
+"typescript@npm:*":
   version: 4.6.4
   resolution: "typescript@npm:4.6.4"
   bin:
@@ -2489,13 +2489,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@*#~builtin<compat/typescript>, typescript@patch:typescript@~4.6.4#~builtin<compat/typescript>":
+"typescript@npm:~4.7.2":
+  version: 4.7.2
+  resolution: "typescript@npm:4.7.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 5163585e6b56410f77d5483b698d9489bbee8902c99029eb70cf6d21525a186530ce19a00951af84eefd4a131cc51d0959f5118e25e70ab61f45ac4057dbd1ef
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@*#~builtin<compat/typescript>":
   version: 4.6.4
   resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=7ad353"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 1cb434fbc637d347be90e3a0c6cd05e33c38f941713c8786d3031faf1842c2c148ba91d2fac01e7276b0ae3249b8633f1660e32686cc7a8c6a8fd5361dc52c66
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@~4.7.2#~builtin<compat/typescript>":
+  version: 4.7.2
+  resolution: "typescript@patch:typescript@npm%3A4.7.2#~builtin<compat/typescript>::version=4.7.2&hash=7ad353"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 7e2b9a9f4a70fb7616f1b0d986977f8e34a74f046202fa7f24fdee79589598277810fa216b3776c20c0683a9235872c73be34fdb93f67f98c1efaca40999422f
   languageName: node
   linkType: hard
 
