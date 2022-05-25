@@ -138,9 +138,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.344":
-  version: 1.0.0-next.344
-  resolution: "@sveltejs/kit@npm:1.0.0-next.344"
+"@sveltejs/kit@npm:=1.0.0-next.345":
+  version: 1.0.0-next.345
+  resolution: "@sveltejs/kit@npm:1.0.0-next.345"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.44
     chokidar: ^3.5.3
@@ -150,7 +150,7 @@ __metadata:
     svelte: ^3.44.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 1587c193df46a06fb1ece4e8c3b320bb924141eba3c0845ba57b79945573477a8388bcff199d86ad2a3ef6af891eccc3492e9246d678142bb9246e041daac46e
+  checksum: 3d151da6c4fcc9fe72286458610971599f73174b24625ca1b3d0ec6309e6e1708dabadf6749643dae878ac4afd19a18ef3a440cf68e73032a60a43d6e1f75f7d
   languageName: node
   linkType: hard
 
@@ -516,7 +516,7 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.21
-    "@sveltejs/kit": =1.0.0-next.344
+    "@sveltejs/kit": =1.0.0-next.345
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.2
