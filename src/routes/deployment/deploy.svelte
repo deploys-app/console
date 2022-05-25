@@ -53,7 +53,7 @@
 <script>
 	import { page } from '$app/stores'
 	import format from '$lib/format'
-	import { onMount } from 'svelte'
+	import { onMount, tick } from 'svelte'
 	import { goto } from '$app/navigation'
 
 	export let locations
@@ -169,11 +169,12 @@
 		form.diskName = form.diskName
 	}
 
-	function changeLocation () {
+	async function changeLocation () {
 		pullSecrets = []
 		workloadIdentities = []
 		disks = []
 
+		await tick()
 		if (!currentLocation) {
 			return
 		}
