@@ -26,3 +26,5 @@ yarn build
 ## License
 
 MIT
+
+This project uses font-awesome pro, you need font-awesome pro license to editing source code.
