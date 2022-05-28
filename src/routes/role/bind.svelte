@@ -23,7 +23,7 @@
 				}
 			}
 
-			selected = (users.result.users || []).find((x) => x.email === email)?.roles
+			selected = (users.result.items || []).find((x) => x.email === email)?.roles
 		}
 
 		return {

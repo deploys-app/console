@@ -18,7 +18,7 @@
 				permission: {
 					users: !users.error?.forbidden
 				},
-				users: users.result?.users || []
+				users: users.result?.items || []
 			},
 			dependencies: ['users']
 		}
