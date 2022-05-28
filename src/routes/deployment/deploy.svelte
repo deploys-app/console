@@ -81,6 +81,7 @@
 		workloadIdentity: deployment.workloadIdentity,
 		port: deployment.port,
 		protocol: deployment.protocol,
+		internal: deployment.internal,
 		command: deployment.command,
 		args: deployment.args,
 		schedule: deployment.schedule,
@@ -101,6 +102,7 @@
 		workloadIdentity: '',
 		port: 8080,
 		protocol: 'http',
+		internal: false, // default for WebService
 		command: [],
 		args: [],
 		schedule: '',
@@ -374,6 +376,12 @@
 						<option value="https">https</option>
 						<option value="h2c">h2c</option>
 					</select>
+				</div>
+			</div>
+			<div class="moon-field">
+				<div class="moon-checkbox">
+					<input id="input-internal" type="checkbox" bind:checked={form.internal}>
+					<label for="input-internal">Internal Service</label>
 				</div>
 			</div>
 		{/if}

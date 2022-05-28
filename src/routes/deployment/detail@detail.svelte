@@ -72,17 +72,19 @@
 <div class="moon-table-container">
 	<table class="moon-table">
 		{#if deployment.type === 'WebService'}
-			<tr>
-				<td>URL</td>
-				<td>
-					<a class="moon-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
-						{`https://${deployment.url}`}
-					</a>
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`https://${deployment.url}`}>
-						<i class="fal fa-copy"></i>
-					</span>
-				</td>
-			</tr>
+			{#if !deployment.internal}
+				<tr>
+					<td>URL</td>
+					<td>
+						<a class="moon-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
+							{`https://${deployment.url}`}
+						</a>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`https://${deployment.url}`}>
+							<i class="fal fa-copy"></i>
+						</span>
+					</td>
+				</tr>
+			{/if}
 			<tr>
 				<td>Internal URL</td>
 				<td>
@@ -112,7 +114,12 @@
 		{/if}
 		<tr>
 			<td>Type</td>
-			<td>{format.deploymentType(deployment.type)}</td>
+			<td>
+				{format.deploymentType(deployment.type)}
+				{#if deployment.internal}
+					(Internal)
+				{/if}
+			</td>
 		</tr>
 		<tr>
 			<td>Location</td>
