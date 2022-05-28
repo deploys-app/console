@@ -15,7 +15,7 @@
 				permission: {
 					pullSecrets: !pullSecrets.error?.forbidden
 				},
-				pullSecrets: pullSecrets.result?.pullSecrets || []
+				pullSecrets: pullSecrets.result?.items || []
 			},
 			dependencies: ['pullSecrets']
 		}

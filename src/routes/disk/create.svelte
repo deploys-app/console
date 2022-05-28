@@ -33,7 +33,7 @@
 
 		return {
 			props: {
-				locations: locations.result.locations || [],
+				locations: locations.result.items || [],
 				location,
 				name,
 				disk: disk?.result

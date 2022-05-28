@@ -15,7 +15,7 @@
 				permission: {
 					workloadIdentities: !workloadIdentities.error?.forbidden
 				},
-				workloadIdentities: workloadIdentities.result?.list || []
+				workloadIdentities: workloadIdentities.result?.items || []
 			},
 			dependencies: ['workloadIdentities']
 		}

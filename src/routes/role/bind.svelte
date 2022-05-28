@@ -32,7 +32,7 @@
 			},
 			props: {
 				email,
-				roles: roles.result.roles || [],
+				roles: roles.result.items || [],
 				selected: selected || []
 			}
 		}

@@ -15,7 +15,7 @@
 				permission: {
 					deployments: !deployments.error?.forbidden
 				},
-				deployments: deployments.result?.deployments || []
+				deployments: deployments.result?.items || []
 			},
 			dependencies: ['deployments']
 		}

@@ -18,11 +18,11 @@
 		}
 		return {
 			stuff: {
-				projects: projects.result.projects || []
+				projects: projects.result.items || []
 			},
 			props: {
 				profile: me.result,
-				projects: projects.result.projects || []
+				projects: projects.result.items || []
 			},
 			dependencies: ['projects']
 		}

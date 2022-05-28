@@ -14,7 +14,7 @@
 
 		return {
 			props: {
-				locations: locations.result.locations || []
+				locations: locations.result.items || []
 			}
 		}
 	}
@@ -55,7 +55,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		const list = resp.result.deployments || []
+		const list = resp.result.items || []
 		deployments = list
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.type === 'WebService')

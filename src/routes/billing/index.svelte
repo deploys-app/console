@@ -11,7 +11,7 @@
 		}
 		return {
 			props: {
-				billingAccounts: billingAccounts.result.billings || []
+				billingAccounts: billingAccounts.result.items || []
 			}
 		}
 	}

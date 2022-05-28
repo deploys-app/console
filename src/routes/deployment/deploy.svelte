@@ -42,7 +42,7 @@
 		}
 		return {
 			props: {
-				locations: locations.result.locations || [],
+				locations: locations.result.items || [],
 				quota: projectInfo.result.quota || {},
 				deployment: deployment?.result
 			}
@@ -128,7 +128,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		pullSecrets = resp.result.pullSecrets || []
+		pullSecrets = resp.result.items || []
 		form.pullSecret = form.pullSecret
 	}
 
@@ -142,7 +142,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		workloadIdentities = resp.result.list || []
+		workloadIdentities = resp.result.items || []
 		form.workloadIdentity = form.workloadIdentity
 	}
 
@@ -156,7 +156,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		disks = resp.result.list || []
+		disks = resp.result.items || []
 		form.diskName = form.diskName
 	}
 

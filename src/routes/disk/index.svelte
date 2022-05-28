@@ -15,7 +15,7 @@
 				permission: {
 					disks: !disks.error?.forbidden
 				},
-				disks: disks.result?.list || []
+				disks: disks.result?.items || []
 			},
 			dependencies: ['disks']
 		}

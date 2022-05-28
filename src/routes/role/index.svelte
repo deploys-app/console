@@ -15,7 +15,7 @@
 				permission: {
 					roles: !roles.error?.forbidden
 				},
-				roles: roles.result?.roles || []
+				roles: roles.result?.items || []
 			}
 		}
 	}

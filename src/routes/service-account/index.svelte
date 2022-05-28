@@ -15,7 +15,7 @@
 				permission: {
 					serviceAccounts: !serviceAccounts.error?.forbidden
 				},
-				serviceAccounts: serviceAccounts.result?.serviceAccounts || []
+				serviceAccounts: serviceAccounts.result?.items || []
 			}
 		}
 	}

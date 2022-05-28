@@ -32,7 +32,7 @@
 		return {
 			props: {
 				project: projectInfo?.result,
-				billingAccounts: billingAccounts.result.billings || []
+				billingAccounts: billingAccounts.result.items || []
 			}
 		}
 	}
