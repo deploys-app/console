@@ -149,8 +149,8 @@
                 <a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
                     <i class="fa-brands fa-discord"></i>
                 </a>
-                <a href="#" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
-                    <i class="fa-brands fa-discord"></i>
+                <a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
+					<i class="fa-solid fa-envelope"></i>
                 </a>
             </div>
         </div>
