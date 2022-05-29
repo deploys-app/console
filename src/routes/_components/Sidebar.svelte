@@ -138,4 +138,17 @@
 			</li>
 		{/if}
 	</ul>
+
+	<div class="_mgt-16px">
+		<div class="_pdh-12px _mgbt-12px">
+			<hr>
+		</div>
+		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
+			<div class="_dp-f _alit-ct">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank">
+					<i class="fa-brands fa-discord"></i>
+				</a>
+			</div>
+		</div>
+	</div>
 </nav>
