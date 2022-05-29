@@ -173,8 +173,11 @@
 	{#if currentLocation}
 		<div class="_w-100pct _mxw-512px _mgv-30px">
 				<pre class="_wsp-pl">
-					Add DNS Record CNAME to<br>{currentLocation.cname}<br><br>
-					or A Record to<br>{currentLocation.endpoint}
+					Add DNS Record CNAME to<br>{currentLocation.cname}
+					{#if currentLocation.endpoint}
+						<br>or A Record to<br>{currentLocation.endpoint}<br>
+					{/if}
+					We're under DDoS, our IPs require Cloudflare proxy to access.
 				</pre>
 		</div>
 	{/if}
