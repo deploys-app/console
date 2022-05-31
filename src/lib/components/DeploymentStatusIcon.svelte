@@ -30,7 +30,7 @@
 			return statusIconClass[status] || 'fas fa-minus _cl-light'
 		}
 
-		if (action === 3) { // action=pause
+		if (action === 3 || action === 'pause') {
 			return 'fas fa-pause _cl-warning-500'
 		}
 

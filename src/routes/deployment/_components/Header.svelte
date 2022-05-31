@@ -9,8 +9,8 @@
 
 	$: project = $page.stuff.project
 
-	$: canPause = deployment.status === 'success' && deployment.action === 1
-	$: canResume = deployment.status === 'success' && deployment.action === 3
+	$: canPause = deployment.status === 'success' && (deployment.action === 1 || deployment.action === 'deploy')
+	$: canResume = deployment.status === 'success' && (deployment.action === 3 || deployment.action === 'pause')
 
 	function pause () {
 		modal.confirm({
