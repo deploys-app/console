@@ -46,7 +46,7 @@
 			{#each billingAccounts as it}
 				<tr>
 					<td>
-						<a class="moon-link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
+						<a sveltekit:prefetch class="moon-link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
 				</tr>

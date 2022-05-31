@@ -84,7 +84,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="moon-link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a sveltekit:prefetch class="moon-link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

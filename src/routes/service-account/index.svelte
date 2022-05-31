@@ -62,7 +62,7 @@
 				{#each serviceAccounts as it}
 					<tr>
 						<td>
-							<a class="moon-link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
+							<a sveltekit:prefetch class="moon-link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
 								{it.email}
 							</a>
 						</td>
