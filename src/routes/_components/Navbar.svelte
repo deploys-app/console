@@ -23,7 +23,7 @@
 	}
 </script>
 
-<nav class="moon-navbar">
+<nav class="navbar">
 	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar}>
 		<i class="fal fa-bars"></i>
 	</div>
@@ -93,8 +93,12 @@
 		cursor: pointer;
 	}
 
-	.moon-navbar {
+	.navbar {
 		display: flex;
+		width: 100%;
+		height: var(--height-navbar, 20rem);
+		background-color: var(--color-neutral-600);
+		box-shadow: var(--raised-z10);
 		align-items: center;
 		justify-content: space-between;
 	}

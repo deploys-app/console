@@ -17,7 +17,28 @@
 	}
 </script>
 
-<nav class="moon-sidebar _pdt-16px _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
+<style lang="scss">
+	.sidebar {
+		width: var(--width-sidebar, 300px);
+		min-height: 100vh;
+
+		background-color: var(--color-neutral-600);
+		box-shadow: var(--raised-z10);
+	}
+
+	.site-logo {
+		margin: 0 auto;
+		width: 100px;
+
+		img {
+			width: 100%;
+			max-width: 100%;
+			height: auto;
+		}
+	}
+</style>
+
+<nav class="sidebar _pdt-16px _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
 	<div class="site-logo">
 		<img src="/images/logo.png" alt="Deploys.app" draggable="false">
 	</div>

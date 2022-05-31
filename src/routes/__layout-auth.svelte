@@ -84,20 +84,20 @@
 		position: relative;
 	}
 
-	.app-layout .navbar-wrapper,
-	.app-layout .sidebar-wrapper,
-	.app-layout .content-wrapper {
+	.navbar-wrapper,
+	.sidebar-wrapper,
+	.content-wrapper {
 		transition: all var(--timing-normal) ease-in-out;
 	}
 
-	.app-layout .sidebar-wrapper {
+	.sidebar-wrapper {
 		position: fixed;
 		z-index: 1;
 
 		transform: translate3d(0, 0, 0);
 	}
 
-	.app-layout .navbar-wrapper {
+	.navbar-wrapper {
 		position: fixed;
 		z-index: 1;
 
@@ -106,7 +106,7 @@
 		padding-left: var(--width-sidebar);
 	}
 
-	.app-layout .content-wrapper {
+	.content-wrapper {
 		padding-top: calc(var(--height-navbar) + var(--content-sidegap));
 		padding-left: calc(var(--width-sidebar) + var(--content-sidegap));
 		padding-right: 2rem;
@@ -119,11 +119,11 @@
 			--content-sidegap: 1rem;
 		}
 
-		.app-layout .navbar-wrapper {
+		.navbar-wrapper {
 			padding-left: 0;
 		}
 
-		.app-layout .sidebar-wrapper {
+		.sidebar-wrapper {
 			transform: translate3d(calc(var(--width-sidebar) * -1), 0, 0);
 		}
 
@@ -131,7 +131,7 @@
 			transform: translate3d(0, 0, 0);
 		}
 
-		.app-layout .content-wrapper {
+		.content-wrapper {
 			padding-left: var(--content-sidegap);
 			padding-right: var(--content-sidegap);
 		}
