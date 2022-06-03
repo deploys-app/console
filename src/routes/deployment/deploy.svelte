@@ -296,7 +296,6 @@
 					<div class="moon-select">
 						<select id="input-type" class="js-type" bind:value={form.type}>
 							<option value="WebService">Web Service</option>
-							<option value="TCPService">TCP Service</option>
 							<option value="InternalTCPService">Internal TCP Service</option>
 							<option value="Worker">Worker</option>
 							<option value="CronJob">CronJob</option>
