@@ -38,12 +38,11 @@
 
 	function deleteDomain (domain) {
 		modal.confirm({
-			title: `Delete domain ${domain.domain} in ${domain.location} ?`,
+			title: `Delete domain "${domain.domain}" ?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('domain.delete', {
 					project,
-					location: domain.location,
 					domain: domain.domain
 				}, fetch)
 				if (!resp.ok) {
@@ -59,13 +58,13 @@
 <h6>Domains</h6>
 <br>
 <div class="moon-panel">
-<!--	<div class="_dp-f _jtfct-spbtw _alit-ct">-->
-<!--		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">-->
-<!--			<a class="moon-button -small" href={`/domain/create?project=${project}`}>-->
-<!--				Create-->
-<!--			</a>-->
-<!--		</div>-->
-<!--	</div>-->
+	<div class="_dp-f _jtfct-spbtw _alit-ct">
+		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+			<a class="moon-button -small" href={`/domain/create?project=${project}`}>
+				Create
+			</a>
+		</div>
+	</div>
 
 	<div class="moon-table-container">
 		<table class="moon-table">
@@ -85,7 +84,9 @@
 			{:else}
 				{#each domains?.items || [] as it}
 					<tr>
-						<td>{it.domain}</td>
+						<td>
+							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="moon-link">{it.domain}</a>
+						</td>
 						<td>{it.location}</td>
 						<td>{format.domainType(it.type)}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
