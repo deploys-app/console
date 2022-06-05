@@ -41,16 +41,14 @@
 
 	$: project = $page.stuff.project
 
-	let showPassword
-	let copyPassword
-	let copyPasswordClipboard
+	let copyList
 
 	onMount(() => {
-		copyPasswordClipboard = new ClipboardJS(copyPassword)
+		copyList = new ClipboardJS('.copy')
 	})
 
 	onDestroy(() => {
-		copyPasswordClipboard?.destroy()
+		copyList?.destroy()
 	})
 
 	function deleteItem () {
@@ -106,21 +104,35 @@
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-value">Value</label>
-			<div class="_dp-f _alit-ct _fw-w">
-				<div class="moon-input moon-input-icon-wrap _dp-ilf _alit-ct _f-1">
-					<input id="input-value"
-						class="_mgr-16px"
-						type={showPassword ? 'text' : 'password'}
-						value={pullSecret.value}
-						readonly>
-					<div class="moon-input-icon _cs-pt">
-						<i on:click={() => showPassword = !showPassword}
-							class={showPassword ? 'fas fa-eye-slash hide' : 'fas fa-eye show'}></i>
-					</div>
+			<label for="input-server">Server</label>
+			<div class="moon-input -has-icon-right">
+				<input id="input-server" type="text" value={pullSecret.spec.server} readonly disabled>
+				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+					data-clipboard-text={pullSecret.spec.server}>
+					<i class="fal fa-copy"></i>
+				</span>
+			</div>
+		</div>
+		<div class="moon-field">
+			<label for="input-username">Username</label>
+			<div class="moon-input -has-icon-right">
+				<input id="input-username" type="text" value={pullSecret.spec.username} readonly disabled>
+				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+					data-clipboard-text={pullSecret.spec.username}>
+					<i class="fal fa-copy"></i>
+				</span>
+			</div>
+		</div>
+		<div class="moon-field">
+			<label for="input-password">Password</label>
+			<div class="moon-input -has-icon-right">
+				<input id="input-password" type="password" value={pullSecret.spec.password} readonly disabled>
+				<div class="icon -is-right">
+					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _fs-600 copy"
+						data-clipboard-text={pullSecret.spec.password}>
+						<i class="fal fa-copy"></i>
+					</span>
 				</div>
-				<span bind:this={copyPassword} class="_cl-primary-500 _cl-primary-400-hover _cs-pt _ussl-n"
-					data-clipboard-text="{pullSecret.value}">Copy</span>
 			</div>
 		</div>
 	</div>
