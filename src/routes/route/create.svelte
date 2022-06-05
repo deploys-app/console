@@ -58,7 +58,9 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		domains = resp.result.items || []
+		const list = resp.result.items || []
+		domains = list
+			.filter((x) => x.status === 'success')
 	}
 
 	async function fetchDeployments () {
