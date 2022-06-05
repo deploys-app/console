@@ -33,7 +33,8 @@
 			props: {
 				project: projectInfo?.result,
 				billingAccounts: billingAccounts.result.items || []
-			}
+			},
+			dependencies: ['projects']
 		}
 	}
 </script>

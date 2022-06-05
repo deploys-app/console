@@ -5,7 +5,8 @@
 		return {
 			props: {
 				projects
-			}
+			},
+			dependencies: ['projects']
 		}
 	}
 </script>
