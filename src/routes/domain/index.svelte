@@ -71,8 +71,8 @@
 			<thead>
 			<tr>
 				<th>Domain</th>
-				<th>Location</th>
 				<th>Type</th>
+				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
 				<th></th>
@@ -87,8 +87,8 @@
 						<td>
 							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="moon-link">{it.domain}</a>
 						</td>
-						<td>{it.location}</td>
 						<td>{format.domainType(it.type)}</td>
+						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
