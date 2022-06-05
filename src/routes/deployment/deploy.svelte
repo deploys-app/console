@@ -90,7 +90,7 @@
 		diskSubPath: deployment.diskSubPath,
 		minReplicas: deployment.minReplicas,
 		maxReplicas: deployment.maxReplicas,
-		memory: deployment.memory,
+		memory: deployment.resources.requests.memory,
 		env: Object.entries(deployment.env || {}).map(([k, v]) => ({k, v})),
 		mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({k, v}))
 	} : {
