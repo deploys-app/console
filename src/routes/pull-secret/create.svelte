@@ -50,20 +50,15 @@
 				throw new Error('server must be an url')
 			}
 
-			const dockerConfig = {
-				auths: {
-					[form.server]: {
-						username: form.username,
-						password: form.password,
-						auth: btoa(`${form.username}:${form.password}`)
-					}
-				}
-			}
 			const resp = await api.invoke('pullSecret.create', {
 				project,
 				location: form.location,
 				name: form.name,
-				value: btoa(JSON.stringify(dockerConfig))
+				spec: {
+					server: form.server,
+					username: form.username,
+					password: form.password
+				}
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
