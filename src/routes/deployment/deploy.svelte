@@ -90,7 +90,7 @@
 		diskSubPath: deployment.diskSubPath,
 		minReplicas: deployment.minReplicas,
 		maxReplicas: deployment.maxReplicas,
-		memory: deployment.resources.requests.memory,
+		resources: deployment.resources,
 		env: Object.entries(deployment.env || {}).map(([k, v]) => ({k, v})),
 		mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({k, v}))
 	} : {
@@ -111,7 +111,11 @@
 		diskSubPath: '',
 		minReplicas: 1,
 		maxReplicas: 1,
-		memory: '0',
+		resources: {
+			requests: {
+				memory: '0'
+			}
+		},
 		env: [],
 		mountData: []
 	}
@@ -533,7 +537,7 @@
 		<div class="moon-field">
 			<label for="input-memory">Memory allocated</label>
 			<div class="moon-select">
-				<select id="input-memory" bind:value={form.memory}>
+				<select id="input-memory" bind:value={form.resources.requests.memory}>
 					{#each currentLocation.memoryAllocatable as it}
 						<option value={it}>{format.memory(it)}</option>
 					{/each}
