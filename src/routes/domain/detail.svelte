@@ -19,17 +19,8 @@
 			}
 		}
 
-		const location = await api.invoke('location.get', { project, id: domain.result.location }, fetch)
-		if (!location.ok) {
-			return {
-				status: 500,
-				error: `location: ${location.error?.message}`
-			}
-		}
-
 		return {
 			props: {
-				location: location.result,
 				domain: domain.result
 			}
 		}
@@ -44,7 +35,6 @@
 	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 
-	export let location
 	export let domain
 
 	$: project = $page.stuff.project
@@ -113,30 +103,6 @@
 				<input type="text" id="input-type" value={format.domainType(domain.type)} readonly disabled>
 			</div>
 		</div>
-		{#if location.endpoint}
-			<div class="moon-field">
-				<label for="input-ip">A Record</label>
-				<div class="moon-input -has-icon-right">
-					<input type="text" id="input-ip" value={location.endpoint} readonly disabled>
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-						data-clipboard-text={location.endpoint}>
-						<i class="fal fa-copy"></i>
-					</span>
-				</div>
-			</div>
-		{/if}
-		{#if location.cname}
-			<div class="moon-field">
-				<label for="input-cname">CNAME Record</label>
-				<div class="moon-input -has-icon-right">
-					<input type="text" id="input-cname" value={location.cname} readonly disabled>
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-						data-clipboard-text={location.cname}>
-						<i class="fal fa-copy"></i>
-					</span>
-				</div>
-			</div>
-		{/if}
 		<div class="moon-field">
 			<label for="text-created_at">Created at</label>
 			<div class="moon-input">
@@ -149,6 +115,51 @@
 				<span id="text-creted_by">{domain.createdBy}</span>
 			</div>
 		</div>
+
+		<hr>
+
+		{#if (domain.dnsConfig.ipv4 || []).length > 0}
+			<div class="moon-field">
+				<label for="input-ip">A Record</label>
+				{#each domain.dnsConfig.ipv4 as ip}
+					<div class="moon-input -has-icon-right _mgbt-4px">
+						<input type="text" id="input-ip" value={ip} readonly disabled>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+							data-clipboard-text={ip}>
+							<i class="fal fa-copy"></i>
+						</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
+		{#if (domain.dnsConfig.ipv6 || []).length > 0}
+			<div class="moon-field">
+				<label for="input-ipv6">AAAA Record</label>
+				{#each domain.dnsConfig.ipv6 as ip}
+					<div class="moon-input -has-icon-right _mgbt-4px">
+						<input type="text" id="input-ipv6" value={ip} readonly disabled>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+							data-clipboard-text={ip}>
+							<i class="fal fa-copy"></i>
+						</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
+		{#if (domain.dnsConfig.cname || []).length > 0}
+			<div class="moon-field">
+				<label for="input-cname">CNAME Record</label>
+				{#each domain.dnsConfig.cname as cname}
+					<div class="moon-input -has-icon-right">
+						<input type="text" id="input-cname" value={cname} readonly disabled>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+							data-clipboard-text={cname}>
+							<i class="fal fa-copy"></i>
+						</span>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
 
 	<hr>
