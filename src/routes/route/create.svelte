@@ -31,6 +31,7 @@
 
 	let form = {
 		domain: '',
+		subdomain: '',
 		path: '',
 		location: '',
 		targetPrefix: '',
@@ -46,6 +47,8 @@
 	let domains = []
 	let deployments = []
 
+	$: selectedDomain = domains.find((x) => x.domain === form.domain)
+
 	async function fetchDomains () {
 		domains = []
 		form.domain = ''
@@ -55,9 +58,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		const list = resp.result.items || []
-		domains = list
-			.map((x) => x.domain)
+		domains = resp.result.items || []
 	}
 
 	async function fetchDeployments () {
@@ -87,12 +88,18 @@
 			return
 		}
 
+		const subdomain = form.subdomain.trim()
+		let domain = form.domain
+		if (selectedDomain.type === 'wildcard' && subdomain !== '') {
+			domain = `${subdomain}.${domain}`
+		}
+
 		saving = true
 		try {
 			const resp = await api.invoke('route.createV2', {
 				project,
 				location: form.location,
-				domain: form.domain,
+				domain,
 				path: form.path,
 				target: `${form.targetPrefix}${form.targetValue}`
 			}, fetch)
@@ -145,11 +152,21 @@
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
 						{#each domains as it}
-							<option value={it}>{it}</option>
+							<option value={it.domain}>{#if it.type === 'wildcard'}*.{/if}{it.domain}</option>
 						{/each}
 					</select>
 				</div>
 			</div>
+
+			{#if selectedDomain?.type === 'wildcard'}
+				<div class="moon-field">
+					<label for="input-subdomain">Subdomain</label>
+					<div class="moon-input -has-icon-right">
+						<input id="input-subdomain" bind:value={form.subdomain}>
+						<input class="icon -is-right _pdh-8px _w-at" value={`.${form.domain}`} size={form.domain.length} readonly disabled>
+					</div>
+				</div>
+			{/if}
 
 			<div class="moon-field">
 				<label for="input-path">Path</label>
