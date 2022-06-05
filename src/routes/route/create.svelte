@@ -37,14 +37,28 @@
 		targetValue: ''
 	}
 
-	$: currentLocation = locations.find((x) => x.id === form.location)
 	$: targetPlaceholder = {
 		'redirect://': 'https://example.com',
 		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
 		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew',
 	}[form.targetPrefix] || ''
 
+	let domains = []
 	let deployments = []
+
+	async function fetchDomains () {
+		domains = []
+		form.domain = ''
+
+		const resp = await api.invoke('domain.list', { project, location: form.location }, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			return
+		}
+		const list = resp.result.items || []
+		domains = list
+			.map((x) => x.domain)
+	}
 
 	async function fetchDeployments () {
 		deployments = []
@@ -60,6 +74,11 @@
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.type === 'WebService')
 			.map((x) => x.name)
+	}
+
+	function fetchLocationData () {
+		fetchDomains()
+		fetchDeployments()
 	}
 
 	let saving
@@ -107,22 +126,10 @@
 	</div>
 	<hr>
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
-			<label for="input-domain">Domain</label>
-			<div class="moon-input">
-				<input id="input-domain" bind:value={form.domain}>
-			</div>
-		</div>
-		<div class="moon-field">
-			<label for="input-path">Path</label>
-			<div class="moon-input">
-				<input id="input-path" bind:value={form.path}>
-			</div>
-		</div>
 		<div class="moon-field _mgbt-20px">
 			<label for="input-location">Location</label>
 			<div class="moon-select">
-				<select id="input-location" bind:value={form.location} on:change={fetchDeployments} required>
+				<select id="input-location" bind:value={form.location} on:change={fetchLocationData} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
 						<option value={it.id}>{it.id}</option>
@@ -131,54 +138,63 @@
 			</div>
 		</div>
 
-		<div class="moon-field _mgbt-20px">
-			<label for="input-target_prefix">Type</label>
-			<div class="moon-select">
-				<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
-					<option value="" selected disabled>Select Type</option>
-					<option value="deployment://">Deployment</option>
-					<option value="redirect://">Redirect</option>
-					<option value="ipfs://">IPFS</option>
-					<option value="ipns://">IPNS</option>
-					<option value="dnslink://">DNSLink</option>
-				</select>
-			</div>
-		</div>
-
-		{#if form.targetPrefix === 'deployment://'}
+		{#if form.location}
 			<div class="moon-field _mgbt-20px">
-				<label for="input-target_deployment">Deployments</label>
+				<label for="input-domain">Domain</label>
 				<div class="moon-select">
-					<select id="input-target_deployment" bind:value={form.targetValue} required>
-						<option value="" selected disabled>Select Deployment</option>
-						{#each deployments as it}
+					<select id="input-domain" bind:value={form.domain} required>
+						<option value="" selected disabled>Select Domain</option>
+						{#each domains as it}
 							<option value={it}>{it}</option>
 						{/each}
 					</select>
 				</div>
 			</div>
-		{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
-			<div class="moon-field _mgbt-20px">
-				<label for="input-target_value">Value</label>
+
+			<div class="moon-field">
+				<label for="input-path">Path</label>
 				<div class="moon-input">
-					<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
+					<input id="input-path" bind:value={form.path}>
 				</div>
 			</div>
+
+			<div class="moon-field _mgbt-20px">
+				<label for="input-target_prefix">Type</label>
+				<div class="moon-select">
+					<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
+						<option value="" selected disabled>Select Type</option>
+						<option value="deployment://">Deployment</option>
+						<option value="redirect://">Redirect</option>
+						<option value="ipfs://">IPFS</option>
+						<option value="ipns://">IPNS</option>
+						<option value="dnslink://">DNSLink</option>
+					</select>
+				</div>
+			</div>
+
+			{#if form.targetPrefix === 'deployment://'}
+				<div class="moon-field _mgbt-20px">
+					<label for="input-target_deployment">Deployments</label>
+					<div class="moon-select">
+						<select id="input-target_deployment" bind:value={form.targetValue} required>
+							<option value="" selected disabled>Select Deployment</option>
+							{#each deployments as it}
+								<option value={it}>{it}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+			{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
+				<div class="moon-field _mgbt-20px">
+					<label for="input-target_value">Value</label>
+					<div class="moon-input">
+						<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
+					</div>
+				</div>
+			{/if}
+			<hr>
+
+			<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
 		{/if}
-		<hr>
-
-		<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
 	</form>
-
-	{#if currentLocation}
-		<div class="_w-100pct _mxw-512px _mgv-30px">
-				<pre class="_wsp-pl">
-					Add DNS Record CNAME to<br>{currentLocation.cname}
-					{#if currentLocation.endpoint}
-						<br>or A Record to<br>{currentLocation.endpoint}<br>
-					{/if}
-					We're under DDoS, our IPs require Cloudflare proxy to access.
-				</pre>
-		</div>
-	{/if}
 </div>
