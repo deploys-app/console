@@ -12,7 +12,7 @@ const cookieOptions = {
 	maxAge: 60 * 60 * 24 * 7,
 	sameSite: 'lax',
 	path: '/',
-	secret: import.meta.env.PROD
+	secure: import.meta.env.PROD
 }
 
 const cookieRemoveOptions = {
@@ -20,7 +20,7 @@ const cookieRemoveOptions = {
 	maxAge: -1,
 	sameSite: 'lax',
 	path: '/',
-	secret: import.meta.env.PROD
+	secure: import.meta.env.PROD
 }
 
 async function handleCookie ({ event, resolve }) {
