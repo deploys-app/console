@@ -7,7 +7,8 @@ const config = {
 		sass: true
 	}),
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		inlineStyleThreshold: 1024
 	}
 }
 
