@@ -1,7 +1,7 @@
 <script>
+	import { createEventDispatcher } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import { page } from '$app/stores'
-	import { invalidate } from '$app/navigation'
 	import api from '$lib/api'
 	import modal from '$lib/modal'
 
@@ -11,6 +11,8 @@
 
 	$: canPause = deployment.status === 'success' && deployment.action === 'deploy'
 	$: canResume = deployment.status === 'success' && deployment.action === 'pause'
+
+	const dispatch = createEventDispatcher()
 
 	function pause () {
 		modal.confirm({
@@ -26,7 +28,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('deployment')
+				dispatch('invalidate')
 			}
 		})
 	}
@@ -45,7 +47,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('deployment')
+				dispatch('invalidate')
 			}
 		})
 	}

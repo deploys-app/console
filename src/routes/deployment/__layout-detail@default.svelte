@@ -72,7 +72,7 @@
 </div>
 <br>
 <div class="moon-panel _dp-g _gg-24px">
-	<Header {deployment} />
+	<Header {deployment} on:invalidate={() => invalidate('deployment')} />
 
 	<slot />
 </div>
