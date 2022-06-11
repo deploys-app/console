@@ -123,7 +123,12 @@
 		</tr>
 		<tr>
 			<td>Location</td>
-			<td>{deployment.location}</td>
+			<td>
+				{deployment.location}
+				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`${deployment.location}`}>
+					<i class="fal fa-copy"></i>
+				</span>
+			</td>
 		</tr>
 		<tr>
 			<td>Image</td>
