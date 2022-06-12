@@ -26,7 +26,7 @@
 </script>
 
 <script>
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
 	import format from '$lib/format'
 	import { goto } from '$app/navigation'
@@ -38,14 +38,11 @@
 	$: hasExternalTCPAddress = ['TCPService'].includes(deployment.type)
 	$: hasInternalTCPAddress = ['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type)
 
-	let copyList
-
 	onMount(() => {
-		copyList = new ClipboardJS('.copy')
-	})
-
-	onDestroy(() => {
-		copyList?.destroy()
+		const copyList = new ClipboardJS('.copy')
+		return () => {
+			copyList.destroy()
+		}
 	})
 
 	function deleteItem () {
