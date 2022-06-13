@@ -13,7 +13,7 @@
 </script>
 
 <script>
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import format from '$lib/format'
 	import { browser } from '$app/env'
 	import NoDataRow from '../../lib/components/NoDataRow.svelte'
@@ -23,13 +23,12 @@
 	let events = []
 
 	if (browser) {
-		let reloadInterval
-		onMount(async () => {
-			await reloadEvents()
-			reloadInterval = setInterval(() => reloadEvents(), 5000)
-		})
-		onDestroy(() => {
-			clearInterval(reloadInterval)
+		onMount(() => {
+			reloadEvents()
+			const reloadInterval = setInterval(() => reloadEvents(), 5000)
+			return () => {
+				clearInterval(reloadInterval)
+			}
 		})
 	}
 

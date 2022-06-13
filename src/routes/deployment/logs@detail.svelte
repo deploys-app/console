@@ -13,17 +13,15 @@
 </script>
 
 <script>
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 
 	export let deployment
 
-	let source
 	let buffer = ''
 	let text = ''
-	let interval
 
 	onMount(() => {
-		source = new EventSource(deployment.logUrl)
+		const source = new EventSource(deployment.logUrl)
 		source.addEventListener('open', () => {
 			buffer = ''
 		})
@@ -33,16 +31,16 @@
 				buffer = `${d.pod} ${d.timestamp} ${d.log}\n` + buffer
 			} catch (err) {}
 		})
-		interval = setInterval(() => {
+		const interval = setInterval(() => {
 			if (text !== buffer) {
 				text = buffer
 			}
 		}, 1000)
-	})
 
-	onDestroy(() => {
-		source?.close()
-		clearInterval(interval)
+		return () => {
+			source.close()
+			clearInterval(interval)
+		}
 	})
 </script>
 

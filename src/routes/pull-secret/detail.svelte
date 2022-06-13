@@ -30,7 +30,7 @@
 
 <script>
 	import ClipboardJS from 'clipboard'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import modal from '$lib/modal'
@@ -41,14 +41,11 @@
 
 	$: project = $page.stuff.project
 
-	let copyList
-
 	onMount(() => {
-		copyList = new ClipboardJS('.copy')
-	})
-
-	onDestroy(() => {
-		copyList?.destroy()
+		const copyList = new ClipboardJS('.copy')
+		return () => {
+			copyList?.destroy()
+		}
 	})
 
 	function deleteItem () {

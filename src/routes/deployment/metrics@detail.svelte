@@ -15,7 +15,7 @@
 <script>
 	import { page } from '$app/stores'
 	import api from '$lib/api'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import Highcharts from 'highcharts'
 	import * as hc from '$lib/hc'
 
@@ -168,14 +168,14 @@
 		hc.init()
 		initCharts()
 		fetchMetrics()
-	})
 
-	onDestroy(() => {
-		clearTimeout(reloadTimeout)
-		chart.cpuUsage.chart?.destroy()
-		chart.memory.chart?.destroy()
-		chart.requests.chart?.destroy()
-		chart.egress.chart?.destroy()
+		return () => {
+			clearTimeout(reloadTimeout)
+			chart.cpuUsage.chart?.destroy()
+			chart.memory.chart?.destroy()
+			chart.requests.chart?.destroy()
+			chart.egress.chart?.destroy()
+		}
 	})
 </script>
 

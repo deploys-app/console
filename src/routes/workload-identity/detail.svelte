@@ -36,7 +36,7 @@
 <script>
 	import { page } from '$app/stores'
 	import format from '$lib/format'
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
 	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
@@ -46,15 +46,11 @@
 
 	$: project = $page.stuff.project
 
-	let copyButton
-	let copyCodeClipboard
-
 	onMount(() => {
-		copyCodeClipboard = new ClipboardJS(copyButton)
-	})
-
-	onDestroy(() => {
-		copyCodeClipboard?.destroy()
+		const copyList = new ClipboardJS('.copy')
+		return () => {
+			copyList.destroy()
+		}
 	})
 
 	function deleteItem () {
@@ -125,7 +121,7 @@
 	<div class="moon-field">
 		<label>Command</label>
 		<pre>
-			<button bind:this={copyButton} class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
+			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
 			<code id="command">{format.gsaBinding(workloadIdentity.projectId, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
 		</pre>
 	</div>
