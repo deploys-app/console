@@ -6,10 +6,10 @@
 	export let url
 
 	const statusIconClass = {
-		'pending': 'fas fa-spinner-third fa-spin',
-		'success': 'fas fa-check-circle _cl-positive-500',
-		'error': 'fas fa-times _cl-negative-500',
-		'cancelled': 'fas fa-ban _cl-negative-500',
+		pending: 'fas fa-spinner-third fa-spin',
+		success: 'fas fa-check-circle _cl-positive-500',
+		error: 'fas fa-times _cl-negative-500',
+		cancelled: 'fas fa-ban _cl-negative-500'
 	}
 
 	let podStatus

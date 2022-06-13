@@ -50,7 +50,7 @@
 
 	$: project = $page.stuff.project
 
-	let form = {
+	const form = {
 		email,
 		roles: selected
 	}

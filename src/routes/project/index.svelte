@@ -21,7 +21,7 @@
 	export let projects
 
 	async function deleteItem (project) {
-		let result = await Swal.fire({
+		const result = await Swal.fire({
 			title: 'Are you sure ?',
 			text: `Type "${project}" to confirm!`,
 			icon: 'warning',

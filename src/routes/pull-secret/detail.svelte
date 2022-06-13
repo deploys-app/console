@@ -67,7 +67,7 @@
 <div>
 	<ul class="moon-breadcrumb">
 		<li>
-			<a href={`/pull-secret`} class="moon-link"><h6>Pull Secrets</h6></a>
+			<a href={`/pull-secret?project=${project}`} class="moon-link"><h6>Pull Secrets</h6></a>
 		</li>
 		<li>
 			<h6>{pullSecret.name}</h6>

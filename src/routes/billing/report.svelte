@@ -36,7 +36,7 @@
 
 	export let billingAccount
 
-	let filter = {
+	const filter = {
 		range: $page.url.searchParams.get('range') || 'this_month',
 		projectSids: []
 	}
@@ -68,7 +68,7 @@
 		initChart()
 	}
 
-	let reportChart = {
+	const reportChart = {
 		el: null,
 		chart: null
 	}
@@ -103,7 +103,7 @@
 			plotOptions: {
 				spline: {
 					lineWidth: 1,
-						states: {
+					states: {
 						hover: {
 							lineWidth: 3
 						}

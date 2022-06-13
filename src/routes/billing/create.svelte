@@ -35,7 +35,7 @@
 
 	export let billingAccount
 
-	let form = {
+	const form = {
 		name: billingAccount?.name || '',
 		taxId: billingAccount?.taxId || '',
 		taxName: billingAccount?.taxName || '',

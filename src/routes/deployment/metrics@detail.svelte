@@ -23,11 +23,11 @@
 
 	const reloadInterval = 60 * 1000 // 1m
 
-	let filter = {
+	const filter = {
 		range: $page.url.searchParams.get('range') || '1h'
 	}
 
-	let chart = {
+	const chart = {
 		cpuUsage: {
 			el: null,
 			chart: null
@@ -90,11 +90,11 @@
 			const gib = 1024 * mib
 			yFormatter = (v) => {
 				if (v > gib) {
-					return Highcharts.numberFormat(v / gib, 2) + "Gi"
+					return Highcharts.numberFormat(v / gib, 2) + 'Gi'
 				} else if (v > mib) {
-					return Highcharts.numberFormat(v / mib, 2) + "Mi";
+					return Highcharts.numberFormat(v / mib, 2) + 'Mi'
 				}
-				return Highcharts.numberFormat(v / kib, 2) + "Ki"
+				return Highcharts.numberFormat(v / kib, 2) + 'Ki'
 			}
 		}
 
@@ -127,12 +127,12 @@
 
 		let prefix = ''
 		switch (resourceType) {
-			case 'usage':
-				prefix = 'Usage '
-				break
-			case 'allocated':
-				prefix = 'Allocated '
-				break
+		case 'usage':
+			prefix = 'Usage '
+			break
+		case 'allocated':
+			prefix = 'Allocated '
+			break
 		}
 
 		!update && chart.series.forEach((x) => x.remove())
@@ -157,7 +157,7 @@
 				marker: {
 					enabled: false
 				},
-				data,
+				data
 			}, false)
 		})
 

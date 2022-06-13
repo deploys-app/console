@@ -7,9 +7,9 @@ export async function post ({ locals, params, request }) {
 		method: 'POST',
 		body: request.body,
 		headers: {
-			'accept': 'application/json',
+			accept: 'application/json',
 			'content-type': request.headers.get('content-type'),
-			'authorization': `bearer ${token}`
+			authorization: `bearer ${token}`
 		}
 	})
 	return {

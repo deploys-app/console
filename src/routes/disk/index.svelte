@@ -41,7 +41,7 @@
 	let pendingTimeout
 	$: {
 		if (browser) {
-			let hasPending = disks.some((x) => x.status === 'pending')
+			const hasPending = disks.some((x) => x.status === 'pending')
 			if (hasPending) {
 				pendingTimeout = setTimeout(() => invalidate('disks'), 2000)
 			}

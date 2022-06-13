@@ -11,7 +11,7 @@
 			if (disk.error.notFound) {
 				return {
 					status: 302,
-					redirect: '/disk?project=${project}'
+					redirect: `/disk?project=${project}`
 				}
 			}
 			return {
@@ -49,7 +49,7 @@
 	let pendingTimeout
 	$: {
 		if (browser) {
-			let hasPending = disk.status === 'pending'
+			const hasPending = disk.status === 'pending'
 			if (hasPending) {
 				pendingTimeout = setTimeout(() => invalidate('disks'), 2000)
 			}

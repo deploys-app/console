@@ -21,7 +21,7 @@
 				if (disk.error.notFound) {
 					return {
 						status: 302,
-						redirect: '/disk?project=${project}'
+						redirect: `/disk?project=${project}`
 					}
 				}
 				return {
@@ -54,10 +54,10 @@
 
 	$: project = $page.stuff.project
 
-	let form = {
+	const form = {
 		location: location || '',
 		name: name || '',
-		size: disk?.size || 1,
+		size: disk?.size || 1
 	}
 
 	let saving

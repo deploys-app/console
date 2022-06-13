@@ -63,62 +63,64 @@
 
 	$: project = $page.stuff.project
 
-	let permission = {
+	const permission = {
 		pullSecrets: true,
 		workloadIdentities: true,
-		disks: true,
+		disks: true
 	}
 	let pullSecrets = []
 	let workloadIdentities = []
 	let disks = []
 
-	let form = deployment ? {
-		location: deployment.location,
-		name: deployment.name,
-		type: deployment.type,
-		image: deployment.image,
-		pullSecret: deployment.pullSecret,
-		workloadIdentity: deployment.workloadIdentity,
-		port: deployment.port,
-		protocol: deployment.protocol,
-		internal: deployment.internal,
-		command: deployment.command,
-		args: deployment.args,
-		schedule: deployment.schedule,
-		diskName: deployment.diskName,
-		diskMountPath: deployment.diskMountPath,
-		diskSubPath: deployment.diskSubPath,
-		minReplicas: deployment.minReplicas,
-		maxReplicas: deployment.maxReplicas,
-		resources: deployment.resources,
-		env: Object.entries(deployment.env || {}).map(([k, v]) => ({k, v})),
-		mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({k, v}))
-	} : {
-		location: deployment?.location || '',
-		name: '',
-		type: 'WebService',
-		image: '',
-		pullSecret: '',
-		workloadIdentity: '',
-		port: 8080,
-		protocol: 'http',
-		internal: false, // default for WebService
-		command: [],
-		args: [],
-		schedule: '',
-		diskName: '',
-		diskMountPath: '',
-		diskSubPath: '',
-		minReplicas: 1,
-		maxReplicas: 1,
-		resources: {
-			requests: {
-				memory: '0'
-			}
-		},
-		env: [],
-		mountData: []
-	}
+	const form = deployment
+		? {
+			location: deployment.location,
+			name: deployment.name,
+			type: deployment.type,
+			image: deployment.image,
+			pullSecret: deployment.pullSecret,
+			workloadIdentity: deployment.workloadIdentity,
+			port: deployment.port,
+			protocol: deployment.protocol,
+			internal: deployment.internal,
+			command: deployment.command,
+			args: deployment.args,
+			schedule: deployment.schedule,
+			diskName: deployment.diskName,
+			diskMountPath: deployment.diskMountPath,
+			diskSubPath: deployment.diskSubPath,
+			minReplicas: deployment.minReplicas,
+			maxReplicas: deployment.maxReplicas,
+			resources: deployment.resources,
+			env: Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v })),
+			mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
+		}
+		: {
+			location: deployment?.location || '',
+			name: '',
+			type: 'WebService',
+			image: '',
+			pullSecret: '',
+			workloadIdentity: '',
+			port: 8080,
+			protocol: 'http',
+			internal: false, // default for WebService
+			command: [],
+			args: [],
+			schedule: '',
+			diskName: '',
+			diskMountPath: '',
+			diskSubPath: '',
+			minReplicas: 1,
+			maxReplicas: 1,
+			resources: {
+				requests: {
+					memory: '0'
+				}
+			},
+			env: [],
+			mountData: []
+		}
 
 	$: currentLocation = locations.find((x) => x.id === form.location)
 
@@ -185,12 +187,12 @@
 		form.env = envText
 			.split('\n')
 			.map((t) => t.split('='))
-			.map(([k, ...v]) => ({k, v: v.join('=')}))
+			.map(([k, ...v]) => ({ k, v: v.join('=') }))
 	}
 
 	function parseEnvValue () {
 		envText = form.env
-			.map(({k, v}) => `${k}=${v}`)
+			.map(({ k, v }) => `${k}=${v}`)
 			.join('\n')
 	}
 
@@ -390,8 +392,8 @@
 		{/if}
 
 		<div class="moon-field">
-			<label>Command</label>
-			<div class="_pdbt-8px">
+			<label for="div-command">Command</label>
+			<div id="div-command" class="_pdbt-8px">
 				{#each form.command as _, i}
 					<div class="moon-input -has-icon-right _mgbt-8px">
 						<input bind:value={form.command[i]}>
@@ -408,8 +410,8 @@
 		</div>
 
 		<div class="moon-field">
-			<label>Args</label>
-			<div class="_pdbt-8px">
+			<label for="div-args">Args</label>
+			<div id="div-args" class="_pdbt-8px">
 				{#each form.args as _, i}
 					<div class="moon-input -has-icon-right _mgbt-8px">
 						<input bind:value={form.args[i]}>

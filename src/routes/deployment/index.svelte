@@ -41,7 +41,7 @@
 	$: project = $page.stuff.project
 	$: {
 		if (browser) {
-			let hasPending = deployments.some((x) => x.status === 'pending')
+			const hasPending = deployments.some((x) => x.status === 'pending')
 			if (hasPending) {
 				pendingTimeout = setTimeout(() => invalidate('deployments'), 2000)
 			}

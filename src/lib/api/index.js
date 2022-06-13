@@ -22,21 +22,21 @@ async function invoke (fn, args, fetch) {
 	if (!body.ok) {
 		const msg = body.error?.message || ''
 		switch (msg) {
-			case 'api: unauthorized':
-				body.error.unauth = true
-				onUnauth && onUnauth()
-				break
-			case 'iam: forbidden':
-				body.error.forbidden = true
-				break
-			case 'api: validate error':
-				body.error.validate = body.error.items
-				break
-			default:
-				if (msg.includes('api: ') && msg.includes('not found')) {
-					body.error.notFound = true
-				}
-				break
+		case 'api: unauthorized':
+			body.error.unauth = true
+			onUnauth && onUnauth()
+			break
+		case 'iam: forbidden':
+			body.error.forbidden = true
+			break
+		case 'api: validate error':
+			body.error.validate = body.error.items
+			break
+		default:
+			if (msg.includes('api: ') && msg.includes('not found')) {
+				body.error.notFound = true
+			}
+			break
 		}
 	}
 	return body

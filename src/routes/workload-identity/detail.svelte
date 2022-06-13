@@ -25,7 +25,7 @@
 		}
 		return {
 			props: {
-				location: locationData.result,
+				// location: locationData.result,
 				name,
 				workloadIdentity: workloadIdentity.result
 			}
@@ -41,7 +41,7 @@
 	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 
-	export let location
+	// export let location
 	export let workloadIdentity
 
 	$: project = $page.stuff.project
@@ -103,14 +103,14 @@
 			</div>
 		</div>
 		<div class="moon-field">
-			<label>Created at</label>
-			<div class="moon-input">
+			<label for="div-created_at">Created at</label>
+			<div id="div-created_at" class="moon-input">
 				{format.datetime(workloadIdentity.createdAt)}
 			</div>
 		</div>
 		<div class="moon-field">
-			<label>Created by</label>
-			<div class="moon-input">
+			<label for="div-created_by">Created by</label>
+			<div id="div-created_by" class="moon-input">
 				{workloadIdentity.createdBy}
 			</div>
 		</div>
@@ -119,8 +119,8 @@
 	<hr>
 
 	<div class="moon-field">
-		<label>Command</label>
-		<pre>
+		<label for="pre-command">Command</label>
+		<pre id="pre-command">
 			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
 			<code id="command">{format.gsaBinding(workloadIdentity.projectId, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
 		</pre>

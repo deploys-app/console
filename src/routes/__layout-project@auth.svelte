@@ -14,13 +14,13 @@
 		if (!pageProject) {
 			return {
 				status: 302,
-				redirect: `/project`
+				redirect: '/project'
 			}
 		}
 
 		return {
 			props: {
-				project: pageProject,
+				project: pageProject
 			},
 			stuff: {
 				project: pageProject
