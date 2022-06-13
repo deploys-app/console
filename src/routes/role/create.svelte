@@ -46,7 +46,7 @@
 	export let role
 	export let permissions
 
-	let form = {
+	const form = {
 		role: role?.role || '',
 		name: role?.name || '',
 		permissions: role?.permissions || []

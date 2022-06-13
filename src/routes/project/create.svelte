@@ -46,7 +46,7 @@
 	export let project
 	export let billingAccounts
 
-	let form = {
+	const form = {
 		sid: project?.project || '',
 		name: project?.name || '',
 		billingAccount: project?.billingAccount || ''

@@ -46,7 +46,7 @@
 	let pendingTimeout
 	$: {
 		if (browser) {
-			let isPending = deployment.status === 'pending'
+			const isPending = deployment.status === 'pending'
 			if (isPending) {
 				pendingTimeout = setTimeout(() => invalidate('deployment'), 2000)
 			}

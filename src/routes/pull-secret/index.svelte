@@ -41,7 +41,7 @@
 	let pendingTimeout
 	$: {
 		if (browser) {
-			let hasPending = pullSecrets.some((x) => x.status === 'pending')
+			const hasPending = pullSecrets.some((x) => x.status === 'pending')
 			if (hasPending) {
 				pendingTimeout = setTimeout(() => invalidate('pullSecrets'), 2000)
 			}

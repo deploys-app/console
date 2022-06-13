@@ -29,7 +29,7 @@
 
 	$: project = $page.stuff.project
 
-	let form = {
+	const form = {
 		domain: '',
 		location: '',
 		type: ''

@@ -30,7 +30,7 @@
 
 	$: project = $page.stuff.project
 
-	let form = {
+	const form = {
 		name: '',
 		location: '',
 		server: 'https://index.docker.io/v2/',

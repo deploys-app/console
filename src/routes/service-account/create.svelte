@@ -12,7 +12,7 @@
 				if (serviceAccount.error.notFound) {
 					return {
 						status: 302,
-						redirect: '/service-account?project=${project}'
+						redirect: `/service-account?project=${project}`
 					}
 				}
 				return {

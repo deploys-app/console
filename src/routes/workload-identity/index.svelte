@@ -41,7 +41,7 @@
 	let pendingTimeout
 	$: {
 		if (browser) {
-			let hasPending = workloadIdentities.status === 'pending'
+			const hasPending = workloadIdentities.status === 'pending'
 			if (hasPending) {
 				pendingTimeout = setTimeout(() => invalidate('workloadIdentities'), 2000)
 			}

@@ -62,7 +62,7 @@
 
 		try {
 			loadingCreateKey = true
-			const resp = await api.invoke('serviceAccount.createKey', { project: project, id }, fetch)
+			const resp = await api.invoke('serviceAccount.createKey', { project, id }, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
 				return
@@ -80,7 +80,7 @@
 			title: 'Confirm delete key ?',
 			yes: 'Delete',
 			callback: async () => {
-				const resp = await api.invoke('serviceAccount.deleteKey', { project: project, id, secret }, fetch)
+				const resp = await api.invoke('serviceAccount.deleteKey', { project, id, secret }, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
 					return

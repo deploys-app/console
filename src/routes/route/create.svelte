@@ -29,7 +29,7 @@
 
 	$: project = $page.stuff.project
 
-	let form = {
+	const form = {
 		domain: '',
 		subdomain: '',
 		path: '',
@@ -41,7 +41,7 @@
 	$: targetPlaceholder = {
 		'redirect://': 'https://example.com',
 		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
-		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew',
+		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
 	}[form.targetPrefix] || ''
 
 	let domains = []
