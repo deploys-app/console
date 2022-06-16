@@ -38,11 +38,13 @@ async function handleCookie ({ event, resolve }) {
 
 	const resp = await resolve(event)
 
-	resp.headers.append('set-cookie', cookie.serialize('token', locals.token, cookieOptions))
-	if (locals.state === null) {
-		resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieRemoveOptions))
-	} else if (locals.state) {
-		resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieOptions))
+	if (resp.headers.get('content-type') === 'text/html') {
+		resp.headers.append('set-cookie', cookie.serialize('token', locals.token, cookieOptions))
+		if (locals.state === null) {
+			resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieRemoveOptions))
+		} else if (locals.state) {
+			resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieOptions))
+		}
 	}
 	return resp
 }
@@ -76,7 +78,7 @@ async function _generateLinkHeader (resp) {
 		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
 			return
 		}
-		headers.push(`<${src}>; rel="preload"; as="${as}"`)
+		headers.push(`<${src}>; rel="preload"; as="${as}"; crossorigin`)
 	}
 
 	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
@@ -88,8 +90,7 @@ async function _generateLinkHeader (resp) {
 
 async function injectLinkHeader ({ event, resolve }) {
 	const resp = await resolve(event)
-	const ct = resp.headers.get('content-type') || ''
-	if (ct.startsWith('text/html')) {
+	if (resp.headers.get('content-type') === 'text/html') {
 		const v = await _generateLinkHeader(resp)
 		if (v) {
 			resp.headers.set('link', v)
