@@ -1,5 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import cookie from 'cookie'
+import cheerio from 'cheerio/lib/slim'
 
 export function getSession ({ locals }) {
 	return {
@@ -61,7 +62,36 @@ function storeProject ({ event, resolve }) {
 	return resolve(event)
 }
 
+async function _generateLinkHeader (resp) {
+	const $ = cheerio.load(await resp.clone().text())
+
+	const headers = []
+
+	const f = (p) => (_, el) => {
+		headers.push(`<${p($(el))}>; rel="preload"`)
+	}
+
+	$('link[rel="stylesheet"]').each(f(($) => $.attr('href')))
+	$('link[rel="modulepreload"]').each(f(($) => $.attr('href')))
+	$('img').each(f(($) => $.attr('src')))
+
+	return headers.join(', ')
+}
+
+async function injectLinkHeader ({ event, resolve }) {
+	const resp = await resolve(event)
+	const ct = resp.headers.get('content-type') || ''
+	if (ct.startsWith('text/html')) {
+		const v = await _generateLinkHeader(resp)
+		if (v) {
+			resp.headers.set('link', v)
+		}
+	}
+	return resp
+}
+
 export const handle = sequence(
+	injectLinkHeader,
 	handleCookie,
 	storeProject
 )
