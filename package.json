@@ -15,6 +15,7 @@
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "=1.0.0-next.23",
     "@sveltejs/kit": "=1.0.0-next.350",
+    "cheerio": "^1.0.0-rc.11",
     "clipboard": "^2.0.11",
     "cookie": "^0.5.0",
     "dayjs": "^1.11.3",
