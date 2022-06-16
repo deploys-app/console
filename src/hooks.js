@@ -1,6 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import cookie from 'cookie'
-import cheerio from 'cheerio/lib/slim'
+import * as cheerio from 'cheerio/lib/slim'
 
 export function getSession ({ locals }) {
 	return {
