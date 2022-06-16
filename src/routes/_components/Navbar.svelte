@@ -30,7 +30,7 @@
 
 	<div class="_mgl-at">
 		<div class="avatar" on:click|stopPropagation={toggle}>
-			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max">
+			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max" crossorigin>
 		</div>
 
 		<div class="moon-popup" class:is-active={active}>

@@ -74,11 +74,20 @@ async function _generateLinkHeader (resp) {
 	const headers = []
 
 	const f = (p, as) => (_, el) => {
-		const src = p($(el)) || ''
+		const $el = $(el)
+		const src = p($el) || ''
 		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
 			return
 		}
-		headers.push(`<${src}>; rel="preload"; as="${as}"; crossorigin`)
+		let h = `<${src}>; rel="preload"; as="${as}"`
+		const crossorigin = $el.attr('crossorigin')
+		if (crossorigin != null) {
+			h += '; crossorigin'
+			if (crossorigin) {
+				h += `=${crossorigin}`
+			}
+		}
+		headers.push(h)
 	}
 
 	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
