@@ -63,17 +63,25 @@ function storeProject ({ event, resolve }) {
 }
 
 async function _generateLinkHeader (resp) {
-	const $ = cheerio.load(await resp.clone().text())
+	const allowPrefix = [
+		'https://',
+		'/'
+	]
 
+	const $ = cheerio.load(await resp.clone().text())
 	const headers = []
 
-	const f = (p) => (_, el) => {
-		headers.push(`<${p($(el))}>; rel="preload"`)
+	const f = (p, as) => (_, el) => {
+		const src = p($(el)) || ''
+		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
+			return
+		}
+		headers.push(`<${src}>; rel="preload"; as="${as}"`)
 	}
 
-	$('link[rel="stylesheet"]').each(f(($) => $.attr('href')))
-	$('link[rel="modulepreload"]').each(f(($) => $.attr('href')))
-	$('img').each(f(($) => $.attr('src')))
+	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
+	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script'))
+	$('img').each(f(($) => $.attr('src'), 'image'))
 
 	return headers.join(', ')
 }
