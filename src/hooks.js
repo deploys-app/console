@@ -38,7 +38,7 @@ async function handleCookie ({ event, resolve }) {
 
 	const resp = await resolve(event)
 
-	if (resp.headers.get('content-type') === 'text/html') {
+	if (resp.headers.get('content-type') === 'text/html' || resp.status === 302) {
 		resp.headers.append('set-cookie', cookie.serialize('token', locals.token, cookieOptions))
 		if (locals.state === null) {
 			resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieRemoveOptions))
