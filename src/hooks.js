@@ -73,25 +73,29 @@ async function _generateLinkHeader (resp) {
 	const $ = cheerio.load(await resp.clone().text())
 	const headers = []
 
-	const f = (p, as) => (_, el) => {
+	const f = (p, as, crossorigin) => (_, el) => {
 		const $el = $(el)
 		const src = p($el) || ''
 		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
 			return
 		}
 		let h = `<${src}>; rel="preload"; as="${as}"`
-		const crossorigin = $el.attr('crossorigin')
-		if (crossorigin != null) {
-			h += '; crossorigin'
-			if (crossorigin) {
-				h += `=${crossorigin}`
+		if (!crossorigin) {
+			const crossorigin = $el.attr('crossorigin')
+			if (crossorigin != null) {
+				h += '; crossorigin'
+				if (crossorigin) {
+					h += `=${crossorigin}`
+				}
 			}
+		} else {
+			h += '; crossorigin'
 		}
 		headers.push(h)
 	}
 
 	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
-	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script'))
+	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script', true))
 	$('img').each(f(($) => $.attr('src'), 'image'))
 
 	return headers.join(', ')
