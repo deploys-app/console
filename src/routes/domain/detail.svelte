@@ -46,6 +46,31 @@
 		}
 	})
 
+	let purging = false
+	async function purgeCache () {
+		if (purging) {
+			return
+		}
+		purging = true
+
+		await modal.confirm({
+			title: `Purge cache on domain "${domain.domain}" ?`,
+			yes: 'Purge',
+			callback: async () => {
+				const resp = await api.invoke('domain.purgeCache', {
+					project,
+					domain: domain.domain
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				modal.success({ content: `Purged cache on domain "${domain.domain}"` })
+			}
+		})
+		purging = false
+	}
+
 	function deleteItem () {
 		modal.confirm({
 			title: `Delete domain "${domain.domain}" ?`,
@@ -161,7 +186,8 @@
 
 	<hr>
 
-	<div class="_mgl-at-lg">
+	<div class="_mgl-at-lg _dp-f _alit-ct _fw-w">
+		<button class="moon-button -danger _mgr-24px" class:-loadin={purging} on:click={purgeCache}>Purge Cache</button>
 		<button class="moon-button -danger" on:click={deleteItem}>Delete</button>
 	</div>
 </div>

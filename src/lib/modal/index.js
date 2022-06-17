@@ -38,5 +38,12 @@ export default {
 			}
 		})
 		callback && callback()
+	},
+	async success ({ content }) {
+		await Swal.fire(
+			'Success',
+			content,
+			'success'
+		)
 	}
 }
