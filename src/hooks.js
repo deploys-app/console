@@ -96,7 +96,7 @@ async function _generateLinkHeader (resp) {
 
 	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
 	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script', true))
-	$('img').each(f(($) => $.attr('src'), 'image'))
+	// $('img').each(f(($) => $.attr('src'), 'image'))
 
 	return headers.join(', ')
 }
