@@ -51,24 +51,27 @@
 		if (purging) {
 			return
 		}
-		purging = true
 
 		await modal.confirm({
 			title: `Purge cache on domain "${domain.domain}" ?`,
 			yes: 'Purge',
 			callback: async () => {
-				const resp = await api.invoke('domain.purgeCache', {
-					project,
-					domain: domain.domain
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
+				purging = true
+				try {
+					const resp = await api.invoke('domain.purgeCache', {
+						project,
+						domain: domain.domain
+					}, fetch)
+					if (!resp.ok) {
+						modal.error({ error: resp.error })
+						return
+					}
+					modal.success({ content: `Purged cache on domain "${domain.domain}"` })
+				} finally {
+					purging = false
 				}
-				modal.success({ content: `Purged cache on domain "${domain.domain}"` })
 			}
 		})
-		purging = false
 	}
 
 	function deleteItem () {
