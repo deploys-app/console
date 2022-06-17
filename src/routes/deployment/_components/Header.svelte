@@ -72,14 +72,14 @@
 			{#if canPause}
 				<div>
 					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={pause}>
-						<i class="fas fa-pause"></i>&nbsp;&nbsp;Pause
+						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
 					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={resume}>
-						<i class="fas fa-play"></i>&nbsp;&nbsp;Resume
+						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>
 			{/if}

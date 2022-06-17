@@ -123,7 +123,7 @@
 						<input type="text" id="input-ip" value={ip} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={ip}>
-							<i class="fal fa-copy"></i>
+							<i class="fa-light fa-copy"></i>
 						</span>
 					</div>
 				{/each}
@@ -137,7 +137,7 @@
 						<input type="text" id="input-ipv6" value={ip} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={ip}>
-							<i class="fal fa-copy"></i>
+							<i class="fa-light fa-copy"></i>
 						</span>
 					</div>
 				{/each}
@@ -151,7 +151,7 @@
 						<input type="text" id="input-cname" value={cname} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={cname}>
-							<i class="fal fa-copy"></i>
+							<i class="fa-light fa-copy"></i>
 						</span>
 					</div>
 				{/each}

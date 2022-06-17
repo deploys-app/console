@@ -25,7 +25,7 @@
 
 <nav class="navbar">
 	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar}>
-		<i class="fal fa-bars"></i>
+		<i class="fa-light fa-bars"></i>
 	</div>
 
 	<div class="_mgl-at">

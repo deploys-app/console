@@ -6,10 +6,10 @@
 	export let url
 
 	const statusIconClass = {
-		pending: 'fas fa-spinner-third fa-spin',
-		success: 'fas fa-check-circle _cl-positive-500',
-		error: 'fas fa-times _cl-negative-500',
-		cancelled: 'fas fa-ban _cl-negative-500'
+		pending: 'fa-solid fa-spinner-third fa-spin',
+		success: 'fa-solid fa-check-circle _cl-positive-500',
+		error: 'fa-solid fa-times _cl-negative-500',
+		cancelled: 'fa-solid fa-ban _cl-negative-500'
 	}
 
 	let podStatus
@@ -27,20 +27,20 @@
 
 	function getIconClass () {
 		if (status !== 'success') {
-			return statusIconClass[status] || 'fas fa-minus _cl-light'
+			return statusIconClass[status] || 'fa-solid fa-minus _cl-light'
 		}
 
 		if (action === 'pause') {
-			return 'fas fa-pause _cl-warning-500'
+			return 'fa-solid fa-pause _cl-warning-500'
 		}
 
 		if (!podStatus) {
-			return 'fas fa-spin fa-spinner _cl-light'
+			return 'fa-solid fa-spin fa-spinner _cl-light'
 		}
 		if (podStatus.ready === podStatus.count) {
-			return 'fas fa-check-circle _cl-positive-500'
+			return 'fa-solid fa-check-circle _cl-positive-500'
 		}
-		return 'fas fa-exclamation-triangle _cl-warning-500'
+		return 'fa-solid fa-exclamation-triangle _cl-warning-500'
 	}
 
 	let fetchPodStatusTimeout

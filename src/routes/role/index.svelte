@@ -83,7 +83,7 @@
 								{#if roleCanUpdate(it.role)}
 									<a href={`/role/create?project=${project}&role=${it.role}`}>
 										<div class="moon-icon-button -secondary">
-											<i class="fas fa-pen"></i>
+											<i class="fa-solid fa-pen"></i>
 										</div>
 									</a>
 								{/if}

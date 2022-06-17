@@ -160,14 +160,14 @@
 				<input type="text" value="{key.secret}" readonly>
 				<div class="icon -is-right _cs-pt">
 					<button class="_bgcl-tpr _cs-pt _bdw-0px _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
-						<i class="fas fa-trash-alt"></i>
+						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>
 			</div>
 		{/each}
 		<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
 			<button class="moon-button -small icon-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
-				<i class="fas fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-12px"></i>
 				Create key
 			</button>
 		</div>

@@ -94,7 +94,7 @@
 <!--						<td>{it.createdBy}</td>-->
 						<td>
 							<button class="moon-icon-button -negative" on:click={() => deleteRoute(it)}>
-								<i class="fas fa-trash-alt"></i>
+								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>

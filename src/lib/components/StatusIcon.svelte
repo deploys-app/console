@@ -2,14 +2,14 @@
 	export let status
 
 	const iconClass = {
-		pending: 'fas fa-spinner-third fa-spin',
-		success: 'fas fa-check-circle _cl-positive-500',
-		error: 'fas fa-times _cl-negative-500',
-		cancelled: 'fas fa-ban _cl-negative-500'
+		pending: 'fa-solid fa-spinner-third fa-spin',
+		success: 'fa-solid fa-check-circle _cl-positive-500',
+		error: 'fa-solid fa-times _cl-negative-500',
+		cancelled: 'fa-solid fa-ban _cl-negative-500'
 	}
 
 	function getIconClass () {
-		return iconClass[status] || 'fas fa-minus _cl-light'
+		return iconClass[status] || 'fa-solid fa-minus _cl-light'
 	}
 </script>
 

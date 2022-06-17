@@ -398,13 +398,13 @@
 					<div class="moon-input -has-icon-right _mgbt-8px">
 						<input bind:value={form.command[i]}>
 						<div class="icon -is-right _cs-pt" on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
-							<i class="fas fa-trash-alt"></i>
+							<i class="fa-solid fa-trash-alt"></i>
 						</div>
 					</div>
 				{/each}
 			</div>
 			<button class="moon-button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
-				<i class="fas fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-12px"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
@@ -416,13 +416,13 @@
 					<div class="moon-input -has-icon-right _mgbt-8px">
 						<input bind:value={form.args[i]}>
 						<div class="icon -is-right _cs-pt" on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
-							<i class="fas fa-trash-alt"></i>
+							<i class="fa-solid fa-trash-alt"></i>
 						</div>
 					</div>
 				{/each}
 			</div>
 			<button class="moon-button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
-				<i class="fas fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-12px"></i>
 				<span>Add Arg</span>
 			</button>
 		</div>
@@ -583,7 +583,7 @@
 								<td class="table-action-container" style="padding: 19px 12px;">
 									<div class="moon-icon-button -negative"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
-										<i class="fas fa-trash-alt"></i>
+										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
 							</tr>
@@ -594,7 +594,7 @@
 							<td colspan="4">
 								<button class="moon-button -small _mg-at" type="button"
 									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
-									<i class="fas fa-plus _mgr-12px"></i>
+									<i class="fa-solid fa-plus _mgr-12px"></i>
 									<span>Add Variable</span>
 								</button>
 							</td>
@@ -643,7 +643,7 @@
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
 									<div class="moon-icon-button -negative" on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
-										<i class="fas fa-trash-alt"></i>
+										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
 							</tr>
@@ -653,7 +653,7 @@
 					<tr>
 						<td colspan="4">
 							<button class="moon-button -small _mg-at" type="button" on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
-								<i class="fas fa-plus _mgr-12px"></i>
+								<i class="fa-solid fa-plus _mgr-12px"></i>
 								<span>Add Data</span>
 							</button>
 						</td>

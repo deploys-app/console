@@ -93,11 +93,11 @@
 							<td class="table-action-container">
 								<a href={`/role/bind?project=${project}&email=${it.email}`}>
 									<div class="moon-icon-button -secondary">
-										<i class="fas fa-pen"></i>
+										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
 								<button class="moon-icon-button -negative" on:click={() => deleteUser(it.email)}>
-									<i class="fas fa-trash-alt"></i>
+									<i class="fa-solid fa-trash-alt"></i>
 								</button>
 							</td>
 						</tr>

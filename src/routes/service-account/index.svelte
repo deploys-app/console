@@ -72,7 +72,7 @@
 							<div class="table-action-container">
 								<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
 									<div class="moon-icon-button -secondary">
-										<i class="fas fa-pen"></i>
+										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
 							</div>

@@ -83,11 +83,11 @@
 						<td class="table-action-container">
 							<a href={`/project/create?project=${it.project}`}>
 								<div class="moon-icon-button -secondary">
-									<i class="fas fa-pen"></i>
+									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
 							<button class="moon-icon-button -negative" on:click={() => deleteItem(it.project)}>
-								<i class="fas fa-trash-alt"></i>
+								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>

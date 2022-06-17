@@ -62,7 +62,7 @@
 <div class="lo-12 lo-6-md _gg-24px _alit-st">
 	<div class="moon-panel lo-12 _gg-24px">
 		<h6>
-			<i class="far fa-project-diagram"></i>
+			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="_mgl-16px">Project Info</strong>
 		</h6>
 		<hr>
@@ -94,7 +94,7 @@
 <!--		<hr>-->
 
 <!--		<a class="_dp-f _alit-ct moon-link" href="">-->
-<!--			<i class="far fa-arrow-right _fs-20"></i>-->
+<!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
 <!--			<span class="_mgl-16px">Project Settings</span>-->
 <!--		</a>-->
 	</div>
@@ -102,7 +102,7 @@
 	{#if permission.billing}
 		<div class="moon-panel lo-12 _gg-24px">
 			<h6>
-				<i class="fas fa-credit-card"></i>
+				<i class="fa-solid fa-credit-card"></i>
 				<strong class="_mgl-16px">Billing</strong>
 			</h6>
 			<hr>

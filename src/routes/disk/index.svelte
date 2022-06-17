@@ -95,7 +95,7 @@
 						<td>
 							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
 								<div class="moon-icon-button -secondary">
-									<i class="fas fa-pen"></i>
+									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
 						</td>

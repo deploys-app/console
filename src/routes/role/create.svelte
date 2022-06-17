@@ -192,7 +192,7 @@
 								<td class="table-action-container">
 									<div class="moon-icon-button -negative"
 										on:click={() => { form.permissions = form.permissions.filter((x) => x !== it) }}>
-										<i class="fas fa-trash-alt"></i>
+										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
 							</tr>

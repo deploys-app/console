@@ -77,7 +77,7 @@
 							{`https://${deployment.url}`}
 						</a>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`https://${deployment.url}`}>
-							<i class="fal fa-copy"></i>
+							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
 				</tr>
@@ -87,7 +87,7 @@
 				<td>
 					http://{deployment.internalUrl}
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`http://${deployment.internalUrl}`}>
-						<i class="fal fa-copy"></i>
+						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
 			</tr>
@@ -104,7 +104,7 @@
 				<td>
 					{deployment.internalAddress}:{deployment.port}
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`${deployment.internalAddress}:${deployment.port}`}>
-						<i class="fal fa-copy"></i>
+						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
 			</tr>
@@ -123,7 +123,7 @@
 			<td>
 				{deployment.location}
 				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`${deployment.location}`}>
-					<i class="fal fa-copy"></i>
+					<i class="fa-light fa-copy"></i>
 				</span>
 			</td>
 		</tr>
@@ -132,7 +132,7 @@
 			<td>
 				{deployment.image}
 				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`${deployment.image}`}>
-					<i class="fal fa-copy"></i>
+					<i class="fa-light fa-copy"></i>
 				</span>
 			</td>
 		</tr>
