@@ -106,11 +106,12 @@
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>{serviceAccount.name}</strong>
+			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
+				<strong>{serviceAccount.name}</strong>
 			</h3>
 			<div class="_dp-f">
 				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
-					Delete service account
+					Delete
 				</button>
 			</div>
 		</div>

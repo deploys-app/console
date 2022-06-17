@@ -105,10 +105,21 @@
 </div>
 <br>
 <div class="moon-panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
-		<h3><strong>Domain: {domain.domain}</strong></h3>
+	<div class="lo-12 _gg-12px">
+		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
+				<strong>Domain: {domain.domain}</strong>
+			</h3>
+			<div class="_dp-f">
+				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
+					Delete
+				</button>
+			</div>
+		</div>
 	</div>
+
 	<hr>
+
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
 		<div class="moon-field">
 			<label for="input-gsa">Domain</label>
@@ -189,8 +200,7 @@
 
 	<hr>
 
-	<div class="_mgl-at-lg _dp-f _alit-ct _fw-w">
-		<button class="moon-button -danger _mgr-24px" class:-loadin={purging} on:click={purgeCache}>Purge Cache</button>
-		<button class="moon-button -danger" on:click={deleteItem}>Delete</button>
+	<div class="_dp-f _alit-ct _fw-w">
+		<button class="moon-button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
 	</div>
 </div>

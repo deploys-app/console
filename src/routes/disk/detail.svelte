@@ -93,9 +93,16 @@
 
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
-		<div class="_dp-f _alit-ct">
-			<h3><StatusIcon status={disk.status} /></h3>
-			<h3 class="_mgr-24px _mgbt-0px-lg">Disk "{disk.name}"</h3>
+		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+			<h3 class="_mgr-24px _mgbt-0px-lg">
+				<StatusIcon status={disk.status} />
+				<strong>Disk: {disk.name}</strong>
+			</h3>
+			<div class="_dp-f">
+				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
+					Delete
+				</button>
+			</div>
 		</div>
 	</div>
 
@@ -134,7 +141,9 @@
 		</div>
 	</div>
 
-	<div class="_dp-f _fw-w _alit-ct _mgv-32px">
-		<button class="moon-button -danger -small" type="button" on:click={deleteItem}>Delete</button>
+	<hr>
+
+	<div class="_dp-f _alit-ct _fw-w">
+		<a class="moon-button -danger -small" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 	</div>
 </div>

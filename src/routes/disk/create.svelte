@@ -109,7 +109,13 @@
 <div class="moon-panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Create Disk</strong></h3>
+			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
+				{#if disk}
+					Update Disk {disk.name}
+				{:else}
+					Create Disk
+				{/if}
+			</strong></h3>
 		</div>
 	</div>
 
