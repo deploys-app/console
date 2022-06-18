@@ -225,7 +225,7 @@
 			</div>
 		{/if}
 
-		{#if domain.status === 'verify'}
+		{#if domain.verification?.ownership?.type}
 			<hr>
 			<p><strong>Domain Verification</strong></p>
 			{#if (domain.verification.ownership.errors || []).length > 0}
