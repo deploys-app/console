@@ -189,19 +189,19 @@
 		<div class="moon-field">
 			<label for="input-gsa">Domain</label>
 			<div class="moon-input">
-				<input type="text" id="input-gsa" value={domain.domain} readonly disabled>
+				<input id="input-gsa" value={domain.domain} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-location">Location</label>
 			<div class="moon-input">
-				<input type="text" id="input-location" value={domain.location} readonly disabled>
+				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-type">Type</label>
 			<div class="moon-input">
-				<input type="text" id="input-type" value={format.domainType(domain.type)} readonly disabled>
+				<input id="input-type" value={format.domainType(domain.type)} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
@@ -236,7 +236,7 @@
 			<div class="moon-field">
 				<label for="input-owner_name">TXT Name</label>
 				<div class="moon-input -has-icon-right _mgbt-4px">
-					<input type="text" id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
+					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
 						<i class="fa-light fa-copy"></i>
@@ -246,7 +246,7 @@
 			<div class="moon-field">
 				<label for="input-owner_value">TXT Value</label>
 				<div class="moon-input -has-icon-right _mgbt-4px">
-					<input type="text" id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
+					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
 						<i class="fa-light fa-copy"></i>
@@ -262,7 +262,7 @@
 				<div class="moon-field">
 					<label for={`input-ssl_name_${index}`}>TXT Name</label>
 					<div class="moon-input -has-icon-right _mgbt-4px">
-						<input type="text" id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
+						<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={it.txtName}>
 								<i class="fa-light fa-copy"></i>
@@ -272,7 +272,7 @@
 				<div class="moon-field">
 					<label for={`input-ssl_value_${index}`}>TXT Value</label>
 					<div class="moon-input -has-icon-right _mgbt-4px">
-						<input type="text" id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
+						<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={it.txtValue}>
 								<i class="fa-light fa-copy"></i>
@@ -289,7 +289,7 @@
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip}
 						<div class="moon-input -has-icon-right _mgbt-4px">
-							<input type="text" id="input-ip" value={ip} readonly disabled>
+							<input id="input-ip" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={ip}>
 								<i class="fa-light fa-copy"></i>
@@ -303,7 +303,7 @@
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip}
 						<div class="moon-input -has-icon-right _mgbt-4px">
-							<input type="text" id="input-ipv6" value={ip} readonly disabled>
+							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={ip}>
 								<i class="fa-light fa-copy"></i>
@@ -317,7 +317,7 @@
 					<label for="input-cname">CNAME Record</label>
 					{#each domain.dnsConfig.cname as cname}
 						<div class="moon-input -has-icon-right">
-							<input type="text" id="input-cname" value={cname} readonly disabled>
+							<input id="input-cname" value={cname} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={cname}>
 								<i class="fa-light fa-copy"></i>

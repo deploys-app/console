@@ -122,13 +122,13 @@
 		<div class="moon-field">
 			<label for="input-email">Email</label>
 			<div class="moon-input">
-				<input type="text" id="input-email" value={serviceAccount.email} readonly>
+				<input id="input-email" value={serviceAccount.email} readonly>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-name">Name</label>
 			<div class="moon-input">
-				<input type="text" id="input-name" value={serviceAccount.name} readonly>
+				<input id="input-name" value={serviceAccount.name} readonly>
 			</div>
 		</div>
 		<div class="moon-field">
@@ -140,13 +140,13 @@
 		<div class="moon-field">
 			<label for="input-created_at">Created At</label>
 			<div class="moon-input">
-				<input type="text" id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
+				<input id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-created_by">Created By</label>
 			<div class="moon-input">
-				<input type="text" id="input-created_by" value="{serviceAccount.createdBy}" readonly>
+				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
 	</div>
@@ -157,7 +157,7 @@
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
 		{#each (serviceAccount.keys || []) as key}
 			<div class="moon-input -has-icon-right">
-				<input type="text" value="{key.secret}" readonly>
+				<input value="{key.secret}" readonly>
 				<div class="icon -is-right _cs-pt">
 					<button class="_bgcl-tpr _cs-pt _bdw-0px _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>

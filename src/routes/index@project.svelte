@@ -69,25 +69,25 @@
 		<div class="moon-field">
 			<label for="input-project_name">Project Name</label>
 			<div class="moon-input">
-				<input id="input-project_name" type="text" readonly value={project.name}>
+				<input id="input-project_name" readonly value={project.name}>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-project_id">Project ID</label>
 			<div class="moon-input">
-				<input id="input-project_id" type="text" readonly value={project.project}>
+				<input id="input-project_id" readonly value={project.project}>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-project_number">Project Number</label>
 			<div class="moon-input">
-				<input id="input-project_number" type="text" readonly value={project.id}>
+				<input id="input-project_number" readonly value={project.id}>
 			</div>
 		</div>
 		<div class="moon-field">
-			<label for="input-project_number">Billing Account ID</label>
+			<label for="input-project_billing">Billing Account ID</label>
 			<div class="moon-input">
-				<input id="input-project_number" type="text" readonly value={project.billingAccount}>
+				<input id="input-project_billing" readonly value={project.billingAccount}>
 			</div>
 		</div>
 

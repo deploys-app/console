@@ -111,19 +111,19 @@
 		<div class="moon-field">
 			<label for="input-name">Name</label>
 			<div class="moon-input">
-				<input id="input-name" type="text" value={disk.name} readonly disabled>
+				<input id="input-name" value={disk.name} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-location">Location</label>
 			<div class="moon-input">
-				<input id="input-location" type="text" value={disk.location} readonly disabled>
+				<input id="input-location" value={disk.location} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-size">Size (GiB)</label>
 			<div class="moon-input">
-				<input id="input-size" type="text" value={disk.size} readonly disabled>
+				<input id="input-size" value={disk.size} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">

@@ -93,13 +93,13 @@
 		<div class="moon-field">
 			<label for="input-gsa">GSA</label>
 			<div class="moon-input">
-				<input type="text" id="input-gsa" value={workloadIdentity.gsa} readonly disabled>
+				<input id="input-gsa" value={workloadIdentity.gsa} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
 			<label for="input-location">Location</label>
 			<div class="moon-input">
-				<input type="text" id="input-location" value={workloadIdentity.location} readonly disabled>
+				<input id="input-location" value={workloadIdentity.location} readonly disabled>
 			</div>
 		</div>
 		<div class="moon-field">
