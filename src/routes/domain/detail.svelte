@@ -45,25 +45,29 @@
 			copyList.destroy()
 		}
 	})
+
+	let reloadTimeout
 	onMount(() => {
+		handleReload()
+		return () => {
+			reloadTimeout && clearTimeout(reloadTimeout)
+		}
+	})
+	function handleReload () {
 		if (!['pending', 'verify'].includes(domain.status)) {
 			return
 		}
-		let timeout
 		const f = async () => {
-			timeout = null
+			reloadTimeout = null
 			await api.invalidate('domain.get')
 			if (domain.status === 'pending') {
-				timeout = setTimeout(f, 3000)
+				reloadTimeout = setTimeout(f, 3000)
 			} else if (domain.status === 'verify') {
-				timeout = setTimeout(f, 5000)
+				reloadTimeout = setTimeout(f, 5000)
 			}
 		}
 		setTimeout(f, 3000)
-		return () => {
-			timeout && clearTimeout(timeout)
-		}
-	})
+	}
 
 	let purging = false
 	async function purgeCache () {
@@ -107,6 +111,48 @@
 					return
 				}
 				await goto(`/domain?project=${project}`)
+			}
+		})
+	}
+
+	function upgradeHostname () {
+		modal.confirm({
+			html: `Upgrade "${domain.domain}" to Hostname ?<br><br>This action can not rollback.`,
+			yes: 'Upgrade to Hostname',
+			callback: async () => {
+				const resp = await api.invoke('domain.create', {
+					project,
+					location: domain.location,
+					domain: domain.domain,
+					type: 'hostname'
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				await api.invalidate('domain.get')
+				handleReload()
+			}
+		})
+	}
+
+	function upgradeWildcard () {
+		modal.confirm({
+			html: `Upgrade "${domain.domain}" to Wildcard ?<br><br>This action can not rollback.`,
+			yes: 'Upgrade to Wildcard',
+			callback: async () => {
+				const resp = await api.invoke('domain.create', {
+					project,
+					location: domain.location,
+					domain: domain.domain,
+					type: 'wildcard'
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				await api.invalidate('domain.get')
+				handleReload()
 			}
 		})
 	}
@@ -207,33 +253,33 @@
 					</span>
 				</div>
 			</div>
+		{/if}
 
-			{#if (domain.verification.ssl.records || []).length > 0}
-				<hr>
-				<p><strong>SSL/TLS Verification</strong></p>
-				{#each domain.verification.ssl.records as it, index}
-					<div class="moon-field">
-						<label for={`input-ssl_name_${index}`}>TXT Name</label>
-						<div class="moon-input -has-icon-right _mgbt-4px">
-							<input type="text" id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
-							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-								data-clipboard-text={domain.verification.ownership.name}>
+		{#if (domain.verification?.ssl?.records || []).length > 0}
+			<hr>
+			<p><strong>SSL/TLS Verification</strong></p>
+			{#each domain.verification.ssl.records as it, index}
+				<div class="moon-field">
+					<label for={`input-ssl_name_${index}`}>TXT Name</label>
+					<div class="moon-input -has-icon-right _mgbt-4px">
+						<input type="text" id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+							data-clipboard-text={it.txtName}>
 								<i class="fa-light fa-copy"></i>
 							</span>
-						</div>
 					</div>
-					<div class="moon-field">
-						<label for={`input-ssl_value_${index}`}>TXT Value</label>
-						<div class="moon-input -has-icon-right _mgbt-4px">
-							<input type="text" id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
-							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-								data-clipboard-text={it.txtValue}>
+				</div>
+				<div class="moon-field">
+					<label for={`input-ssl_value_${index}`}>TXT Value</label>
+					<div class="moon-input -has-icon-right _mgbt-4px">
+						<input type="text" id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
+						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+							data-clipboard-text={it.txtValue}>
 								<i class="fa-light fa-copy"></i>
 							</span>
-						</div>
 					</div>
-				{/each}
-			{/if}
+				</div>
+			{/each}
 		{/if}
 
 		{#if domain.status === 'success' || domain.status === 'verify'}
@@ -287,6 +333,14 @@
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
 			<button class="moon-button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
+		</div>
+	{/if}
+
+	{#if domain.type === 'cloudflare'}
+		<hr>
+		<div class="_dp-f _alit-ct _fw-w">
+			<button class="moon-button -positive _mgr-12px" on:click={upgradeHostname}>Upgrade to Hostname</button>
+			<button class="moon-button -positive" on:click={upgradeWildcard}>Upgrade to Wildcard</button>
 		</div>
 	{/if}
 </div>

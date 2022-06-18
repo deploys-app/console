@@ -85,7 +85,12 @@
 						<td>
 							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="moon-link">{it.domain}</a>
 						</td>
-						<td>{format.domainType(it.type)}</td>
+						<td>
+							{format.domainType(it.type)}
+							{#if it.type === 'cloudflare'}
+								<i class="fa-solid fa-triangle-exclamation _cl-negative-500"></i>
+							{/if}
+						</td>
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
