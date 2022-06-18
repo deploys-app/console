@@ -22,7 +22,8 @@
 		return {
 			props: {
 				domain: domain.result
-			}
+			},
+			dependencies: ['domain']
 		}
 	}
 </script>
@@ -32,7 +33,7 @@
 	import format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
-	import { goto } from '$app/navigation'
+	import { goto, invalidate } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let domain
@@ -43,6 +44,25 @@
 		const copyList = new ClipboardJS('.copy')
 		return () => {
 			copyList.destroy()
+		}
+	})
+	onMount(() => {
+		if (!['pending', 'verify'].includes(domain.status)) {
+			return
+		}
+		let timeout
+		const f = async () => {
+			timeout = null
+			await invalidate('domain')
+			if (domain.status === 'pending') {
+				timeout = setTimeout(f, 3000)
+			} else if (domain.status === 'verify') {
+				timeout = setTimeout(f, 5000)
+			}
+		}
+		setTimeout(f, 3000)
+		return () => {
+			timeout && clearTimeout(timeout)
 		}
 	})
 
@@ -152,55 +172,122 @@
 			</div>
 		</div>
 
+		{#if domain.status === 'pending'}
+			<hr>
+			<p><strong>Domain Verification</strong></p>
+			<div class="_fs-800">
+				<i class="fa-solid fa-spinner-third fa-spin"></i>
+			</div>
+		{/if}
+
+		{#if domain.status === 'verify'}
+			<hr>
+			<p><strong>Domain Verification</strong></p>
+			{#if (domain.verification.ownership.errors || []).length > 0}
+				{#each domain.verification.ownership.errors as e}
+					<p class="_cl-negative-500">{e}</p>
+				{/each}
+			{/if}
+			<div class="moon-field">
+				<label for="input-owner_name">TXT Name</label>
+				<div class="moon-input -has-icon-right _mgbt-4px">
+					<input type="text" id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
+					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+						data-clipboard-text={domain.verification.ownership.name}>
+						<i class="fa-light fa-copy"></i>
+					</span>
+				</div>
+			</div>
+			<div class="moon-field">
+				<label for="input-owner_value">TXT Value</label>
+				<div class="moon-input -has-icon-right _mgbt-4px">
+					<input type="text" id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
+					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+						data-clipboard-text={domain.verification.ownership.value}>
+						<i class="fa-light fa-copy"></i>
+					</span>
+				</div>
+			</div>
+
+			{#if (domain.verification.ssl.records || []).length > 0}
+				<hr>
+				<p><strong>SSL/TLS Verification</strong></p>
+				{#each domain.verification.ssl.records as it, index}
+					<div class="moon-field">
+						<label for={`input-ssl_name_${index}`}>TXT Name</label>
+						<div class="moon-input -has-icon-right _mgbt-4px">
+							<input type="text" id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
+							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+								data-clipboard-text={domain.verification.ownership.name}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</div>
+					</div>
+					<div class="moon-field">
+						<label for={`input-ssl_value_${index}`}>TXT Value</label>
+						<div class="moon-input -has-icon-right _mgbt-4px">
+							<input type="text" id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
+							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+								data-clipboard-text={it.txtValue}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</div>
+					</div>
+				{/each}
+			{/if}
+		{/if}
+
+		{#if domain.status === 'success' || domain.status === 'verify'}
+			<hr>
+			{#if (domain.dnsConfig.ipv4 || []).length > 0}
+				<div class="moon-field">
+					<label for="input-ip">A Record</label>
+					{#each domain.dnsConfig.ipv4 as ip}
+						<div class="moon-input -has-icon-right _mgbt-4px">
+							<input type="text" id="input-ip" value={ip} readonly disabled>
+							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+								data-clipboard-text={ip}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+			{#if (domain.dnsConfig.ipv6 || []).length > 0}
+				<div class="moon-field">
+					<label for="input-ipv6">AAAA Record</label>
+					{#each domain.dnsConfig.ipv6 as ip}
+						<div class="moon-input -has-icon-right _mgbt-4px">
+							<input type="text" id="input-ipv6" value={ip} readonly disabled>
+							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+								data-clipboard-text={ip}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+			{#if (domain.dnsConfig.cname || []).length > 0}
+				<div class="moon-field">
+					<label for="input-cname">CNAME Record</label>
+					{#each domain.dnsConfig.cname as cname}
+						<div class="moon-input -has-icon-right">
+							<input type="text" id="input-cname" value={cname} readonly disabled>
+							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+								data-clipboard-text={cname}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		{/if}
+	</div>
+
+	{#if domain.type !== 'cloudflare' && domain.status === 'success'}
 		<hr>
-
-		{#if (domain.dnsConfig.ipv4 || []).length > 0}
-			<div class="moon-field">
-				<label for="input-ip">A Record</label>
-				{#each domain.dnsConfig.ipv4 as ip}
-					<div class="moon-input -has-icon-right _mgbt-4px">
-						<input type="text" id="input-ip" value={ip} readonly disabled>
-						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-							data-clipboard-text={ip}>
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</div>
-				{/each}
-			</div>
-		{/if}
-		{#if (domain.dnsConfig.ipv6 || []).length > 0}
-			<div class="moon-field">
-				<label for="input-ipv6">AAAA Record</label>
-				{#each domain.dnsConfig.ipv6 as ip}
-					<div class="moon-input -has-icon-right _mgbt-4px">
-						<input type="text" id="input-ipv6" value={ip} readonly disabled>
-						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-							data-clipboard-text={ip}>
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</div>
-				{/each}
-			</div>
-		{/if}
-		{#if (domain.dnsConfig.cname || []).length > 0}
-			<div class="moon-field">
-				<label for="input-cname">CNAME Record</label>
-				{#each domain.dnsConfig.cname as cname}
-					<div class="moon-input -has-icon-right">
-						<input type="text" id="input-cname" value={cname} readonly disabled>
-						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
-							data-clipboard-text={cname}>
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</div>
-				{/each}
-			</div>
-		{/if}
-	</div>
-
-	<hr>
-
-	<div class="_dp-f _alit-ct _fw-w">
-		<button class="moon-button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
-	</div>
+		<div class="_dp-f _alit-ct _fw-w">
+			<button class="moon-button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
+		</div>
+	{/if}
 </div>

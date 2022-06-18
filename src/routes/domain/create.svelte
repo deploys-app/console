@@ -103,8 +103,8 @@
 				<select id="input-target_prefix" bind:value={form.type} required>
 					<option value="" selected disabled>Select Type</option>
 					<option value="cloudflare">Cloudflare</option>
-					<option value="hostname" disabled>Hostname (Soon)</option>
-					<option value="wildcard" disabled>Wildcard (Soon)</option>
+					<option value="hostname">Hostname</option>
+					<option value="wildcard">Wildcard</option>
 				</select>
 			</div>
 		</div>
