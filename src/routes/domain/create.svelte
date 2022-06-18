@@ -102,7 +102,7 @@
 			<div class="moon-select">
 				<select id="input-target_prefix" bind:value={form.type} required>
 					<option value="" selected disabled>Select Type</option>
-					<option value="cloudflare">Cloudflare</option>
+					<option value="cloudflare" disabled>Cloudflare</option>
 					<option value="hostname">Hostname</option>
 					<option value="wildcard">Wildcard</option>
 				</select>
