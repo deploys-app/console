@@ -16,8 +16,7 @@
 					workloadIdentities: !workloadIdentities.error?.forbidden
 				},
 				workloadIdentities: workloadIdentities.result?.items || []
-			},
-			dependencies: ['workloadIdentities']
+			}
 		}
 	}
 </script>
@@ -30,7 +29,6 @@
 	import { loading } from '$lib/stores'
 	import format from '$lib/format'
 	import { browser } from '$app/env'
-	import { invalidate } from '$app/navigation'
 	import { onDestroy } from 'svelte'
 
 	export let permission
@@ -43,7 +41,7 @@
 		if (browser) {
 			const hasPending = workloadIdentities.status === 'pending'
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => invalidate('workloadIdentities'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('workloadIdentity.list'), 2000)
 			}
 		}
 	}

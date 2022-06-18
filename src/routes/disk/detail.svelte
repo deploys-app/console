@@ -25,8 +25,7 @@
 				location,
 				name,
 				disk: disk.result
-			},
-			dependencies: ['disk']
+			}
 		}
 	}
 </script>
@@ -37,7 +36,7 @@
 	import format from '$lib/format'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { browser } from '$app/env'
-	import { goto, invalidate } from '$app/navigation'
+	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let location
@@ -51,7 +50,7 @@
 		if (browser) {
 			const hasPending = disk.status === 'pending'
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => invalidate('disks'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('disk.get'), 2000)
 			}
 		}
 	}

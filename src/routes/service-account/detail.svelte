@@ -21,14 +21,13 @@
 			props: {
 				id,
 				serviceAccount: serviceAccount.result
-			},
-			dependencies: ['serviceAccount', 'serviceAccount/keys']
+			}
 		}
 	}
 </script>
 
 <script>
-	import { goto, invalidate } from '$app/navigation'
+	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import format from '$lib/format'
 	import modal from '$lib/modal'
@@ -67,7 +66,7 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			await invalidate('serviceAccount/keys')
+			await api.invalidate('serviceAccount.get')
 		} catch (e) {
 			modal.error({ error: e })
 		} finally {
@@ -85,7 +84,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('serviceAccount/keys')
+				await api.invalidate('serviceAccount.get')
 			}
 		})
 	}

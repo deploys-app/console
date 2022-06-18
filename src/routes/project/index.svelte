@@ -5,15 +5,13 @@
 		return {
 			props: {
 				projects
-			},
-			dependencies: ['projects']
+			}
 		}
 	}
 </script>
 
 <script>
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { invalidate } from '$app/navigation'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 	import modal from '$lib/modal'
@@ -45,7 +43,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		await invalidate('projects')
+		await api.invalidate('project.list')
 	}
 </script>
 

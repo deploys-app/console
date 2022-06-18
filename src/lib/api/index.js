@@ -1,4 +1,5 @@
 import JSONBig from 'json-bigint'
+import { invalidate } from '$app/navigation'
 
 const jsonBig = JSONBig({ storeAsString: true })
 
@@ -46,5 +47,8 @@ export default {
 	invoke,
 	setOnUnauth: (callback) => {
 		onUnauth = callback
+	},
+	invalidate: (fn) => {
+		return invalidate(`${endpoint}/${fn}`)
 	}
 }

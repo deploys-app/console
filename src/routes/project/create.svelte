@@ -33,14 +33,13 @@
 			props: {
 				project: projectInfo?.result,
 				billingAccounts: billingAccounts.result.items || []
-			},
-			dependencies: ['projects']
+			}
 		}
 	}
 </script>
 
 <script>
-	import { goto, invalidate } from '$app/navigation'
+	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let project
@@ -75,7 +74,7 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			await invalidate('projects')
+			await api.invalidate('project.list')
 			await goto(`/?project=${form.sid}`)
 		} finally {
 			saving = false

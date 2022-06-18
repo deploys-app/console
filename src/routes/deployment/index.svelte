@@ -16,8 +16,7 @@
 					deployments: !deployments.error?.forbidden
 				},
 				deployments: deployments.result?.items || []
-			},
-			dependencies: ['deployments']
+			}
 		}
 	}
 </script>
@@ -29,7 +28,6 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { browser } from '$app/env'
 	import { page } from '$app/stores'
-	import { invalidate } from '$app/navigation'
 	import format from '$lib/format'
 	import { loading } from '$lib/stores'
 
@@ -43,7 +41,7 @@
 		if (browser) {
 			const hasPending = deployments.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => invalidate('deployments'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('deployment.list'), 2000)
 			}
 		}
 	}

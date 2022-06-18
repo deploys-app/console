@@ -16,8 +16,7 @@
 					pullSecrets: !pullSecrets.error?.forbidden
 				},
 				pullSecrets: pullSecrets.result?.items || []
-			},
-			dependencies: ['pullSecrets']
+			}
 		}
 	}
 </script>
@@ -30,7 +29,6 @@
 	import format from '$lib/format'
 	import { page } from '$app/stores'
 	import { browser } from '$app/env'
-	import { invalidate } from '$app/navigation'
 	import { loading } from '$lib/stores'
 
 	export let permission
@@ -43,7 +41,7 @@
 		if (browser) {
 			const hasPending = pullSecrets.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => invalidate('pullSecrets'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('pullSecret.list'), 2000)
 			}
 		}
 	}

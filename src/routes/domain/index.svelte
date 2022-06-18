@@ -16,8 +16,7 @@
 					domains: !domains.error?.forbidden
 				},
 				domains: domains.result
-			},
-			dependencies: ['domains']
+			}
 		}
 	}
 </script>
@@ -27,7 +26,6 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
-	import { invalidate } from '$app/navigation'
 	import modal from '$lib/modal'
 	import format from '$lib/format'
 
@@ -49,7 +47,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('domains')
+				api.invalidate('domain.list')
 			}
 		})
 	}

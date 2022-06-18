@@ -19,8 +19,7 @@
 					users: !users.error?.forbidden
 				},
 				users: users.result?.items || []
-			},
-			dependencies: ['users']
+			}
 		}
 	}
 </script>
@@ -30,7 +29,6 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
-	import { invalidate } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let permission
@@ -52,7 +50,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('users')
+				api.invalidate('role.users')
 			}
 		})
 	}

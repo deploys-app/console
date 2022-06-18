@@ -16,8 +16,7 @@
 					disks: !disks.error?.forbidden
 				},
 				disks: disks.result?.items || []
-			},
-			dependencies: ['disks']
+			}
 		}
 	}
 </script>
@@ -30,7 +29,6 @@
 	import format from '$lib/format'
 	import { page } from '$app/stores'
 	import { browser } from '$app/env'
-	import { invalidate } from '$app/navigation'
 	import { loading } from '$lib/stores'
 
 	export let permission
@@ -43,7 +41,7 @@
 		if (browser) {
 			const hasPending = disks.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => invalidate('disks'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('disk.list'), 2000)
 			}
 		}
 	}

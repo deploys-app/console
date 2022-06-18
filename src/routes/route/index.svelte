@@ -16,8 +16,7 @@
 					routes: !routes.error?.forbidden
 				},
 				routes: routes.result
-			},
-			dependencies: ['routes']
+			}
 		}
 	}
 </script>
@@ -27,7 +26,6 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { page } from '$app/stores'
 	import { loading } from '$lib/stores'
-	import { invalidate } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let permission
@@ -50,7 +48,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				await invalidate('routes')
+				await api.invalidate('route.list')
 			}
 		})
 	}

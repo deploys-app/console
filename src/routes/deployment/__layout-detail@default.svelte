@@ -26,8 +26,7 @@
 				location,
 				name,
 				deployment: deployment.result
-			},
-			dependencies: ['deployment']
+			}
 		}
 	}
 </script>
@@ -36,7 +35,6 @@
 	import { page } from '$app/stores'
 	import Header from './_components/Header.svelte'
 	import { browser } from '$app/env'
-	import { invalidate } from '$app/navigation'
 	import { onDestroy } from 'svelte'
 
 	export let deployment
@@ -48,7 +46,7 @@
 		if (browser) {
 			const isPending = deployment.status === 'pending'
 			if (isPending) {
-				pendingTimeout = setTimeout(() => invalidate('deployment'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('deployment.get'), 2000)
 			}
 		}
 	}
@@ -72,7 +70,7 @@
 </div>
 <br>
 <div class="moon-panel _dp-g _gg-24px">
-	<Header {deployment} on:invalidate={() => invalidate('deployment')} />
+	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
 
 	<slot />
 </div>

@@ -22,8 +22,7 @@
 		return {
 			props: {
 				domain: domain.result
-			},
-			dependencies: ['domain']
+			}
 		}
 	}
 </script>
@@ -33,7 +32,7 @@
 	import format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
-	import { goto, invalidate } from '$app/navigation'
+	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 
 	export let domain
@@ -53,7 +52,7 @@
 		let timeout
 		const f = async () => {
 			timeout = null
-			await invalidate('domain')
+			await api.invalidate('domain.get')
 			if (domain.status === 'pending') {
 				timeout = setTimeout(f, 3000)
 			} else if (domain.status === 'verify') {
