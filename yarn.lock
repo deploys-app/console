@@ -570,7 +570,7 @@ __metadata:
     svelte: ^3.48.0
     svelte-check: ^2.7.2
     svelte-preprocess: ^4.10.7
-    sweetalert2: ^11.4.17
+    sweetalert2: ^11.4.18
     typescript: ~4.7.4
     valid-url: ^1.0.9
   languageName: unknown
@@ -2803,10 +2803,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.4.17":
-  version: 11.4.17
-  resolution: "sweetalert2@npm:11.4.17"
-  checksum: 362dbbe9a590f4525f2e60d6277288017ef301425c5df63d26809a8b471acc33c155e2e956b62f70db84276654a5de62d19439332771f1841233cbdd61caade2
+"sweetalert2@npm:^11.4.18":
+  version: 11.4.18
+  resolution: "sweetalert2@npm:11.4.18"
+  checksum: 2e093964b7610dd1e875877bbd039a3b87895a4e38a9b79e31c43d78e4f9ac4803d86c857341f5b5c374897d26607de6a6acea3182e52e2fa78721f0f6603d84
   languageName: node
   linkType: hard
 
