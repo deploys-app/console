@@ -28,7 +28,8 @@
 
 		return {
 			stuff: {
-				menu: 'role.users'
+				menu: 'role.users',
+				overrideRedirect: '/role/users'
 			},
 			props: {
 				email,

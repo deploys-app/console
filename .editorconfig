@@ -1,0 +1,4 @@
+root = true
+
+[*.svelte]
+indent_style = tab

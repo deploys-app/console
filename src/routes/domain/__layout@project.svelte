@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'domain'
+				menu: 'domain',
+				overrideRedirect: '/domain'
 			}
 		}
 	}

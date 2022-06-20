@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'service-account'
+				menu: 'service-account',
+				overrideRedirect: '/service-account'
 			}
 		}
 	}

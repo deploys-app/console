@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'route'
+				menu: 'route',
+				overrideRedirect: '/route'
 			}
 		}
 	}

@@ -12,5 +12,6 @@ declare namespace App {
 	interface Stuff {
 		project: string
 		menu: string
+		overrideRedirect: ?string
 	}
 }

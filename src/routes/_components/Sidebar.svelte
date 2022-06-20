@@ -10,7 +10,7 @@
 		q.set('project', sid)
 
 		if ($project) {
-			goto(`?${q.toString()}`)
+			goto(`${$page.stuff.overrideRedirect || ''}?${q.toString()}`)
 			return
 		}
 		goto(`/?${q.toString()}`)

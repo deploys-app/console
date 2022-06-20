@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'deployment'
+				menu: 'deployment',
+				overrideRedirect: '/deployment'
 			}
 		}
 	}

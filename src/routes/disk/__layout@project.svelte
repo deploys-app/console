@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'disk'
+				menu: 'disk',
+				overrideRedirect: '/disk'
 			}
 		}
 	}

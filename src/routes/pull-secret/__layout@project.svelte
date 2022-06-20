@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'pull-secret'
+				menu: 'pull-secret',
+				overrideRedirect: '/pull-secret'
 			}
 		}
 	}

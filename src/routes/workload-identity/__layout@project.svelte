@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'workload-identity'
+				menu: 'workload-identity',
+				overrideRedirect: '/workload-identity'
 			}
 		}
 	}

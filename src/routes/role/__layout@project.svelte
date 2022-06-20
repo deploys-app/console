@@ -2,7 +2,8 @@
 	export function load () {
 		return {
 			stuff: {
-				menu: 'role'
+				menu: 'role',
+				overrideRedirect: '/role'
 			}
 		}
 	}
