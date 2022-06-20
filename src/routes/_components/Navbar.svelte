@@ -1,4 +1,5 @@
 <script>
+	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 
 	export let profile
@@ -33,35 +34,38 @@
 			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max" crossorigin>
 		</div>
 
-		<div class="moon-popup" class:is-active={active}>
-			<ul class="user-menu">
-				<li>
-					<a sveltekit:prefetch class="item _dp-b" href="/billing" on:click={close}>
-                        Billing accounts
-                    </a>
-				</li>
-				<li on:click={() => signOut.submit()}>
-					<div class="item">
-						Signout
-					</div>
-					<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
-                        <button>Sign Out</button>
-					</form>
-				</li>
-			</ul>
-		</div>
+		{#if active}
+			<div class="popup" transition:scale={{ duration: 160 }}>
+				<ul class="user-menu">
+					<li>
+						<a sveltekit:prefetch class="item _dp-b" href="/billing" on:click={close}>
+							Billing accounts
+						</a>
+					</li>
+					<li on:click={() => signOut.submit()}>
+						<div class="item">
+							Signout
+						</div>
+						<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
+							<button>Sign Out</button>
+						</form>
+					</li>
+				</ul>
+			</div>
+		{/if}
 	</div>
 </nav>
 
 <style>
-	.moon-popup {
+	.popup {
+		position: absolute;
+		z-index: 1;
+		box-shadow: var(--raised-z11);
+		min-width: 256px;
+
 		right: 1rem;
 		margin-top: -.5rem;
-
-		transition: all var(--timing-faster) ease-in-out;
-
 		transform-origin: top right;
-		transform: scale(0);
 	}
 
 	ul.user-menu {
@@ -70,10 +74,6 @@
 
 		background: white;
 		color: var(--color-dark-primary);
-	}
-
-	.moon-popup.is-active {
-		transform: scale(1);
 	}
 
 	ul.user-menu > li {
