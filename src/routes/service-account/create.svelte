@@ -59,6 +59,7 @@
 				modal.error({ error: resp.error })
 				return
 			}
+			await api.invalidate('serviceAccount.list')
 			goto(`/service-account?project=${project}`)
 		} catch (e) {
 			modal.error({ error: e })
