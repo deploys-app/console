@@ -64,7 +64,7 @@ function storeProject ({ event, resolve }) {
 	return resolve(event)
 }
 
-async function _generateLinkHeader (resp) {
+async function _generateLinkHeaders (resp) {
 	const allowPrefix = [
 		'https://',
 		'/'
@@ -98,16 +98,14 @@ async function _generateLinkHeader (resp) {
 	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script', true))
 	// $('img').each(f(($) => $.attr('src'), 'image'))
 
-	return headers.join(', ')
+	return headers
 }
 
 async function injectLinkHeader ({ event, resolve }) {
 	const resp = await resolve(event)
 	if (resp.headers.get('content-type') === 'text/html') {
-		const v = await _generateLinkHeader(resp)
-		if (v) {
-			resp.headers.set('link', v)
-		}
+		const headers = await _generateLinkHeaders(resp)
+		headers.forEach((h) => resp.headers.append('link', h))
 	}
 	return resp
 }
