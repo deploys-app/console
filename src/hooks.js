@@ -79,7 +79,7 @@ async function _generateLinkHeader (resp) {
 		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
 			return
 		}
-		let h = `<${src}>; rel="preload"; as="${as}"`
+		let h = `<${src}>; rel=preload; as=${as}`
 		if (!crossorigin) {
 			const crossorigin = $el.attr('crossorigin')
 			if (crossorigin != null) {
