@@ -180,7 +180,9 @@
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
 			<div class="_dp-f _jtfct-fe _alit-ct _gg-8px _w-100pct _pdh-16px">
-				<strong class="_fw-500 _fs-300">Contact us</strong>
+				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
+					<i class="fa-brands fa-github"></i>
+				</a>
 				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
 					<i class="fa-brands fa-discord"></i>
 				</a>
