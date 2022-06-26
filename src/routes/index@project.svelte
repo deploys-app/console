@@ -118,7 +118,7 @@
 					<h4 class="_cl-primary-500">Memory</h4>
 					<div class="_mgt-8px">
 						<span class="_fs-600">{billing?.memory}</span>
-						<span>&nbsp;GiB/s</span>
+						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
@@ -132,7 +132,7 @@
 					<h4 class="_cl-primary-500">Disk</h4>
 					<div class="_mgt-8px">
 						<span class="_fs-600">{billing?.disk}</span>
-						<span>&nbsp;GiB/s</span>
+						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
