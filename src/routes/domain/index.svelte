@@ -28,6 +28,7 @@
 	import { loading } from '$lib/stores'
 	import modal from '$lib/modal'
 	import format from '$lib/format'
+	import StatusIcon from "../../lib/components/StatusIcon.svelte";
 
 	export let permission
 	export let domains
@@ -65,7 +66,7 @@
 	</div>
 
 	<div class="moon-table-container">
-		<table class="moon-table">
+		<table class="moon-table -ruled">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -83,6 +84,7 @@
 				{#each domains?.items || [] as it}
 					<tr>
 						<td>
+							<StatusIcon status={it.status} />
 							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="moon-link">{it.domain}</a>
 						</td>
 						<td>
