@@ -66,7 +66,7 @@
 	</div>
 
 	<div class="moon-table-container">
-		<table class="moon-table">
+		<table class="moon-table -ruled">
 			<thead>
 			<tr>
 				<th>Route</th>
