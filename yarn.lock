@@ -128,19 +128,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.23":
-  version: 1.0.0-next.23
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.23"
+"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.24":
+  version: 1.0.0-next.24
+  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.24"
   dependencies:
     esbuild: ^0.14.42
     worktop: 0.8.0-next.14
-  checksum: ec35a36200d413f9ca904ee47efa31813a34f3d9c95bde5340dba3f059e0085c30c4624821602f17cdb6c326e0fbe6b58405b440200af38e936f1e377a5eb186
+  checksum: 647741592b2dd7214c0cc7d2675b7e94add82f39d19db52cf81bc4093dfb8e881302ca4e22b56ec0ed327e137d8f6ac96af0ead3294bc629d2443926126047f0
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.354":
-  version: 1.0.0-next.354
-  resolution: "@sveltejs/kit@npm:1.0.0-next.354"
+"@sveltejs/kit@npm:=1.0.0-next.357":
+  version: 1.0.0-next.357
+  resolution: "@sveltejs/kit@npm:1.0.0-next.357"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.48
     chokidar: ^3.5.3
@@ -150,7 +150,7 @@ __metadata:
     svelte: ^3.44.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 2fdbde4d4bd24990ba2c48344dd8a14d3181eec5ce50b34b4708ec97f12e7c8522fa1140b8c6249b98f021c7daf3bad67176d0cf9baa5ad6769acd119d3ba271
+  checksum: 66285bb0806b07f5d622e0d0f66301c21036956278e2da7e67deab604848b2473a238e777a3f3d516f2367c127e2b9ae8bd9f0ee37ebb1d8545399d6a4863e44
   languageName: node
   linkType: hard
 
@@ -449,9 +449,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.11":
-  version: 1.0.0-rc.11
-  resolution: "cheerio@npm:1.0.0-rc.11"
+"cheerio@npm:^1.0.0-rc.12":
+  version: 1.0.0-rc.12
+  resolution: "cheerio@npm:1.0.0-rc.12"
   dependencies:
     cheerio-select: ^2.1.0
     dom-serializer: ^2.0.0
@@ -460,8 +460,7 @@ __metadata:
     htmlparser2: ^8.0.1
     parse5: ^7.0.0
     parse5-htmlparser2-tree-adapter: ^7.0.0
-    tslib: ^2.4.0
-  checksum: 7619edcbecafb70ca6ca842ce149307a84e8d451432a888d82959b2aa04e2090701658f25eac75821e0832cc1305bdbcf02f17175102fc1723f119f3c9ece17a
+  checksum: 5d4c1b7a53cf22d3a2eddc0aff70cf23cbb30d01a4c79013e703a012475c02461aa1fcd99127e8d83a02216386ed6942b2c8103845fd0812300dd199e6e7e054
   languageName: node
   linkType: hard
 
@@ -552,9 +551,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sveltejs/adapter-cloudflare": =1.0.0-next.23
-    "@sveltejs/kit": =1.0.0-next.354
-    cheerio: ^1.0.0-rc.11
+    "@sveltejs/adapter-cloudflare": =1.0.0-next.24
+    "@sveltejs/kit": =1.0.0-next.357
+    cheerio: ^1.0.0-rc.12
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.3
@@ -568,9 +567,9 @@ __metadata:
     prettier-plugin-svelte: ^2.7.0
     sass: ^1.53.0
     svelte: ^3.48.0
-    svelte-check: ^2.7.2
+    svelte-check: ^2.8.0
     svelte-preprocess: ^4.10.7
-    sweetalert2: ^11.4.18
+    sweetalert2: ^11.4.19
     typescript: ~4.7.4
     valid-url: ^1.0.9
   languageName: unknown
@@ -2669,9 +2668,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-check@npm:^2.7.2":
-  version: 2.7.2
-  resolution: "svelte-check@npm:2.7.2"
+"svelte-check@npm:^2.8.0":
+  version: 2.8.0
+  resolution: "svelte-check@npm:2.8.0"
   dependencies:
     "@jridgewell/trace-mapping": ^0.3.9
     chokidar: ^3.4.1
@@ -2685,7 +2684,7 @@ __metadata:
     svelte: ^3.24.0
   bin:
     svelte-check: bin/svelte-check
-  checksum: e9aac2c659d45ff62ceffc9cdd201711e3108ea45934588bb09bf7cfd86f34cae3d6601f23037412301c87d56441843e33ce874262a58b95dd72b2bb53aaa802
+  checksum: af574f088182ea0db489cb5e0a1b4be7266d4c4c2fd80bfb0e1bbe89456bc4773e3e912d1963b6ce79c7941a4e2f460c3f8baa0b659a1977b95200fa0d70daf7
   languageName: node
   linkType: hard
 
@@ -2803,10 +2802,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.4.18":
-  version: 11.4.18
-  resolution: "sweetalert2@npm:11.4.18"
-  checksum: 2e093964b7610dd1e875877bbd039a3b87895a4e38a9b79e31c43d78e4f9ac4803d86c857341f5b5c374897d26607de6a6acea3182e52e2fa78721f0f6603d84
+"sweetalert2@npm:^11.4.19":
+  version: 11.4.19
+  resolution: "sweetalert2@npm:11.4.19"
+  checksum: 4bdc1f967fd18e51cae69fb26d57bc90c9f97a8699f3e7d49a83f699d95f80e65fc814d9dab8393e0eb4f15ddd46936cdcbcb443e6734874cfc45b0ba200924e
   languageName: node
   linkType: hard
 
@@ -2844,13 +2843,6 @@ __metadata:
   dependencies:
     is-number: ^7.0.0
   checksum: f76fa01b3d5be85db6a2a143e24df9f60dd047d151062d0ba3df62953f2f697b16fe5dad9b0ac6191c7efc7b1d9dcaa4b768174b7b29da89d4428e64bc0a20ed
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "tslib@npm:2.4.0"
-  checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
   languageName: node
   linkType: hard
 
