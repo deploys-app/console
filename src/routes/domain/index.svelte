@@ -28,7 +28,7 @@
 	import { loading } from '$lib/stores'
 	import modal from '$lib/modal'
 	import format from '$lib/format'
-	import StatusIcon from "../../lib/components/StatusIcon.svelte";
+	import StatusIcon from '$lib/components/StatusIcon.svelte'
 
 	export let permission
 	export let domains
