@@ -4,17 +4,28 @@
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
 
-		const locations = await api.invoke('location.list', { project }, fetch)
+		const [locations, projectInfo] = await Promise.all([
+			api.invoke('location.list', { project }, fetch),
+			api.invoke('project.get', { project }, fetch)
+		])
+
 		if (!locations.ok) {
 			return {
 				status: 500,
 				error: `locations: ${locations.error.message}`
 			}
 		}
+		if (!projectInfo.ok) {
+			return {
+				status: 500,
+				error: `project: ${project.error.message}`
+			}
+		}
 
 		return {
 			props: {
-				locations: locations.result.items || []
+				locations: locations.result.items || [],
+				projectInfo: projectInfo.result
 			}
 		}
 	}
@@ -26,6 +37,7 @@
 	import modal from '$lib/modal'
 
 	export let locations
+	export let projectInfo
 
 	$: project = $page.stuff.project
 
@@ -102,6 +114,9 @@
 			<div class="moon-select">
 				<select id="input-target_prefix" bind:value={form.type} required>
 					<option value="" selected disabled>Select Type</option>
+					{#if projectInfo.config.domainCloudflare}
+						<option value="cloudflare">Cloudflare</option>
+					{/if}
 					<option value="hostname">Hostname</option>
 					<option value="wildcard">Wildcard</option>
 				</select>

@@ -3,19 +3,31 @@
 
 	export async function load ({ stuff, fetch }) {
 		const { project } = stuff
-		const domains = await api.invoke('domain.list', { project }, fetch)
+
+		const [domains, projectInfo] = await Promise.all([
+			api.invoke('domain.list', { project }, fetch),
+			api.invoke('project.get', { project }, fetch)
+		])
 		if (!domains.ok && !domains.error.forbidden) {
 			return {
 				status: 500,
 				error: `domains: ${domains.error.message}`
 			}
 		}
+		if (!projectInfo.ok) {
+			return {
+				status: 500,
+				error: `project: ${project.error.message}`
+			}
+		}
+
 		return {
 			props: {
 				permission: {
 					domains: !domains.error?.forbidden
 				},
-				domains: domains.result
+				domains: domains.result,
+				projectInfo: projectInfo.result
 			}
 		}
 	}
@@ -32,6 +44,7 @@
 
 	export let permission
 	export let domains
+	export let projectInfo
 
 	$: project = $page.stuff.project
 
@@ -89,7 +102,7 @@
 						</td>
 						<td>
 							{format.domainType(it.type)}
-							{#if it.type === 'cloudflare'}
+							{#if !projectInfo.config.domainCloudflare && it.type === 'cloudflare'}
 								<i class="fa-solid fa-triangle-exclamation _cl-negative-500"></i>
 							{/if}
 						</td>
