@@ -40,6 +40,8 @@
 </script>
 
 <script>
+	import { onMount } from 'svelte'
+
 	export let project
 	export let usage
 	export let price
@@ -55,6 +57,15 @@
 		disk: (+usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
 		replica: (+usage.replica).toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
+
+	onMount(() => {
+		const interval = setInterval(() => {
+			api.invalidate('project.usage')
+		}, 600000)
+		return () => {
+			clearInterval(interval)
+		}
+	})
 </script>
 
 <h6>Dashboard</h6>
