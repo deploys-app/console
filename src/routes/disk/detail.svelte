@@ -78,9 +78,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/disk?project=${project}`} class="moon-link"><h6>Disks</h6></a>
+			<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
 		</li>
 		<li>
 			<h6>{disk.name}</h6>
@@ -90,7 +90,7 @@
 
 <br>
 
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-0px-lg">
@@ -98,7 +98,7 @@
 				<strong>Disk: {disk.name}</strong>
 			</h3>
 			<div class="_dp-f">
-				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
+				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
 					Delete
 				</button>
 			</div>
@@ -108,33 +108,33 @@
 	<hr>
 
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" value={disk.name} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-location" value={disk.location} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-size">Size (GiB)</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-size" value={disk.size} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-created_at">Created at</label>
-			<div class="moon-input">
+			<div class="input">
 				<span id="input-created_at">{format.datetime(disk.createdAt)}</span>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-created_by">Created by</label>
-			<div class="moon-input">
+			<div class="input">
 				<span id="input-created_by">{disk.createdBy}</span>
 			</div>
 		</div>
@@ -143,6 +143,6 @@
 	<hr>
 
 	<div class="_dp-f _alit-ct _fw-w">
-		<a class="moon-button -danger -small" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+		<a class="button -danger -small" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 	</div>
 </div>

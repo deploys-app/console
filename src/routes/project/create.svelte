@@ -83,13 +83,13 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href="/project" class="moon-link"><h6>Projects</h6></a>
+			<a href="/project" class="link"><h6>Projects</h6></a>
 		</li>
 		{#if project}
 			<li>
-				<a href={`/?project=${project.project}`} class="moon-link"><h6>{project.name}</h6></a>
+				<a href={`/?project=${project.project}`} class="link"><h6>{project.name}</h6></a>
 			</li>
 		{/if}
 		<li>
@@ -98,7 +98,7 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _jtfit-st _gg-12px">
 		{#if project}
 			<h5><strong>Update Project: {project.name}</strong></h5>
@@ -110,23 +110,23 @@
 	<hr>
 
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-project">ID</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-project" placeholder="Project ID" bind:value={form.sid} readonly={!!project}>
 			</div>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" placeholder="Project name" bind:value={form.name} required>
 			</div>
 		</div>
 
-		<div class="moon-field _mgbt-20px">
+		<div class="field _mgbt-20px">
 			<label for="input-billing_account">Billing Account</label>
-			<div class="moon-select">
+			<div class="select">
 				<select id="input-billing_account" bind:value={form.billingAccount} required>
 					<option value="" selected disabled>Select Billing Account</option>
 					{#each billingAccounts as it}
@@ -136,7 +136,7 @@
 			</div>
 		</div>
 
-		<button class="moon-button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
 			{#if project}
 				Update Project
 			{:else}

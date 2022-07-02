@@ -69,17 +69,17 @@
 
 <h6>Domains</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/domain/create?project=${project}`}>
+			<a class="button -small" href={`/domain/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -98,7 +98,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="moon-link">{it.domain}</a>
+							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>
 							{format.domainType(it.type)}
@@ -110,7 +110,7 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="moon-icon-button -negative" on:click={() => deleteDomain(it)}>
+							<button class="icon-button -negative" on:click={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

@@ -56,17 +56,17 @@
 
 <h6>Routes</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/route/create?project=${project}`}>
+			<a class="button -small" href={`/route/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 			<tr>
 				<th>Route</th>
@@ -84,14 +84,14 @@
 				{#each routes?.items || [] as it}
 					<tr>
 						<td>
-							<a class="moon-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
+							<a class="link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
 						</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="moon-icon-button -negative" on:click={() => deleteRoute(it)}>
+							<button class="icon-button -negative" on:click={() => deleteRoute(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

@@ -55,17 +55,17 @@
 
 <h6>Workload Identities</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/workload-identity/create?project=${project}`}>
+			<a class="button -small" href={`/workload-identity/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -81,7 +81,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a sveltekit:prefetch class="moon-link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a sveltekit:prefetch class="link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

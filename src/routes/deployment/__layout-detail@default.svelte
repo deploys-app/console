@@ -59,9 +59,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/deployment?project=${project}`} class="moon-link"><h6>Deployments</h6></a>
+			<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
 		</li>
 		<li>
 			<h6>{deployment.name}</h6>
@@ -69,7 +69,7 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
 
 	<slot />

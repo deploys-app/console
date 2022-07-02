@@ -65,20 +65,20 @@
 			</div>
 		</h3>
 		<div class="_dp-f _alit-ct _fw-w">
-			<a class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg"
+			<a class="button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg"
 				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
 				Deploy New Revision
 			</a>
 			{#if canPause}
 				<div>
-					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={pause}>
+					<button class="button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="moon-button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={resume}>
+					<button class="button -info -small _mgl-at-lg _mgr-24px _mgbt-16px _mgbt-0px-lg" type="button" on:click={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>

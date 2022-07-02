@@ -117,9 +117,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/route?project=${project}`} class="moon-link"><h6>Routes</h6></a>
+			<a href={`/route?project=${project}`} class="link"><h6>Routes</h6></a>
 		</li>
 		<li>
 			<h6>Create</h6>
@@ -127,7 +127,7 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Create route</strong></h3>
@@ -135,9 +135,9 @@
 	</div>
 	<hr>
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field _mgbt-20px">
+		<div class="field _mgbt-20px">
 			<label for="input-location">Location</label>
-			<div class="moon-select">
+			<div class="select">
 				<select id="input-location" bind:value={form.location} on:change={fetchLocationData} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
@@ -148,9 +148,9 @@
 		</div>
 
 		{#if form.location}
-			<div class="moon-field _mgbt-20px">
+			<div class="field _mgbt-20px">
 				<label for="input-domain">Domain</label>
-				<div class="moon-select">
+				<div class="select">
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
 						{#each domains as it}
@@ -161,25 +161,25 @@
 			</div>
 
 			{#if selectedDomain?.type === 'wildcard'}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-subdomain">Subdomain</label>
-					<div class="moon-input -has-icon-right">
+					<div class="input -has-icon-right">
 						<input id="input-subdomain" bind:value={form.subdomain}>
 						<input class="icon -is-right _pdh-8px _w-at" value={`.${form.domain}`} size={form.domain.length} readonly disabled>
 					</div>
 				</div>
 			{/if}
 
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-path">Path</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-path" bind:value={form.path}>
 				</div>
 			</div>
 
-			<div class="moon-field _mgbt-20px">
+			<div class="field _mgbt-20px">
 				<label for="input-target_prefix">Type</label>
-				<div class="moon-select">
+				<div class="select">
 					<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
 						<option value="" selected disabled>Select Type</option>
 						<option value="deployment://">Deployment</option>
@@ -192,9 +192,9 @@
 			</div>
 
 			{#if form.targetPrefix === 'deployment://'}
-				<div class="moon-field _mgbt-20px">
+				<div class="field _mgbt-20px">
 					<label for="input-target_deployment">Deployments</label>
-					<div class="moon-select">
+					<div class="select">
 						<select id="input-target_deployment" bind:value={form.targetValue} required>
 							<option value="" selected disabled>Select Deployment</option>
 							{#each deployments as it}
@@ -204,16 +204,16 @@
 					</div>
 				</div>
 			{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
-				<div class="moon-field _mgbt-20px">
+				<div class="field _mgbt-20px">
 					<label for="input-target_value">Value</label>
-					<div class="moon-input">
+					<div class="input">
 						<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
 					</div>
 				</div>
 			{/if}
 			<hr>
 
-			<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
+			<button class="button _mgr-at" class:-loading={saving}>Save</button>
 		{/if}
 	</form>
 </div>

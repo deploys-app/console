@@ -90,9 +90,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/role/users?project=${project}`} class="moon-link"><h6>Users</h6></a>
+			<a href={`/role/users?project=${project}`} class="link"><h6>Users</h6></a>
 		</li>
 		<li>
 			<h6>Add</h6>
@@ -100,7 +100,7 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Add member to "{project}" project</strong></h3>
@@ -110,13 +110,13 @@
 	<hr>
 
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
-			<div class="moon-input">
+		<div class="field">
+			<div class="input">
 				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email}>
 			</div>
 		</div>
-		<div class="moon-field _mgbt-20px">
-			<div class="moon-select">
+		<div class="field _mgbt-20px">
+			<div class="select">
 				<select on:change={(e) => { addRole(e.target.value); e.target.value = '' }}>
 					<option value="" disabled selected>---Select Role---</option>
 					{#each roles as it}
@@ -129,7 +129,7 @@
 		</div>
 
 		<div class="table-responsive _mgbt-50px">
-			<table class="moon-table table-sm">
+			<table class="table table-sm">
 				<thead>
 				<tr>
 					<th>Role</th>
@@ -141,7 +141,7 @@
 					<tr>
 						<td>{it}</td>
 						<td>
-							<button type="button" class="js-delete-role moon-button -danger -small"
+							<button type="button" class="js-delete-role button -danger -small"
 								on:click={() => form.roles = form.roles.filter((x) => x !== it)}>
 								Delete
 							</button>
@@ -155,6 +155,6 @@
 				</tbody>
 			</table>
 		</div>
-		<button class="moon-button -success" class:-loading={saving}>Save</button>
+		<button class="button -success" class:-loading={saving}>Save</button>
 	</form>
 </div>

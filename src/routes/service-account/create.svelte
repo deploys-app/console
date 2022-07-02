@@ -70,14 +70,14 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		{#if id}
 			<li>
-				<a href={`/service-account?project=${project}&id=${id}`} class="moon-link"><h6>{serviceAccount.sid}</h6></a>
+				<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
 			</li>
 		{:else}
 			<li>
-				<a href={`/service-account?project=${project}`} class="moon-link"><h6>Service Accounts</h6></a>
+				<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
 			</li>
 		{/if}
 		<li>
@@ -94,7 +94,7 @@
 
 <br>
 
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
@@ -111,35 +111,35 @@
 
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
 		{#if id}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-email">Email</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-email" value={serviceAccount.email} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-sid">ID</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-sid" placeholder="ID" bind:value={sid}>
 				</div>
 			</div>
 		{/if}
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" placeholder="Name" required bind:value={name}>
 			</div>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-description">Description</label>
-			<div class="moon-textarea">
+			<div class="textarea">
 				<textarea id="input-description" rows="5" placeholder="Description" bind:value={desc}></textarea>
 			</div>
 		</div>
 
-		<button class="moon-button _mgr-at" class:-loading={saving} disabled={saving}>Save</button>
+		<button class="button _mgr-at" class:-loading={saving} disabled={saving}>Save</button>
 	</form>
 </div>

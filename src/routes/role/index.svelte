@@ -40,17 +40,17 @@
 
 <h6>Roles</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/role/create?project=${project}`}>
+			<a class="button -small" href={`/role/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 			<tr>
 				<th>Role</th>
@@ -68,7 +68,7 @@
 					<tr>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href={`/role/create?project=${project}&role=${it.role}`} class="moon-link">
+								<a href={`/role/create?project=${project}&role=${it.role}`} class="link">
 									<strong>{it.role}</strong>
 								</a>
 							{:else}
@@ -82,7 +82,7 @@
 							<div class="table-action-container">
 								{#if roleCanUpdate(it.role)}
 									<a href={`/role/create?project=${project}&role=${it.role}`}>
-										<div class="moon-icon-button -secondary">
+										<div class="icon-button -secondary">
 											<i class="fa-solid fa-pen"></i>
 										</div>
 									</a>

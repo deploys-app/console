@@ -74,9 +74,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/workload-identity?project=${project}`} class="moon-link"><h6>Workload Identities</h6></a>
+			<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
 		</li>
 		<li>
 			<h6>{workloadIdentity.name}</h6>
@@ -84,33 +84,33 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _jtfit-st _gg-12px">
 		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
 	</div>
 	<hr>
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-gsa">GSA</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-gsa" value={workloadIdentity.gsa} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-location" value={workloadIdentity.location} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="div-created_at">Created at</label>
-			<div id="div-created_at" class="moon-input">
+			<div id="div-created_at" class="input">
 				{format.datetime(workloadIdentity.createdAt)}
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="div-created_by">Created by</label>
-			<div id="div-created_by" class="moon-input">
+			<div id="div-created_by" class="input">
 				{workloadIdentity.createdBy}
 			</div>
 		</div>
@@ -118,7 +118,7 @@
 
 	<hr>
 
-	<div class="moon-field">
+	<div class="field">
 		<label for="pre-command">Command</label>
 		<pre id="pre-command">
 			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
@@ -127,6 +127,6 @@
 	</div>
 
 	<div class="_mgl-at-lg">
-		<button class="moon-button -danger" on:click={deleteItem}>Delete</button>
+		<button class="button -danger" on:click={deleteItem}>Delete</button>
 	</div>
 </div>

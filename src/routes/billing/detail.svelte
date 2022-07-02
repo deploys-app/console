@@ -49,9 +49,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href="/billing" class="moon-link"><h6>Billing</h6></a>
+			<a href="/billing" class="link"><h6>Billing</h6></a>
 		</li>
 		<li>
 			<h6>{billingAccount.name}</h6>
@@ -61,12 +61,12 @@
 
 <br>
 
-<div class="moon-panel _dp-g _gg-16px">
+<div class="panel _dp-g _gg-16px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>"{billingAccount.name}" account information</strong></h3>
 			<div class="_dp-f">
-				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete account</button>
+				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete account</button>
 			</div>
 		</div>
 	</div>
@@ -74,8 +74,8 @@
 	<hr>
 
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<div class="moon-table-container _mgbt-30px">
-			<table class="moon-table">
+		<div class="table-container _mgbt-30px">
+			<table class="table">
 				<tbody>
 				<tr>
 					<td>Account name</td>
@@ -97,7 +97,7 @@
 			</table>
 		</div>
 
-		<a class="moon-button _mgr-at" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
-		<a class="moon-button _mgr-at" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
+		<a class="button _mgr-at" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
+		<a class="button _mgr-at" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
 	</div>
 </div>

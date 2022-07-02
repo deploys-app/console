@@ -159,9 +159,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/domain?project=${project}`} class="moon-link"><h6>Domains</h6></a>
+			<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 		</li>
 		<li>
 			<h6>{domain.domain}</h6>
@@ -169,14 +169,14 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
 				<strong>Domain: {domain.domain}</strong>
 			</h3>
 			<div class="_dp-f">
-				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
+				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
 					Delete
 				</button>
 			</div>
@@ -186,33 +186,33 @@
 	<hr>
 
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-gsa">Domain</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-gsa" value={domain.domain} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-type">Type</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-type" value={format.domainType(domain.type)} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="text-created_at">Created at</label>
-			<div class="moon-input">
+			<div class="input">
 				<span id="text-created_at">{format.datetime(domain.createdAt)}</span>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="text-creted_by">Created by</label>
-			<div class="moon-input">
+			<div class="input">
 				<span id="text-creted_by">{domain.createdBy}</span>
 			</div>
 		</div>
@@ -233,9 +233,9 @@
 					<p class="_cl-negative-500">{e}</p>
 				{/each}
 			{/if}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-owner_name">TXT Name</label>
-				<div class="moon-input -has-icon-right _mgbt-4px">
+				<div class="input -has-icon-right _mgbt-4px">
 					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
@@ -243,9 +243,9 @@
 					</span>
 				</div>
 			</div>
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-owner_value">TXT Value</label>
-				<div class="moon-input -has-icon-right _mgbt-4px">
+				<div class="input -has-icon-right _mgbt-4px">
 					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
@@ -259,9 +259,9 @@
 			<hr>
 			<p><strong>SSL/TLS Verification</strong></p>
 			{#each domain.verification.ssl.records as it, index}
-				<div class="moon-field">
+				<div class="field">
 					<label for={`input-ssl_name_${index}`}>TXT Name</label>
-					<div class="moon-input -has-icon-right _mgbt-4px">
+					<div class="input -has-icon-right _mgbt-4px">
 						<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={it.txtName}>
@@ -269,9 +269,9 @@
 							</span>
 					</div>
 				</div>
-				<div class="moon-field">
+				<div class="field">
 					<label for={`input-ssl_value_${index}`}>TXT Value</label>
-					<div class="moon-input -has-icon-right _mgbt-4px">
+					<div class="input -has-icon-right _mgbt-4px">
 						<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 							data-clipboard-text={it.txtValue}>
@@ -285,10 +285,10 @@
 		{#if domain.status === 'success' || domain.status === 'verify'}
 			<hr>
 			{#if (domain.dnsConfig.ipv4 || []).length > 0}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip}
-						<div class="moon-input -has-icon-right _mgbt-4px">
+						<div class="input -has-icon-right _mgbt-4px">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -299,10 +299,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.ipv6 || []).length > 0}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip}
-						<div class="moon-input -has-icon-right _mgbt-4px">
+						<div class="input -has-icon-right _mgbt-4px">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -313,10 +313,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.cname || []).length > 0}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-cname">CNAME Record</label>
 					{#each domain.dnsConfig.cname as cname}
-						<div class="moon-input -has-icon-right">
+						<div class="input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
 							<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 								data-clipboard-text={cname}>
@@ -332,15 +332,15 @@
 	{#if domain.type !== 'cloudflare' && domain.status === 'success'}
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="moon-button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
+			<button class="button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
 		</div>
 	{/if}
 
 	{#if domain.type === 'cloudflare'}
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="moon-button -positive _mgr-12px" on:click={upgradeHostname}>Upgrade to Hostname</button>
-			<button class="moon-button -positive" on:click={upgradeWildcard}>Upgrade to Wildcard</button>
+			<button class="button -positive _mgr-12px" on:click={upgradeHostname}>Upgrade to Hostname</button>
+			<button class="button -positive" on:click={upgradeWildcard}>Upgrade to Wildcard</button>
 		</div>
 	{/if}
 </div>

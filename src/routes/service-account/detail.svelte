@@ -91,9 +91,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/service-account?project=${project}`} class="moon-link"><h6>Service Accounts</h6></a>
+			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
 		</li>
 		<li>
 			<h6>{serviceAccount.name}</h6>
@@ -102,14 +102,14 @@
 </div>
 <br>
 
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
 				<strong>{serviceAccount.name}</strong>
 			</h3>
 			<div class="_dp-f">
-				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>
+				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
 					Delete
 				</button>
 			</div>
@@ -119,33 +119,33 @@
 	<hr>
 
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px _mgbt-20px">
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-email">Email</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-email" value={serviceAccount.email} readonly>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" value={serviceAccount.name} readonly>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-description">Description</label>
-			<div class="moon-textarea">
+			<div class="textarea">
 				<textarea id="input-description" rows="5" readonly>{serviceAccount.description}</textarea>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-created_at">Created At</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-created_by">Created By</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
@@ -156,7 +156,7 @@
 	<h6><strong>Keys</strong></h6>
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
 		{#each (serviceAccount.keys || []) as key}
-			<div class="moon-input -has-icon-right">
+			<div class="input -has-icon-right">
 				<input value="{key.secret}" readonly>
 				<div class="icon -is-right _cs-pt">
 					<button class="_bgcl-tpr _cs-pt _bdw-0px _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
@@ -166,7 +166,7 @@
 			</div>
 		{/each}
 		<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-			<button class="moon-button -small icon-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+			<button class="button -small icon-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
 				<i class="fa-solid fa-plus _mgr-12px"></i>
 				Create key
 			</button>

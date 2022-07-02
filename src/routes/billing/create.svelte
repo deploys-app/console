@@ -70,13 +70,13 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href="/billing" class="moon-link"><h6>Billing</h6></a>
+			<a href="/billing" class="link"><h6>Billing</h6></a>
 		</li>
 		{#if billingAccount}
 			<li>
-				<a href={`/billing/detail?id=${billingAccount.id}`} class="moon-link"><h6>{billingAccount.name}</h6></a>
+				<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
 			</li>
 			<li>
 				<h6>Update</h6>
@@ -91,7 +91,7 @@
 
 <br>
 
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Account information</strong></h3>
@@ -99,38 +99,38 @@
 	</div>
 	<hr>
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Account name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" bind:value={form.name} required>
 			</div>
 		</div>
 
 		<h4 class="_mgt-30px _mgbt-12px">Billing Information</h4>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-tax_id">Tax ID</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-tax_id" bind:value={form.taxId} required>
 			</div>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-tax_name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-tax_name" bind:value={form.taxName} required>
 			</div>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-tax_address">Address</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-tax_address" bind:value={form.taxAddress} required>
 			</div>
 		</div>
 
 		<hr>
 
-		<button class="moon-button _mgr-at" class:-loading={saving}>Save</button>
+		<button class="button _mgr-at" class:-loading={saving}>Save</button>
 	</form>
 </div>

@@ -229,13 +229,13 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/deployment?project=${project}`} class="moon-link"><h6>Deployments</h6></a>
+			<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
 		</li>
 		{#if deployment}
 			<li>
-				<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="moon-link">
+				<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
 					<h6>{deployment.name}</h6>
 				</a>
 			</li>
@@ -247,7 +247,7 @@
 </div>
 <br>
 
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _jtfit-st _gg-12px">
 		{#if deployment}
 			<h5><strong>Deploy new revision</strong></h5>
@@ -259,16 +259,16 @@
 
 	<form class="_dp-g _gg-16px _w-100pct _mxw-700px" on:submit|preventDefault={save}>
 		{#if deployment}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-location-readonly">Location</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-location-readonly" value={deployment.location} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="moon-field _mgbt-20px">
+			<div class="field _mgbt-20px">
 				<label for="input-location">Location</label>
-				<div class="moon-select">
+				<div class="select">
 					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
 						{#each locations as it}
@@ -282,24 +282,24 @@
 		{/if}
 
 		{#if currentLocation}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-name">Name</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!deployment}>
 				</div>
 			</div>
 
 			{#if deployment}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-type-readonly">Type</label>
-					<div class="moon-input">
+					<div class="input">
 						<input id="input-type-readonly" value={format.deploymentType(deployment.type)} readonly>
 					</div>
 				</div>
 			{:else}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-type">Type</label>
-					<div class="moon-select">
+					<div class="select">
 						<select id="input-type" class="js-type" bind:value={form.type}>
 							<option value="WebService">Web Service</option>
 							<option value="InternalTCPService">Internal TCP Service</option>
@@ -310,17 +310,17 @@
 				</div>
 			{/if}
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-image">Image</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-image" placeholder="image" bind:value={form.image}>
 			</div>
 		</div>
 
 		{#if permission.pullSecrets}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-pull_secret">Pull Secret</label>
-				<div class="moon-select">
+				<div class="select">
 					<select id="input-pull_secret" bind:value={form.pullSecret}>
 						<option value="">No Pull Secret</option>
 						{#each pullSecrets as it}
@@ -330,9 +330,9 @@
 				</div>
 			</div>
 		{:else}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-pull_secret-text">Pull Secret</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
 				<p class="_fs-200">* You don't have permission to list pull secrets</p>
@@ -341,9 +341,9 @@
 
 		{#if currentLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-workload_identity">Workload Identity</label>
-					<div class="moon-select">
+					<div class="select">
 						<select id="input-workload_identity" bind:value={form.workloadIdentity}>
 							<option value="">No Workload Identity</option>
 							{#each workloadIdentities as it}
@@ -353,9 +353,9 @@
 					</div>
 				</div>
 			{:else}
-				<div class="moon-field">
+				<div class="field">
 					<label for="input-workload_identity-text">Workload Identity</label>
-					<div class="moon-input">
+					<div class="input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
 					<p class="_fs-200">* You don't have permission to list workload identities</p>
@@ -364,18 +364,18 @@
 		{/if}
 
 		{#if ['WebService', 'TCPService', 'InternalTCPService'].includes(form.type)}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-port">Port</label>
-				<div class="moon-input">
+				<div class="input">
 					<input class="-no-arrow" id="input-port" placeholder="8080" type="number" bind:value={form.port}>
 				</div>
 			</div>
 		{/if}
 
 		{#if form.type === 'WebService'}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-protocol">Protocol</label>
-				<div class="moon-select">
+				<div class="select">
 					<select id="input-protocol" bind:value={form.protocol}>
 						<option value="http">http</option>
 						<option value="https">https</option>
@@ -383,19 +383,19 @@
 					</select>
 				</div>
 			</div>
-			<div class="moon-field">
-				<div class="moon-checkbox">
+			<div class="field">
+				<div class="checkbox">
 					<input id="input-internal" type="checkbox" bind:checked={form.internal}>
 					<label for="input-internal">Internal Service</label>
 				</div>
 			</div>
 		{/if}
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="_pdbt-8px">
 				{#each form.command as _, i}
-					<div class="moon-input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-8px">
 						<input bind:value={form.command[i]}>
 						<div class="icon -is-right _cs-pt" on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
 							<i class="fa-solid fa-trash-alt"></i>
@@ -403,17 +403,17 @@
 					</div>
 				{/each}
 			</div>
-			<button class="moon-button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
+			<button class="button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus _mgr-12px"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="_pdbt-8px">
 				{#each form.args as _, i}
-					<div class="moon-input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-8px">
 						<input bind:value={form.args[i]}>
 						<div class="icon -is-right _cs-pt" on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
 							<i class="fa-solid fa-trash-alt"></i>
@@ -421,16 +421,16 @@
 					</div>
 				{/each}
 			</div>
-			<button class="moon-button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
+			<button class="button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus _mgr-12px"></i>
 				<span>Add Arg</span>
 			</button>
 		</div>
 
 		{#if form.type === 'CronJob'}
-			<div class="moon-field">
+			<div class="field">
 				<label for="input-schedule">Schedule</label>
-				<div class="moon-input">
+				<div class="input">
 					<input id="input-schedule" placeholder="*/5 * * * *" bind:value={form.schedule}>
 				</div>
 			</div>
@@ -445,9 +445,9 @@
 				<h6><strong>Disk</strong></h6>
 
 				{#if permission.disks}
-					<div class="moon-field">
+					<div class="field">
 						<label for="input-disk_name">Name</label>
-						<div class="moon-select">
+						<div class="select">
 							<select id="input-disk_name" bind:value={form.diskName}>
 								<option value="">No Disk</option>
 								{#each disks as it}
@@ -457,9 +457,9 @@
 						</div>
 					</div>
 				{:else}
-					<div class="moon-field">
+					<div class="field">
 						<label for="input-disk_name-text">Name</label>
-						<div class="moon-input">
+						<div class="input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.diskName}>
 						</div>
 						<p class="_fs-200">* You don't have permission to list disks</p>
@@ -467,15 +467,15 @@
 				{/if}
 
 				{#if form.diskName}
-					<div class="moon-field">
+					<div class="field">
 						<label for="input-disk_mount_path">Mount Path</label>
-						<div class="moon-input">
+						<div class="input">
 							<input id="input-disk_mount_path" placeholder="" bind:value={form.diskMountPath}>
 						</div>
 					</div>
-					<div class="moon-field">
+					<div class="field">
 						<label for="input-disk_sub_path">Sub Path</label>
-						<div class="moon-input">
+						<div class="input">
 							<input id="input-disk_sub_path" placeholder="" bind:value={form.diskSubPath}>
 						</div>
 					</div>
@@ -492,9 +492,9 @@
 
 					<h6><strong>Autoscaling</strong></h6>
 					<div class="lo-6 _gg-16px">
-						<div class="moon-field">
+						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
-							<div class="moon-input">
+							<div class="input">
 								<input id="input-min_replicas"
 									bind:value={form.minReplicas}
 									type="number"
@@ -503,9 +503,9 @@
 							</div>
 						</div>
 
-						<div class="moon-field">
+						<div class="field">
 							<label for="input-max_replicas">Max Replicas</label>
-							<div class="moon-input">
+							<div class="input">
 								<input id="input-max_replicas"
 									bind:value={form.maxReplicas}
 									type="number"
@@ -522,9 +522,9 @@
 		<hr>
 		<br>
 
-<!--		{{/*        <div class="moon-field">*/}}-->
+<!--		{{/*        <div class="field">*/}}-->
 <!--		{{/*            <label for="input-cpu">CPU allocated</label>*/}}-->
-<!--		{{/*            <div class="moon-select">*/}}-->
+<!--		{{/*            <div class="select">*/}}-->
 <!--		{{/*                <select id="input-cpu" name="cpu">*/}}-->
 <!--		{{/*                    {{range .Location.CPUAllocatable}}*/}}-->
 <!--		{{/*                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>*/}}-->
@@ -536,9 +536,9 @@
 <!--		{{/*            </small>*/}}-->
 <!--		{{/*        </div>*/}}-->
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-memory">Memory allocated</label>
-			<div class="moon-select">
+			<div class="select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
 					{#each currentLocation.memoryAllocatable as it}
 						<option value={it}>{format.memory(it)}</option>
@@ -556,8 +556,8 @@
 
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
-			<div class="moon-table-container">
-				<table class="moon-table -ruled">
+			<div class="table-container">
+				<table class="table -ruled">
 					<thead>
 						<tr>
 							<th>Key</th>
@@ -570,18 +570,18 @@
 						{#each form.env as it, i}
 							<tr>
 								<td class="_mnw-128px">
-									<div class="moon-input">
+									<div class="input">
 										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
 									</div>
 								</td>
 								<td class="_pd-0px _pdl-12px">:</td>
 								<td class="_mnw-128px _pdl-12px">
-									<div class="moon-input">
+									<div class="input">
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<div class="moon-icon-button -negative"
+									<div class="icon-button -negative"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
@@ -592,7 +592,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="moon-button -small _mg-at" type="button"
+								<button class="button -small _mg-at" type="button"
 									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
 									<i class="fa-solid fa-plus _mgr-12px"></i>
 									<span>Add Variable</span>
@@ -603,11 +603,11 @@
 				</table>
 			</div>
 
-			<button class="moon-button -small _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
+			<button class="button -small _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="moon-textarea _mgt-12px">
+				<div class="textarea _mgt-12px">
 					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -617,8 +617,8 @@
 
 		<h6><strong>Mount Data</strong></h6>
 		<div>
-			<div class="moon-table-container">
-				<table class="moon-table -ruled">
+			<div class="table-container">
+				<table class="table -ruled">
 					<thead>
 						<tr>
 							<th>Path</th>
@@ -631,18 +631,18 @@
 						{#each form.mountData as it, i}
 							<tr>
 								<td class="_mnw-128px">
-									<div class="moon-input">
+									<div class="input">
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
 								<td class="_pd-0px _pdl-12px">:</td>
 								<td class="_mnw-128px _pdl-12px">
-									<div class="moon-textarea">
+									<div class="textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<div class="moon-icon-button -negative" on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
+									<div class="icon-button -negative" on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
@@ -652,7 +652,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="moon-button -small _mg-at" type="button" on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
+							<button class="button -small _mg-at" type="button" on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
 								<i class="fa-solid fa-plus _mgr-12px"></i>
 								<span>Add Data</span>
 							</button>
@@ -665,7 +665,7 @@
 
 		<hr>
 
-		<button class="moon-button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
 			Deploy
 		</button>
 	{/if}

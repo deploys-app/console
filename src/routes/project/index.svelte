@@ -28,8 +28,8 @@
 			buttonsStyling: false,
 			confirmButtonText: 'Delete',
 			customClass: {
-				confirmButton: 'moon-button _cl-white -danger _mgr-16px',
-				cancelButton: 'moon-button -negative -tertiary',
+				confirmButton: 'button _cl-white -danger _mgr-16px',
+				cancelButton: 'button -negative -tertiary',
 				actions: '_mgt-24px'
 			},
 			preConfirm: (input) => input === project
@@ -49,17 +49,17 @@
 
 <h6>Projects</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href="/project/create">
+			<a class="button -small" href="/project/create">
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -72,7 +72,7 @@
 				{#each projects as it}
 					<tr>
 						<td>
-							<a href={`/?project=${it.project}`} class="moon-link">
+							<a href={`/?project=${it.project}`} class="link">
 								<strong>{it.name}</strong>
 							</a>
 						</td>
@@ -80,11 +80,11 @@
 						<td>{it.id}</td>
 						<td class="table-action-container">
 							<a href={`/project/create?project=${it.project}`}>
-								<div class="moon-icon-button -secondary">
+								<div class="icon-button -secondary">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
-							<button class="moon-icon-button -negative" on:click={() => deleteItem(it.project)}>
+							<button class="icon-button -negative" on:click={() => deleteItem(it.project)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

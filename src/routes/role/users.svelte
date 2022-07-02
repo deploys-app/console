@@ -58,17 +58,17 @@
 
 <h6>Users</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/role/bind?project=${project}`}>
+			<a class="button -small" href={`/role/bind?project=${project}`}>
 				Add
 			</a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 				<tr>
 					<th>Email</th>
@@ -90,11 +90,11 @@
 							</td>
 							<td class="table-action-container">
 								<a href={`/role/bind?project=${project}&email=${it.email}`}>
-									<div class="moon-icon-button -secondary">
+									<div class="icon-button -secondary">
 										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
-								<button class="moon-icon-button -negative" on:click={() => deleteUser(it.email)}>
+								<button class="icon-button -negative" on:click={() => deleteUser(it.email)}>
 									<i class="fa-solid fa-trash-alt"></i>
 								</button>
 							</td>

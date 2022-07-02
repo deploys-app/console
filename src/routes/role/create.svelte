@@ -103,9 +103,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/role?project=${project}`} class="moon-link"><h6>Roles</h6></a>
+			<a href={`/role?project=${project}`} class="link"><h6>Roles</h6></a>
 		</li>
 		{#if role}
 			<li>
@@ -123,7 +123,7 @@
 </div>
 <br>
 
-<div class="moon-panel _dp-g _gg-16px">
+<div class="panel _dp-g _gg-16px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3><strong>
@@ -136,7 +136,7 @@
 
 			{#if role}
 				<div class="_dp-f">
-					<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
+					<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
 				</div>
 			{/if}
 		</div>
@@ -145,16 +145,16 @@
 	<hr>
 
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-role">Role ID</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-role" bind:value={form.role} placeholder="Role" required readonly={!!role}>
 			</div>
 		</div>
 
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" bind:value={form.name} placeholder="Role name" required>
 			</div>
 		</div>
@@ -166,8 +166,8 @@
 		<div class="_dp-g _gg-16px">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="moon-field _dp-f _mgbt-12px">
-				<div class="moon-select _f-1">
+			<div class="field _dp-f _mgbt-12px">
+				<div class="select _f-1">
 					<select on:change={(e) => { addPermission(e.target.value); e.target.value = '' }}>
 						<option value="" disabled selected>---Select Permission---</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it}
@@ -177,8 +177,8 @@
 				</div>
 			</div>
 
-			<div class="moon-table-container">
-				<table class="moon-table -ruled">
+			<div class="table-container">
+				<table class="table -ruled">
 					<thead>
 						<tr>
 							<th>Permission</th>
@@ -190,7 +190,7 @@
 							<tr>
 								<td>{it}</td>
 								<td class="table-action-container">
-									<div class="moon-icon-button -negative"
+									<div class="icon-button -negative"
 										on:click={() => { form.permissions = form.permissions.filter((x) => x !== it) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
@@ -206,7 +206,7 @@
 
 		<hr>
 
-		<button class="moon-button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
 			{#if role}Update{:else}Create{/if}
 		</button>
 	</form>

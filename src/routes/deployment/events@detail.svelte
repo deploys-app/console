@@ -41,8 +41,8 @@
 
 <h6><strong>Events</strong></h6>
 
-<div class="moon-table-container">
-	<table class="moon-table">
+<div class="table-container">
+	<table class="table">
 		<thead>
 		<tr>
 			<th>Last Seen</th>

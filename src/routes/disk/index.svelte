@@ -55,17 +55,17 @@
 
 <h6>Disks</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href={`/disk/create?project=${project}`}>
+			<a class="button -small" href={`/disk/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 			<tr>
 				<th>Disk name</th>
@@ -83,7 +83,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a sveltekit:prefetch class="moon-link" href={`/disk/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a sveltekit:prefetch class="link" href={`/disk/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>
@@ -92,7 +92,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
 							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
-								<div class="moon-icon-button -secondary">
+								<div class="icon-button -secondary">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>

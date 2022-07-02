@@ -56,8 +56,8 @@
 </script>
 
 <h6><strong>Revision</strong></h6>
-<div class="moon-table-container _wsp-nw">
-	<table class="moon-table">
+<div class="table-container _wsp-nw">
+	<table class="table">
 		<thead>
 		<tr>
 			<th>Revision</th>
@@ -76,7 +76,7 @@
 				<td>{it.createdBy}</td>
 				<td>
 					{#if index > 0}
-						<button class="moon-button -tertiary -small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
+						<button class="button -tertiary -small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
 					{/if}
 				</td>
 			</tr>

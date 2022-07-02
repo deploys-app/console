@@ -49,7 +49,7 @@
 					<strong>CURRENT PROJECT</strong>
 				</small>
 
-				<div class="moon-select">
+				<div class="select">
 					<select on:change={(e) => setProject(e.target.value)}>
 						<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
 						{#each projects as it}
@@ -60,7 +60,7 @@
 
 				<div class="u-halign-right">
 					<a href="/project">
-						<small class="moon-link">View all projects</small>
+						<small class="link">View all projects</small>
 					</a>
 				</div>
 		</div>

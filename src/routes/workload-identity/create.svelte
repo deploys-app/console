@@ -61,9 +61,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/workload-identity?project=${project}`} class="moon-link"><h6>Workload Identities</h6></a>
+			<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
 		</li>
 		<li>
 			<h6>Create</h6>
@@ -71,7 +71,7 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-24px">
+<div class="panel _dp-g _gg-24px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Create</strong></h3>
@@ -79,15 +79,15 @@
 	</div>
 	<hr>
 	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" placeholder="name" bind:value={form.name}>
 			</div>
 		</div>
-		<div class="moon-field _mgbt-20px">
+		<div class="field _mgbt-20px">
 			<label for="input-location">Location</label>
-			<div class="moon-select">
+			<div class="select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
@@ -98,14 +98,14 @@
 				</select>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-gsa">GSA</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-gsa" placeholder="email gsa" bind:value={form.gsa}>
 			</div>
 		</div>
 		<hr>
-		<button class="moon-button _mgr-at" class:-loading={saving}>Create</button>
+		<button class="button _mgr-at" class:-loading={saving}>Create</button>
 	</form>
 
 </div>

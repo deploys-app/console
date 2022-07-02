@@ -138,12 +138,12 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href="/billing" class="moon-link"><h6>Billing</h6></a>
+			<a href="/billing" class="link"><h6>Billing</h6></a>
 		</li>
 		<li>
-			<a href={`/billing/detail?id=${billingAccount.id}`} class="moon-link"><h6>{billingAccount.name}</h6></a>
+			<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
 		</li>
 		<li>
 			<h6>Report</h6>
@@ -152,10 +152,10 @@
 </div>
 <br>
 
-<div class="moon-panel">
+<div class="panel">
 	<div class="lo-grid-span-horizontal _gg-12px">
 		<div class="lo-grid-span-horizontal _gg-8px">
-			<div class="moon-select">
+			<div class="select">
 				<select bind:value={filter.range} on:change={fetchReport}>
 					<option value="this_month">This month</option>
 					<option value="prev_month">Prev month</option>
@@ -170,7 +170,7 @@
 	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-32px">
 		<div class="_dp-f _fw-w">
 			{#each (report?.projectList || []) as it}
-				<div class="moon-checkbox _mgbt-8px _mgr-12px">
+				<div class="checkbox _mgbt-8px _mgr-12px">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} on:change={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>
@@ -183,8 +183,8 @@
 	<br>
 
 	<h5><strong>Billings</strong></h5>
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 				<tr>
 					<th>Project</th>

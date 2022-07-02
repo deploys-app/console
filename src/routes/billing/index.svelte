@@ -25,17 +25,17 @@
 
 <h6>Billing</h6>
 <br>
-<div class="moon-panel">
+<div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
-			<a class="moon-button -small" href="/billing/create">
+			<a class="button -small" href="/billing/create">
                 Create account
             </a>
 		</div>
 	</div>
 	<br>
-	<div class="moon-table-container">
-		<table class="moon-table -ruled">
+	<div class="table-container">
+		<table class="table -ruled">
 			<thead>
 				<tr>
 					<th>Billing name</th>
@@ -46,7 +46,7 @@
 			{#each billingAccounts as it}
 				<tr>
 					<td>
-						<a sveltekit:prefetch class="moon-link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
+						<a sveltekit:prefetch class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
 				</tr>

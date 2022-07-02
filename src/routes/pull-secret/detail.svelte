@@ -65,9 +65,9 @@
 </script>
 
 <div>
-	<ul class="moon-breadcrumb">
+	<ul class="breadcrumb">
 		<li>
-			<a href={`/pull-secret?project=${project}`} class="moon-link"><h6>Pull Secrets</h6></a>
+			<a href={`/pull-secret?project=${project}`} class="link"><h6>Pull Secrets</h6></a>
 		</li>
 		<li>
 			<h6>{pullSecret.name}</h6>
@@ -75,12 +75,12 @@
 	</ul>
 </div>
 <br>
-<div class="moon-panel _dp-g _gg-16px">
+<div class="panel _dp-g _gg-16px">
 	<div class="lo-12 _gg-12px">
 		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
 			<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
 			<div class="_dp-f">
-				<button class="moon-button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
+				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
 			</div>
 		</div>
 	</div>
@@ -88,21 +88,21 @@
 	<hr>
 
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-name" value={pullSecret.name} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-location" value={pullSecret.location} readonly disabled>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-server">Server</label>
-			<div class="moon-input -has-icon-right">
+			<div class="input -has-icon-right">
 				<input id="input-server" value={pullSecret.spec.server} readonly disabled>
 				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.server}>
@@ -110,9 +110,9 @@
 				</span>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-username">Username</label>
-			<div class="moon-input -has-icon-right">
+			<div class="input -has-icon-right">
 				<input id="input-username" value={pullSecret.spec.username} readonly disabled>
 				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.username}>
@@ -120,9 +120,9 @@
 				</span>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-password">Password</label>
-			<div class="moon-input -has-icon-right">
+			<div class="input -has-icon-right">
 				<input id="input-password" type="password" value={pullSecret.spec.password} readonly disabled>
 				<div class="icon -is-right">
 					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _fs-600 copy"

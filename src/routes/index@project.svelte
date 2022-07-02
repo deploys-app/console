@@ -71,47 +71,47 @@
 <h6>Dashboard</h6>
 <br>
 <div class="lo-12 lo-6-md _gg-24px _alit-st">
-	<div class="moon-panel lo-12 _gg-24px">
+	<div class="panel lo-12 _gg-24px">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="_mgl-16px">Project Info</strong>
 		</h6>
 		<hr>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-project_name">Project Name</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-project_name" readonly value={project.name}>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-project_id">Project ID</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-project_id" readonly value={project.project}>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-project_number">Project Number</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-project_number" readonly value={project.id}>
 			</div>
 		</div>
-		<div class="moon-field">
+		<div class="field">
 			<label for="input-project_billing">Billing Account ID</label>
-			<div class="moon-input">
+			<div class="input">
 				<input id="input-project_billing" readonly value={project.billingAccount}>
 			</div>
 		</div>
 
 <!--		<hr>-->
 
-<!--		<a class="_dp-f _alit-ct moon-link" href="">-->
+<!--		<a class="_dp-f _alit-ct link" href="">-->
 <!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
 <!--			<span class="_mgl-16px">Project Settings</span>-->
 <!--		</a>-->
 	</div>
 
 	{#if permission.billing}
-		<div class="moon-panel lo-12 _gg-24px">
+		<div class="panel lo-12 _gg-24px">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
 				<strong class="_mgl-16px">Billing</strong>

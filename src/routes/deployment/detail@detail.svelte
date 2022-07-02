@@ -66,14 +66,14 @@
 </script>
 
 <h6><strong>Deployment details</strong></h6>
-<div class="moon-table-container">
-	<table class="moon-table">
+<div class="table-container">
+	<table class="table">
 		{#if deployment.type === 'WebService'}
 			{#if !deployment.internal}
 				<tr>
 					<td>URL</td>
 					<td>
-						<a class="moon-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
+						<a class="link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
 							{`https://${deployment.url}`}
 						</a>
 						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 copy" data-clipboard-text={`https://${deployment.url}`}>
@@ -223,13 +223,13 @@
 
 <div class="_dp-f _fw-w _alit-ct _mgv-32px">
 	<div class="_mgl-at-lg _mgbt-12px _mgbt-0px-lg">
-		<button class="moon-button -danger -small" type="button" on:click={deleteItem}>Delete</button>
+		<button class="button -danger -small" type="button" on:click={deleteItem}>Delete</button>
 	</div>
 </div>
 
 <h6><strong>Environment variables</strong></h6>
-<div class="moon-table-container">
-	<table class="moon-table">
+<div class="table-container">
+	<table class="table">
 		<thead>
 		<tr>
 			<th>Env</th>
@@ -252,8 +252,8 @@
 </div>
 
 <h6><strong>Mount Data</strong></h6>
-<div class="moon-table-container">
-	<table class="moon-table">
+<div class="table-container">
+	<table class="table">
 		<thead>
 		<tr>
 			<th>Path</th>
