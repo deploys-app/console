@@ -12,8 +12,8 @@ export default {
 			buttonsStyling: false,
 			confirmButtonText: yes || 'Yes',
 			customClass: {
-				confirmButton: 'moon-button _cl-white -danger _mgr-16px',
-				cancelButton: 'moon-button -negative -tertiary',
+				confirmButton: 'button _cl-white -danger _mgr-16px',
+				cancelButton: 'button -negative -tertiary',
 				actions: '_mgt-24px'
 			}
 		})

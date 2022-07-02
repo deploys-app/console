@@ -285,8 +285,8 @@ $components-colors: (
 	to   { transform: rotate(359deg); }
 }
 
-.moon-input {
-	&.moon-input-icon-wrap {
+.input {
+	&.input-icon-wrap {
 		position: relative;
 		width: fit-content;
 		user-select: none;
@@ -295,7 +295,7 @@ $components-colors: (
 			padding-right: 35px;
 		}
 
-		.moon-input-icon {
+		.input-icon {
 			position: absolute;
 			top: 50%;
 			right: 25px;
