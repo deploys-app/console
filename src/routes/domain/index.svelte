@@ -97,7 +97,7 @@
 				{#each domains?.items || [] as it}
 					<tr>
 						<td>
-							<StatusIcon status={it.status} />
+							<StatusIcon status={it.verification?.ssl?.pending ? 'verify' : it.status} />
 							<a sveltekit:prefetch href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>
