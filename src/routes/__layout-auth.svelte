@@ -36,6 +36,7 @@
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
 	import { browser } from '$app/env'
+	import ModalSelectProject from './_components/ModalSelectProject.svelte'
 
 	export let profile
 	export let projects
@@ -72,6 +73,8 @@
 		<slot />
 	</div>
 </div>
+
+<ModalSelectProject {projects} />
 
 <style>
 	:root {

@@ -1,20 +1,8 @@
 <script>
 	import { page } from '$app/stores'
-	import { goto } from '$app/navigation'
 	import { project } from '$lib/stores'
 
 	export let projects
-
-	function setProject (sid) {
-		const q = new URLSearchParams($page.url.search)
-		q.set('project', sid)
-
-		if ($project) {
-			goto(`${$page.stuff.overrideRedirect || ''}?${q.toString()}`)
-			return
-		}
-		goto(`/?${q.toString()}`)
-	}
 </script>
 
 <style lang="scss">
@@ -45,24 +33,24 @@
 
 	<div class="_f-1">
 		<div class="lo-12 _gg-12px _pdh-12px _mgt-32px">
-				<small class="_dp-f _jtfct-spbtw">
-					<strong>CURRENT PROJECT</strong>
-				</small>
+			<small class="_dp-f _jtfct-spbtw">
+				<strong>CURRENT PROJECT</strong>
+			</small>
 
-				<div class="select">
-					<select on:change={(e) => setProject(e.target.value)}>
-						<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
-						{#each projects as it}
-							<option value={it.project} selected={$project === it.project}>{it.name}</option>
-						{/each}
-					</select>
-				</div>
+			<label for="project-select-modal" class="select _cs-pt">
+				<select class="_ptev-n">
+					<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
+					{#each projects as it}
+						<option value={it.project} selected={$project === it.project}>{it.name}</option>
+					{/each}
+				</select>
+			</label>
 
-				<div class="u-halign-right">
-					<a href="/project">
-						<small class="link">View all projects</small>
-					</a>
-				</div>
+			<div class="u-halign-right">
+				<a href="/project">
+					<small class="link">View all projects</small>
+				</a>
+			</div>
 		</div>
 		<br>
 
