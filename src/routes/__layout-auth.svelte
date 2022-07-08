@@ -45,6 +45,7 @@
 	stores.projects.set(projects)
 
 	let showSidebar
+	let projectModal
 
 	$: $page, showSidebar = false
 
@@ -66,7 +67,7 @@
 
 	<div class="sidebar-wrapper">
 		<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
-		<Sidebar {projects} />
+		<Sidebar {projects} on:openProjectModal={() => projectModal.open()} />
 	</div>
 
 	<div class="content-wrapper">
@@ -74,7 +75,7 @@
 	</div>
 </div>
 
-<ModalSelectProject {projects} />
+<ModalSelectProject bind:this={projectModal} {projects} />
 
 <style>
 	:root {

@@ -1,8 +1,16 @@
 <script>
+	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
 	import { project } from '$lib/stores'
 
 	export let projects
+	$: projectName = projects.find((p) => p.project === $project)?.name || $project
+
+	const dispatch = createEventDispatcher()
+
+	function openProjectModal () {
+		dispatch('openProjectModal')
+	}
 </script>
 
 <style lang="scss">
@@ -37,14 +45,14 @@
 				<strong>CURRENT PROJECT</strong>
 			</small>
 
-			<label for="project-select-modal" class="select _cs-pt">
-				<select class="_ptev-n">
-					<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
-					{#each projects as it}
-						<option value={it.project} selected={$project === it.project}>{it.name}</option>
-					{/each}
-				</select>
-			</label>
+			<div class="_cs-pt" on:click={openProjectModal}>
+				{#if $project}
+					{projectName}
+				{:else}
+					&#45;&#45;PROJECT&#45;&#45;
+				{/if}
+				<i class="fa-solid fa-caret-down"></i>
+			</div>
 
 			<div class="u-halign-right">
 				<a href="/project">

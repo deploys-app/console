@@ -3,10 +3,13 @@
 	import { goto } from '$app/navigation'
 	import { project } from '$lib/stores'
 
-	let isActive
 	export let projects
 
+	let isActive
+
 	function setProject (sid) {
+		close()
+
 		const q = new URLSearchParams($page.url.search)
 		q.set('project', sid)
 
@@ -15,8 +18,11 @@
 			return
 		}
 
-		close()
 		goto(`/?${q.toString()}`)
+	}
+
+	export function open () {
+		isActive = true
 	}
 
 	function close () {
@@ -24,13 +30,7 @@
 	}
 </script>
 
-<!-- To open and close modal either
-1. use <label for="project-select-modal" /> any where to toggle checkbox state
-2. set 'isActive' (which bind to checkbox state)
-3. query this checkbox element then simulate click it
--->
-<input class="modal-state" id="project-select-modal" type="checkbox" bind:checked={isActive}>
-<div class="modal" on:click|self={close}>
+<div class="modal" on:click|self={close} class:is-active={isActive}>
 	<div class="modal-panel u-raised-1">
 		<div class="modal-close" on:click|self={close}>✕</div>
 		<h4>Projects</h4>
@@ -41,7 +41,7 @@
 					<tr>
 						<th class="collapsed"></th>
 						<th>Name</th>
-						<th>Id</th>
+						<th>ID</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -65,6 +65,7 @@
 		</div>
 	</div>
 </div>
+
 <style lang="scss">
 	.table-container {
 		max-height: 405px;
