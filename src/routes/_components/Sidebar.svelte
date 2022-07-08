@@ -81,7 +81,6 @@
 				<i class="fa-solid fa-caret-down _mgl-4px"></i>
 			</div>
 
-
 			<div class="u-halign-right">
 				<a href="/project">
 					<small class="link">View all projects</small>
