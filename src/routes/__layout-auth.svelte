@@ -36,6 +36,7 @@
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
 	import { browser } from '$app/env'
+	import ModalSelectProject from './_components/ModalSelectProject.svelte'
 
 	export let profile
 	export let projects
@@ -44,6 +45,7 @@
 	stores.projects.set(projects)
 
 	let showSidebar
+	let projectModal
 
 	$: $page, showSidebar = false
 
@@ -65,13 +67,15 @@
 
 	<div class="sidebar-wrapper">
 		<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
-		<Sidebar {projects} />
+		<Sidebar {projects} on:openProjectModal={() => projectModal.open()} />
 	</div>
 
 	<div class="content-wrapper">
 		<slot />
 	</div>
 </div>
+
+<ModalSelectProject bind:this={projectModal} {projects} />
 
 <style>
 	:root {

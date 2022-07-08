@@ -1,19 +1,15 @@
 <script>
+	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
-	import { goto } from '$app/navigation'
 	import { project } from '$lib/stores'
 
 	export let projects
+	$: projectName = projects.find((p) => p.project === $project)?.name || $project
 
-	function setProject (sid) {
-		const q = new URLSearchParams($page.url.search)
-		q.set('project', sid)
+	const dispatch = createEventDispatcher()
 
-		if ($project) {
-			goto(`${$page.stuff.overrideRedirect || ''}?${q.toString()}`)
-			return
-		}
-		goto(`/?${q.toString()}`)
+	function openProjectModal () {
+		dispatch('openProjectModal')
 	}
 </script>
 
@@ -36,6 +32,31 @@
 			height: auto;
 		}
 	}
+
+	.project-box {
+		display: flex;
+		padding: 10px 12px;
+		background-color: var(--color-neutral-500);
+		font-size: 0.9375rem;
+		border-radius: 4px;
+		border: 1px solid var(--color-neutral-400);
+		color: var(--color-light-primary);
+		outline: none;
+		transition: all var(--timing-normal) ease;
+		box-shadow: var(--raised-z6);
+
+		&:hover {
+			border: 1px solid var(--color-neutral-300);
+		}
+
+		span {
+			width: 150px;
+			flex: 1;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow-x: hidden;
+		}
+	}
 </style>
 
 <nav class="sidebar _pdt-16px _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
@@ -45,24 +66,26 @@
 
 	<div class="_f-1">
 		<div class="lo-12 _gg-12px _pdh-12px _mgt-32px">
-				<small class="_dp-f _jtfct-spbtw">
-					<strong>CURRENT PROJECT</strong>
-				</small>
+			<small class="_dp-f _jtfct-spbtw">
+				<strong>CURRENT PROJECT</strong>
+			</small>
 
-				<div class="select">
-					<select on:change={(e) => setProject(e.target.value)}>
-						<option value="" disabled selected="{!$project}">&#45;&#45;PROJECT&#45;&#45;</option>
-						{#each projects as it}
-							<option value={it.project} selected={$project === it.project}>{it.name}</option>
-						{/each}
-					</select>
-				</div>
+			<div class="project-box _cs-pt" on:click={openProjectModal}>
+				<span>
+					{#if $project}
+						{projectName}
+					{:else}
+						&#45;&#45;PROJECT&#45;&#45;
+					{/if}
+				</span>
+				<i class="fa-solid fa-caret-down _mgl-4px"></i>
+			</div>
 
-				<div class="u-halign-right">
-					<a href="/project">
-						<small class="link">View all projects</small>
-					</a>
-				</div>
+			<div class="u-halign-right">
+				<a href="/project">
+					<small class="link">View all projects</small>
+				</a>
+			</div>
 		</div>
 		<br>
 

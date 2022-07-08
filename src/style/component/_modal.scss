@@ -1,102 +1,65 @@
-$timing-normal: 0.3s;
-%base-modal-panel {
-	position: relative;
-
-	width: 100%;
-	max-width: 30rem;
-
-	margin: 0 auto;
-	padding: 16px;
-	border-radius: 8px;
-
-	background: var(--color-neutral-800);
-
-	transform: translate3d(0, 20px, 0);
-	transition: all $timing-normal ease;
-	border: 1px solid rgba(130, 130, 130, 0.26);
-
-	opacity: 0;
-
-	> .header {
-		padding: 0 2rem;
-		text-align: center;
-
-		+ .description { margin-top: 0.25rem; }
-		+ .content { margin-top: 2rem; }
-	}
-
-	> .description {
-		padding: 0 2rem;
-
-		font-size: var(--font-size-400);
-		text-align: center;
-
-		color: var(--color-dark-primary);
-
-		+ .content { margin-top: 2rem; }
-	}
-
-	> .close {
-		position: absolute;
-		top: 0;
-		right: 0;
-
-		cursor: pointer;
-	}
-}
-
 .#{$prefix}modal {
 	position: fixed;
-	overflow-y: auto;
-	z-index: 3;
-
-	display: flex;
-	flex-direction: column;
-
+	z-index: 999;
 	top: 0;
+	right: 0;
+	bottom: 0;
 	left: 0;
-
-	width: 100vw;
-	height: 100vh;
-
-	margin: auto;
-
-	background: rgba(0, 0, 0, 0.5);
-
-	pointer-events: none;
+	display: flex;
 	visibility: hidden;
+	overflow-y: hidden;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	transition-timing-function: cubic-bezier(0.3, 0, .25, 1);
+	transition-duration: 0.16s;
+	transition-property: transform, opacity;
+	pointer-events: none;
 	opacity: 0;
-
-	transition: all $timing-normal ease;
+	background: rgb(0 0 0 / 0.5);
+	overscroll-behavior: contain;
+	padding: 0 16px;
 
 	&:before,
 	&:after {
-		content: '';
-
 		display: block;
-
-		min-height: 2rem;
-		height: 1.5rem;
-
-		-webkit-box-flex: 1;
-		box-flex: 1;
-		-webkit-flex-grow: 1;
 		flex-grow: 1;
-
+		height: 1.5rem;
+		min-height: 2rem;
+		content: '';
 	}
 
-	> .#{$prefix}modal-panel {
-		@extend %base-modal-panel;
+	.#{$prefix}modal-panel {
+		position: relative;
+		width: 100%;
+		max-width: 48rem;
+		padding: 1.5rem;
+		transition: all 0.16s ease-in-out;
+		transform: translate3d(0, -12px, 0);
+		border-radius: 0.75rem;
+		background: var(--color-neutral-600);
 	}
 
-	&.-show {
-		pointer-events: all;
+	.#{$prefix}modal-close {
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		cursor: pointer;
+		border-radius: 999px;
+	}
+
+	&.is-active {
 		visibility: visible;
+		pointer-events: all;
 		opacity: 1;
 
 		.#{$prefix}modal-panel {
 			transform: translate3d(0, 0, 0);
-			opacity: 1;
 		}
 	}
 }
