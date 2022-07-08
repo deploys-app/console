@@ -32,6 +32,31 @@
 			height: auto;
 		}
 	}
+
+	.project-box {
+		display: flex;
+		padding: 10px 12px;
+		background-color: var(--color-neutral-500);
+		font-size: 0.9375rem;
+		border-radius: inherit;
+		border: 1px solid var(--color-neutral-400);
+		color: var(--color-light-primary);
+		outline: none;
+		transition: all var(--timing-normal) ease;
+		box-shadow: var(--raised-z6);
+
+		&:hover {
+			border: 1px solid var(--color-neutral-300);
+		}
+
+		span {
+			width: 150px;
+			flex: 1;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			overflow-x: hidden;
+		}
+	}
 </style>
 
 <nav class="sidebar _pdt-16px _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
@@ -45,14 +70,17 @@
 				<strong>CURRENT PROJECT</strong>
 			</small>
 
-			<div class="_cs-pt" on:click={openProjectModal}>
-				{#if $project}
-					{projectName}
-				{:else}
-					&#45;&#45;PROJECT&#45;&#45;
-				{/if}
-				<i class="fa-solid fa-caret-down"></i>
+			<div class="project-box _cs-pt" on:click={openProjectModal}>
+				<span>
+					{#if $project}
+						{projectName}
+					{:else}
+						&#45;&#45;PROJECT&#45;&#45;
+					{/if}
+				</span>
+				<i class="fa-solid fa-caret-down _mgl-4px"></i>
 			</div>
+
 
 			<div class="u-halign-right">
 				<a href="/project">
