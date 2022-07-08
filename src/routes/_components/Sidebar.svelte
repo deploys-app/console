@@ -38,7 +38,7 @@
 		padding: 10px 12px;
 		background-color: var(--color-neutral-500);
 		font-size: 0.9375rem;
-		border-radius: inherit;
+		border-radius: 4px;
 		border: 1px solid var(--color-neutral-400);
 		color: var(--color-light-primary);
 		outline: none;
