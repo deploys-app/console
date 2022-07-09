@@ -128,19 +128,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.25":
-  version: 1.0.0-next.25
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.25"
+"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.26":
+  version: 1.0.0-next.26
+  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.26"
   dependencies:
     esbuild: ^0.14.42
     worktop: 0.8.0-next.14
-  checksum: 2e10cd6a6b75c6a872e26fb9437dac866d3152ce036bd1994ab6a62711dd0fc2ab0fe772ab114094668c452c57c89feda231578beab0252af04853cae3ff6926
+  checksum: 2b8e21a372a92589ee9652f976aa796a7673dac3b320e82b8ef182655915f1e2e11b74419b1eaf79a655fea13a82ec1f56902c51d36d2bc9dccf05bd7a8df00a
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.361":
-  version: 1.0.0-next.361
-  resolution: "@sveltejs/kit@npm:1.0.0-next.361"
+"@sveltejs/kit@npm:=1.0.0-next.367":
+  version: 1.0.0-next.367
+  resolution: "@sveltejs/kit@npm:1.0.0-next.367"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.0-next.48
     chokidar: ^3.5.3
@@ -150,7 +150,7 @@ __metadata:
     vite: ^2.9.10
   bin:
     svelte-kit: svelte-kit.js
-  checksum: e1bc47f3f1c5c3fe82cfa6d34ecc7ed1ada25fd16867ade6e58f1684b6b8a084e8ced095cee72b7785c9a833cd17878fb94c67d287cafb3eeb3784d04d84bdf4
+  checksum: 6967eeb8096a43f1cc918aba8e1e2abf52491869ffa3f6b9ab5667799ff2a87845e594820ed917ddf4020ee215960759902f27cd62468f9a63c58eb6415e1702
   languageName: node
   linkType: hard
 
@@ -551,8 +551,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sveltejs/adapter-cloudflare": =1.0.0-next.25
-    "@sveltejs/kit": =1.0.0-next.361
+    "@sveltejs/adapter-cloudflare": =1.0.0-next.26
+    "@sveltejs/kit": =1.0.0-next.367
     cheerio: ^1.0.0-rc.12
     clipboard: ^2.0.11
     cookie: ^0.5.0
@@ -572,7 +572,7 @@ __metadata:
     sweetalert2: ^11.4.20
     typescript: ~4.7.4
     valid-url: ^1.0.9
-    vite: ^2.9.13
+    vite: ^2.9.14
   languageName: unknown
   linkType: soft
 
@@ -2958,9 +2958,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^2.9.13":
-  version: 2.9.13
-  resolution: "vite@npm:2.9.13"
+"vite@npm:^2.9.14":
+  version: 2.9.14
+  resolution: "vite@npm:2.9.14"
   dependencies:
     esbuild: ^0.14.27
     fsevents: ~2.3.2
@@ -2983,7 +2983,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: a5e501b920a448c352e9b3836019dea56c523535f8e8540160708c2e164d84da6655ae39abbba1e2888092f5c6cd03dd06279852422359b51be601914645f49f
+  checksum: f78b54f58482ea97d385e36873ae1aa4744c5e467c1d6d4e0835bd55494d2d8f6ce763f17c241c66104be687d5ee535b8e1e96c14210c9ba0c343fe78c58f694
   languageName: node
   linkType: hard
 
