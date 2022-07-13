@@ -5,6 +5,13 @@ __metadata:
   version: 6
   cacheKey: 8
 
+"@cloudflare/workers-types@npm:^3.14.0":
+  version: 3.14.1
+  resolution: "@cloudflare/workers-types@npm:3.14.1"
+  checksum: eba53686f24ec671a6930da07c7872e2c05420ffdff78e179bc440775fa0dc6fd673e1febf3069ac5099fc4725c68281be100af89dcc7855eacbffee244da5f9
+  languageName: node
+  linkType: hard
+
 "@eslint/eslintrc@npm:^1.3.0":
   version: 1.3.0
   resolution: "@eslint/eslintrc@npm:1.3.0"
@@ -128,13 +135,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.26":
-  version: 1.0.0-next.26
-  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.26"
+"@sveltejs/adapter-cloudflare@npm:=1.0.0-next.27":
+  version: 1.0.0-next.27
+  resolution: "@sveltejs/adapter-cloudflare@npm:1.0.0-next.27"
   dependencies:
+    "@cloudflare/workers-types": ^3.14.0
     esbuild: ^0.14.42
     worktop: 0.8.0-next.14
-  checksum: 2b8e21a372a92589ee9652f976aa796a7673dac3b320e82b8ef182655915f1e2e11b74419b1eaf79a655fea13a82ec1f56902c51d36d2bc9dccf05bd7a8df00a
+  checksum: 322fb40a6b516f6e54001aeee20a136b87f68d1ec4e60eae257b5f3990b44a9c0c356ce1614f8adbd085833f3007ee2ba6fd0706c419810af829a3e20f3a9d1d
   languageName: node
   linkType: hard
 
@@ -551,7 +559,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sveltejs/adapter-cloudflare": =1.0.0-next.26
+    "@sveltejs/adapter-cloudflare": =1.0.0-next.27
     "@sveltejs/kit": =1.0.0-next.370
     cheerio: ^1.0.0-rc.12
     clipboard: ^2.0.11
