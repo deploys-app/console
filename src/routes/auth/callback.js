@@ -1,4 +1,4 @@
-export async function get ({ locals, url }) {
+export async function GET ({ locals, url }) {
 	const state = url.searchParams.get('state')
 	const code = url.searchParams.get('code')
 

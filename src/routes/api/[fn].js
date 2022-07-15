@@ -1,6 +1,6 @@
 const endpoint = 'https://api.deploys.app'
 
-export async function post ({ locals, params, request }) {
+export async function POST ({ locals, params, request }) {
 	const token = locals.token
 
 	const resp = await fetch(`${endpoint}/${params.fn}`, {

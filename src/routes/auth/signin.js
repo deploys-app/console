@@ -19,7 +19,7 @@ function randomState () {
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
-export async function get ({ locals, url }) {
+export async function GET ({ locals, url }) {
 	const state = randomState()
 
 	const callback = new URL(url.toString())

@@ -1,6 +1,6 @@
 const landing = 'https://www.deploys.app/'
 
-export async function post ({ locals }) {
+export async function POST ({ locals }) {
 	const token = locals.token
 
 	if (token) {
