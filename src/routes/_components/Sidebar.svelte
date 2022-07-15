@@ -192,6 +192,16 @@
 							</div>
 						</a>
 					</li>
+					<li>
+						<a sveltekit:prefetch href={`/email?project=${$project}`} title="Users">
+							<div class="menu-item" class:is-active={$page.stuff.menu === 'email'}>
+								<span class="menu-icon">
+									<i class="fa-solid fa-envelope"></i>
+								</span>
+								<span>Emails</span>
+							</div>
+						</a>
+					</li>
 				{/if}
 			</ul>
 		</div>
