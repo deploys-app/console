@@ -86,7 +86,11 @@
 			command: deployment.command,
 			args: deployment.args,
 			schedule: deployment.schedule,
-			disk: deployment.disk,
+			disk: deployment.disk || {
+				name: '',
+				mountPath: '',
+				subPath: ''
+			},
 			minReplicas: deployment.minReplicas,
 			maxReplicas: deployment.maxReplicas,
 			resources: deployment.resources,
