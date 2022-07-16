@@ -86,9 +86,7 @@
 			command: deployment.command,
 			args: deployment.args,
 			schedule: deployment.schedule,
-			diskName: deployment.diskName,
-			diskMountPath: deployment.diskMountPath,
-			diskSubPath: deployment.diskSubPath,
+			disk: deployment.disk,
 			minReplicas: deployment.minReplicas,
 			maxReplicas: deployment.maxReplicas,
 			resources: deployment.resources,
@@ -108,9 +106,11 @@
 			command: [],
 			args: [],
 			schedule: '',
-			diskName: '',
-			diskMountPath: '',
-			diskSubPath: '',
+			disk: {
+				name: '',
+				mountPath: '',
+				subPath: ''
+			},
 			minReplicas: 1,
 			maxReplicas: 1,
 			resources: {
@@ -163,7 +163,7 @@
 			return
 		}
 		disks = resp.result.items || []
-		form.diskName = form.diskName
+		form.disk.name = form.disk.name
 	}
 
 	async function changeLocation () {
@@ -448,7 +448,7 @@
 					<div class="field">
 						<label for="input-disk_name">Name</label>
 						<div class="select">
-							<select id="input-disk_name" bind:value={form.diskName}>
+							<select id="input-disk_name" bind:value={form.disk.name}>
 								<option value="">No Disk</option>
 								{#each disks as it}
 									<option value={it.name}>{it.name}</option>
@@ -460,23 +460,23 @@
 					<div class="field">
 						<label for="input-disk_name-text">Name</label>
 						<div class="input">
-							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.diskName}>
+							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
 						<p class="_fs-200">* You don't have permission to list disks</p>
 					</div>
 				{/if}
 
-				{#if form.diskName}
+				{#if form.disk.name}
 					<div class="field">
 						<label for="input-disk_mount_path">Mount Path</label>
 						<div class="input">
-							<input id="input-disk_mount_path" placeholder="" bind:value={form.diskMountPath}>
+							<input id="input-disk_mount_path" placeholder="" bind:value={form.disk.mountPath}>
 						</div>
 					</div>
 					<div class="field">
 						<label for="input-disk_sub_path">Sub Path</label>
 						<div class="input">
-							<input id="input-disk_sub_path" placeholder="" bind:value={form.diskSubPath}>
+							<input id="input-disk_sub_path" placeholder="" bind:value={form.disk.subPath}>
 						</div>
 					</div>
 				{/if}
