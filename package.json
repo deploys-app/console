@@ -13,12 +13,12 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "devDependencies": {
-    "@sveltejs/adapter-cloudflare": "=1.0.0-next.29",
-    "@sveltejs/kit": "=1.0.0-next.377",
+    "@sveltejs/adapter-cloudflare": "=1.0.0-next.30",
+    "@sveltejs/kit": "=1.0.0-next.384",
     "cheerio": "^1.0.0-rc.12",
     "clipboard": "^2.0.11",
     "cookie": "^0.5.0",
-    "dayjs": "^1.11.3",
+    "dayjs": "^1.11.4",
     "eslint": "^8.20.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "gravatar-url": "^4.0.1",
@@ -34,7 +34,7 @@
     "sweetalert2": "^11.4.23",
     "typescript": "~4.7.4",
     "valid-url": "^1.0.9",
-    "vite": "^3.0.1"
+    "vite": "^3.0.2"
   },
   "type": "module"
 }
