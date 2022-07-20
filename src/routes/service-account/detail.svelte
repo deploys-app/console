@@ -166,7 +166,7 @@
 			</div>
 		{/each}
 		<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-			<button class="button -small icon-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+			<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
 				<i class="fa-solid fa-plus _mgr-12px"></i>
 				Create key
 			</button>
