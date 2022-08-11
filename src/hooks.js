@@ -1,6 +1,5 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import cookie from 'cookie'
-import * as cheerio from 'cheerio/lib/slim'
 
 export function getSession ({ locals }) {
 	return {
@@ -64,54 +63,7 @@ function storeProject ({ event, resolve }) {
 	return resolve(event)
 }
 
-async function _generateLinkHeaders (resp) {
-	const allowPrefix = [
-		'https://',
-		'/'
-	]
-
-	const $ = cheerio.load(await resp.clone().text())
-	const headers = []
-
-	const f = (p, as, crossorigin) => (_, el) => {
-		const $el = $(el)
-		const src = p($el) || ''
-		if (!allowPrefix.some((prefix) => src.startsWith(prefix))) {
-			return
-		}
-		let h = `<${src}>; rel=preload; as=${as}`
-		if (!crossorigin) {
-			const crossorigin = $el.attr('crossorigin')
-			if (crossorigin != null) {
-				h += '; crossorigin'
-				if (crossorigin) {
-					h += `=${crossorigin}`
-				}
-			}
-		} else {
-			h += '; crossorigin'
-		}
-		headers.push(h)
-	}
-
-	$('link[rel="stylesheet"]').each(f(($) => $.attr('href'), 'style'))
-	$('link[rel="modulepreload"]').each(f(($) => $.attr('href'), 'script', true))
-	// $('img').each(f(($) => $.attr('src'), 'image'))
-
-	return headers
-}
-
-async function injectLinkHeader ({ event, resolve }) {
-	const resp = await resolve(event)
-	if (resp.headers.get('content-type') === 'text/html') {
-		const headers = await _generateLinkHeaders(resp)
-		headers.forEach((h) => resp.headers.append('link', h))
-	}
-	return resp
-}
-
 export const handle = sequence(
-	injectLinkHeader,
 	handleCookie,
 	storeProject
 )
