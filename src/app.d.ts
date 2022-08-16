@@ -9,9 +9,4 @@ declare namespace App {
 	}
 	// interface Platform {}
 	// interface Session {}
-	interface Stuff {
-		project: string
-		menu: string
-		overrideRedirect: ?string
-	}
 }

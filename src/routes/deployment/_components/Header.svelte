@@ -7,7 +7,7 @@
 
 	export let deployment
 
-	$: project = $page.stuff.project
+	$: project = $page.data.project
 
 	$: canPause = deployment.status === 'success' && deployment.action === 'deploy'
 	$: canResume = deployment.status === 'success' && deployment.action === 'pause'

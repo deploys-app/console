@@ -4,6 +4,7 @@
 	import { project } from '$lib/stores'
 
 	export let projects
+	$: menu = $page.data.menu || ''
 	$: projectName = projects.find((p) => p.project === $project)?.name || $project
 
 	const dispatch = createEventDispatcher()
@@ -94,7 +95,7 @@
 				{#if $project}
 					<li>
 						<a sveltekit:prefetch href={`/?project=${$project}`} title="Dashboard">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'dashboard'}>
+							<div class="menu-item" class:is-active={menu === 'dashboard'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-columns"></i>
 								</span>
@@ -104,7 +105,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/deployment?project=${$project}`} title="Deployments">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'deployment'}>
+							<div class="menu-item" class:is-active={menu === 'deployment'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-rocket"></i>
 								</span>
@@ -114,7 +115,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/domain?project=${$project}`} title="Domains">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'domain'}>
+							<div class="menu-item" class:is-active={menu === 'domain'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-globe"></i>
 								</span>
@@ -124,7 +125,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/route?project=${$project}`} title="Routes">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'route'}>
+							<div class="menu-item" class:is-active={menu === 'route'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-router"></i>
 								</span>
@@ -134,7 +135,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/workload-identity?project=${$project}`} title="Workload Identities">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'workload-identity'}>
+							<div class="menu-item" class:is-active={menu === 'workload-identity'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-network-wired"></i>
 								</span>
@@ -144,7 +145,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/disk?project=${$project}`} title="Disks">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'disk'}>
+							<div class="menu-item" class:is-active={menu === 'disk'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-hdd"></i>
 								</span>
@@ -154,7 +155,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/pull-secret?project=${$project}`} title="Pull Secrets">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'pull-secret'}>
+							<div class="menu-item" class:is-active={menu === 'pull-secret'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-key"></i>
 								</span>
@@ -164,7 +165,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/role?project=${$project}`} title="Roles">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'role'}>
+							<div class="menu-item" class:is-active={menu === 'role'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-tag"></i>
 								</span>
@@ -174,7 +175,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/role/users?project=${$project}`} title="Users">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'role.users'}>
+							<div class="menu-item" class:is-active={menu === 'role.users'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-users"></i>
 								</span>
@@ -184,7 +185,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/service-account?project=${$project}`} title="Users">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'service-account'}>
+							<div class="menu-item" class:is-active={menu === 'service-account'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-lock"></i>
 								</span>
@@ -194,7 +195,7 @@
 					</li>
 					<li>
 						<a sveltekit:prefetch href={`/email?project=${$project}`} title="Users">
-							<div class="menu-item" class:is-active={$page.stuff.menu === 'email'}>
+							<div class="menu-item" class:is-active={menu === 'email'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-envelope"></i>
 								</span>
