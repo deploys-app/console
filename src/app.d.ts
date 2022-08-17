@@ -6,7 +6,7 @@ declare namespace App {
 	interface Locals {
 		state: string
 		token: string
+		project: string
 	}
 	// interface Platform {}
-	// interface Session {}
 }
