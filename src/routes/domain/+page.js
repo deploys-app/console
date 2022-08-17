@@ -9,10 +9,10 @@ export async function load ({ parent, fetch }) {
 		api.invoke('project.get', { project }, fetch)
 	])
 	if (!domains.ok && !domains.error.forbidden) {
-		throw error(500, `domains: ${domains.error.message}`);
+		throw error(500, `domains: ${domains.error.message}`)
 	}
 	if (!projectInfo.ok) {
-		throw error(500, `project: ${project.error.message}`);
+		throw error(500, `project: ${project.error.message}`)
 	}
 
 	return {
