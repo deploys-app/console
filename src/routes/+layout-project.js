@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit'
 
-export async function load ({ url, data }) {
+export function load ({ url, data }) {
 	const pageProject = url.searchParams.get('project')
 	const { restoreProject } = data
 
