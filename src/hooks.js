@@ -1,12 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks'
 import cookie from 'cookie'
 
-export function getSession ({ locals }) {
-	return {
-		project: locals.project || ''
-	}
-}
-
 const cookieOptions = {
 	httpOnly: true,
 	maxAge: 60 * 60 * 24 * 7,

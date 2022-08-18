@@ -1,8 +1,8 @@
 import { redirect } from '@sveltejs/kit'
 
-export function load ({ session, url }) {
+export function load ({ url, data }) {
 	const pageProject = url.searchParams.get('project')
-	const restoreProject = session.project
+	const { restoreProject } = data
 
 	if (!pageProject && restoreProject) {
 		const q = new URLSearchParams(url.search)
