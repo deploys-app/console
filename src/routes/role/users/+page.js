@@ -9,6 +9,7 @@ export async function load ({ parent, fetch }) {
 	}
 	return {
 		menu: 'role.users',
+		overrideRedirect: '/role/users',
 		permission: {
 			users: !users.error?.forbidden
 		},
