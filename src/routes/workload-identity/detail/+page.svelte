@@ -1,5 +1,4 @@
 <script>
-	import { page } from '$app/stores'
 	import format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
@@ -9,10 +8,8 @@
 
 	export let data
 
-	$: ({ workloadIdentity } = data)
+	$: ({ workloadIdentity, project } = data)
 	// export let location
-
-	$: project = $page.stuff.project
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
