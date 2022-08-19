@@ -13,7 +13,6 @@ export async function load ({ url, parent, fetch }) {
 		throw error(500, `deployment: ${deployment.error.message}`)
 	}
 	return {
-		project,
 		location,
 		name,
 		deployment: deployment.result

@@ -29,7 +29,6 @@ export async function load ({ url, parent, fetch }) {
 		}
 	}
 	return {
-		project,
 		locations: locations.result.items || [],
 		quota: projectInfo.result.quota || {},
 		deployment: deployment?.result

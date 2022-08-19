@@ -8,7 +8,6 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `deployments: ${deployments.error.message}`)
 	}
 	return {
-		project,
 		permission: {
 			deployments: !deployments.error?.forbidden
 		},

@@ -8,7 +8,6 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `serviceAccounts: ${serviceAccounts.error.message}`)
 	}
 	return {
-		project,
 		permission: {
 			serviceAccounts: !serviceAccounts.error?.forbidden
 		},

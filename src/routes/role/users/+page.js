@@ -8,7 +8,6 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `users: ${users.error.message}`)
 	}
 	return {
-		project,
 		menu: 'role.users',
 		permission: {
 			users: !users.error?.forbidden

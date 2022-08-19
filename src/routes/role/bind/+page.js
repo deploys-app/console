@@ -21,7 +21,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		project,
 		menu: 'role.users',
 		overrideRedirect: '/role/users',
 		email,

@@ -14,7 +14,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		project,
 		domain: domain.result
 	}
 }

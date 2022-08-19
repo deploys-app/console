@@ -13,7 +13,6 @@ export async function load ({ url, parent, fetch }) {
 		throw error(500, `pullSecret: ${pullSecret.error.message}`)
 	}
 	return {
-		project,
 		location,
 		name,
 		pullSecret: pullSecret.result

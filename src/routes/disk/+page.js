@@ -8,7 +8,6 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `disks: ${disks.error.message}`)
 	}
 	return {
-		project,
 		permission: {
 			disks: !disks.error?.forbidden
 		},

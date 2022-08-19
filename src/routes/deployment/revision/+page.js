@@ -15,7 +15,6 @@ export async function load ({ parent, fetch }) {
 	}
 
 	return {
-		project,
 		deployment,
 		revisions: revisions.result.items || []
 	}
