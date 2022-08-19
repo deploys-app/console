@@ -20,7 +20,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		project,
 		menu: 'role',
 		role,
 		permissions: permissions.result || []

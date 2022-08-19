@@ -16,7 +16,6 @@ export async function load ({ parent, fetch }) {
 	}
 
 	return {
-		project,
 		permission: {
 			domains: !domains.error?.forbidden
 		},

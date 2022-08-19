@@ -14,7 +14,6 @@ export async function load ({ parent, fetch }) {
 	}
 
 	return {
-		project,
 		location: locationInfo.result,
 		deployment
 	}

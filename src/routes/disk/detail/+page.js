@@ -15,7 +15,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		project,
 		location,
 		name,
 		disk: disk.result

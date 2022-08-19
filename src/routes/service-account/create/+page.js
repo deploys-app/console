@@ -17,7 +17,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		project,
 		id,
 		serviceAccount: serviceAccount?.result
 	}

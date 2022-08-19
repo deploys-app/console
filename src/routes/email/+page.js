@@ -8,7 +8,6 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `emails: ${emails.error.message}`)
 	}
 	return {
-		project,
 		permission: {
 			emails: !emails.error?.forbidden
 		},

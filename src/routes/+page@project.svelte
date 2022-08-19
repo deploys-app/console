@@ -4,7 +4,7 @@
 
 	export let data
 	$: ({
-		project,
+		projectInfo,
 		usage,
 		price,
 		permission
@@ -43,25 +43,25 @@
 		<div class="field">
 			<label for="input-project_name">Project Name</label>
 			<div class="input">
-				<input id="input-project_name" readonly value={project.name}>
+				<input id="input-project_name" readonly value={projectInfo.name}>
 			</div>
 		</div>
 		<div class="field">
 			<label for="input-project_id">Project ID</label>
 			<div class="input">
-				<input id="input-project_id" readonly value={project.project}>
+				<input id="input-project_id" readonly value={projectInfo.project}>
 			</div>
 		</div>
 		<div class="field">
 			<label for="input-project_number">Project Number</label>
 			<div class="input">
-				<input id="input-project_number" readonly value={project.id}>
+				<input id="input-project_number" readonly value={projectInfo.id}>
 			</div>
 		</div>
 		<div class="field">
 			<label for="input-project_billing">Billing Account ID</label>
 			<div class="input">
-				<input id="input-project_billing" readonly value={project.billingAccount}>
+				<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
 			</div>
 		</div>
 

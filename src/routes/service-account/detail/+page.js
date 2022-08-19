@@ -12,7 +12,6 @@ export async function load ({ url, parent, fetch }) {
 		throw error(500, `serviceAccount: ${serviceAccount.error.message}`)
 	}
 	return {
-		project,
 		id,
 		serviceAccount: serviceAccount.result
 	}

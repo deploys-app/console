@@ -17,7 +17,6 @@ export async function load ({ parent, fetch }) {
 	}
 
 	return {
-		project,
 		locations: locations.result.items || [],
 		projectInfo: projectInfo.result
 	}

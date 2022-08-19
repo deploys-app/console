@@ -25,7 +25,7 @@ export async function load ({ parent, fetch }) {
 		permission: {
 			billing: !usage.error?.forbidden && !price.error?.forbidden
 		},
-		project: projectInfo.result,
+		projectInfo: projectInfo.result,
 		usage: usage.result || {},
 		price: price.result || {}
 	}
