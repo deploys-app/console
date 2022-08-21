@@ -160,9 +160,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.423":
-  version: 1.0.0-next.423
-  resolution: "@sveltejs/kit@npm:1.0.0-next.423"
+"@sveltejs/kit@npm:=1.0.0-next.428":
+  version: 1.0.0-next.428
+  resolution: "@sveltejs/kit@npm:1.0.0-next.428"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.1
     cookie: ^0.5.0
@@ -181,7 +181,7 @@ __metadata:
     vite: ^3.0.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 45551946324c1d4e7bc667f9cb5d3241c92ac9ffe58bac69b545e36adc30bc4bff003af1b7568ca7093263723ad1d2df859f7613d583160dd4452b1757f5a78f
+  checksum: 5f28151e52d1c973b5c2f567af86e7d9f1b7af0945b09833173a468f29c9255249573d3bd8a9bc2b8ccb00f5809c2a55ef77d3f951b10178f95419690118773a
   languageName: node
   linkType: hard
 
@@ -563,7 +563,7 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.31
-    "@sveltejs/kit": =1.0.0-next.423
+    "@sveltejs/kit": =1.0.0-next.428
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.5
@@ -575,14 +575,14 @@ __metadata:
     json-bigint: ^1.0.0
     prettier: ^2.7.1
     prettier-plugin-svelte: ^2.7.0
-    sass: ^1.54.4
+    sass: ^1.54.5
     svelte: ^3.49.0
     svelte-check: ^2.8.1
     svelte-preprocess: ^4.10.7
-    sweetalert2: ^11.4.28
+    sweetalert2: ^11.4.29
     typescript: ~4.7.4
     valid-url: ^1.0.9
-    vite: ^3.0.8
+    vite: ^3.0.9
   languageName: unknown
   linkType: soft
 
@@ -2346,16 +2346,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.54.4":
-  version: 1.54.4
-  resolution: "sass@npm:1.54.4"
+"sass@npm:^1.54.5":
+  version: 1.54.5
+  resolution: "sass@npm:1.54.5"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: bb6aead09764de450a02b9a66e4ee538f0ba6bc8f2fc3905c71b2c302b5f47e089b510b86cfa7ef2d4139c210c8abf99fe157e7a5bd356c057f10d29e6c4b44c
+  checksum: ba7a65aa7508419468547c8de4d59e537bec874f52823f501663dc98d80dfd2d374e8ea73a31200db7f510b8816c925edf89728c9b36889f4e6673d3e94ec100
   languageName: node
   linkType: hard
 
@@ -2692,10 +2692,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.4.28":
-  version: 11.4.28
-  resolution: "sweetalert2@npm:11.4.28"
-  checksum: 179fa00fa90fc0db02dcbc253fd225f97c49256d1170caa3ac589298b3cfb71e33156cbea86481237122f6fd0dda558a3d58c32eba1fe1acaca7f9c8842e8ed0
+"sweetalert2@npm:^11.4.29":
+  version: 11.4.29
+  resolution: "sweetalert2@npm:11.4.29"
+  checksum: a3fe80e7585bef06f1ba3c52a7f636e771743ec00edca374d105e43990b5543822fa3b74174aa77d157edbf301e2d7a1b85cd69831b851ad2f1a7a5702d10be8
   languageName: node
   linkType: hard
 
@@ -2871,9 +2871,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^3.0.8":
-  version: 3.0.8
-  resolution: "vite@npm:3.0.8"
+"vite@npm:^3.0.9":
+  version: 3.0.9
+  resolution: "vite@npm:3.0.9"
   dependencies:
     esbuild: ^0.14.47
     fsevents: ~2.3.2
@@ -2899,7 +2899,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: ec3f57d52f2bf28f2f89898053c2156f025a108a95e9308ce6580f43d8fdaae866f7988afa8207a8c8509069d3a0b50ee79b9a8050590a825f4b7771646c2755
+  checksum: 6341aa43579ae45f8a383bdc0c5041dea3dff98f14e0a546d6d884a864134b00082246a28d1de8adff0ce0dd92b468c7ade8f972ffe1ed97258671d63e0f16f7
   languageName: node
   linkType: hard
 
