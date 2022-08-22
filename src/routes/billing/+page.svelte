@@ -22,6 +22,7 @@
 				<tr>
 					<th>Billing name</th>
 					<th>Billing ID</th>
+					<th class="collapse _tal-ct">Active</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -31,9 +32,16 @@
 						<a sveltekit:prefetch class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
+					<td class="_tal-ct">
+						{#if it.active}
+							<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+						{:else}
+							<i class="fa-solid fa-times _cl-negative-500"></i>
+						{/if}
+					</td>
 				</tr>
 			{:else}
-				<NoDataRow span="2" />
+				<NoDataRow span="3" />
 			{/each}
 			</tbody>
 		</table>
