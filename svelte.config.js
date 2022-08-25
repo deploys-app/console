@@ -7,7 +7,10 @@ const config = {
 		sass: true
 	}),
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		alias: {
+			$style: './src/style'
+		}
 	}
 }
 

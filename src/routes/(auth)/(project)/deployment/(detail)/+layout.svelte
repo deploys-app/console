@@ -1,5 +1,5 @@
 <script>
-	import Header from './_components/Header.svelte'
+	import Header from '../_components/Header.svelte'
 	import { browser } from '$app/env'
 	import { onDestroy } from 'svelte'
 	import api from '$lib/api'

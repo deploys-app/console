@@ -1,13 +1,13 @@
 <script>
-	import '../style/main.scss'
-	import Navbar from './_components/Navbar.svelte'
-	import Sidebar from './_components/Sidebar.svelte'
+	import '$style/main.scss'
+	import Navbar from '../_components/Navbar.svelte'
+	import Sidebar from '../_components/Sidebar.svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
 	import { browser } from '$app/env'
 	import api from '$lib/api'
-	import ModalSelectProject from './_components/ModalSelectProject.svelte'
+	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
 
 	export let data
 	$: ({
