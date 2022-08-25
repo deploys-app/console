@@ -9,7 +9,7 @@ const config = {
 	kit: {
 		adapter: adapter(),
 		alias: {
-			'$style': './src/style',
+			$style: './src/style'
 		}
 	}
 }
