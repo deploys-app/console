@@ -302,12 +302,36 @@
 		{/if}
 	</div>
 
-	{#if domain.type !== 'cloudflare' && domain.status === 'success'}
-		<hr>
-		<div class="_dp-f _alit-ct _fw-w">
-			<button class="button -danger" class:-loading={purging} on:click={purgeCache}>Purge Cache</button>
+	<div>
+		<div class="_mgbt-12px">
+			<strong>Danger Zone</strong>
 		</div>
-	{/if}
+		<div class="_bgcl-neutral-800 _pd-24px _bdw-1px _bdcl-negative-900 _bdrd-8px">
+			{#if domain.type !== 'cloudflare' && domain.status === 'success'}
+				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
+					<div class="_f-1 lo-12 _gg-4px">
+						<div><strong>Purge cache everything</strong></div>
+						<p class="_fs-300 _opct-80">Cached resources are immediately removed from the stored assets in your Content Delivery Network</p>
+					</div>
+					<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
+						Purge Cache Everything
+					</button>
+				</div>
+			{/if}
+			{#if domain.type !== 'cloudflare' && domain.status === 'success'}
+				<hr class="_mgv-24px">
+				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
+					<div class="_f-1 lo-12 _gg-4px">
+						<div><strong>Purge Cache Prefix</strong></div>
+						<p class="_fs-300 _opct-80">Cached resources are immediately removed from the stored assets in your Content Delivery Network Cached resources are immediately removed from the stored assets in your Content Delivery Network</p>
+					</div>
+					<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
+						Purge Cache Prefix
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
 
 	{#if domain.type === 'cloudflare'}
 		<hr>
