@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 	import api from '$lib/api'
+	import Swal from 'sweetalert2'
 
 	export let data
 	$: ({
@@ -68,6 +69,46 @@
 				}
 			}
 		})
+	}
+
+	async function purgeCachePrefix () {
+		if (purging) {
+			return
+		}
+
+		const result = await Swal.fire({
+			title: `Purge cache on domain "${domain.domain}"`,
+			text: 'Type path prefix',
+			icon: 'warning',
+			input: 'text',
+			showCancelButton: true,
+			buttonsStyling: false,
+			confirmButtonText: 'Purge',
+			customClass: {
+				confirmButton: 'button _cl-white -danger _mgr-16px',
+				cancelButton: 'button -negative -tertiary',
+				actions: '_mgt-24px'
+			}
+		})
+		if (!result.isConfirmed || !result.value) {
+			return
+		}
+
+		purging = true
+		try {
+			const resp = await api.invoke('domain.purgeCache', {
+				project,
+				domain: domain.domain,
+				prefix: result.value
+			}, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
+				return
+			}
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path "${result.value}"` })
+		} finally {
+			purging = false
+		}
 	}
 
 	function deleteItem () {
@@ -302,36 +343,34 @@
 		{/if}
 	</div>
 
+	{#if domain.type !== 'cloudflare' && domain.status === 'success'}
 	<div>
 		<div class="_mgbt-12px">
-			<strong>Danger Zone</strong>
+			<strong>Purge Cache</strong>
 		</div>
 		<div class="_bgcl-neutral-800 _pd-24px _bdw-1px _bdcl-negative-900 _bdrd-8px">
-			{#if domain.type !== 'cloudflare' && domain.status === 'success'}
 				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
 					<div class="_f-1 lo-12 _gg-4px">
-						<div><strong>Purge cache everything</strong></div>
-						<p class="_fs-300 _opct-80">Cached resources are immediately removed from the stored assets in your Content Delivery Network</p>
+						<div><strong>Purge everything</strong></div>
+						<p class="_fs-300 _opct-80">Remove all cached resources</p>
 					</div>
 					<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
-						Purge Cache Everything
+						Purge everything
 					</button>
 				</div>
-			{/if}
-			{#if domain.type !== 'cloudflare' && domain.status === 'success'}
 				<hr class="_mgv-24px">
 				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
 					<div class="_f-1 lo-12 _gg-4px">
-						<div><strong>Purge Cache Prefix</strong></div>
-						<p class="_fs-300 _opct-80">Cached resources are immediately removed from the stored assets in your Content Delivery Network Cached resources are immediately removed from the stored assets in your Content Delivery Network</p>
+						<div><strong>Purge prefix</strong></div>
+						<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
 					</div>
-					<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
-						Purge Cache Prefix
+					<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
+						Purge prefix
 					</button>
 				</div>
-			{/if}
 		</div>
 	</div>
+	{/if}
 
 	{#if domain.type === 'cloudflare'}
 		<hr>
