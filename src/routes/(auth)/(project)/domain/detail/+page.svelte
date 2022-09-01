@@ -348,26 +348,26 @@
 		<div class="_mgbt-12px">
 			<strong>Purge Cache</strong>
 		</div>
-		<div class="_bgcl-neutral-800 _pd-24px _bdw-1px _bdcl-negative-900 _bdrd-8px">
-				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
-					<div class="_f-1 lo-12 _gg-4px">
-						<div><strong>Purge everything</strong></div>
-						<p class="_fs-300 _opct-80">Remove all cached resources</p>
-					</div>
-					<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
-						Purge everything
-					</button>
+		<div class="_bgcl-neutral-800 _pd-24px _bdw-1px _bdcl-negative-900 _bdrd-8px _mxw-512px">
+			<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct-md">
+				<div class="_f-1 lo-12 _gg-4px">
+					<div><strong>Purge everything</strong></div>
+					<p class="_fs-300 _opct-80">Remove all cached resources</p>
 				</div>
-				<hr class="_mgv-24px">
-				<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct">
-					<div class="_f-1 lo-12 _gg-4px">
-						<div><strong>Purge prefix</strong></div>
-						<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
-					</div>
-					<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
-						Purge prefix
-					</button>
+				<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
+					Purge everything
+				</button>
+			</div>
+			<hr class="_mgv-24px">
+			<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct-md">
+				<div class="_f-1 lo-12 _gg-4px">
+					<div><strong>Purge prefix</strong></div>
+					<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
 				</div>
+				<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
+					Purge prefix
+				</button>
+			</div>
 		</div>
 	</div>
 	{/if}
