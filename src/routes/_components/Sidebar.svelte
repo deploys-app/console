@@ -94,7 +94,7 @@
 			<ul class="sidebar-menus">
 				{#if $project}
 					<li>
-						<a sveltekit:prefetch href={`/?project=${$project}`} title="Dashboard">
+						<a href={`/?project=${$project}`} title="Dashboard">
 							<div class="menu-item" class:is-active={menu === 'dashboard'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-columns"></i>
@@ -104,7 +104,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/deployment?project=${$project}`} title="Deployments">
+						<a href={`/deployment?project=${$project}`} title="Deployments">
 							<div class="menu-item" class:is-active={menu === 'deployment'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-rocket"></i>
@@ -114,7 +114,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/domain?project=${$project}`} title="Domains">
+						<a href={`/domain?project=${$project}`} title="Domains">
 							<div class="menu-item" class:is-active={menu === 'domain'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-globe"></i>
@@ -124,7 +124,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/route?project=${$project}`} title="Routes">
+						<a href={`/route?project=${$project}`} title="Routes">
 							<div class="menu-item" class:is-active={menu === 'route'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-router"></i>
@@ -134,7 +134,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/workload-identity?project=${$project}`} title="Workload Identities">
+						<a href={`/workload-identity?project=${$project}`} title="Workload Identities">
 							<div class="menu-item" class:is-active={menu === 'workload-identity'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-network-wired"></i>
@@ -144,7 +144,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/disk?project=${$project}`} title="Disks">
+						<a href={`/disk?project=${$project}`} title="Disks">
 							<div class="menu-item" class:is-active={menu === 'disk'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-hdd"></i>
@@ -154,7 +154,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/pull-secret?project=${$project}`} title="Pull Secrets">
+						<a href={`/pull-secret?project=${$project}`} title="Pull Secrets">
 							<div class="menu-item" class:is-active={menu === 'pull-secret'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-key"></i>
@@ -164,7 +164,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/role?project=${$project}`} title="Roles">
+						<a href={`/role?project=${$project}`} title="Roles">
 							<div class="menu-item" class:is-active={menu === 'role'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-tag"></i>
@@ -174,7 +174,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/role/users?project=${$project}`} title="Users">
+						<a href={`/role/users?project=${$project}`} title="Users">
 							<div class="menu-item" class:is-active={menu === 'role.users'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-users"></i>
@@ -184,7 +184,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/service-account?project=${$project}`} title="Users">
+						<a href={`/service-account?project=${$project}`} title="Users">
 							<div class="menu-item" class:is-active={menu === 'service-account'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-lock"></i>
@@ -194,7 +194,7 @@
 						</a>
 					</li>
 					<li>
-						<a sveltekit:prefetch href={`/email?project=${$project}`} title="Users">
+						<a href={`/email?project=${$project}`} title="Users">
 							<div class="menu-item" class:is-active={menu === 'email'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-envelope"></i>
@@ -208,7 +208,7 @@
 		</div>
 	</div>
 
-	<div class="_mgt-16px _pdbt-12px">
+	<div class="_mgt-16px _pdbt-12px" data-sveltekit-prefetch="off">
 		<div class="_pdh-12px _mgbt-12px">
 			<hr>
 		</div>

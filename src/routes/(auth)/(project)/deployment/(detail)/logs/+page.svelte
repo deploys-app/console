@@ -32,5 +32,5 @@
 </script>
 
 <h6><strong>Logs</strong></h6>
-<a class="button -info -small _jtfs-fst" href={`${deployment.logUrl}&type=text&raw=1`} target="_blank">Stream Raw Logs</a>
+<a data-sveltekit-prefetch="off" class="button -info -small _jtfs-fst" href={`${deployment.logUrl}&type=text&raw=1`} target="_blank">Stream Raw Logs</a>
 <pre class="_pdv-30px pre-scoll" id="js-logs">{text}</pre>

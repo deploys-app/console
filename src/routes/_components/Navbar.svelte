@@ -38,7 +38,7 @@
 			<div class="popup" transition:scale={{ duration: 160 }}>
 				<ul class="user-menu">
 					<li>
-						<a sveltekit:prefetch class="item _dp-b" href="/billing" on:click={close}>
+						<a class="item _dp-b" href="/billing" on:click={close}>
 							Billing accounts
 						</a>
 					</li>
