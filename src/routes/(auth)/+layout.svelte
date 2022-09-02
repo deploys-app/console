@@ -5,7 +5,7 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import * as stores from '$lib/stores'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import api from '$lib/api'
 	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
 

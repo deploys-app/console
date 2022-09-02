@@ -14,26 +14,26 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-cloudflare": "=1.0.0-next.32",
-    "@sveltejs/kit": "=1.0.0-next.442",
+    "@sveltejs/kit": "=1.0.0-next.463",
     "clipboard": "^2.0.11",
     "cookie": "^0.5.0",
     "dayjs": "^1.11.5",
-    "eslint": "^8.22.0",
+    "eslint": "^8.23.0",
     "eslint-plugin-svelte3": "^4.0.0",
     "gravatar-url": "^4.0.1",
-    "highcharts": "^10.2.0",
+    "highcharts": "^10.2.1",
     "js-cookie": "^3.0.1",
     "json-bigint": "^1.0.0",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
-    "sass": "^1.54.5",
+    "sass": "^1.54.8",
     "svelte": "^3.49.0",
-    "svelte-check": "^2.8.1",
+    "svelte-check": "^2.9.0",
     "svelte-preprocess": "^4.10.7",
     "sweetalert2": "^11.4.29",
     "typescript": "~4.8.2",
     "valid-url": "^1.0.9",
-    "vite": "^3.0.9"
+    "vite": "^3.1.0-beta.1"
   },
   "type": "module"
 }

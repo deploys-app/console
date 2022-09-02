@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte'
 	import format from '$lib/format'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data

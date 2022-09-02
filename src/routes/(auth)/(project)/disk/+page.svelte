@@ -4,7 +4,7 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import format from '$lib/format'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 

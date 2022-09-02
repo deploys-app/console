@@ -4,7 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
 	import format from '$lib/format'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import { onDestroy } from 'svelte'
 	import api from '$lib/api'
 
