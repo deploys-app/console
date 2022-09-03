@@ -208,7 +208,7 @@
 		</div>
 	</div>
 
-	<div class="_mgt-16px _pdbt-12px" data-sveltekit-prefetch="off">
+	<div class="_mgt-16px _pdbt-12px">
 		<div class="_pdh-12px _mgbt-12px">
 			<hr>
 		</div>

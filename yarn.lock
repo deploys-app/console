@@ -174,9 +174,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.463":
-  version: 1.0.0-next.463
-  resolution: "@sveltejs/kit@npm:1.0.0-next.463"
+"@sveltejs/kit@npm:=1.0.0-next.464":
+  version: 1.0.0-next.464
+  resolution: "@sveltejs/kit@npm:1.0.0-next.464"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.4
     cookie: ^0.5.0
@@ -195,7 +195,7 @@ __metadata:
     vite: ^3.1.0-beta.1
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 2b2df88fb33536b85b3295a9bc32b951202835493dc3527ce1a9fd550857946fb0a8a99631db1c2d7c7dd69a3560040d3a4c24011de29689e4c019d16f0f8e2f
+  checksum: 36f3bbab88154c05788ed8e8b5fa16329392b5f5ea5eaf3b5d471b92667725cc23df2bce080020b0d49248cde292f99bc8150a81fb8457e07449a78e995915fb
   languageName: node
   linkType: hard
 
@@ -568,7 +568,7 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.32
-    "@sveltejs/kit": =1.0.0-next.463
+    "@sveltejs/kit": =1.0.0-next.464
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.5
@@ -581,7 +581,7 @@ __metadata:
     prettier: ^2.7.1
     prettier-plugin-svelte: ^2.7.0
     sass: ^1.54.8
-    svelte: ^3.49.0
+    svelte: ^3.50.0
     svelte-check: ^2.9.0
     svelte-preprocess: ^4.10.7
     sweetalert2: ^11.4.29
@@ -2893,10 +2893,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^3.49.0":
-  version: 3.49.0
-  resolution: "svelte@npm:3.49.0"
-  checksum: 5b7cb8dbf6b6581b50fab1de63cbcb81816081a1240b03e234b299268fff2f3237bf8f92b683a848f95453353b5694dfe26fa05a55da185a4bb0cd8b80d87dd4
+"svelte@npm:^3.50.0":
+  version: 3.50.0
+  resolution: "svelte@npm:3.50.0"
+  checksum: cc8e8fd14bac3add208b00b9c2ffd64d343f29f84a626899762b3c9d00010cab5f49dce44d376acb270f996c860ad49b727d2bf140f434f2b959061b22249548
   languageName: node
   linkType: hard
 
