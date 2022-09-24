@@ -59,14 +59,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@humanwhocodes/config-array@npm:^0.10.4":
-  version: 0.10.4
-  resolution: "@humanwhocodes/config-array@npm:0.10.4"
+"@humanwhocodes/config-array@npm:^0.10.5":
+  version: 0.10.5
+  resolution: "@humanwhocodes/config-array@npm:0.10.5"
   dependencies:
     "@humanwhocodes/object-schema": ^1.2.1
     debug: ^4.1.1
     minimatch: ^3.0.4
-  checksum: d480e5d57e6d787565b6cff78e27c3d1b380692d4ffb0ada7d7f5957a56c9032f034da05a3e443065dbd0671ebf4d859036ced34e96b325bbc1badbae3c05300
+  checksum: af4fa2633c57414be22ddba0a072cc611ef9a07104542fa24bde918a0153b89b6e08ca6a20ccc9079de6079e219e2406e38414d1b662db8bb59a3ba9d6eee6e3
   languageName: node
   linkType: hard
 
@@ -190,9 +190,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.497":
-  version: 1.0.0-next.497
-  resolution: "@sveltejs/kit@npm:1.0.0-next.497"
+"@sveltejs/kit@npm:=1.0.0-next.502":
+  version: 1.0.0-next.502
+  resolution: "@sveltejs/kit@npm:1.0.0-next.502"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.0.5
     "@types/cookie": ^0.5.1
@@ -212,7 +212,7 @@ __metadata:
     vite: ^3.1.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 8c4edfd2461c849848cf9af9a7e2cfee92f78f7e7b5a809de3653eff0c05ca7cf34864b42c0dc66524f2705c3af4ca3617be78f205c1f3dc09614a6bde21e9a9
+  checksum: 1ecfb65564f2c78e4bae8185417eaa4ddf706ebd8a5d6060f83a49338d5a43acec9073389ddf3e0eea838d8d8c3c252c6c5f7992aa376bfc968a22f3a549afde
   languageName: node
   linkType: hard
 
@@ -592,11 +592,11 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.38
-    "@sveltejs/kit": =1.0.0-next.497
+    "@sveltejs/kit": =1.0.0-next.502
     clipboard: ^2.0.11
     cookie: ^0.5.0
     dayjs: ^1.11.5
-    eslint: ^8.23.1
+    eslint: ^8.24.0
     eslint-plugin-svelte3: ^4.0.0
     gravatar-url: ^4.0.1
     highcharts: ^10.2.1
@@ -1257,12 +1257,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.23.1":
-  version: 8.23.1
-  resolution: "eslint@npm:8.23.1"
+"eslint@npm:^8.24.0":
+  version: 8.24.0
+  resolution: "eslint@npm:8.24.0"
   dependencies:
     "@eslint/eslintrc": ^1.3.2
-    "@humanwhocodes/config-array": ^0.10.4
+    "@humanwhocodes/config-array": ^0.10.5
     "@humanwhocodes/gitignore-to-minimatch": ^1.0.2
     "@humanwhocodes/module-importer": ^1.0.1
     ajv: ^6.10.0
@@ -1302,7 +1302,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: a727e15492786a03b438bcf021db49f715680679846a7b8d79b98ad34576f2a570404ffe882d3c3e26f6359bff7277ef11fae5614bfe8629adb653f20d018c71
+  checksum: ca293ce7116599b742d7ab4d43db469beec22f40dd272092d809498be3cff3a7c567769f9763bdf6799aac13dd53447b93a99629b7b54092783046eb57eaced6
   languageName: node
   linkType: hard
 
