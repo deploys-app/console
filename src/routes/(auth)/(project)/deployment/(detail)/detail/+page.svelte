@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import modal from '$lib/modal'
 	import api from '$lib/api'
+	import Secret from '$lib/components/Secret.svelte'
 
 	export let data
 	$: ({
@@ -217,7 +218,9 @@
 		{#each Object.entries(deployment.env || {}) as [k, v]}
 			<tr>
 				<td>{k}</td>
-				<td>{v}</td>
+				<td>
+					<Secret value={v} />
+				</td>
 			</tr>
 		{:else}
 			<tr>
