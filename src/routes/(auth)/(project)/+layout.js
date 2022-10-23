@@ -2,7 +2,7 @@ import { redirect } from '@sveltejs/kit'
 
 export function load ({ url, data }) {
 	const pageProject = url.searchParams.get('project')
-	const { restoreProject } = data
+	const { restoreProject } = data || {} // TODO: break when csr
 
 	if (!pageProject && restoreProject) {
 		const q = new URLSearchParams(url.search)

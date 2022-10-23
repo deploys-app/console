@@ -1,6 +1,6 @@
 <script>
 	import Cookie from 'js-cookie'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 
 	export let data
 

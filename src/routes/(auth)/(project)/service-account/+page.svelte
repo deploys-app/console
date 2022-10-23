@@ -40,7 +40,7 @@
 				{#each serviceAccounts as it}
 					<tr>
 						<td>
-							<a sveltekit:prefetch class="link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
+							<a class="link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
 								{it.email}
 							</a>
 						</td>

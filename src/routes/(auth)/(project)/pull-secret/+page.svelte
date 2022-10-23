@@ -4,7 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import format from '$lib/format'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 
@@ -61,7 +61,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a sveltekit:prefetch class="link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

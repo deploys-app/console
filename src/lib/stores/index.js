@@ -16,8 +16,8 @@ export const loading = derived(
 		if (!$navigating) {
 			return false
 		}
-		if ($navigating.from?.pathname === $navigating.to?.pathname) {
+		if ($navigating.from?.url.pathname === $navigating.to?.url.pathname) {
 			return true
 		}
-		return $page.url.toString() === $navigating.to?.toString()
+		return $page.url.toString() === $navigating.to?.url.toString()
 	})

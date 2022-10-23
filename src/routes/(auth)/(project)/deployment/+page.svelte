@@ -3,7 +3,7 @@
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { browser } from '$app/env'
+	import { browser } from '$app/environment'
 	import format from '$lib/format'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
@@ -66,7 +66,7 @@
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
-							<a sveltekit:prefetch class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

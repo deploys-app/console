@@ -29,7 +29,7 @@
 			{#each billingAccounts as it}
 				<tr>
 					<td>
-						<a sveltekit:prefetch class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
+						<a class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
 					<td class="_tal-ct">
