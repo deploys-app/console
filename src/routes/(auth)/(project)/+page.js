@@ -9,7 +9,7 @@ export async function load ({ parent, fetch }) {
 		api.invoke('billing.project', { project }, fetch)
 	])
 
-	if (!projectInfo.ok && projectInfo.error.forbidden) {
+	if (!projectInfo.ok && (projectInfo.error.forbidden || projectInfo.error.notFound)) {
 		throw redirect(302, '/project')
 	}
 
