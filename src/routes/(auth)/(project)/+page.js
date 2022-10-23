@@ -1,4 +1,4 @@
-import {error, redirect} from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
