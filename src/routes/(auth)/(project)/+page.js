@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
@@ -8,6 +8,10 @@ export async function load ({ parent, fetch }) {
 		api.invoke('project.usage', { project }, fetch),
 		api.invoke('billing.project', { project }, fetch)
 	])
+
+	if (!projectInfo.ok && (projectInfo.error.forbidden || projectInfo.error.notFound)) {
+		throw redirect(302, '/project')
+	}
 
 	if (!usage.ok && usage.error.forbidden) {
 		usage.ok = true
