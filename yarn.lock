@@ -180,9 +180,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.526":
-  version: 1.0.0-next.526
-  resolution: "@sveltejs/kit@npm:1.0.0-next.526"
+"@sveltejs/kit@npm:=1.0.0-next.528":
+  version: 1.0.0-next.528
+  resolution: "@sveltejs/kit@npm:1.0.0-next.528"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.1.0
     "@types/cookie": ^0.5.1
@@ -201,13 +201,13 @@ __metadata:
     vite: ^3.1.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 7ab27981162259e1832b2391cf6d463d3021e482be53a2307ac4a1dbd5ea8c2f0c2c6204c98a3a068047fc5e7b1920edb4d08c6abc0c339a80a28f73364b60f2
+  checksum: 150cf9b660376f0144872cfd6f14588cba86824a7846853a99f34963f73a07fc1e54275115137521f34227d1239724456da87d5b3559f891c02a1c17d199c326
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@patch:@sveltejs/kit@npm:=1.0.0-next.526#.yarn/patches/@sveltejs-kit-npm-1.0.0-next.522-805dea7f8b.patch::locator=console%40workspace%3A.":
-  version: 1.0.0-next.526
-  resolution: "@sveltejs/kit@patch:@sveltejs/kit@npm%3A1.0.0-next.526#.yarn/patches/@sveltejs-kit-npm-1.0.0-next.522-805dea7f8b.patch::version=1.0.0-next.526&hash=e3668a&locator=console%40workspace%3A."
+"@sveltejs/kit@patch:@sveltejs/kit@npm:=1.0.0-next.528#.yarn/patches/@sveltejs-kit-npm-1.0.0-next.522-805dea7f8b.patch::locator=console%40workspace%3A.":
+  version: 1.0.0-next.528
+  resolution: "@sveltejs/kit@patch:@sveltejs/kit@npm%3A1.0.0-next.528#.yarn/patches/@sveltejs-kit-npm-1.0.0-next.522-805dea7f8b.patch::version=1.0.0-next.528&hash=e3668a&locator=console%40workspace%3A."
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.1.0
     "@types/cookie": ^0.5.1
@@ -226,7 +226,7 @@ __metadata:
     vite: ^3.1.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: bc492335a2a686a2554c6a8c199d2e20ac8d85fb4a9ce65f51df7849c4f23f3fe1f300248ee916c48daa805e86253a237dbb93c5face443cd5f31cb79f96db83
+  checksum: 37300d4a20a9371f14260407d93dff4ad775b134d751c059fdb02ceb56a9957e10c949f05a88785df54211b07fac330274b8d19a2d891feaf6eca46bc49937ad
   languageName: node
   linkType: hard
 
@@ -607,7 +607,7 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.39
-    "@sveltejs/kit": =1.0.0-next.526
+    "@sveltejs/kit": =1.0.0-next.528
     clipboard: ^2.0.11
     dayjs: ^1.11.6
     eslint: ^8.26.0

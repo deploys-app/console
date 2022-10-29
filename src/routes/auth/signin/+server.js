@@ -19,7 +19,7 @@ function randomState () {
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
-export async function GET ({ locals, url }) {
+export async function GET ({ cookies, url }) {
 	const state = randomState()
 
 	const callback = new URL(url.toString())
@@ -29,7 +29,13 @@ export async function GET ({ locals, url }) {
 	q.set('callback', callback.toString())
 	q.set('state', state)
 
-	locals.state = state
+	cookies.set('state', state, {
+		httpOnly: true,
+		maxAge: 60 * 60,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
 
 	return new Response(undefined, {
 		status: 302,
