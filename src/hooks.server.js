@@ -1,5 +1,4 @@
 import { sequence } from '@sveltejs/kit/hooks'
-import cookie from 'cookie'
 
 const cookieOptions = {
 	httpOnly: true,
@@ -18,12 +17,11 @@ const cookieRemoveOptions = {
 }
 
 async function handleCookie ({ event, resolve }) {
-	const { request, locals, url } = event
-	const cs = cookie.parse(request.headers.get('cookie') || '')
+	const { cookies, locals, url } = event
 
-	locals.token = cs.token || ''
-	locals.project = cs.project || ''
-	locals.state = cs.state
+	locals.token = cookies.get('token') || ''
+	locals.project = cookies.get('project') || ''
+	locals.state = cookies.get('state')
 
 	if (url.pathname.startsWith('/api/')) {
 		return resolve(event)
@@ -32,11 +30,11 @@ async function handleCookie ({ event, resolve }) {
 	const resp = await resolve(event)
 
 	if (resp.headers.get('content-type') === 'text/html' || resp.status === 302) {
-		resp.headers.append('set-cookie', cookie.serialize('token', locals.token, cookieOptions))
+		cookies.set('token', locals.token, cookieOptions)
 		if (locals.state === null) {
-			resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieRemoveOptions))
+			cookies.set('state', locals.state, cookieRemoveOptions)
 		} else if (locals.state) {
-			resp.headers.append('set-cookie', cookie.serialize('state', locals.state, cookieOptions))
+			cookies.set('state', locals.state, cookieOptions)
 		}
 	}
 	return resp
