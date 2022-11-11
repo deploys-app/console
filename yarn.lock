@@ -178,14 +178,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.0.0-next.531":
-  version: 1.0.0-next.531
-  resolution: "@sveltejs/kit@npm:1.0.0-next.531"
+"@sveltejs/kit@npm:=1.0.0-next.542":
+  version: 1.0.0-next.542
+  resolution: "@sveltejs/kit@npm:1.0.0-next.542"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^1.1.0
     "@types/cookie": ^0.5.1
     cookie: ^0.5.0
-    devalue: ^4.0.1
+    devalue: ^4.2.0
     kleur: ^4.1.5
     magic-string: ^0.26.7
     mime: ^3.0.0
@@ -196,10 +196,10 @@ __metadata:
     undici: 5.12.0
   peerDependencies:
     svelte: ^3.44.0
-    vite: ^3.1.0
+    vite: ^3.2.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 37f5c3b708a8b88ba5bd0f75571a00c04f201ea980d832ded29622b206c48ec3593b8b922118ae0340d4faa325d21abc3a953a869d1afbfd059d90e617b5af0b
+  checksum: 3c55048c19ac5859429751fcf16604ce9e06b824235b7dd4a02773052b588535967d39c449680a3c102aa60e7d5ebc33b0a7834bf18a706de66dece7a29ae346
   languageName: node
   linkType: hard
 
@@ -580,10 +580,10 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@sveltejs/adapter-cloudflare": =1.0.0-next.40
-    "@sveltejs/kit": =1.0.0-next.531
+    "@sveltejs/kit": =1.0.0-next.542
     clipboard: ^2.0.11
     dayjs: ^1.11.6
-    eslint: ^8.26.0
+    eslint: ^8.27.0
     eslint-plugin-svelte3: ^4.0.0
     gravatar-url: ^4.0.1
     highcharts: ^10.3.1
@@ -591,14 +591,14 @@ __metadata:
     json-bigint: ^1.0.0
     prettier: ^2.7.1
     prettier-plugin-svelte: ^2.8.0
-    sass: ^1.55.0
-    svelte: ^3.52.0
+    sass: ^1.56.1
+    svelte: ^3.53.1
     svelte-check: ^2.9.2
     svelte-preprocess: ^4.10.7
-    sweetalert2: ^11.6.5
+    sweetalert2: ^11.6.8
     typescript: ~4.8.4
     valid-url: ^1.0.9
-    vite: ^3.2.2
+    vite: ^3.2.3
   languageName: unknown
   linkType: soft
 
@@ -681,10 +681,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devalue@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "devalue@npm:4.0.1"
-  checksum: c7acc645e29482129a5e43e5b3896ed68939a3696cbe4d5a5e1d5e9e4a906f18253b6f4b58b7523ff1ac6c1183fb4aabd08ff83bd7cbc83efaad9a64d2a1e09b
+"devalue@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "devalue@npm:4.2.0"
+  checksum: 29f29f72255b6330030773e02def96aa118dc410f5f2d2d389d674068bd2a698668421a0d2176d7c98e7941cbe5d535a251002d589ecc222f6e2b16783351b3d
   languageName: node
   linkType: hard
 
@@ -1220,9 +1220,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.26.0":
-  version: 8.26.0
-  resolution: "eslint@npm:8.26.0"
+"eslint@npm:^8.27.0":
+  version: 8.27.0
+  resolution: "eslint@npm:8.27.0"
   dependencies:
     "@eslint/eslintrc": ^1.3.3
     "@humanwhocodes/config-array": ^0.11.6
@@ -1265,7 +1265,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: a2aced939ea060f77d10dcfced5cfeb940f63f383fd7ab1decadea64170ab552582e1c5909db1db641d4283178c9bc569f19b0f8900e00314a5f783e4b3f759d
+  checksum: 153b022d309e1b647a73b1bb0fa98912add699b06e279084155f23c6f2b5fc5abd05411fc1ba81608a24bbfaf044ca079544c16fffa6fc987b8f676c9960a2c4
   languageName: node
   linkType: hard
 
@@ -2500,16 +2500,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.55.0":
-  version: 1.55.0
-  resolution: "sass@npm:1.55.0"
+"sass@npm:^1.56.1":
+  version: 1.56.1
+  resolution: "sass@npm:1.56.1"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: 7d769ed08efce4e6134e0f3dc11c4f07e32c413ac8eb43c5855f2686890fdcbd80da34165c91fb4ba407f478ca108e171574b5a60cb9814a5ed09d80f6014f96
+  checksum: 78e693e5992b149574c95d5adfe39ca3e5b97d80befa11191a20d1daa41fe201a98ac099beab726cd3095e2d2e7991a2c408ba0fcc3fa9f525879de7eee18dad
   languageName: node
   linkType: hard
 
@@ -2839,17 +2839,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^3.52.0":
-  version: 3.52.0
-  resolution: "svelte@npm:3.52.0"
-  checksum: a1fcbf63901055ee0224872aaf1e7736920ce8b9ced5b132c3d62506e11d125aa86ad1b889a08601ffa2b92fb96adc66e1b1c0c866d2f681788403d3e5f7b39e
+"svelte@npm:^3.53.1":
+  version: 3.53.1
+  resolution: "svelte@npm:3.53.1"
+  checksum: addf72d3d5daec3af0a37fcd9e1549ad2362cb631b32060674e0a6ed1e45388c459f8b7eeebf486fc411fbd9b882c5fcd70c017ddac94942d86f87888fc13102
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.6.5":
-  version: 11.6.5
-  resolution: "sweetalert2@npm:11.6.5"
-  checksum: 931bcd1277a88528d69e15afc79578d79a31265ae2e9ce8cb3241bc7878fb081ad3498c1c31ce86a2071be513fae2b8a898ed0362467ecf38aa864e968ce2b7b
+"sweetalert2@npm:^11.6.8":
+  version: 11.6.8
+  resolution: "sweetalert2@npm:11.6.8"
+  checksum: bcd0fa985bab7b4c0b5ffa6775aff45f6b0ca8279ea006fb203b9031b0a3e21234f0fca98a46305f0dd146b3412be4b89ce6ac4d341ccfff0c9cb5588810de00
   languageName: node
   linkType: hard
 
@@ -3020,9 +3020,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "vite@npm:3.2.2"
+"vite@npm:^3.2.3":
+  version: 3.2.3
+  resolution: "vite@npm:3.2.3"
   dependencies:
     esbuild: ^0.15.9
     fsevents: ~2.3.2
@@ -3030,6 +3030,7 @@ __metadata:
     resolve: ^1.22.1
     rollup: ^2.79.1
   peerDependencies:
+    "@types/node": ">= 14"
     less: "*"
     sass: "*"
     stylus: "*"
@@ -3039,6 +3040,8 @@ __metadata:
     fsevents:
       optional: true
   peerDependenciesMeta:
+    "@types/node":
+      optional: true
     less:
       optional: true
     sass:
@@ -3051,7 +3054,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 7197ac91c612dda922367a95afa1b210353d6168d41845c186e2217bda1328d17b021b93d8089e336f9533b94645ae5dca18bb10937759f559c87006dd957fcd
+  checksum: 3c7c618f7fb471cdfaf7f8eb769cb5f4174447e1103cd6221cbc2ae1ea1102bc28dd6a621ead250e6aa42c1e9ee3c8092666ea81078e1d88d2325c484218fd0a
   languageName: node
   linkType: hard
 
