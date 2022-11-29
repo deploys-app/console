@@ -8,9 +8,6 @@ const config = {
 	}),
 	kit: {
 		adapter: adapter(),
-		prerender: {
-			enabled: false
-		},
 		alias: {
 			$style: './src/style'
 		}
