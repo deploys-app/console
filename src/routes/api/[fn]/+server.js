@@ -13,5 +13,5 @@ export async function POST ({ locals, params, request }) {
 			authorization: `bearer ${token}`
 		}
 	})
-	return new Response(await resp.text(), { status: resp.status })
+	return new Response(resp.body, { status: resp.status })
 }
