@@ -87,7 +87,9 @@
 						<option value="cloudflare">Cloudflare</option>
 					{/if}
 					<option value="hostname">Hostname</option>
-					<option value="wildcard">Wildcard</option>
+					{#if projectInfo.config.domainWildcard}
+						<option value="wildcard">Wildcard</option>
+					{/if}
 				</select>
 			</div>
 		</div>
