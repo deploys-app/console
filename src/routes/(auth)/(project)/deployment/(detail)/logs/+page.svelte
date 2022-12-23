@@ -17,7 +17,7 @@
 		source.addEventListener("message", (ev) => {
 			try {
 				const d = JSON.parse(ev.data);
-				buffer = `${d.pod} ${d.log}\n${buffer}`;
+				buffer = `${d.pod} ${d.timestamp} ${d.log}\n${buffer}`;
 			} catch (err) {}
 		});
 		const interval = setInterval(() => {
@@ -45,7 +45,6 @@
 
 <style>
 	.pre-scoll {
-		overflow-x: auto;
 		font-size: 12px;
 	}
 </style>
