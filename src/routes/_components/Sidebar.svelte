@@ -184,7 +184,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/service-account?project=${$project}`} title="Users">
+						<a href={`/service-account?project=${$project}`} title="Service Accounts">
 							<div class="menu-item" class:is-active={menu === 'service-account'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-lock"></i>
@@ -194,7 +194,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/email?project=${$project}`} title="Users">
+						<a href={`/email?project=${$project}`} title="Emails">
 							<div class="menu-item" class:is-active={menu === 'email'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-envelope"></i>
