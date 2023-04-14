@@ -172,10 +172,12 @@
 			<td>Pull Secret</td>
 			<td>{deployment.pullSecret || '-'}</td>
 		</tr>
-		<tr>
-			<td>Workload Identity</td>
-			<td>{deployment.workloadIdentity || '-'}</td>
-		</tr>
+		{#if location.features.workloadIdentity}
+			<tr>
+				<td>Workload Identity</td>
+				<td>{deployment.workloadIdentity || '-'}</td>
+			</tr>
+		{/if}
 		<!--{{/*			<tr>*/}}-->
 		<!--{{/*				<td>CPU allocated</td>*/}}-->
 		<!--{{/*				<td>{{.Deployment.Resources.Requests.CPU | textDeploymentCPU}}</td>*/}}-->
