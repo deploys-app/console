@@ -20,7 +20,7 @@
 		if (browser) {
 			const hasPending = disks.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('disk.list'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('disk.list'), 4000)
 			}
 		}
 	}

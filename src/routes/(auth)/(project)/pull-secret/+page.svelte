@@ -20,7 +20,7 @@
 		if (browser) {
 			const hasPending = pullSecrets.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('pullSecret.list'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('pullSecret.list'), 4000)
 			}
 		}
 	}

@@ -19,7 +19,7 @@
 
 	$: {
 		if (browser) {
-			const reloadTime = deployments.some((x) => x.status === 'pending') ? 2000 : 300000
+			const reloadTime = deployments.some((x) => x.status === 'pending') ? 4000 : 300000
 			pendingTimeout = setTimeout(() => api.invalidate('deployment.list'), reloadTime)
 		}
 	}

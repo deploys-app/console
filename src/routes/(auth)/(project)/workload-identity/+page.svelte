@@ -20,7 +20,7 @@
 		if (browser) {
 			const hasPending = workloadIdentities.some((x) => x.status === 'pending')
 			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('workloadIdentity.list'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('workloadIdentity.list'), 4000)
 			}
 		}
 	}

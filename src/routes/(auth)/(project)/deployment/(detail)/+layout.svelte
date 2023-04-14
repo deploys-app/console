@@ -15,7 +15,7 @@
 		if (browser) {
 			const isPending = deployment.status === 'pending'
 			if (isPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('deployment.get'), 2000)
+				pendingTimeout = setTimeout(() => api.invalidate('deployment.get'), 4000)
 			}
 		}
 	}
