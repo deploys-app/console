@@ -68,7 +68,7 @@
 								{it.name}
 							</a>
 						</td>
-						<td>{it.type}</td>
+						<td>{format.deploymentType(it.type)}</td>
 	<!--					<td>{format.cpu(it.resources.requests.cpu)}</td>-->
 						<td>{format.memory(it.resources.requests.memory)}</td>
 						<td>
