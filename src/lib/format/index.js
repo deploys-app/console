@@ -38,12 +38,5 @@ export default {
 			TCPService: 'TCP Service',
 			InternalTCPService: 'Internal TCP Service'
 		}[t] || t
-	},
-	domainType (t) {
-		return {
-			cloudflare: 'Cloudflare',
-			hostname: 'Hostname',
-			wildcard: 'Wildcard'
-		}[t] || t
 	}
 }
