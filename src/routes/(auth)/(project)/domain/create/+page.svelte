@@ -13,7 +13,8 @@
 	const form = {
 		domain: '',
 		location: '',
-		type: ''
+		cdn: true,
+		wildcard: false
 	}
 
 	let saving
@@ -28,7 +29,8 @@
 				project,
 				location: form.location,
 				domain: form.domain,
-				type: form.type
+				cdn: form.cdn,
+				wildcard: form.wildcard
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -78,19 +80,22 @@
 			</div>
 		</div>
 
+		<div class="field _mgt-12px">
+			<label>Advanced Settings</label>
+		</div>
+
+		{#if projectInfo.config.domainWildcard}
+			<div class="field _mgbt-20px">
+				<div class="checkbox">
+					<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
+					<label for="input-wildcard">Wildcard</label>
+				</div>
+			</div>
+		{/if}
 		<div class="field _mgbt-20px">
-			<label for="input-target_prefix">Type</label>
-			<div class="select">
-				<select id="input-target_prefix" bind:value={form.type} required>
-					<option value="" selected disabled>Select Type</option>
-					{#if projectInfo.config.domainCloudflare}
-						<option value="cloudflare">Cloudflare</option>
-					{/if}
-					<option value="hostname">Hostname</option>
-					{#if projectInfo.config.domainWildcard}
-						<option value="wildcard">Wildcard</option>
-					{/if}
-				</select>
+			<div class="checkbox">
+				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainCloudflare}>
+				<label for="input-cdn">CDN (DDoS Protection)</label>
 			</div>
 		</div>
 

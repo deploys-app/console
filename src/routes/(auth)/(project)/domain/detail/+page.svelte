@@ -129,37 +129,16 @@
 		})
 	}
 
-	function upgradeHostname () {
+	function upgradeCdn () {
 		modal.confirm({
-			html: `Upgrade "${domain.domain}" to Hostname ?<br><br>This action can not rollback.`,
+			html: `Add CDN to "${domain.domain}" ?<br><br>This action can not roll back.`,
 			yes: 'Upgrade to Hostname',
 			callback: async () => {
 				const resp = await api.invoke('domain.create', {
 					project,
 					location: domain.location,
 					domain: domain.domain,
-					type: 'hostname'
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				await api.invalidate('domain.get')
-				handleReload()
-			}
-		})
-	}
-
-	function upgradeWildcard () {
-		modal.confirm({
-			html: `Upgrade "${domain.domain}" to Wildcard ?<br><br>This action can not rollback.`,
-			yes: 'Upgrade to Wildcard',
-			callback: async () => {
-				const resp = await api.invoke('domain.create', {
-					project,
-					location: domain.location,
-					domain: domain.domain,
-					type: 'wildcard'
+					cdn: true
 				}, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
@@ -212,10 +191,16 @@
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
+		<div class="field _mgt-12px">
+			<div class="checkbox">
+				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
+				<label for="input-cdn">CDN (DDoS Protection)</label>
+			</div>
+		</div>
 		<div class="field">
-			<label for="input-type">Type</label>
-			<div class="input">
-				<input id="input-type" value={format.domainType(domain.type)} readonly disabled>
+			<div class="checkbox">
+				<input id="input-wildcard" type="checkbox" bind:checked={domain.wildcard} disabled readonly>
+				<label for="input-wildcard">Wildcard</label>
 			</div>
 		</div>
 		<div class="field">
@@ -343,7 +328,7 @@
 		{/if}
 	</div>
 
-	{#if domain.type !== 'cloudflare' && domain.status === 'success'}
+	{#if domain.cdn && domain.status === 'success'}
 	<div>
 		<div class="_mgbt-12px">
 			<strong>Purge Cache</strong>
@@ -372,11 +357,10 @@
 	</div>
 	{/if}
 
-	{#if domain.type === 'cloudflare'}
+	{#if !domain.cdn}
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="button -positive _mgr-12px" on:click={upgradeHostname}>Upgrade to Hostname</button>
-			<button class="button -positive" on:click={upgradeWildcard}>Upgrade to Wildcard</button>
+			<button class="button -positive _mgr-12px" on:click={upgradeCdn}>Add CDN (DDoS Protection)</button>
 		</div>
 	{/if}
 </div>

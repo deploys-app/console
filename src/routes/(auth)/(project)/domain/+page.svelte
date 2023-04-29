@@ -50,7 +50,8 @@
 			<thead>
 			<tr>
 				<th>Domain</th>
-				<th>Type</th>
+				<th>Wildcard</th>
+				<th>CDN</th>
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
@@ -59,7 +60,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="4" />
+				<LoadingRow span="5" />
 			{:else}
 				{#each domains?.items || [] as it}
 					<tr>
@@ -68,9 +69,17 @@
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>
-							{format.domainType(it.type)}
-							{#if !projectInfo.config.domainCloudflare && it.type === 'cloudflare'}
-								<i class="fa-solid fa-triangle-exclamation _cl-negative-500"></i>
+							{#if it.wildcard}
+								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+							{:else}
+								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
+							{/if}
+						</td>
+						<td>
+							{#if it.cdn}
+								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+							{:else}
+								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
 							{/if}
 						</td>
 						<td>{it.location}</td>
@@ -83,7 +92,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" forbidden={!permission.domains} />
+					<NoDataRow span="5" forbidden={!permission.domains} />
 				{/each}
 			{/if}
 			</tbody>
