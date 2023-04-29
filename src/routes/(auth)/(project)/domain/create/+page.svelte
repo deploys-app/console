@@ -94,7 +94,7 @@
 		{/if}
 		<div class="field _mgbt-20px">
 			<div class="checkbox">
-				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainCloudflare}>
+				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainAllowDisableCdn}>
 				<label for="input-cdn">CDN (DDoS Protection)</label>
 			</div>
 		</div>
