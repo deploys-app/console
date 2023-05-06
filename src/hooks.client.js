@@ -1,4 +1,3 @@
-import { handleErrorWithSentry } from '@sentry/sveltekit'
 import * as Sentry from '@sentry/sveltekit'
 import { env } from '$env/dynamic/public'
 
@@ -9,4 +8,4 @@ if (env.PUBLIC_SENTRY_DSN) {
 	})
 }
 
-export const handleError = handleErrorWithSentry()
+export const handleError = Sentry.handleErrorWithSentry()
