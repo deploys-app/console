@@ -1,19 +1,26 @@
-import { redirect } from '@sveltejs/kit'
+import { error, redirect } from '@sveltejs/kit'
+import api from '$lib/api'
 
-export function load ({ url, data }) {
-	const pageProject = url.searchParams.get('project')
+export async function load ({ url, data, fetch }) {
+	const project = url.searchParams.get('project')
 	const { restoreProject } = data || {}
 
-	if (!pageProject && restoreProject) {
+	if (!project && restoreProject) {
 		const q = new URLSearchParams(url.search)
 		q.set('project', restoreProject)
 		throw redirect(302, `?${q.toString()}`)
 	}
-	if (!pageProject) {
+	if (!project) {
 		throw redirect(302, '/project')
 	}
 
+	const locations = await api.invoke('location.list', { project }, fetch)
+	if (!locations.ok) {
+		throw error(500, `locations: ${locations.error.message}`)
+	}
+
 	return {
-		project: pageProject
+		project,
+		locations: locations.result.items || []
 	}
 }

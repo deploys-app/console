@@ -6,17 +6,7 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	const [
-		locations,
-		projectInfo
-	] = await Promise.all([
-		api.invoke('location.list', { project }, fetch),
-		api.invoke('project.get', { project }, fetch)
-	])
-
-	if (!locations.ok) {
-		throw error(500, `locations: ${locations.error.message}`)
-	}
+	const projectInfo = await api.invoke('project.get', { project }, fetch)
 	if (!projectInfo.ok) {
 		throw error(500, `project: ${project.error.message}`)
 	}
@@ -32,7 +22,6 @@ export async function load ({ url, parent, fetch }) {
 		}
 	}
 	return {
-		locations: locations.result.items || [],
 		quota: projectInfo.result.quota || {},
 		deployment: deployment?.result
 	}

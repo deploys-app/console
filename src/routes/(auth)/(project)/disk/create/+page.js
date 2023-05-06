@@ -6,11 +6,6 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	const locations = await api.invoke('location.list', { project }, fetch)
-	if (!locations.ok) {
-		throw error(500, `locations: ${locations.error.message}`)
-	}
-
 	let disk
 	if (location && name) {
 		disk = await api.invoke('disk.get', { project, location, name }, fetch)
@@ -23,7 +18,6 @@ export async function load ({ url, parent, fetch }) {
 	}
 
 	return {
-		locations: locations.result.items || [],
 		location,
 		name,
 		disk: disk?.result
