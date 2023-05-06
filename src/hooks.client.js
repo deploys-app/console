@@ -1,4 +1,5 @@
-import * as Sentry from '@sentry/svelte'
+import { handleErrorWithSentry } from '@sentry/sveltekit'
+import * as Sentry from '@sentry/sveltekit'
 import { env } from '$env/dynamic/public'
 
 if (env.PUBLIC_SENTRY_DSN) {
@@ -8,12 +9,4 @@ if (env.PUBLIC_SENTRY_DSN) {
 	})
 }
 
-/** @type {import('@sveltejs/kit').HandleClientError} */
-export async function handleError({ error, event }) {
-	Sentry.captureException(error, { contexts: { sveltekit: { event } } })
-
-	return {
-		// @ts-ignore
-		message: error.message || 'Unknown Error'
-	}
-}
+export const handleError = handleErrorWithSentry()

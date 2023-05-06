@@ -1,13 +1,4 @@
-import * as Sentry from '@sentry/node'
 import { sequence } from '@sveltejs/kit/hooks'
-import { env } from '$env/dynamic/public'
-
-if (env.PUBLIC_SENTRY_DSN) {
-	Sentry.init({
-		dsn: env.PUBLIC_SENTRY_DSN,
-		tracesSampleRate: 1
-	})
-}
 
 /** @type {import('@sveltejs/kit').Handle} */
 async function handleCookie ({ event, resolve }) {
@@ -36,18 +27,6 @@ function storeProject ({ event, resolve }) {
 }
 
 export const handle = sequence(
-	// Sentry.sentryHandle(),
 	handleCookie,
 	storeProject
 )
-// export const handleError = Sentry.handleErrorWithSentry()
-
-/** @type {import('@sveltejs/kit').HandleServerError} */
-export function handleError ({ error, event }) {
-	Sentry.captureException(error, { contexts: { sveltekit: { event } } })
-
-	return {
-		// @ts-ignore
-		message: error.message || 'Unknown Error'
-	}
-}
