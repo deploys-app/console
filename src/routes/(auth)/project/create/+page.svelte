@@ -5,7 +5,11 @@
 
 	export let data
 
-	const { project, billingAccounts } = data
+	/** @type {import('$types').ProjectItem} */
+	const project = data.project
+
+	/** @type {import('$types').BillingAccount[]} */
+	const billingAccounts = data.billingAccounts
 
 	const form = {
 		sid: project?.project || '',
@@ -13,7 +17,7 @@
 		billingAccount: project?.billingAccount || ''
 	}
 
-	let saving
+	let saving = false
 	async function save () {
 		if (saving) {
 			return

@@ -8,7 +8,9 @@
 		id,
 		serviceAccount
 	} = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	let sid = serviceAccount?.sid
 	let name = serviceAccount?.name

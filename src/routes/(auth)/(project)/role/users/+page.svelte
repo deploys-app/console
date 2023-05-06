@@ -6,11 +6,15 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		users
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let users
+	$: users = data.users
 
 	function deleteUser (email) {
 		modal.confirm({

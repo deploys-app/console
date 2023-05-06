@@ -6,11 +6,15 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		routes
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let routes
+	$: routes = data.routes
 
 	function deleteRoute (route) {
 		modal.confirm({

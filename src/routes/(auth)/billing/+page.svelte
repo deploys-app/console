@@ -2,7 +2,10 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
-	$: ({ billingAccounts } = data)
+
+	/** @type {import('$types').BillingAccount[]} */
+	let billingAccounts
+	$: billingAccounts = data.billingAccounts
 </script>
 
 <h6>Billing</h6>

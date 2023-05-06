@@ -6,7 +6,9 @@
 	import * as hc from '$lib/hc'
 
 	export let data
-	$: ({ deployment } = data)
+
+	let deployment
+	$: deployment = data.deployment
 
 	const reloadInterval = 60 * 1000 // 1m
 

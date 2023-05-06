@@ -8,12 +8,18 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		location,
-		name,
-		disk
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let location
+	$: location = data.location
+
+	let name
+	$: name = data.name
+
+	let disk
+	$: disk = data.disk
 
 	let pendingTimeout
 	$: {

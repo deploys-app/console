@@ -6,12 +6,18 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		location,
-		name,
-		pullSecret
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let location
+	$: location = data.location
+
+	let name
+	$: name = data.name
+
+	let pullSecret
+	$: pullSecret = data.pullSecret
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

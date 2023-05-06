@@ -1,5 +1,6 @@
 import { sequence } from '@sveltejs/kit/hooks'
 
+/** @type {import('@sveltejs/kit').Handle} */
 async function handleCookie ({ event, resolve }) {
 	const { cookies, locals } = event
 
@@ -9,6 +10,7 @@ async function handleCookie ({ event, resolve }) {
 	return resolve(event)
 }
 
+/** @type {import('@sveltejs/kit').Handle} */
 function storeProject ({ event, resolve }) {
 	const { url, locals } = event
 

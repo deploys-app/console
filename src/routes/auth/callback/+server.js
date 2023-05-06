@@ -1,3 +1,4 @@
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
 	const state = url.searchParams.get('state')
 	const code = url.searchParams.get('code')

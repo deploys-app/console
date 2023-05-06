@@ -1,3 +1,4 @@
+/** @type {Crypto} */
 let webcrypto
 
 // workaround for dev
@@ -13,12 +14,17 @@ if (typeof crypto === 'undefined') {
 	webcrypto = crypto
 }
 
+/**
+ * randomState generates a random string for OAuth2 state
+ * @returns {string}
+ */
 function randomState () {
 	const x = new Uint8Array(16)
 	webcrypto.getRandomValues(x)
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
 	const state = randomState()
 

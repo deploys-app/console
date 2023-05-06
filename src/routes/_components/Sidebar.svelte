@@ -3,8 +3,15 @@
 	import { page } from '$app/stores'
 	import { project } from '$lib/stores'
 
+	/** @type {import('$types').ProjectItem[]} */
 	export let projects
+
+	/** @type {string} */
+	let menu
 	$: menu = $page.data.menu || ''
+
+	/** @type {string} */
+	let projectName
 	$: projectName = projects.find((p) => p.project === $project)?.name || $project
 
 	const dispatch = createEventDispatcher()

@@ -4,10 +4,12 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		locations
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let locations
+	$: locations = data.locations
 
 	const form = {
 		domain: '',

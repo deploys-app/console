@@ -5,11 +5,15 @@
 	import { loading } from '$lib/stores'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		serviceAccounts
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let serviceAccounts
+	$: serviceAccounts = data.serviceAccounts
 </script>
 
 <h6>Service Accounts</h6>

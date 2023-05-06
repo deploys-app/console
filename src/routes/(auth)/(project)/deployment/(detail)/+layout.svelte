@@ -5,10 +5,12 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		deployment
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let deployment
+	$: deployment = data.deployment
 
 	let pendingTimeout
 	$: {

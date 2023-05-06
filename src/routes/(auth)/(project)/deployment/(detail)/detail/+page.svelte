@@ -8,10 +8,12 @@
 	import Secret from '$lib/components/Secret.svelte'
 
 	export let data
-	$: ({
-		deployment,
-		location
-	} = data)
+
+	let deployment
+	$: deployment = data.deployment
+
+	let location
+	$: location = data.location
 
 	$: hasExternalTCPAddress = ['TCPService'].includes(deployment.type)
 	$: hasInternalTCPAddress = ['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type)

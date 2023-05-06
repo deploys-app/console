@@ -11,7 +11,9 @@
 		quota,
 		deployment
 	} = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	const permission = {
 		pullSecrets: true,

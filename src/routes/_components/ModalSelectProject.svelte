@@ -3,10 +3,14 @@
 	import { goto } from '$app/navigation'
 	import { project } from '$lib/stores'
 
+	/** @type {import('$types').ProjectItem[]} */
 	export let projects
 
-	let isActive
+	let isActive = false
 
+	/**
+	 * @param {string} sid
+	 */
 	function setProject (sid) {
 		close()
 

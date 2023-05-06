@@ -6,7 +6,9 @@
 
 	export let data
 	const { locations } = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	const form = {
 		name: '',

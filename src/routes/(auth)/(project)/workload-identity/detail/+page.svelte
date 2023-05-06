@@ -8,7 +8,12 @@
 
 	export let data
 
-	$: ({ workloadIdentity, project } = data)
+	let workloadIdentity
+	$: workloadIdentity = data.workloadIdentity
+
+	let project
+	$: project = data.project
+
 	// export let location
 
 	onMount(() => {

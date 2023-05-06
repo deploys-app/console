@@ -3,6 +3,8 @@ import api from '$lib/api'
 
 export async function load ({ url, fetch }) {
 	const project = url.searchParams.get('project')
+
+	/** @type {ApiResponse<ProjectItem>} */
 	let projectInfo
 	if (project) {
 		projectInfo = await api.invoke('project.get', { project }, fetch)
@@ -14,6 +16,7 @@ export async function load ({ url, fetch }) {
 		}
 	}
 
+	/** @type {ApiResponse<List<BillingAccount>>} */
 	const billingAccounts = await api.invoke('billing.list', {}, fetch)
 	if (!billingAccounts.ok) {
 		throw error(500, `billingAccounts: ${billingAccounts.error.message}`)

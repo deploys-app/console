@@ -3,17 +3,22 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
 	import modal from '$lib/modal'
-	import format from '$lib/format'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		domains,
-		projectInfo
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let domains
+	$: domains = data.domains
+
+	let projectInfo
+	$: projectInfo = data.projectInfo
 
 	function deleteDomain (domain) {
 		modal.confirm({

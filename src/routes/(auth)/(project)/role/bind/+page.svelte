@@ -9,7 +9,9 @@
 		email,
 		selected
 	} = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	const form = {
 		email,
@@ -24,7 +26,7 @@
 		form.roles = [...form.roles, role]
 	}
 
-	let saving
+	let saving = false
 
 	async function save () {
 		if (saving) {
