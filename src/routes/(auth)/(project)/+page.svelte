@@ -21,13 +21,14 @@
 
 	const unitGiB = 1024 * 1024 * 1024
 
+	// TODO: convert workaround for json big
 	$: billing = {
 		price: (+price.price).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		cpu: usage.cpuUsage.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		memory: (usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		egress: (usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		disk: (usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
+		cpu: (+usage.cpuUsage).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		memory: (+usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		egress: (+usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		disk: (+usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		replica: (+usage.replica).toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
 
 	onMount(() => {
