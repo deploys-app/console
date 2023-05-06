@@ -6,7 +6,12 @@
 	/** @type {import('$types').Project[]} */
 	export let projects
 
+	/** @type {string} */
+	let menu
 	$: menu = $page.data.menu || ''
+
+	/** @type {string} */
+	let projectName
 	$: projectName = projects.find((p) => p.project === $project)?.name || $project
 
 	const dispatch = createEventDispatcher()
@@ -73,7 +78,7 @@
 				<strong>CURRENT PROJECT</strong>
 			</small>
 
-			<div class="project-box _cs-pt" on:click={openProjectModal} on:keypress={openProjectModal}>
+			<div class="project-box _cs-pt" on:click={openProjectModal}>
 				<span>
 					{#if $project}
 						{projectName}

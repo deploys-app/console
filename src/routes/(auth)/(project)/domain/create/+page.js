@@ -6,7 +6,7 @@ export async function load ({ parent, fetch }) {
 
 	const projectInfo = await api.invoke('project.get', { project }, fetch)
 	if (!projectInfo.ok) {
-		throw error(500, `project: ${projectInfo.error.message}`)
+		throw error(500, `project: ${project.error.message}`)
 	}
 
 	return {

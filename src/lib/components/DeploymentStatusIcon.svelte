@@ -1,10 +1,10 @@
 <script>
 	import { onDestroy } from 'svelte'
 
-	/** @type {'deploy' | 'delete' | 'pause'} */
+	/** @type {'deploy', 'delete', 'pause'} */
 	export let action
 
-	/** @type {'pending' | 'success' | 'error' | 'cancelled'} */
+	/** @type {'pending', 'success', 'error', 'cancelled'} */
 	export let status
 
 	/** @type {string} */

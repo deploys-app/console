@@ -3,10 +3,8 @@ let webcrypto
 
 // workaround for dev
 if (typeof crypto === 'undefined') {
-	// @ts-ignore
 	import('node:crypto')
 		.then((imp) => {
-			// @ts-ignore
 			webcrypto = imp.webcrypto
 		})
 		.catch(() => {

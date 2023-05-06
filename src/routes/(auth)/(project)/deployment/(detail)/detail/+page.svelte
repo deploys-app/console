@@ -1,15 +1,18 @@
 <script>
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
-	import * as format from '$lib/format'
+	import format from '$lib/format'
 	import { goto } from '$app/navigation'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import api from '$lib/api'
 	import Secret from '$lib/components/Secret.svelte'
 
 	export let data
 
+	let deployment
 	$: deployment = data.deployment
+
+	let location
 	$: location = data.location
 
 	$: hasExternalTCPAddress = ['TCPService'].includes(deployment.type)

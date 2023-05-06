@@ -3,14 +3,10 @@
 	export let value
 
 	let isHidden = true
-
-	function toggle () {
-		isHidden = !isHidden
-	}
 </script>
 
 <span>
-	<div on:click={toggle} on:keypress={toggle} tabindex="0" role="link">
+	<div on:click={() => isHidden = !isHidden}>
 		{#if isHidden}
 			<i class="fa-solid fa-eye"></i>
 		{:else}

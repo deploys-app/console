@@ -2,10 +2,12 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 
 	export let data
 
+	/** @type {import('$types').Project[]} */
+	let projects
 	$: projects = data.projects
 
 	/**
@@ -84,7 +86,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span={4} />
+					<NoDataRow span="4" />
 				{/each}
 			</tbody>
 		</table>

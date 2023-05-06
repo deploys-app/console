@@ -4,9 +4,19 @@
 
 	export let data
 
+	/** @type {import('$types').Project} */
+	let projectInfo
 	$: projectInfo = data.projectInfo
+
+	/** @type {import('$types').ProjectUsage} */
+	let usage
 	$: usage = data.usage
+
+	/** @type {import('$types').BillingProject} */
+	let price
 	$: price = data.price
+
+	let permission
 	$: permission = data.permission
 
 	const unitGiB = 1024 * 1024 * 1024

@@ -6,7 +6,10 @@
 
 	export let data
 
+	let project
 	$: project = data.project
+
+	let deployment
 	$: deployment = data.deployment
 
 	let pendingTimeout

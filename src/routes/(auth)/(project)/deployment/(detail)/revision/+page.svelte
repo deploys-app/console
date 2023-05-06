@@ -1,7 +1,7 @@
 <script>
-	import * as format from '$lib/format'
+	import format from '$lib/format'
 	import { goto } from '$app/navigation'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data

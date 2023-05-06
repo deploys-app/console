@@ -6,10 +6,9 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	/** @type {import('$types').ApiResponse<import('$types').Project>} */
 	const projectInfo = await api.invoke('project.get', { project }, fetch)
 	if (!projectInfo.ok) {
-		throw error(500, `project: ${projectInfo.error.message}`)
+		throw error(500, `project: ${project.error.message}`)
 	}
 
 	let deployment
@@ -23,7 +22,7 @@ export async function load ({ url, parent, fetch }) {
 		}
 	}
 	return {
-		quota: projectInfo.result.quota,
+		quota: projectInfo.result.quota || {},
 		deployment: deployment?.result
 	}
 }

@@ -1,12 +1,14 @@
 <script>
 	import { goto } from '$app/navigation'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
+	/** @type {import('$types').Location[]} */
 	const locations = data.locations
 
+	let project
 	$: project = data.project
 
 	const form = {

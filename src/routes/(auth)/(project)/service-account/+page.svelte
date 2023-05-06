@@ -1,13 +1,18 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import * as format from '$lib/format'
+	import format from '$lib/format'
 	import { loading } from '$lib/stores'
 
 	export let data
 
+	let project
 	$: project = data.project
+
+	let permission
 	$: permission = data.permission
+
+	let serviceAccounts
 	$: serviceAccounts = data.serviceAccounts
 </script>
 
@@ -34,7 +39,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span={4} />
+				<LoadingRow span="4" />
 			{:else}
 				{#each serviceAccounts as it}
 					<tr>
@@ -56,7 +61,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span={4} forbidden={!permission.serviceAccounts} />
+					<NoDataRow span="4" forbidden={!permission.serviceAccounts} />
 				{/each}
 			{/if}
 			</tbody>

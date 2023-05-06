@@ -2,15 +2,23 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
 
 	export let data
 
+	let project
 	$: project = data.project
+
+	let permission
 	$: permission = data.permission
+
+	/** @type {import('$types').Domain[]} */
+	let domains
 	$: domains = data.domains
+
+	let projectInfo
 	$: projectInfo = data.projectInfo
 
 	function deleteDomain (domain) {
@@ -58,7 +66,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span={5} />
+				<LoadingRow span="5" />
 			{:else}
 				{#each domains as it}
 					<tr>
@@ -90,7 +98,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span={5} forbidden={!permission.domains} />
+					<NoDataRow span="5" forbidden={!permission.domains} />
 				{/each}
 			{/if}
 			</tbody>

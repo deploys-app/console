@@ -176,7 +176,7 @@
 						<td>{it.billingValue}</td>
 					</tr>
 				{:else}
-					<NoDataRow span={5} />
+					<NoDataRow span="5" />
 				{/each}
 			</tbody>
 		</table>

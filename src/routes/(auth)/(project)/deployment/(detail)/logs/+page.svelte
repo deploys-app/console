@@ -3,6 +3,7 @@
 
 	export let data
 
+	let deployment
 	$: deployment = data.deployment
 
 	let buffer = ''

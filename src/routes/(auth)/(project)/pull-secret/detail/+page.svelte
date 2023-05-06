@@ -2,14 +2,25 @@
 	import ClipboardJS from 'clipboard'
 	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
+	/** @type {string} */
+	let project
 	$: project = data.project
+
+	/** @type {string} */
+	let location
 	$: location = data.location
+
+	/** @type {string} */
+	let name
 	$: name = data.name
+
+	/** @type {import('$types').PullSecret} */
+	let pullSecret
 	$: pullSecret = data.pullSecret
 
 	onMount(() => {

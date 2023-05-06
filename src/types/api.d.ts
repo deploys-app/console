@@ -126,11 +126,6 @@ export interface Domain {
 			errors: string[]
 		}
 	},
-	dnsConfig: {
-		ipv4: string[]
-		ipv6: string[]
-		cname: string[]
-	}
 	status: 'pending' | 'success' | 'error' | 'verify'
 	createdAt: string
 	createdBy: string
@@ -173,14 +168,6 @@ export interface Disk {
 	createdAt: string
 	createdBy: string
 	successAt: string
-}
-
-export interface Role {
-	role: string
-	name: string
-	permissions: string[]
-	createdAt: string
-	createdBy: string
 }
 
 export {}

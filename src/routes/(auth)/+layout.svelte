@@ -11,13 +11,19 @@
 
 	export let data
 
+	/** @type {import('$types').Profile} */
+	let profile
 	$: profile = data.profile
+
+	/** @type {import('$types').Project[]} */
+	let projects
 	$: projects = data.projects
 
 	stores.profile.set(profile)
 	stores.projects.set(projects)
 
-	let showSidebar = false
+	/** @type {boolean} */
+	let showSidebar
 	$: $page, showSidebar = false
 
 	/** @type {ModalSelectProject} */
@@ -27,10 +33,6 @@
 		api.setOnUnauth(() => {
 			goto('/auth/signin')
 		})
-	}
-
-	function hideSidebar () {
-		showSidebar = false
 	}
 </script>
 
@@ -44,7 +46,7 @@
 	</div>
 
 	<div class="sidebar-wrapper">
-		<div class="sidebar-backdrop" on:click={hideSidebar} on:keypress={hideSidebar}></div>
+		<div class="sidebar-backdrop" on:click={() => showSidebar = false}></div>
 		<Sidebar {projects} on:openProjectModal={() => projectModal.open()} />
 	</div>
 

@@ -14,7 +14,6 @@ export async function load ({ url, data, fetch }) {
 		throw redirect(302, '/project')
 	}
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Location>>} */
 	const locations = await api.invoke('location.list', { project }, fetch)
 	if (!locations.ok) {
 		throw error(500, `locations: ${locations.error.message}`)

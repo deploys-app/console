@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import * as modal from '$lib/modal'
+	import modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
@@ -10,6 +10,7 @@
 		permissions
 	} = data
 
+	let project
 	$: project = data.project
 
 	const form = {
@@ -33,9 +34,6 @@
 		})
 	}
 
-	/**
-	 * @param {string} permission
-	*/
 	function addPermission (permission) {
 		if (!permission || form.permissions.includes(permission)) {
 			return
@@ -44,15 +42,6 @@
 			...form.permissions,
 			permission
 		]
-	}
-
-	function selectPermissionChanged (e) {
-		addPermission(e.target.value)
-		e.target.value = ''
-	}
-
-	function removePermission (permission) {
-		form.permissions = form.permissions.filter((x) => x !== permission)
 	}
 
 	let saving = false
@@ -144,7 +133,7 @@
 
 			<div class="field _dp-f _mgbt-12px">
 				<div class="select _f-1">
-					<select on:change={selectPermissionChanged}>
+					<select on:change={(e) => { addPermission(e.target.value); e.target.value = '' }}>
 						<option value="" disabled selected>---Select Permission---</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it}
 							<option value={it}>{it}</option>
@@ -167,13 +156,13 @@
 								<td>{it}</td>
 								<td class="table-action-container">
 									<div class="icon-button -negative"
-										on:click={() => removePermission(it)} on:keypress={() => removePermission(it)}>
+										on:click={() => { form.permissions = form.permissions.filter((x) => x !== it) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
 							</tr>
 						{:else}
-							<NoDataRow span={2} />
+							<NoDataRow span="2" />
 						{/each}
 					</tbody>
 				</table>
