@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/sveltekit'
+import * as Sentry from '@sentry/node'
 import { sequence } from '@sveltejs/kit/hooks'
 import { env } from '$env/dynamic/public'
 
@@ -36,8 +36,18 @@ function storeProject ({ event, resolve }) {
 }
 
 export const handle = sequence(
-	Sentry.sentryHandle(),
+	// Sentry.sentryHandle(),
 	handleCookie,
 	storeProject
 )
-export const handleError = Sentry.handleErrorWithSentry()
+// export const handleError = Sentry.handleErrorWithSentry()
+
+/** @type {import('@sveltejs/kit').HandleServerError} */
+export function handleError ({ error, event }) {
+	Sentry.captureException(error, { contexts: { sveltekit: { event } } })
+
+	return {
+		// @ts-ignore
+		message: error.message || 'Unknown Error'
+	}
+}

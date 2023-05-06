@@ -16,8 +16,5 @@ ENV BODY_SIZE_LIMIT=0
 ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
-ADD package.json yarn.lock .yarnrc.yml ./
-ADD .yarn .yarn
 COPY --from=0 /workspace/build .
-RUN yarn install
 CMD ["index.js"]
