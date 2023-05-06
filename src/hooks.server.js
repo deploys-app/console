@@ -1,4 +1,13 @@
+import * as Sentry from '@sentry/sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
+import { env } from '$env/dynamic/public'
+
+if (env.PUBLIC_SENTRY_DSN) {
+	Sentry.init({
+		dsn: env.PUBLIC_SENTRY_DSN,
+		tracesSampleRate: 1
+	})
+}
 
 /** @type {import('@sveltejs/kit').Handle} */
 async function handleCookie ({ event, resolve }) {
@@ -27,6 +36,8 @@ function storeProject ({ event, resolve }) {
 }
 
 export const handle = sequence(
+	Sentry.sentryHandle(),
 	handleCookie,
 	storeProject
 )
+export const handleError = Sentry.handleErrorWithSentry()
