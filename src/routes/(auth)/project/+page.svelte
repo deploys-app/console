@@ -6,7 +6,7 @@
 
 	export let data
 
-	/** @type {import('$types').ProjectItem[]} */
+	/** @type {import('$types').Project[]} */
 	let projects
 	$: projects = data.projects
 

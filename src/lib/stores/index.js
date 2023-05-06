@@ -4,10 +4,10 @@ import { navigating, page } from '$app/stores'
 /** @type {import('svelte/store').Writable<import('$types').Profile>} */
 export const profile = writable(null)
 
-/** @type {import('svelte/store').Writable<import('$types').ProjectItem[]>} */
+/** @type {import('svelte/store').Writable<import('$types').Project[]>} */
 export const projects = writable([])
 
-/** @type {import('svelte/store').Readable<import('$types').ProjectItem>} */
+/** @type {import('svelte/store').Readable<import('$types').Project>} */
 export const project = derived(
 	page,
 	($page) =>

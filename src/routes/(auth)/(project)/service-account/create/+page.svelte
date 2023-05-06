@@ -15,7 +15,7 @@
 	let sid = serviceAccount?.sid
 	let name = serviceAccount?.name
 	let desc = serviceAccount?.description
-	let saving
+	let saving = false
 
 	async function save () {
 		if (saving) {

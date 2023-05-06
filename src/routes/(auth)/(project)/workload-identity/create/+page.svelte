@@ -4,7 +4,9 @@
 	import api from '$lib/api'
 
 	export let data
-	const { locations } = data
+
+	/** @type {import('$types').Location[]} */
+	const locations = data.locations
 
 	let project
 	$: project = data.project
@@ -15,7 +17,7 @@
 		gsa: ''
 	}
 
-	let saving
+	let saving = false
 	async function save () {
 		if (saving) {
 			return

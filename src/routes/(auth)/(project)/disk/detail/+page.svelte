@@ -18,6 +18,7 @@
 	let name
 	$: name = data.name
 
+	/** @type {import('$types').Disk} */
 	let disk
 	$: disk = data.disk
 

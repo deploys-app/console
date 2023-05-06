@@ -6,6 +6,7 @@
 
 	export let data
 
+	/** @type {string} */
 	let project
 	$: project = data.project
 

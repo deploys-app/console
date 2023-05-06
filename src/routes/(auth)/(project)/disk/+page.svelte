@@ -16,6 +16,7 @@
 	let permission
 	$: permission = data.permission
 
+	/** @type {import('$types').Disk[]} */
 	let disks
 	$: disks = data.disks
 

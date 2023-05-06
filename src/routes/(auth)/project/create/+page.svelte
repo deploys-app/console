@@ -5,7 +5,7 @@
 
 	export let data
 
-	/** @type {import('$types').ProjectItem} */
+	/** @type {import('$types').Project} */
 	const project = data.project
 
 	/** @type {import('$types').BillingAccount[]} */

@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation'
 	import { project } from '$lib/stores'
 
-	/** @type {import('$types').ProjectItem[]} */
+	/** @type {import('$types').Project[]} */
 	export let projects
 
 	let isActive = false

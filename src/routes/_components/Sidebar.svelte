@@ -3,7 +3,7 @@
 	import { page } from '$app/stores'
 	import { project } from '$lib/stores'
 
-	/** @type {import('$types').ProjectItem[]} */
+	/** @type {import('$types').Project[]} */
 	export let projects
 
 	/** @type {string} */

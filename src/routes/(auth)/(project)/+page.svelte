@@ -4,7 +4,7 @@
 
 	export let data
 
-	/** @type {import('$types').ProjectItem} */
+	/** @type {import('$types').Project} */
 	let projectInfo
 	$: projectInfo = data.projectInfo
 

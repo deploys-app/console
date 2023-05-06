@@ -8,7 +8,7 @@ export async function load ({ fetch }) {
 		throw redirect(302, '/auth/signin')
 	}
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').ProjectItem>>} */
+	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Project>>} */
 	const projects = await api.invoke('project.list', {}, fetch)
 	if (!projects.ok) {
 		throw error(500, projects.error?.message)

@@ -5,6 +5,7 @@ export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
+
 	const pullSecret = await api.invoke('pullSecret.get', { project, location, name }, fetch)
 	if (!pullSecret.ok) {
 		if (pullSecret.error.notFound) {
@@ -12,6 +13,7 @@ export async function load ({ url, parent, fetch }) {
 		}
 		throw error(500, `pullSecret: ${pullSecret.error.message}`)
 	}
+
 	return {
 		location,
 		name,

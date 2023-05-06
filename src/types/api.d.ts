@@ -23,7 +23,7 @@ export interface List<T> {
 	items: T[]
 }
 
-export interface ProjectItem {
+export interface Project {
 	id: string
 	project: string
 	name: string
@@ -129,6 +129,45 @@ export interface Domain {
 	status: 'pending' | 'success' | 'error' | 'verify'
 	createdAt: string
 	createdBy: string
+}
+
+export interface PullSecret {
+	name: string
+	value: string
+	spec: PullSecretSpec
+	location: string
+	action: 'create' | 'delete',
+	status: 'pending' | 'success' | 'error'
+	createdAt: string
+	createdBy: string
+}
+
+export interface PullSecretSpec {
+	server: string
+	username: string
+	password: string
+}
+
+export interface WorkloadIdentity {
+	project: string
+	location: string
+	name: string
+	gsa: string
+	status: 'pending' | 'success' | 'error'
+	createdAt: string
+	createdBy: string
+}
+
+export interface Disk {
+	project: string
+	location: string
+	name: string
+	size: number
+	status: 'pending' | 'success' | 'error'
+	action: 'create' | 'delete'
+	createdAt: string
+	createdBy: string
+	successAt: string
 }
 
 export {}

@@ -10,12 +10,14 @@
 
 	export let data
 
+	/** @type {string} */
 	let project
 	$: project = data.project
 
 	let permission
 	$: permission = data.permission
 
+	/** @type {import('$types').PullSecret[]} */
 	let pullSecrets
 	$: pullSecrets = data.pullSecrets
 

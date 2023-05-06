@@ -17,7 +17,7 @@
 		wildcard: false
 	}
 
-	let saving
+	let saving = false
 	async function save () {
 		if (saving) {
 			return

@@ -6,7 +6,10 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	const [locations, projectInfo] = await Promise.all([
+	const [
+		locations,
+		projectInfo
+	] = await Promise.all([
 		api.invoke('location.list', { project }, fetch),
 		api.invoke('project.get', { project }, fetch)
 	])

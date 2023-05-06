@@ -15,7 +15,7 @@
 	let profile
 	$: profile = data.profile
 
-	/** @type {import('$types').ProjectItem[]} */
+	/** @type {import('$types').Project[]} */
 	let projects
 	$: projects = data.projects
 

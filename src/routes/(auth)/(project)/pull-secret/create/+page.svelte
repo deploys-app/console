@@ -5,10 +5,13 @@
 	import api from '$lib/api'
 
 	export let data
-	const { locations } = data
 
+	/** type {string} */
 	let project
 	$: project = data.project
+
+	/** @type {import('$types').Location[]} */
+	const locations = data.locations
 
 	const form = {
 		name: '',
@@ -18,7 +21,7 @@
 		password: ''
 	}
 
-	let saving
+	let saving = false
 	async function save () {
 		if (saving) {
 			return

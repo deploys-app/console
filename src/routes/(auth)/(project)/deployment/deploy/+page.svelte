@@ -6,12 +6,16 @@
 	import api from '$lib/api'
 
 	export let data
+
+	/** @type {import('$types').Location[]} */
+	const locations = data.locations
+
 	const {
-		locations,
 		quota,
 		deployment
 	} = data
 
+	/** @type {string} */
 	let project
 	$: project = data.project
 
@@ -20,8 +24,14 @@
 		workloadIdentities: true,
 		disks: true
 	}
+
+	/** @type {import('$types').PullSecret[]} */
 	let pullSecrets = []
+
+	/** @type {import('$types').WorkloadIdentity[]} */
 	let workloadIdentities = []
+
+	/** @type {import('$types').Disk[]} */
 	let disks = []
 
 	const form = deployment
@@ -152,7 +162,7 @@
 			.join('\n')
 	}
 
-	let saving
+	let saving = false
 
 	async function save () {
 		if (saving) {
