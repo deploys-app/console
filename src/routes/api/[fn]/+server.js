@@ -1,4 +1,6 @@
-const endpoint = 'https://api.deploys.app'
+import { env } from '$env/dynamic/private'
+
+const endpoint = env.API_ENDPOINT
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function POST ({ locals, params, request }) {

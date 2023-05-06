@@ -1,3 +1,7 @@
+import { env } from '$env/dynamic/public'
+
+const endpoint = env.PUBLIC_API_ENDPOINT
+
 const landing = 'https://www.deploys.app/'
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
@@ -12,7 +16,7 @@ export async function POST ({ locals }) {
 		return new Response(undefined, {
 			status: 302,
 			headers: {
-				location: `https://api.deploys.app/auth/signout?${q.toString()}`
+				location: `${endpoint}/auth/signout?${q.toString()}`
 			}
 		})
 	}
