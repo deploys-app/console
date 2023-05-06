@@ -3,8 +3,6 @@
 
 	export let data
 
-	/** @type {import('$types').BillingAccount[]} */
-	let billingAccounts
 	$: billingAccounts = data.billingAccounts
 </script>
 
@@ -44,7 +42,7 @@
 					</td>
 				</tr>
 			{:else}
-				<NoDataRow span="3" />
+				<NoDataRow span={3} />
 			{/each}
 			</tbody>
 		</table>

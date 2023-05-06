@@ -1,18 +1,13 @@
 <script>
 	import { goto } from '$app/navigation'
-	import format from '$lib/format'
-	import modal from '$lib/modal'
+	import * as format from '$lib/format'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let id
 	$: id = data.id
-
-	let serviceAccount
 	$: serviceAccount = data.serviceAccount
 
 	function deleteItem () {

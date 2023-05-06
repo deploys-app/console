@@ -25,16 +25,20 @@
 	function toggleSidebar () {
 		window.dispatchEvent(new Event('sidebar:toggle'))
 	}
+
+	function doSignOut () {
+		signOut.submit()
+	}
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar}>
+	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
 	<div class="_mgl-at">
-		<div class="avatar" on:click|stopPropagation={toggle}>
-			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max" crossorigin>
+		<div class="avatar" on:click|stopPropagation={toggle} on:keypress={toggle} tabindex="0" role="button">
+			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous">
 		</div>
 
 		{#if active}
@@ -45,8 +49,8 @@
 							Billing accounts
 						</a>
 					</li>
-					<li on:click={() => signOut.submit()}>
-						<div class="item">
+					<li>
+						<div class="item" on:click={doSignOut} on:keypress={doSignOut} tabindex="0" role="button">
 							Signout
 						</div>
 						<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>

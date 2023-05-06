@@ -1,13 +1,12 @@
 <script>
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { onMount, tick } from 'svelte'
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	/** @type {import('$types').Location[]} */
 	const locations = data.locations
 
 	const {
@@ -15,8 +14,6 @@
 		deployment
 	} = data
 
-	/** @type {string} */
-	let project
 	$: project = data.project
 
 	const permission = {
@@ -363,9 +360,10 @@
 				{#each form.command as _, i}
 					<div class="input -has-icon-right _mgbt-8px">
 						<input bind:value={form.command[i]}>
-						<div class="icon -is-right _cs-pt" on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
+						<button class="icon-button icon -is-right _cs-pt" type="button"
+							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
 							<i class="fa-solid fa-trash-alt"></i>
-						</div>
+						</button>
 					</div>
 				{/each}
 			</div>
@@ -381,9 +379,10 @@
 				{#each form.args as _, i}
 					<div class="input -has-icon-right _mgbt-8px">
 						<input bind:value={form.args[i]}>
-						<div class="icon -is-right _cs-pt" on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
+						<button class="icon-button icon -is-right _cs-pt" type="button"
+							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
 							<i class="fa-solid fa-trash-alt"></i>
-						</div>
+						</button>
 					</div>
 				{/each}
 			</div>
@@ -547,10 +546,10 @@
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<div class="icon-button -negative"
+									<button class="icon-button -negative" type="button"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
-									</div>
+									</button>
 								</td>
 							</tr>
 						{/each}
@@ -608,9 +607,10 @@
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<div class="icon-button -negative" on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
+									<button class="icon-button -negative" type="button"
+										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
 										<i class="fa-solid fa-trash-alt"></i>
-									</div>
+									</button>
 								</td>
 							</tr>
 						{/each}
@@ -618,7 +618,8 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="button -small _mg-at" type="button" on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
+							<button class="button -small _mg-at" type="button"
+								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
 								<i class="fa-solid fa-plus _mgr-12px"></i>
 								<span>Add Data</span>
 							</button>

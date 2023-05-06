@@ -304,3 +304,13 @@ $components-colors: (
 		}
 	}
 }
+
+.#{$prefix}input > button.#{$prefix}icon-button {
+	background-color: transparent;
+	box-shadow: none;
+
+	&:hover {
+		transform: none;
+		background-color: transparent;
+	}
+}

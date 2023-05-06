@@ -7,7 +7,7 @@ export const profile = writable(null)
 /** @type {import('svelte/store').Writable<import('$types').Project[]>} */
 export const projects = writable([])
 
-/** @type {import('svelte/store').Readable<import('$types').Project>} */
+/** @type {import('svelte/store').Readable<string>} */
 export const project = derived(
 	page,
 	($page) =>

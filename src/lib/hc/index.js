@@ -30,7 +30,6 @@ export function init () {
 		title: {
 			style: {
 				color: '#e0e0e3',
-				// textTransform: 'uppercase',
 				fontSize: '20px'
 			}
 		},
@@ -118,11 +117,6 @@ export function init () {
 				style: {
 					color: '#c0c0c0'
 				}
-			}
-		},
-		labels: {
-			style: {
-				color: '#707073'
 			}
 		},
 		drilldown: {

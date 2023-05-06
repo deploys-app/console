@@ -1,4 +1,5 @@
 <script>
+	/** @type {string} */
 	export let status
 
 	const iconClassByStatus = {
@@ -9,7 +10,6 @@
 		verify: 'fa-solid fa-exclamation-triangle _cl-warning-500'
 	}
 
-	let iconClass
 	$: iconClass = iconClassByStatus[status] || 'fa-solid fa-minus _cl-light'
 </script>
 

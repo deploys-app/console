@@ -3,21 +3,15 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { browser } from '$app/environment'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	/** @type {import('$types').Disk[]} */
-	let disks
 	$: disks = data.disks
 
 	let pendingTimeout
@@ -61,7 +55,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="5" />
+				<LoadingRow span={5} />
 			{:else}
 				{#each disks as it}
 					<tr>
@@ -83,7 +77,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="5" forbidden={!permission.disks} />
+					<NoDataRow span={5} forbidden={!permission.disks} />
 				{/each}
 			{/if}
 			</tbody>

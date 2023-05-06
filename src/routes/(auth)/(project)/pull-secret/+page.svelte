@@ -3,22 +3,15 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { browser } from '$app/environment'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 
 	export let data
 
-	/** @type {string} */
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	/** @type {import('$types').PullSecret[]} */
-	let pullSecrets
 	$: pullSecrets = data.pullSecrets
 
 	let pendingTimeout
@@ -61,7 +54,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="4" />
+				<LoadingRow span={4} />
 			{:else}
 				{#each pullSecrets as it}
 					<tr>
@@ -76,7 +69,7 @@
 						<td>{it.createdBy}</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" forbidden={!permission.pullSecrets} />
+					<NoDataRow span={4} forbidden={!permission.pullSecrets} />
 				{/each}
 			{/if}
 			</tbody>

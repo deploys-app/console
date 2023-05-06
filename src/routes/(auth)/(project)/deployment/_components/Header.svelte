@@ -3,7 +3,7 @@
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 
 	export let deployment
 

@@ -2,18 +2,12 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 
 	export let data
 
-	/** @type {string} */
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	let emails
 	$: emails = data.emails
 </script>
 
@@ -37,7 +31,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="3" />
+				<LoadingRow span={3} />
 			{:else}
 				{#each emails as it}
 					<tr>
@@ -46,7 +40,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 					</tr>
 				{:else}
-					<NoDataRow span="3" forbidden={!permission.emails} />
+					<NoDataRow span={3} forbidden={!permission.emails} />
 				{/each}
 			{/if}
 			</tbody>

@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
@@ -81,7 +81,7 @@
 		</div>
 
 		<div class="field _mgt-12px">
-			<label>Advanced Settings</label>
+			<h6><strong>Advanced Settings</strong></h6>
 		</div>
 
 		{#if projectInfo.config.domainWildcard}

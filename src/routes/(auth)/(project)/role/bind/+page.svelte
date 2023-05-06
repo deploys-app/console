@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
@@ -10,7 +10,6 @@
 		selected
 	} = data
 
-	let project
 	$: project = data.project
 
 	const form = {
@@ -24,6 +23,11 @@
 		}
 
 		form.roles = [...form.roles, role]
+	}
+
+	function selectRoleChanged (e) {
+		addRole(e.target.value)
+		e.target.value = ''
 	}
 
 	let saving = false
@@ -79,7 +83,7 @@
 		</div>
 		<div class="field _mgbt-20px">
 			<div class="select">
-				<select on:change={(e) => { addRole(e.target.value); e.target.value = '' }}>
+				<select on:change={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
 					{#each roles as it}
 						{#if !form.roles.includes(it.role)}
