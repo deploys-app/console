@@ -6,11 +6,16 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		routes
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	/** @type {import('$types').Route[]} */
+	let routes
+	$: routes = data.routes
 
 	function deleteRoute (route) {
 		modal.confirm({
@@ -60,7 +65,7 @@
 			{#if $loading}
 				<LoadingRow span="4" />
 			{:else}
-				{#each routes?.items || [] as it}
+				{#each routes as it}
 					<tr>
 						<td>
 							<a class="link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>

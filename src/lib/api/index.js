@@ -5,6 +5,13 @@ const jsonBig = JSONBig({ storeAsString: true })
 
 const endpoint = '/api'
 
+/**
+ * @template T
+ * @param {string} fn
+ * @param {Object} args
+ * @param {fetch} fetch
+ * @returns {Promise<import('$types').ApiResponse<T>>}
+ */
 async function _invoke (fn, args, fetch) {
 	const response = await fetch(`${endpoint}/${fn}`, {
 		method: 'POST',
@@ -16,8 +23,16 @@ async function _invoke (fn, args, fetch) {
 	return jsonBig.parse(await response.text())
 }
 
+/** @type {Function} */
 let onUnauth
 
+/**
+ * @template T
+ * @param {string} fn
+ * @param {Object} args
+ * @param {fetch} fetch
+ * @returns {Promise<import('$types').ApiResponse<T>>}
+ */
 async function invoke (fn, args, fetch) {
 	const body = await _invoke(fn, args || {}, fetch)
 	if (!body.ok) {
@@ -25,7 +40,7 @@ async function invoke (fn, args, fetch) {
 		switch (msg) {
 		case 'api: unauthorized':
 			body.error.unauth = true
-			onUnauth && onUnauth()
+			onUnauth?.()
 			break
 		case 'iam: forbidden':
 			body.error.forbidden = true
@@ -43,12 +58,23 @@ async function invoke (fn, args, fetch) {
 	return body
 }
 
+/**
+ * @param {Function} callback
+ */
+function setOnUnauth (callback) {
+	onUnauth = callback
+}
+
+/**
+ * @param {string} fn
+ * @returns {Promise<void>}
+ */
+function wrapInvalidate (fn) {
+	return invalidate(`${endpoint}/${fn}`)
+}
+
 export default {
 	invoke,
-	setOnUnauth: (callback) => {
-		onUnauth = callback
-	},
-	invalidate: (fn) => {
-		return invalidate(`${endpoint}/${fn}`)
-	}
+	setOnUnauth,
+	invalidate: wrapInvalidate
 }

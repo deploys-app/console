@@ -9,11 +9,15 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		workloadIdentities
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let workloadIdentities
+	$: workloadIdentities = data.workloadIdentities
 
 	let pendingTimeout
 	$: {

@@ -5,8 +5,15 @@
 	import modal from '$lib/modal'
 
 	export let data
-	$: ({ projects } = data)
 
+	/** @type {import('$types').ProjectItem[]} */
+	let projects
+	$: projects = data.projects
+
+	/**
+	 * @param {string} project
+	 * @returns {Promise}
+	 */
 	async function deleteItem (project) {
 		const result = await Swal.fire({
 			title: 'Are you sure ?',

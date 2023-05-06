@@ -19,7 +19,7 @@ export async function load ({ parent, fetch }) {
 		permission: {
 			domains: !domains.error?.forbidden
 		},
-		domains: domains.result,
+		domains: domains.result.items || [],
 		projectInfo: projectInfo.result
 	}
 }

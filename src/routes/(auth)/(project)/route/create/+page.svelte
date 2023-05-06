@@ -4,10 +4,13 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		locations
-	} = data)
+
+	let project
+	$: project = data.project
+
+	/** @type {import('$types').Location[]} */
+	let locations
+	$: locations = data.locations
 
 	const form = {
 		domain: '',
@@ -24,6 +27,7 @@
 		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
 	}[form.targetPrefix] || ''
 
+	/** @type {import('$types').Domain[]} */
 	let domains = []
 	let deployments = []
 
@@ -33,6 +37,7 @@
 		domains = []
 		form.domain = ''
 
+		/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Domain>>} */
 		const resp = await api.invoke('domain.list', { project, location: form.location }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
@@ -72,7 +77,7 @@
 
 		const subdomain = form.subdomain.trim()
 		let domain = form.domain
-		if (selectedDomain.type === 'wildcard' && subdomain !== '') {
+		if (selectedDomain.wildcard && subdomain !== '') {
 			domain = `${subdomain}.${domain}`
 		}
 
@@ -134,13 +139,13 @@
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
 						{#each domains as it}
-							<option value={it.domain}>{#if it.type === 'wildcard'}*.{/if}{it.domain}</option>
+							<option value={it.domain}>{#if it.wildcard}*.{/if}{it.domain}</option>
 						{/each}
 					</select>
 				</div>
 			</div>
 
-			{#if selectedDomain?.type === 'wildcard'}
+			{#if selectedDomain?.wildcard}
 				<div class="field">
 					<label for="input-subdomain">Subdomain</label>
 					<div class="input -has-icon-right">

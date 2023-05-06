@@ -3,22 +3,31 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		projectInfo,
-		usage,
-		price,
-		permission
-	} = data)
+
+	/** @type {import('$types').ProjectItem} */
+	let projectInfo
+	$: projectInfo = data.projectInfo
+
+	/** @type {import('$types').ProjectUsage} */
+	let usage
+	$: usage = data.usage
+
+	/** @type {import('$types').BillingProject} */
+	let price
+	$: price = data.price
+
+	let permission
+	$: permission = data.permission
 
 	const unitGiB = 1024 * 1024 * 1024
 
 	$: billing = {
 		price: (+price.price).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		cpu: (+usage.cpuUsage).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		memory: (+usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		egress: (+usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		disk: (+usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		replica: (+usage.replica).toLocaleString(undefined, { maximumFractionDigits: 2 })
+		cpu: usage.cpuUsage.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		memory: (usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		egress: (usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		disk: (usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
 
 	onMount(() => {

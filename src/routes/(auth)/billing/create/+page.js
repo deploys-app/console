@@ -4,6 +4,7 @@ import api from '$lib/api'
 export async function load ({ url, fetch }) {
 	const id = url.searchParams.get('id')
 
+	/** @type {import('$types').ApiResponse<import('$types').BillingAccount>} */
 	let billingAccount
 	if (id) {
 		billingAccount = await api.invoke('billing.get', { id }, fetch)

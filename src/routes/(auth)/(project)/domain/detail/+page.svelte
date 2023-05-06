@@ -8,10 +8,12 @@
 	import Swal from 'sweetalert2'
 
 	export let data
-	$: ({
-		project,
-		domain
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let domain
+	$: domain = data.domain
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

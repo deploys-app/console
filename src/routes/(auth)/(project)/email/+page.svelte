@@ -5,11 +5,15 @@
 	import format from '$lib/format'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		emails
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let emails
+	$: emails = data.emails
 </script>
 
 <h6>Emails</h6>

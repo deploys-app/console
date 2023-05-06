@@ -10,18 +10,24 @@
 	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
 
 	export let data
-	$: ({
-		profile,
-		projects
-	} = data)
+
+	/** @type {import('$types').Profile} */
+	let profile
+	$: profile = data.profile
+
+	/** @type {import('$types').ProjectItem[]} */
+	let projects
+	$: projects = data.projects
 
 	stores.profile.set(profile)
 	stores.projects.set(projects)
 
+	/** @type {boolean} */
 	let showSidebar
-	let projectModal
-
 	$: $page, showSidebar = false
+
+	/** @type {ModalSelectProject} */
+	let projectModal
 
 	if (browser) {
 		api.setOnUnauth(() => {

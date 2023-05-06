@@ -1,8 +1,13 @@
 <script>
 	import { onDestroy } from 'svelte'
 
+	/** @type {'deploy', 'delete', 'pause'} */
 	export let action
+
+	/** @type {'pending', 'success', 'error', 'cancelled'} */
 	export let status
+
+	/** @type {string} */
 	export let url
 
 	const statusIconClass = {
@@ -12,8 +17,12 @@
 		cancelled: 'fa-solid fa-ban _cl-negative-500'
 	}
 
+	/** @type {import('$types').PodStatus | null} */
 	let podStatus
+
+	/** @type {string} */
 	let iconClass
+
 	$: {
 		status
 		url
@@ -25,6 +34,9 @@
 		iconClass = getIconClass()
 	}
 
+	/**
+	 * @returns {string}
+	 */
 	function getIconClass () {
 		if (status !== 'success') {
 			return statusIconClass[status] || 'fa-solid fa-minus _cl-light'

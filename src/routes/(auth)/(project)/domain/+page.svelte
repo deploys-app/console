@@ -3,17 +3,23 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
 	import modal from '$lib/modal'
-	import format from '$lib/format'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		domains,
-		projectInfo
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	/** @type {import('$types').Domain[]} */
+	let domains
+	$: domains = data.domains
+
+	let projectInfo
+	$: projectInfo = data.projectInfo
 
 	function deleteDomain (domain) {
 		modal.confirm({
@@ -62,10 +68,10 @@
 			{#if $loading}
 				<LoadingRow span="5" />
 			{:else}
-				{#each domains?.items || [] as it}
+				{#each domains as it}
 					<tr>
 						<td>
-							<StatusIcon status={it.verification?.ssl?.pending ? 'verify' : it.status} />
+							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>

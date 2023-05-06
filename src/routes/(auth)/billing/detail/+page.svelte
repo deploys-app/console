@@ -4,7 +4,10 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({ billingAccount } = data)
+
+	/** @type {import('$types').BillingAccount} */
+	let billingAccount
+	$: billingAccount = data.billingAccount
 
 	function deleteItem () {
 		modal.confirm({

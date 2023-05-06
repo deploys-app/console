@@ -5,7 +5,9 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
-	$: ({ deployment } = data)
+
+	let deployment
+	$: deployment = data.deployment
 
 	let events = []
 

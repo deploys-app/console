@@ -10,7 +10,9 @@
 		name,
 		disk
 	} = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	const form = {
 		location: location || '',

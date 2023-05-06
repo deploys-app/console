@@ -4,7 +4,9 @@
 	import api from '$lib/api'
 
 	export let data
-	const { billingAccount } = data
+
+	/** @type {import('$types').BillingAccount} */
+	const billingAccount = data.billingAccount
 
 	const form = {
 		name: billingAccount?.name || '',
@@ -13,7 +15,7 @@
 		taxAddress: billingAccount?.taxAddress || ''
 	}
 
-	let saving
+	let saving = false
 	async function save () {
 		if (saving) {
 			return

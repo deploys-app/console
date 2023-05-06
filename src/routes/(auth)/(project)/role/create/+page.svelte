@@ -9,7 +9,9 @@
 		role,
 		permissions
 	} = data
-	$: ({ project } = data)
+
+	let project
+	$: project = data.project
 
 	const form = {
 		role: role?.role || '',

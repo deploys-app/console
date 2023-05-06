@@ -5,11 +5,15 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		id,
-		serviceAccount
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let id
+	$: id = data.id
+
+	let serviceAccount
+	$: serviceAccount = data.serviceAccount
 
 	function deleteItem () {
 		modal.confirm({

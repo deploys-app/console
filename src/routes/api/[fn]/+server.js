@@ -1,5 +1,6 @@
 const endpoint = 'https://api.deploys.app'
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function POST ({ locals, params, request }) {
 	const token = locals.token
 
@@ -13,5 +14,10 @@ export async function POST ({ locals, params, request }) {
 			authorization: `bearer ${token}`
 		}
 	})
-	return new Response(resp.body, { status: resp.status })
+	return new Response(resp.body, {
+		status: resp.status,
+		headers: {
+			'content-type': resp.headers.get('content-type')
+		}
+	})
 }

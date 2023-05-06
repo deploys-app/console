@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte'
 
 	export let data
-	$: ({ deployment } = data)
+
+	let deployment
+	$: deployment = data.deployment
 
 	let buffer = ''
 	let text = ''

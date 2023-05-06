@@ -2,9 +2,12 @@
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 
+	/** @type {import('$types').Profile} */
 	export let profile
 
-	let active
+	let active = false
+
+	/** @type {HTMLFormElement} */
 	let signOut
 
 	export function open () {

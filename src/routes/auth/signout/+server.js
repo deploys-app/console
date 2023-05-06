@@ -1,5 +1,6 @@
 const landing = 'https://www.deploys.app/'
 
+/** @type {import('@sveltejs/kit').RequestHandler} */
 export async function POST ({ locals }) {
 	const token = locals.token
 

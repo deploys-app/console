@@ -5,11 +5,15 @@
 	import { loading } from '$lib/stores'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		roles
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let roles
+	$: roles = data.roles
 
 	function roleCanUpdate (sid) {
 		return sid !== 'owner'

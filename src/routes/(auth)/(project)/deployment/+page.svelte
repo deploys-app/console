@@ -9,14 +9,17 @@
 	import api from '$lib/api'
 
 	export let data
-	$: ({
-		project,
-		permission,
-		deployments
-	} = data)
+
+	let project
+	$: project = data.project
+
+	let permission
+	$: permission = data.permission
+
+	let deployments
+	$: deployments = data.deployments
 
 	let pendingTimeout
-
 	$: {
 		if (browser) {
 			const reloadTime = deployments.some((x) => x.status === 'pending') ? 4000 : 300000
