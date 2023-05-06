@@ -14,6 +14,7 @@
 	let permission
 	$: permission = data.permission
 
+	/** @type {import('$types').Domain[]} */
 	let domains
 	$: domains = data.domains
 
@@ -67,10 +68,10 @@
 			{#if $loading}
 				<LoadingRow span="5" />
 			{:else}
-				{#each domains?.items || [] as it}
+				{#each domains as it}
 					<tr>
 						<td>
-							<StatusIcon status={it.verification?.ssl?.pending ? 'verify' : it.status} />
+							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>
