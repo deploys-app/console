@@ -1,12 +1,11 @@
 <script>
 	import { onMount } from 'svelte'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { browser } from '$app/environment'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
 
-	let deployment
 	$: deployment = data.deployment
 
 	let events = []
@@ -49,7 +48,7 @@
 				<td>{it.message}</td>
 			</tr>
 		{:else}
-			<NoDataRow span="4" />
+			<NoDataRow span={4} />
 		{/each}
 		</tbody>
 	</table>

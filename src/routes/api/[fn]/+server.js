@@ -7,6 +7,7 @@ export async function POST ({ locals, params, request }) {
 	const resp = await fetch(`${endpoint}/${params.fn}`, {
 		method: 'POST',
 		body: request.body,
+		// @ts-ignore
 		duplex: 'half',
 		headers: {
 			accept: 'application/json',

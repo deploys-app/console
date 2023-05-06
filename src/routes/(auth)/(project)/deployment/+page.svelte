@@ -4,19 +4,14 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { browser } from '$app/environment'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	let deployments
 	$: deployments = data.deployments
 
 	let pendingTimeout
@@ -61,7 +56,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="6" />
+				<LoadingRow span={6} />
 			{:else}
 				{#each deployments as it}
 					<tr>
@@ -90,7 +85,7 @@
 	<!--					<td>{it.createdBy}</td>-->
 					</tr>
 				{:else}
-					<NoDataRow span="6" forbidden={!permission.deployments} />
+					<NoDataRow span={6} forbidden={!permission.deployments} />
 				{/each}
 			{/if}
 			</tbody>

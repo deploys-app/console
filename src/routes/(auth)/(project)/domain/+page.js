@@ -12,7 +12,7 @@ export async function load ({ parent, fetch }) {
 		throw error(500, `domains: ${domains.error.message}`)
 	}
 	if (!projectInfo.ok) {
-		throw error(500, `project: ${project.error.message}`)
+		throw error(500, `project: ${projectInfo.error.message}`)
 	}
 
 	return {

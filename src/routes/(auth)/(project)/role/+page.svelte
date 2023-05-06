@@ -1,18 +1,13 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { loading } from '$lib/stores'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	let roles
 	$: roles = data.roles
 
 	function roleCanUpdate (sid) {
@@ -44,7 +39,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="5" />
+				<LoadingRow span={5} />
 			{:else}
 				{#each roles as it}
 					<tr>
@@ -73,7 +68,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="5" forbidden={!permission.roles} />
+					<NoDataRow span={5} forbidden={!permission.roles} />
 				{/each}
 			{/if}
 			</tbody>

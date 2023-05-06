@@ -1,12 +1,10 @@
 <script>
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	/** @type {import('$types').BillingAccount} */
-	let billingAccount
 	$: billingAccount = data.billingAccount
 
 	function deleteItem () {

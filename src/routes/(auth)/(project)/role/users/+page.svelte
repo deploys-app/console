@@ -2,18 +2,13 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	let users
 	$: users = data.users
 
 	function deleteUser (email) {
@@ -58,7 +53,7 @@
 			</thead>
 			<tbody>
 				{#if $loading}
-					<LoadingRow span="3" />
+					<LoadingRow span={3} />
 				{:else}
 					{#each users as it}
 						<tr>
@@ -80,7 +75,7 @@
 							</td>
 						</tr>
 					{:else}
-						<NoDataRow span="3" forbidden={!permission.users} />
+						<NoDataRow span={3} forbidden={!permission.users} />
 					{/each}
 				{/if}
 			</tbody>

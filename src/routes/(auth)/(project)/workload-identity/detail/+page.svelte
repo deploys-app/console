@@ -1,17 +1,14 @@
 <script>
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	let workloadIdentity
 	$: workloadIdentity = data.workloadIdentity
-
-	let project
 	$: project = data.project
 
 	// export let location

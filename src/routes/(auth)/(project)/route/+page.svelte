@@ -2,19 +2,13 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let permission
 	$: permission = data.permission
-
-	/** @type {import('$types').Route[]} */
-	let routes
 	$: routes = data.routes
 
 	function deleteRoute (route) {
@@ -63,7 +57,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span="4" />
+				<LoadingRow span={4} />
 			{:else}
 				{#each routes as it}
 					<tr>
@@ -81,7 +75,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span="4" forbidden={!permission.routes} />
+					<NoDataRow span={4} forbidden={!permission.routes} />
 				{/each}
 			{/if}
 			</tbody>

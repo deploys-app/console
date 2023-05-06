@@ -1,18 +1,15 @@
 <script>
-	import format from '$lib/format'
+	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 
 	export let data
 
-	let project
 	$: project = data.project
-
-	let domain
 	$: domain = data.domain
 
 	onMount(() => {

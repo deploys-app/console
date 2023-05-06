@@ -34,9 +34,9 @@
 	}
 </script>
 
-<div class="modal" on:click|self={close} class:is-active={isActive}>
+<div class="modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
 	<div class="modal-panel u-raised-1">
-		<div class="modal-close" on:click|self={close}>✕</div>
+		<div class="modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
 		<div class="table-container">
@@ -57,7 +57,10 @@
 							{/if}
 						</td>
 						<td>
-							<div on:click={() => setProject(it.project)} class="_tdcrt-udl _cs-pt _cl-primary-500-hover" style="font-weight: 500">
+							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
+								tabindex="0" role="link"
+								class="_tdcrt-udl _cs-pt _cl-primary-500-hover"
+								style="font-weight: 500">
 								{it.name}
 							</div>
 						</td>

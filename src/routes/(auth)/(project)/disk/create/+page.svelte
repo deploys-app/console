@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation'
-	import modal from '$lib/modal'
+	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	export let data
@@ -11,7 +11,6 @@
 		disk
 	} = data
 
-	let project
 	$: project = data.project
 
 	const form = {
