@@ -5,6 +5,7 @@ on:
     - main
 jobs:
   build:
+    runs-on: ubuntu-latest
     name: Build
     steps:
     - uses: actions/checkout@v3
@@ -26,7 +27,7 @@ jobs:
         push: true
         tags: asia-southeast1-docker.pkg.dev/deploys-app/public/console:${{ github.sha }}
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     name: Deploy
     needs: build
     steps:
