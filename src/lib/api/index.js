@@ -1,27 +1,6 @@
-import JSONBig from 'json-bigint'
 import { invalidate } from '$app/navigation'
 
-const jsonBig = JSONBig({ storeAsString: true })
-
 const endpoint = '/api'
-
-/**
- * @template T
- * @param {string} fn
- * @param {Object} args
- * @param {fetch} fetch
- * @returns {Promise<import('$types').ApiResponse<T>>}
- */
-async function _invoke (fn, args, fetch) {
-	const response = await fetch(`${endpoint}/${fn}`, {
-		method: 'POST',
-		body: JSONBig.stringify(args),
-		headers: {
-			'content-type': 'application/json'
-		}
-	})
-	return jsonBig.parse(await response.text())
-}
 
 /** @type {Function} */
 let onUnauth
@@ -34,7 +13,15 @@ let onUnauth
  * @returns {Promise<import('$types').ApiResponse<T>>}
  */
 async function invoke (fn, args, fetch) {
-	const body = await _invoke(fn, args || {}, fetch)
+	const resp = await fetch(`${endpoint}/${fn}`, {
+		method: 'POST',
+		body: JSON.stringify(args || {}),
+		headers: {
+			'content-type': 'application/json'
+		}
+	})
+
+	const body = await resp.json()
 	if (!body.ok) {
 		const msg = body.error?.message || ''
 		switch (msg) {
