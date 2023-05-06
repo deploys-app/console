@@ -13,11 +13,9 @@ FROM node:18-slim
 
 ENV NODE_ENV=production
 ENV BODY_SIZE_LIMIT=0
-ENV ADDRESS_HEADER=X-Real-Ip
+# ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
-ADD package.json yarn.lock .yarnrc.yml ./
-ADD .yarn .yarn
+ADD package.json ./
 COPY --from=0 /workspace/build .
-RUN yarn install
 CMD ["index.js"]
