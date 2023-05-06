@@ -16,5 +16,6 @@ ENV BODY_SIZE_LIMIT=0
 ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
+ADD package.json ./
 COPY --from=0 /workspace/build .
 CMD ["index.js"]
