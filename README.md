@@ -4,7 +4,7 @@ Web console for manage resources on deploys.app.
 
 ## Developing
 
-Install dependencies with `yarn install`.
+Install dependencies with `yarn workspaces focus`.
 
 Start development server:
 

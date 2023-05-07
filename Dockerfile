@@ -5,7 +5,7 @@ ENV NODE_ENV=production
 WORKDIR /workspace
 ADD package.json yarn.lock .yarnrc.yml ./
 ADD .yarn .yarn
-RUN yarn install
+RUN yarn workspaces focus
 ADD . .
 RUN yarn build
 
@@ -18,6 +18,6 @@ ENV ADDRESS_HEADER=X-Real-Ip
 WORKDIR /app
 ADD package.json yarn.lock .yarnrc.yml ./
 ADD .yarn .yarn
-RUN yarn install
+RUN yarn workspaces focus --production
 COPY --from=0 /workspace/build .
 CMD ["index.js"]
