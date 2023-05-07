@@ -1,8 +1,7 @@
 <script>
-	import { onDestroy } from 'svelte'
+	import { onMount } from 'svelte'
 	import * as format from '$lib/format'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import { browser } from '$app/environment'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -14,21 +13,12 @@
 	$: name = data.name
 	$: disk = data.disk
 
-	let pendingTimeout
-	$: {
-		if (browser) {
-			const hasPending = disk.status === 'pending'
-			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('disk.get'), 4000)
-			}
+	onMount(() => api.intervalInvalidate(async () => {
+		await api.invalidate('disk.get')
+		if (disk.status !== 'pending') {
+			return 300000
 		}
-	}
-
-	if (browser) {
-		onDestroy(() => {
-			clearTimeout(pendingTimeout)
-		})
-	}
+	}, 4000))
 
 	function deleteItem () {
 		modal.confirm({

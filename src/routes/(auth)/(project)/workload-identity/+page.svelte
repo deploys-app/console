@@ -4,8 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import { loading } from '$lib/stores'
 	import * as format from '$lib/format'
-	import { browser } from '$app/environment'
-	import { onDestroy } from 'svelte'
+	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
 	export let data
@@ -14,21 +13,9 @@
 	$: permission = data.permission
 	$: workloadIdentities = data.workloadIdentities
 
-	let pendingTimeout
-	$: {
-		if (browser) {
-			const hasPending = workloadIdentities.some((x) => x.status === 'pending')
-			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('workloadIdentity.list'), 4000)
-			}
-		}
-	}
-
-	if (browser) {
-		onDestroy(() => {
-			clearTimeout(pendingTimeout)
-		})
-	}
+	onMount(() => api.intervalInvalidate(async () => {
+		await api.invalidate('workloadIdentity.list')
+	}, 5000))
 </script>
 
 <h6>Workload Identities</h6>

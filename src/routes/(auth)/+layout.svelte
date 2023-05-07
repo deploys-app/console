@@ -4,9 +4,8 @@
 	import Sidebar from '../_components/Sidebar.svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import * as stores from '$lib/stores'
-	import { browser } from '$app/environment'
 	import api from '$lib/api'
+	import { onMount } from 'svelte'
 	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
 
 	export let data
@@ -20,11 +19,11 @@
 	/** @type {ModalSelectProject} */
 	let projectModal
 
-	if (browser) {
+	onMount(() => {
 		api.setOnUnauth(() => {
 			goto('/auth/signin')
 		})
-	}
+	})
 
 	function hideSidebar () {
 		showSidebar = false

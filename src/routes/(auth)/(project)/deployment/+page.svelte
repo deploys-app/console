@@ -1,5 +1,5 @@
 <script>
-	import { onDestroy } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
@@ -14,19 +14,12 @@
 	$: permission = data.permission
 	$: deployments = data.deployments
 
-	let pendingTimeout
-	$: {
-		if (browser) {
-			const reloadTime = deployments.some((x) => x.status === 'pending') ? 4000 : 300000
-			pendingTimeout = setTimeout(() => api.invalidate('deployment.list'), reloadTime)
+	onMount(() => api.intervalInvalidate(async () => {
+		await api.invalidate('deployment.list')
+		if (!deployments.some((x) => x.status === 'pending')) {
+			return 300000
 		}
-	}
-
-	if (browser) {
-		onDestroy(() => {
-			clearTimeout(pendingTimeout)
-		})
-	}
+	}, 4000))
 </script>
 
 <h6>Deployments</h6>

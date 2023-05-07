@@ -1,16 +1,14 @@
 <script>
 	import Cookie from 'js-cookie'
-	import { browser } from '$app/environment'
+	import { onMount } from 'svelte'
 
 	export let data
 
 	const project = data.project
 
-	$: {
-		if (browser) {
-			Cookie.set('project', project, { expires: 7 })
-		}
-	}
+	onMount(() => {
+		Cookie.set('project', project, { expires: 7 })
+	})
 </script>
 
 <slot />

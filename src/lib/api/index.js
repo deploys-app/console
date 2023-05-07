@@ -60,8 +60,35 @@ function wrapInvalidate (fn) {
 	return invalidate(`${endpoint}/${fn}`)
 }
 
+/**
+ * intervalInvalidate calls callback every interval milliseconds
+ * must be called in onMount
+ * callback can return a number to override the interval for only the next call
+ * @param {() => Promise<number | void>} callback
+ * @param {number} interval
+ * @returns {Function}
+ */
+function intervalInvalidate(callback, interval) {
+	let p
+
+	let f
+	f = async () => {
+		let newInterval = await callback()
+		if (!newInterval) {
+			newInterval = interval
+		}
+		p = setTimeout(f, newInterval)
+	}
+	p = setTimeout(f, interval)
+
+	return () => {
+		clearTimeout(p)
+	}
+}
+
 export default {
 	invoke,
 	setOnUnauth,
-	invalidate: wrapInvalidate
+	invalidate: wrapInvalidate,
+	intervalInvalidate
 }

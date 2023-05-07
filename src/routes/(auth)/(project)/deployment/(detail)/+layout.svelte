@@ -1,7 +1,6 @@
 <script>
 	import Header from '../_components/Header.svelte'
-	import { browser } from '$app/environment'
-	import { onDestroy } from 'svelte'
+	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
 	export let data
@@ -9,21 +8,12 @@
 	$: project = data.project
 	$: deployment = data.deployment
 
-	let pendingTimeout
-	$: {
-		if (browser) {
-			const isPending = deployment.status === 'pending'
-			if (isPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('deployment.get'), 4000)
-			}
+	onMount(() => api.intervalInvalidate(async () => {
+		await api.invalidate('deployment.get')
+		if (deployment.status !== 'pending') {
+			return 300000
 		}
-	}
-
-	if (browser) {
-		onDestroy(() => {
-			clearTimeout(pendingTimeout)
-		})
-	}
+	}, 4000))
 </script>
 
 <div>

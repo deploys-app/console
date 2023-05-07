@@ -1,10 +1,9 @@
 <script>
-	import { onDestroy } from 'svelte'
+	import { onMount } from 'svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { browser } from '$app/environment'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
 
@@ -14,21 +13,12 @@
 	$: permission = data.permission
 	$: disks = data.disks
 
-	let pendingTimeout
-	$: {
-		if (browser) {
-			const hasPending = disks.some((x) => x.status === 'pending')
-			if (hasPending) {
-				pendingTimeout = setTimeout(() => api.invalidate('disk.list'), 4000)
-			}
+	onMount(() => api.intervalInvalidate(async () => {
+		await api.invalidate('disk.list')
+		if (!disks.some((x) => x.status === 'pending')) {
+			return 300000
 		}
-	}
-
-	if (browser) {
-		onDestroy(() => {
-			clearTimeout(pendingTimeout)
-		})
-	}
+	}, 4000))
 </script>
 
 <h6>Disks</h6>
