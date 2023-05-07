@@ -14,9 +14,6 @@
 	$: profile = data.profile
 	$: projects = data.projects
 
-	stores.profile.set(profile)
-	stores.projects.set(projects)
-
 	let showSidebar = false
 	$: $page, showSidebar = false
 

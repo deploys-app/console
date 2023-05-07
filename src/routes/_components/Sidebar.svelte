@@ -1,13 +1,13 @@
 <script>
 	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
-	import { project } from '$lib/stores'
 
 	/** @type {import('$types').Project[]} */
 	export let projects
 
 	$: menu = $page.data.menu || ''
-	$: projectName = projects.find((p) => p.project === $project)?.name || $project
+	$: project = $page.url.searchParams.get('project')
+	$: projectName = projects.find((p) => p.project === project)?.name || project
 
 	const dispatch = createEventDispatcher()
 
@@ -75,7 +75,7 @@
 
 			<div class="project-box _cs-pt" on:click={openProjectModal} on:keypress={openProjectModal}>
 				<span>
-					{#if $project}
+					{#if project}
 						{projectName}
 					{:else}
 						&#45;&#45;PROJECT&#45;&#45;
@@ -94,9 +94,9 @@
 
 		<div>
 			<ul class="sidebar-menus">
-				{#if $project}
+				{#if project}
 					<li>
-						<a href={`/?project=${$project}`} title="Dashboard">
+						<a href={`/?project=${project}`} title="Dashboard">
 							<div class="menu-item" class:is-active={menu === 'dashboard'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-columns"></i>
@@ -106,7 +106,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/deployment?project=${$project}`} title="Deployments">
+						<a href={`/deployment?project=${project}`} title="Deployments">
 							<div class="menu-item" class:is-active={menu === 'deployment'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-rocket"></i>
@@ -116,7 +116,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/domain?project=${$project}`} title="Domains">
+						<a href={`/domain?project=${project}`} title="Domains">
 							<div class="menu-item" class:is-active={menu === 'domain'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-globe"></i>
@@ -126,7 +126,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/route?project=${$project}`} title="Routes">
+						<a href={`/route?project=${project}`} title="Routes">
 							<div class="menu-item" class:is-active={menu === 'route'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-router"></i>
@@ -136,7 +136,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/workload-identity?project=${$project}`} title="Workload Identities">
+						<a href={`/workload-identity?project=${project}`} title="Workload Identities">
 							<div class="menu-item" class:is-active={menu === 'workload-identity'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-network-wired"></i>
@@ -146,7 +146,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/disk?project=${$project}`} title="Disks">
+						<a href={`/disk?project=${project}`} title="Disks">
 							<div class="menu-item" class:is-active={menu === 'disk'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-hdd"></i>
@@ -156,7 +156,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/pull-secret?project=${$project}`} title="Pull Secrets">
+						<a href={`/pull-secret?project=${project}`} title="Pull Secrets">
 							<div class="menu-item" class:is-active={menu === 'pull-secret'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-key"></i>
@@ -166,7 +166,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/role?project=${$project}`} title="Roles">
+						<a href={`/role?project=${project}`} title="Roles">
 							<div class="menu-item" class:is-active={menu === 'role'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-tag"></i>
@@ -176,7 +176,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/role/users?project=${$project}`} title="Users">
+						<a href={`/role/users?project=${project}`} title="Users">
 							<div class="menu-item" class:is-active={menu === 'role.users'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-users"></i>
@@ -186,7 +186,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/service-account?project=${$project}`} title="Service Accounts">
+						<a href={`/service-account?project=${project}`} title="Service Accounts">
 							<div class="menu-item" class:is-active={menu === 'service-account'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-user-lock"></i>
@@ -196,7 +196,7 @@
 						</a>
 					</li>
 					<li>
-						<a href={`/email?project=${$project}`} title="Emails">
+						<a href={`/email?project=${project}`} title="Emails">
 							<div class="menu-item" class:is-active={menu === 'email'}>
 								<span class="menu-icon">
 									<i class="fa-solid fa-envelope"></i>

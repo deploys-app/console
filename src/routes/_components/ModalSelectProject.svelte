@@ -1,11 +1,11 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { project } from '$lib/stores'
 
 	/** @type {import('$types').Project[]} */
 	export let projects
 
+	$: project = $page.url.searchParams.get('project')
 	let isActive = false
 
 	/**
@@ -17,7 +17,7 @@
 		const q = new URLSearchParams($page.url.search)
 		q.set('project', sid)
 
-		if ($project) {
+		if (project) {
 			goto(`${$page.data.overrideRedirect || ''}?${q.toString()}`)
 			return
 		}
@@ -52,7 +52,7 @@
 					{#each projects as it}
 					<tr>
 						<td>
-							{#if $project === it.project}
+							{#if project === it.project}
 								<i class="fas fa-check _cl-primary-500 _fs-600"></i>
 							{/if}
 						</td>

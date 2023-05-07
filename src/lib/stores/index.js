@@ -1,17 +1,5 @@
-import { derived, writable } from 'svelte/store'
+import { derived } from 'svelte/store'
 import { navigating, page } from '$app/stores'
-
-/** @type {import('svelte/store').Writable<import('$types').Profile>} */
-export const profile = writable(null)
-
-/** @type {import('svelte/store').Writable<import('$types').Project[]>} */
-export const projects = writable([])
-
-/** @type {import('svelte/store').Readable<string>} */
-export const project = derived(
-	page,
-	($page) =>
-		$page.url.searchParams.get('project'))
 
 /** @type {import('svelte/store').Readable<boolean>} */
 export const loading = derived(
