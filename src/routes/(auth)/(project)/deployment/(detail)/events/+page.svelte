@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
 	import * as format from '$lib/format'
-	import { browser } from '$app/environment'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
@@ -10,15 +9,13 @@
 
 	let events = []
 
-	if (browser) {
-		onMount(() => {
-			reloadEvents()
-			const reloadInterval = setInterval(() => reloadEvents(), 5000)
-			return () => {
-				clearInterval(reloadInterval)
-			}
-		})
-	}
+	onMount(() => {
+		reloadEvents()
+		const reloadInterval = setInterval(() => reloadEvents(), 5000)
+		return () => {
+			clearInterval(reloadInterval)
+		}
+	})
 
 	async function reloadEvents () {
 		const response = await fetch(deployment.eventUrl)
