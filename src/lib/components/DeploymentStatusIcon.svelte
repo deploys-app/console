@@ -65,6 +65,10 @@
 
 		try {
 			const response = await fetch(url)
+			if (response.status === 403) {
+				// token expired, stop polling
+				return
+			}
 			podStatus = await response.json()
 		} finally {
 			if (!podStatus || podStatus.ready !== podStatus.count) {

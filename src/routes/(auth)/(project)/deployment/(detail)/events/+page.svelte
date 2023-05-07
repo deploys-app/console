@@ -22,6 +22,10 @@
 
 	async function reloadEvents () {
 		const response = await fetch(deployment.eventUrl)
+		if (response.status === 403) {
+			// token expired
+			return
+		}
 		const result = await response.json()
 		events = result || []
 	}
