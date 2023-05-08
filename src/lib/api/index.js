@@ -68,11 +68,10 @@ function wrapInvalidate (fn) {
  * @param {number} interval
  * @returns {Function}
  */
-function intervalInvalidate(callback, interval) {
+function intervalInvalidate (callback, interval) {
 	let p
 
-	let f
-	f = async () => {
+	const f = async () => {
 		let newInterval = await callback()
 		if (!newInterval) {
 			newInterval = interval

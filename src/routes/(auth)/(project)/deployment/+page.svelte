@@ -1,9 +1,8 @@
 <script>
-	import { onDestroy, onMount } from 'svelte'
+	import { onMount } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { browser } from '$app/environment'
 	import * as format from '$lib/format'
 	import { loading } from '$lib/stores'
 	import api from '$lib/api'
