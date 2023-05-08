@@ -5,10 +5,7 @@
 
 	export let data
 
-	/** @type {import('$types').Project} */
 	const project = data.project
-
-	/** @type {import('$types').BillingAccount[]} */
 	const billingAccounts = data.billingAccounts
 
 	const form = {

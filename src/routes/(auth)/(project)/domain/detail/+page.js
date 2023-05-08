@@ -14,6 +14,8 @@ export async function load ({ url, parent, fetch }) {
 		throw error(500, `domain: ${domain.error?.message}`)
 	}
 
+	if (!domain.result) throw redirect(302, `/domain?project=${project}`)
+
 	return {
 		domain: domain.result
 	}

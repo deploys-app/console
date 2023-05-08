@@ -31,32 +31,7 @@
 	/** @type {import('$types').Disk[]} */
 	let disks = []
 
-	const form = deployment
-		? {
-			location: deployment.location,
-			name: deployment.name,
-			type: deployment.type,
-			image: deployment.image,
-			pullSecret: deployment.pullSecret,
-			workloadIdentity: deployment.workloadIdentity,
-			port: deployment.port,
-			protocol: deployment.protocol,
-			internal: deployment.internal,
-			command: deployment.command,
-			args: deployment.args,
-			schedule: deployment.schedule,
-			disk: deployment.disk || {
-				name: '',
-				mountPath: '',
-				subPath: ''
-			},
-			minReplicas: deployment.minReplicas,
-			maxReplicas: deployment.maxReplicas,
-			resources: deployment.resources,
-			env: Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v })),
-			mountData: Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
-		}
-		: {
+	const form = {
 			location: deployment?.location || '',
 			name: '',
 			type: 'WebService',
@@ -66,7 +41,9 @@
 			port: 8080,
 			protocol: 'http',
 			internal: false, // default for WebService
+			/** @type {string[]} */
 			command: [],
+			/** @type {string[]} */
 			args: [],
 			schedule: '',
 			disk: {
@@ -81,9 +58,35 @@
 					memory: '0'
 				}
 			},
+			/** @type {{ k: string, v: string }[]} */
 			env: [],
+			/** @type {{ k: string, v: string }[]} */
 			mountData: []
 		}
+	if (deployment) {
+		form.location = deployment.location
+		form.name = deployment.name
+		form.type = deployment.type
+		form.image = deployment.image
+		form.pullSecret = deployment.pullSecret
+		form.workloadIdentity = deployment.workloadIdentity
+		form.port = deployment.port
+		form.protocol = deployment.protocol
+		form.internal = deployment.internal
+		form.command = deployment.command
+		form.args = deployment.args
+		form.schedule = deployment.schedule
+		form.disk = deployment.disk || {
+			name: '',
+			mountPath: '',
+			subPath: ''
+		}
+		form.minReplicas = deployment.minReplicas
+		form.maxReplicas = deployment.maxReplicas
+		form.resources = deployment.resources
+		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
+		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
+	}
 
 	$: currentLocation = locations.find((x) => x.id === form.location)
 

@@ -25,7 +25,7 @@
 		})
 	}
 
-	let loadingCreateKey
+	let loadingCreateKey = false
 
 	async function createKey () {
 		if (loadingCreateKey) {

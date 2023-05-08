@@ -10,7 +10,7 @@
 
 	/**
 	 * @param {string} project
-	 * @returns {Promise}
+	 * @returns {Promise<void>}
 	 */
 	async function deleteItem (project) {
 		const result = await Swal.fire({

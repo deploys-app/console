@@ -12,6 +12,7 @@ export async function load ({ url, parent, fetch }) {
 		throw error(500, `project: ${projectInfo.error.message}`)
 	}
 
+	/** @type {import('$types').ApiResponse<import('$types').Deployment>} */
 	let deployment
 	if (location && name) {
 		deployment = await api.invoke('deployment.get', { project, location, name }, fetch)

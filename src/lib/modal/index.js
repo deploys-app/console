@@ -38,7 +38,7 @@ export async function confirm ({ title, html, yes, callback }) {
 
 /**
  * @typedef {Object} ModalErrorOptions
- * @property {string | import('$types').Error} error
+ * @property {string | import('$types').Error} [error]
  * @property {Function} [callback]
  */
 
@@ -75,6 +75,15 @@ export async function error ({ error, callback }) {
 	callback?.()
 }
 
+/**
+ * @typedef {Object} ModalSuccessOptions
+ * @property {string} [content]
+ */
+
+/**
+ * @param {ModalSuccessOptions} options
+ * @returns {Promise<void>}
+ */
 export async function success ({ content }) {
 	await Swal.fire(
 		'Success',

@@ -183,4 +183,77 @@ export interface Role {
 	createdBy: string
 }
 
+export interface Env {
+	[key: string]: string
+}
+
+export interface MountData {
+	[key: string]: string
+}
+
+export interface Annotations {
+	[key: string]: string
+}
+
+export interface DeploymentDisk {
+	name: string
+	mountPath: string
+	subPath: string
+}
+
+export enum DeploymentProtocol {
+	HTTP = 'http',
+	HTTPS = 'https',
+	H2C = 'h2c'
+}
+
+export interface Resource {
+	// cpu: string
+	memory: string
+}
+
+export interface DeploymentResource {
+	requests: Resource
+	limits: Resource
+}
+
+export interface Deployment {
+	project: string
+	location: string
+	name: string
+	type: string
+	revision: number
+	image: string
+	env: Env
+	command: string[]
+	args: string[]
+	workloadIdentity: string
+	pullSecret: string
+	disk?: DeploymentDisk
+	mountData: MountData
+	minReplicas: number
+	maxReplicas: number
+	schedule: string
+	port: number
+	protocol: DeploymentProtocol
+	internal: boolean
+	nodePort: number
+	annotations: Annotations
+	resources: DeploymentResource
+	url: string
+	internalUrl: string
+	logUrl: string
+	eventUrl: string
+	podsUrl: string
+	statusUrl: string
+	address: string
+	internalAddress: string
+	status: 'pending' | 'success' | 'error'
+	action: 'deploy' | 'delete' | 'pause'
+	allocatedPrice: number
+	createdAt: string
+	createdBy: string
+	successAt: string
+}
+
 export {}
