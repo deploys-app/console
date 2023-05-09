@@ -6,25 +6,18 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	/** @type {import('$types').ApiResponse<import('$types').Project>} */
-	const projectInfo = await api.invoke('project.get', { project }, fetch)
-	if (!projectInfo.ok) {
-		throw error(500, `project: ${projectInfo.error.message}`)
-	}
-
-	/** @type {import('$types').ApiResponse<import('$types').Deployment>} */
-	let deployment
+	/** @type {import('$types').ApiResponse<import('$types').Deployment> | null} */
+	let deployment = null
 	if (location && name) {
 		deployment = await api.invoke('deployment.get', { project, location, name }, fetch)
 		if (!deployment.ok) {
-			if (deployment.error.notFound) {
+			if (deployment.error?.notFound) {
 				throw redirect(302, `/deployment?project=${project}`)
 			}
-			throw error(500, `deployment: ${deployment.error.message}`)
+			throw error(500, `deployment: ${deployment.error?.message}`)
 		}
 	}
 	return {
-		quota: projectInfo.result.quota,
 		deployment: deployment?.result
 	}
 }

@@ -1,5 +1,16 @@
 import { error, redirect } from '@sveltejs/kit'
 import api from '$lib/api'
+import { browser } from '$app/environment'
+
+const browserCache = {
+	project: '',
+
+	/** @type {import('$types').Project | null} */
+	projectInfo: null,
+
+	/** @type {import('$types').Location[] | null} */
+	locations: null
+}
 
 export async function load ({ url, data, fetch }) {
 	const project = url.searchParams.get('project')
@@ -14,17 +25,43 @@ export async function load ({ url, data, fetch }) {
 		throw redirect(302, '/project')
 	}
 
+	if (browser) {
+		if (browserCache.project === project) {
+			return {
+				project,
+				projectInfo: browserCache.projectInfo,
+				locations: browserCache.locations
+			}
+		}
+	}
+
+	/** @type {import('$types').ApiResponse<import('$types').Project>} */
+	const projectInfo = await api.invoke('project.get', { project }, fetch)
+	if (!projectInfo.ok) {
+		// not allow to access if user don't have permission 'project.get'
+		if (projectInfo.error?.forbidden || projectInfo.error?.notFound) {
+			throw redirect(302, '/project')
+		}
+		throw error(500, `project: ${projectInfo.error?.message}`)
+	}
+	if (!projectInfo.result) throw error(302, '/project')
+
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Location>>} */
 	const locations = await api.invoke('location.list', { project }, fetch)
 	if (!locations.ok) {
-		if (locations.error.notFound) {
-			throw redirect(302, '/project')
-		}
-		throw error(500, `locations: ${locations.error.message}`)
+		throw error(500, `locations: ${locations.error?.message}`)
+	}
+	if (!locations.result) throw error(302, '/project')
+
+	if (browser) {
+		browserCache.project = project
+		browserCache.projectInfo = projectInfo.result
+		browserCache.locations = locations.result.items ?? []
 	}
 
 	return {
 		project,
-		locations: locations.result.items || []
+		projectInfo: projectInfo.result,
+		locations: locations.result.items ?? []
 	}
 }

@@ -7,14 +7,10 @@
 
 	export let data
 
-	const locations = data.locations
-
-	const {
-		quota,
-		deployment
-	} = data
-
+	$: locations = data.locations
 	$: project = data.project
+	$: quota = data.projectInfo.quota
+	$: deployment = data.deployment
 
 	const permission = {
 		pullSecrets: true,

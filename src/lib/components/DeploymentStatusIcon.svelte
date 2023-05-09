@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import { onDestroy } from 'svelte'
 
 	/** @type {'deploy' | 'delete' | 'pause'} */
@@ -27,7 +28,7 @@
 		status
 		url
 		action
-		fetchPodStatus()
+		browser && fetchPodStatus()
 	}
 	$: {
 		podStatus
