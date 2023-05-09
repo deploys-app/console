@@ -10,7 +10,7 @@
 	$: locations = data.locations
 	$: project = data.project
 	$: quota = data.projectInfo.quota
-	$: deployment = data.deployment
+	const deployment = data.deployment
 
 	const permission = {
 		pullSecrets: true,
@@ -28,37 +28,37 @@
 	let disks = []
 
 	const form = {
-			location: deployment?.location || '',
+		location: deployment?.location || '',
+		name: '',
+		type: 'WebService',
+		image: '',
+		pullSecret: '',
+		workloadIdentity: '',
+		port: 8080,
+		protocol: 'http',
+		internal: false, // default for WebService
+		/** @type {string[]} */
+		command: [],
+		/** @type {string[]} */
+		args: [],
+		schedule: '',
+		disk: {
 			name: '',
-			type: 'WebService',
-			image: '',
-			pullSecret: '',
-			workloadIdentity: '',
-			port: 8080,
-			protocol: 'http',
-			internal: false, // default for WebService
-			/** @type {string[]} */
-			command: [],
-			/** @type {string[]} */
-			args: [],
-			schedule: '',
-			disk: {
-				name: '',
-				mountPath: '',
-				subPath: ''
-			},
-			minReplicas: 1,
-			maxReplicas: 1,
-			resources: {
-				requests: {
-					memory: '0'
-				}
-			},
-			/** @type {{ k: string, v: string }[]} */
-			env: [],
-			/** @type {{ k: string, v: string }[]} */
-			mountData: []
-		}
+			mountPath: '',
+			subPath: ''
+		},
+		minReplicas: 1,
+		maxReplicas: 1,
+		resources: {
+			requests: {
+				memory: '0'
+			}
+		},
+		/** @type {{ k: string, v: string }[]} */
+		env: [],
+		/** @type {{ k: string, v: string }[]} */
+		mountData: []
+	}
 	if (deployment) {
 		form.location = deployment.location
 		form.name = deployment.name

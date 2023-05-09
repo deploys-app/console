@@ -1,5 +1,6 @@
 module.exports = {
 	root: true,
+	ignorePatterns: ['node_modules', 'build'],
 	extends: ['eslint:recommended'],
 	plugins: ['svelte3'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
