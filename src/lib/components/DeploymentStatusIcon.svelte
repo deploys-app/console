@@ -72,7 +72,7 @@
 			}
 			podStatus = await response.json()
 		} finally {
-			setTimeout(fetchPodStatus, 5000)
+			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 5000)
 		}
 	}
 
