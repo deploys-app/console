@@ -51,6 +51,8 @@
 				return
 			}
 
+			if (!update) clearCharts()
+
 			setChartSeries(chart.cpuUsage.chart, 'usage', resp.result.cpuUsage, update)
 			setChartSeries(chart.memory.chart, 'usage', resp.result.memoryUsage, update)
 			setChartSeries(chart.memory.chart, 'allocated', resp.result.memory, true)
@@ -130,7 +132,7 @@
 			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
 
 			if (update) {
-				const s = chart.series.find((it) => it.name === lineName)
+				const s = chart.series?.find((it) => it.name === lineName)
 				// already exists, update
 				if (s) {
 					s.update({ data }, false)
@@ -150,6 +152,13 @@
 		})
 
 		chart.redraw()
+	}
+
+	function clearCharts () {
+		chart.cpuUsage.chart?.series?.forEach((x) => x.remove())
+		chart.memory.chart?.series?.forEach((x) => x.remove())
+		chart.requests.chart?.series?.forEach((x) => x.remove())
+		chart.egress.chart?.series?.forEach((x) => x.remove())
 	}
 
 	onMount(() => {
