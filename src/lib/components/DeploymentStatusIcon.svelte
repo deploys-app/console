@@ -72,9 +72,7 @@
 			}
 			podStatus = await response.json()
 		} finally {
-			if (!podStatus || podStatus.ready !== podStatus.count) {
-				setTimeout(() => fetchPodStatus(), 5000)
-			}
+			setTimeout(fetchPodStatus, 5000)
 		}
 	}
 
