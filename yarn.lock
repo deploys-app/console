@@ -391,17 +391,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/browser@npm:7.51.0":
-  version: 7.51.0
-  resolution: "@sentry/browser@npm:7.51.0"
+"@sentry-internal/tracing@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry-internal/tracing@npm:7.51.2"
   dependencies:
-    "@sentry-internal/tracing": 7.51.0
-    "@sentry/core": 7.51.0
-    "@sentry/replay": 7.51.0
-    "@sentry/types": 7.51.0
-    "@sentry/utils": 7.51.0
+    "@sentry/core": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
     tslib: ^1.9.3
-  checksum: 10ab6ef9b8025461dc99a4540b92922e2992f46b4df1e2b29909548987885f17264fb3ee5fbcd06a4e7f5ddc95409cd78853f1b323629f7357ce6815a9d5784a
+  checksum: a10ee8717b76f140eaa1a94aac67005da98f0aa32a433d33a29265db7197fcb2e4a1e1a21502926f3c1460a5c82a6bc78413013731ac0a3bb41797f25550694e
+  languageName: node
+  linkType: hard
+
+"@sentry/browser@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/browser@npm:7.51.2"
+  dependencies:
+    "@sentry-internal/tracing": 7.51.2
+    "@sentry/core": 7.51.2
+    "@sentry/replay": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
+    tslib: ^1.9.3
+  checksum: af027bc6d38dee0a5577ee83b69d57ffce63334ff8232a2ab24ae142aef9c8d50968badcc5bf11ef296d14c92cba7009216b5b0692d9af587ed6a506210bf553
   languageName: node
   linkType: hard
 
@@ -447,19 +459,46 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/integrations@npm:7.51.0":
-  version: 7.51.0
-  resolution: "@sentry/integrations@npm:7.51.0"
+"@sentry/core@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/core@npm:7.51.2"
   dependencies:
-    "@sentry/types": 7.51.0
-    "@sentry/utils": 7.51.0
-    localforage: ^1.8.1
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
     tslib: ^1.9.3
-  checksum: dc62cc7c28488283fd188c70b3a1d59f08489ee3ca405c5c6640c3b377dc2fedbb004fb9bb2d82d28dd40330c12843f3fd8d9976f71eafe66130c143a3fd5862
+  checksum: f0526ff9cbbea368e50e24ff3ff4b97df8e6d2bede340de69ae2362715bc30d9f1b526eff4eea1f1e891b69e5fec09d263196fa49a1dfeca7aab38e92aa79a90
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:7.51.0, @sentry/node@npm:^7.19.0":
+"@sentry/integrations@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/integrations@npm:7.51.2"
+  dependencies:
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
+    localforage: ^1.8.1
+    tslib: ^1.9.3
+  checksum: 5e40e34433e5393b7927a3299760924170cfedcd54f2730b71e51363778e3dbd35d139e01c7afbb8cb20a8be1e8548f473515480daf5187b736f3d2de50b2e87
+  languageName: node
+  linkType: hard
+
+"@sentry/node@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/node@npm:7.51.2"
+  dependencies:
+    "@sentry-internal/tracing": 7.51.2
+    "@sentry/core": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
+    cookie: ^0.4.1
+    https-proxy-agent: ^5.0.0
+    lru_map: ^0.3.3
+    tslib: ^1.9.3
+  checksum: 86abe40ccd69268c0ab3cf57ef9f93126e70a222da962476b3d8157c2f8225537344bfe29fc0bbb2148f9f30d3377afd6f1b20cbe3fa8f349bc27796171ad18b
+  languageName: node
+  linkType: hard
+
+"@sentry/node@npm:^7.19.0":
   version: 7.51.0
   resolution: "@sentry/node@npm:7.51.0"
   dependencies:
@@ -475,48 +514,48 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/replay@npm:7.51.0":
-  version: 7.51.0
-  resolution: "@sentry/replay@npm:7.51.0"
+"@sentry/replay@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/replay@npm:7.51.2"
   dependencies:
-    "@sentry/core": 7.51.0
-    "@sentry/types": 7.51.0
-    "@sentry/utils": 7.51.0
-  checksum: eeb663bbccfeb9fbd2d04091af6018a1bac3749ec565edcf6720688bbdfc7ffafd502528f753739c3b2144a569b6bb9b7d00fbba59f344ddf7a3dd78c1cd2211
+    "@sentry/core": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
+  checksum: 2f6c5b9a31576049e9385aebb384237372889ecf07a6bc9a72a50d4b21584fed2c77bb6897ec7c6fd790469fbcc3c62affeb617475cf39b0993b01a400611aed
   languageName: node
   linkType: hard
 
-"@sentry/svelte@npm:7.51.0":
-  version: 7.51.0
-  resolution: "@sentry/svelte@npm:7.51.0"
+"@sentry/svelte@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/svelte@npm:7.51.2"
   dependencies:
-    "@sentry/browser": 7.51.0
-    "@sentry/types": 7.51.0
-    "@sentry/utils": 7.51.0
+    "@sentry/browser": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
     magic-string: ^0.26.2
     tslib: ^1.9.3
   peerDependencies:
     svelte: 3.x
-  checksum: 4f28327c291af596c3a938affa746d1a5d0cfe89681f59e0c1a03adff9437395298cbd77043e1140294253b19726a76c2f250931f29a977690a2ab19d8d8f754
+  checksum: 4d714f2b4fbdddecbc98adec4f19e58ed9fd477f6341d495d9155f895c7966abb6141142da1853b8a2f0997120ff274422f9d90b9e1bb3794d88e160471dac65
   languageName: node
   linkType: hard
 
-"@sentry/sveltekit@npm:^7.51.0":
-  version: 7.51.0
-  resolution: "@sentry/sveltekit@npm:7.51.0"
+"@sentry/sveltekit@npm:^7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/sveltekit@npm:7.51.2"
   dependencies:
-    "@sentry-internal/tracing": 7.51.0
-    "@sentry/core": 7.51.0
-    "@sentry/integrations": 7.51.0
-    "@sentry/node": 7.51.0
-    "@sentry/svelte": 7.51.0
-    "@sentry/types": 7.51.0
-    "@sentry/utils": 7.51.0
+    "@sentry-internal/tracing": 7.51.2
+    "@sentry/core": 7.51.2
+    "@sentry/integrations": 7.51.2
+    "@sentry/node": 7.51.2
+    "@sentry/svelte": 7.51.2
+    "@sentry/types": 7.51.2
+    "@sentry/utils": 7.51.2
     "@sentry/vite-plugin": ^0.6.0
     sorcery: 0.11.0
   peerDependencies:
     "@sveltejs/kit": 1.x
-  checksum: c52fb52a9463e6fd03b23846b0849f9fb853d945cba9685c3547b6bfe5dd2e6cae531921ef3e84420582ad7cfdad6badb8aab12c0ff84341329f3caa882c2be9
+  checksum: 2c11ae33811be764f70e7be69ae3a8cd1c20dd1bcc86f94c3a924d4e235ebc2de79f4ca857579099fdf012ff965b1b18a128adf7806ead94748fca56f42d695e
   languageName: node
   linkType: hard
 
@@ -536,6 +575,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/types@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/types@npm:7.51.2"
+  checksum: 6d200e1b4f15f0d4911a1579c44e5fabe73220b2b0ec297ece88503e93249fd1f268f5b6319b22f58334638a9f7e611a5cf89813d087b74b2cc4e7d6b0c027ca
+  languageName: node
+  linkType: hard
+
 "@sentry/utils@npm:7.51.0":
   version: 7.51.0
   resolution: "@sentry/utils@npm:7.51.0"
@@ -543,6 +589,16 @@ __metadata:
     "@sentry/types": 7.51.0
     tslib: ^1.9.3
   checksum: 6de2f18dfc41021a8b16b5f99f678bae28efbbf0796466c64d11e37a225d0159f8864997274a8d95f819a4419a5622c867789bb1bc640e70e0817bfc7bd78b14
+  languageName: node
+  linkType: hard
+
+"@sentry/utils@npm:7.51.2":
+  version: 7.51.2
+  resolution: "@sentry/utils@npm:7.51.2"
+  dependencies:
+    "@sentry/types": 7.51.2
+    tslib: ^1.9.3
+  checksum: 626e4ceb17677f67b5276624509e14bc3849244d4ea103df25ab5a3b2f341d2a3e791d9bb366dc79aa39b4085418a7562ee16037ceb8d05eb4f1b4874a8f3d06
   languageName: node
   linkType: hard
 
@@ -569,9 +625,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.16.2":
-  version: 1.16.2
-  resolution: "@sveltejs/kit@npm:1.16.2"
+"@sveltejs/kit@npm:=1.16.3":
+  version: 1.16.3
+  resolution: "@sveltejs/kit@npm:1.16.3"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^2.1.1
     "@types/cookie": ^0.5.1
@@ -591,7 +647,7 @@ __metadata:
     vite: ^4.0.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: c6d170b63c1ec00ecb8a9c2e65611a24233e5cbaeaed2209736906306d8e7715725c5145b0379e06b92c3552ad4502b1eac733ecf1756a723ee7001775a8566d
+  checksum: 624904bb227e700737fc766ca7c6fe5d5eec6778d4c8638b17b307075194a9d68b2012a3e4dc07b75095a4db9f7251684519b63e38b46dc67df6396f8c57d015
   languageName: node
   linkType: hard
 
@@ -982,21 +1038,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@sentry/sveltekit": ^7.51.0
+    "@sentry/sveltekit": ^7.51.2
     "@sveltejs/adapter-node": ^1.2.4
-    "@sveltejs/kit": =1.16.2
+    "@sveltejs/kit": =1.16.3
     clipboard: ^2.0.11
     dayjs: ^1.11.7
     eslint: ^8.40.0
     eslint-plugin-svelte3: ^4.0.0
     gravatar-url: ^4.0.1
-    highcharts: ^11.0.0
+    highcharts: ^11.0.1
     js-cookie: ^3.0.5
     prettier: ^2.8.8
     prettier-plugin-svelte: ^2.10.0
     sass: ^1.62.1
-    svelte: ^3.59.0
-    svelte-check: ^3.3.1
+    svelte: ^3.59.1
+    svelte-check: ^3.3.2
     svelte-preprocess: ^5.0.3
     sweetalert2: ^11.7.5
     typescript: ~5.0.4
@@ -1664,10 +1720,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"highcharts@npm:^11.0.0":
-  version: 11.0.0
-  resolution: "highcharts@npm:11.0.0"
-  checksum: f173287d413e1b7d55d6c8d1572e2469588ab2b10fd38f6a42159188be4bf61a9f06e559d591c4ed0a0e95cdd76b7c99d24fd928e9fdae948042f9bb2ff77ed5
+"highcharts@npm:^11.0.1":
+  version: 11.0.1
+  resolution: "highcharts@npm:11.0.1"
+  checksum: 773a7b876502d616b7c5f522610b061cc714233a6ecdd7f7d073151fdf53bc597c01a758fbda5bba9069a0ee487e7defddfbdb1de73a78db6267a9257250137c
   languageName: node
   linkType: hard
 
@@ -2919,9 +2975,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-check@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "svelte-check@npm:3.3.1"
+"svelte-check@npm:^3.3.2":
+  version: 3.3.2
+  resolution: "svelte-check@npm:3.3.2"
   dependencies:
     "@jridgewell/trace-mapping": ^0.3.17
     chokidar: ^3.4.1
@@ -2935,7 +2991,7 @@ __metadata:
     svelte: ^3.55.0
   bin:
     svelte-check: bin/svelte-check
-  checksum: e79fdbac6f0f72a21c2d8c77b5229158a8993464bd600586207c9287bccf6a9091d1ff323cab03eeb467bb4d15cca90390342158f6add341f055e99077a7c301
+  checksum: eb2079f499e42313dd875efc0dc72b4c3c843165bf5b7f013faf759d96fd4bab7ec9d3765a04ae4a77ef2e79b4b7ac90908cce3e844cf069fffbb9ad7ed56a98
   languageName: node
   linkType: hard
 
@@ -2994,10 +3050,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte@npm:^3.59.0":
-  version: 3.59.0
-  resolution: "svelte@npm:3.59.0"
-  checksum: 10e337f2241f716a8ada0f8ccc9660f283c75ffb0cd5ae4f17a6848b7a6b727432a808d50687553637a0591925236e430c21b2d0b5b40210d81479ceadefe4a5
+"svelte@npm:^3.59.1":
+  version: 3.59.1
+  resolution: "svelte@npm:3.59.1"
+  checksum: bd4344f01a5b0e219af99874b4e300e4e63449f81aa9e45c1216301a23f72baaf9b235147a40949d87e2a1430e7850659d73dec6be398bcd07706b79d4022cd6
   languageName: node
   linkType: hard
 
