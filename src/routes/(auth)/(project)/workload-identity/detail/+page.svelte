@@ -10,8 +10,7 @@
 
 	$: workloadIdentity = data.workloadIdentity
 	$: project = data.project
-
-	// export let location
+	$: projectInfo = data.projectInfo
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -89,7 +88,9 @@
 		<label for="pre-command">Command</label>
 		<pre id="pre-command">
 			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
-			<code id="command">{format.gsaBinding(workloadIdentity.projectId, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
+			{#if projectInfo}
+				<code id="command">{format.gsaBinding(projectInfo.id, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
+			{/if}
 		</pre>
 	</div>
 
