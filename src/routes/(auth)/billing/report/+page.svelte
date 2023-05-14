@@ -96,6 +96,10 @@
 	onMount(() => {
 		hc.init()
 		fetchReport()
+
+		return () => {
+			chart?.destroy()
+		}
 	})
 </script>
 
