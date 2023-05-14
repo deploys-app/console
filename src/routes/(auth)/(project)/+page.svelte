@@ -12,12 +12,12 @@
 	const unitGiB = 1024 * 1024 * 1024
 
 	$: billing = {
-		price: price.price?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '?',
-		cpu: usage.cpuUsage.toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		memory: (usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		egress: (usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		disk: (usage.disk / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
-		replica: usage.replica.toLocaleString(undefined, { maximumFractionDigits: 2 })
+		price: formatNumber(price.price),
+		cpu: formatNumber(usage.cpuUsage),
+		memory: formatNumber(usage.memory / unitGiB),
+		egress: formatNumber(usage.egress / unitGiB),
+		disk: formatNumber(usage.disk / unitGiB),
+		replica: formatNumber(usage.replica)
 	}
 
 	onMount(() => {
@@ -28,6 +28,11 @@
 			clearInterval(interval)
 		}
 	})
+
+	function formatNumber (v) {
+		if (Number.isNaN(v)) return '?'
+		return v?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '?'
+	}
 </script>
 
 <h6>Dashboard</h6>
