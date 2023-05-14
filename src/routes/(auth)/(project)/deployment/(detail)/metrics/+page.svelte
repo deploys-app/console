@@ -1,9 +1,8 @@
 <script>
 	import { page } from '$app/stores'
 	import api from '$lib/api'
-	import { onMount } from 'svelte'
-	import Highcharts from 'highcharts'
-	import * as hc from '$lib/hc'
+	import { onMount, tick } from 'svelte'
+	import Chart from '$lib/components/Chart.svelte'
 
 	export let data
 
@@ -15,29 +14,15 @@
 		range: $page.url.searchParams.get('range') || '1h'
 	}
 
-	const chart = {
-		cpuUsage: {
-			el: null,
-			chart: null
-		},
-		memory: {
-			el: null,
-			chart: null
-		},
-		requests: {
-			el: null,
-			chart: null
-		},
-		egress: {
-			el: null,
-			chart: null
-		}
-	}
+	let cpu = []
+	let memory = []
+	let request = []
+	let egress = []
 
 	let reloadTimeout
 
-	async function fetchMetrics (update = false) {
-		clearTimeout(reloadTimeout)
+	async function fetchMetrics (clear = false) {
+		reloadTimeout && clearTimeout(reloadTimeout)
 		reloadTimeout = null
 
 		try {
@@ -51,127 +36,40 @@
 				return
 			}
 
-			if (!update) clearCharts()
+			if (clear) {
+				cpu = []
+				memory = []
+				request = []
+				egress = []
+				await tick()
+			}
 
-			setChartSeries(chart.cpuUsage.chart, 'usage', resp.result.cpuUsage, update)
-			setChartSeries(chart.memory.chart, 'usage', resp.result.memoryUsage, update)
-			setChartSeries(chart.memory.chart, 'allocated', resp.result.memory, true)
-			chart.requests.chart && setChartSeries(chart.requests.chart, '', resp.result.requests, update)
-			setChartSeries(chart.egress.chart, '', resp.result.egress, update)
+			cpu = [
+				{ prefix: 'Usage', lines: resp.result.cpuUsage ?? [] }
+			]
+			memory = [
+				{ prefix: 'Usage', lines: resp.result.memoryUsage ?? [] },
+				{ prefix: 'Allocated', lines: resp.result.memory ?? [] }
+			]
+			if (deployment.type === 'WebService') {
+				request = [
+					{ prefix: 'Requests', lines: resp.result.requests ?? [] }
+				]
+			}
+			egress = [
+				{ prefix: 'Egress', lines: resp.result.egress ?? [] }
+			]
 		} finally {
-			clearTimeout(reloadTimeout) // prevent race condition
-			reloadTimeout = setTimeout(() => fetchMetrics(true), reloadInterval)
+			reloadTimeout && clearTimeout(reloadTimeout)
+			reloadTimeout = setTimeout(fetchMetrics, reloadInterval)
 		}
-	}
-
-	function initCharts () {
-		initChart(chart.cpuUsage, 'vCPU (second)', 'second')
-		initChart(chart.memory, 'Memory (bytes)', 'bytes')
-		chart.requests.el && initChart(chart.requests, 'Requests (rps)')
-		initChart(chart.egress, 'Egress (bytes)', 'bytes')
-	}
-
-	function initChart (it, title, format) {
-		let yFormatter = null
-
-		if (format === 'bytes') {
-			const kib = 1024
-			const mib = 1024 * kib
-			const gib = 1024 * mib
-			yFormatter = (v) => {
-				if (v > gib) {
-					return Highcharts.numberFormat(v / gib, 2) + 'Gi'
-				} else if (v > mib) {
-					return Highcharts.numberFormat(v / mib, 2) + 'Mi'
-				}
-				return Highcharts.numberFormat(v / kib, 2) + 'Ki'
-			}
-		}
-
-		it.chart = Highcharts.chart(it.el, {
-			title: {
-				text: title
-			},
-			xAxis: {
-				type: 'datetime'
-			},
-			yAxis: {
-				labels: {
-					formatter () {
-						if (!yFormatter) {
-							return this.value
-						}
-
-						return yFormatter(this.value)
-					}
-				}
-			},
-			series: []
-		})
-	}
-
-	function setChartSeries (chart, resourceType, lines, update) {
-		if (!lines) {
-			lines = []
-		}
-
-		let prefix = ''
-		switch (resourceType) {
-		case 'usage':
-			prefix = 'Usage '
-			break
-		case 'allocated':
-			prefix = 'Allocated '
-			break
-		}
-
-		!update && chart.series.forEach((x) => x.remove())
-
-		lines.forEach((l) => {
-			const lineName = prefix + l.name
-			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
-
-			if (update) {
-				const s = chart.series?.find((it) => it.name === lineName)
-				// already exists, update
-				if (s) {
-					s.update({ data }, false)
-					return
-				}
-			}
-
-			// not exists, add new series
-			chart.addSeries({
-				type: 'line',
-				name: lineName,
-				marker: {
-					enabled: false
-				},
-				data
-			}, false)
-		})
-
-		chart.redraw()
-	}
-
-	function clearCharts () {
-		chart.cpuUsage.chart?.series?.forEach((x) => x.remove())
-		chart.memory.chart?.series?.forEach((x) => x.remove())
-		chart.requests.chart?.series?.forEach((x) => x.remove())
-		chart.egress.chart?.series?.forEach((x) => x.remove())
 	}
 
 	onMount(() => {
-		hc.init()
-		initCharts()
 		fetchMetrics()
 
 		return () => {
-			clearTimeout(reloadTimeout)
-			chart.cpuUsage.chart?.destroy()
-			chart.memory.chart?.destroy()
-			chart.requests.chart?.destroy()
-			chart.egress.chart?.destroy()
+			reloadTimeout && clearTimeout(reloadTimeout)
 		}
 	})
 </script>
@@ -180,7 +78,7 @@
 
 <div class="_dp-g _gg-16px _jtfct-fst">
 	<div class="select">
-		<select bind:value={filter.range} on:change={() => fetchMetrics()}>
+		<select bind:value={filter.range} on:change={() => fetchMetrics(true)}>
 			<option value="1h">1 Hour</option>
 			<option value="6h">6 Hours</option>
 			<option value="12h">12 Hours</option>
@@ -197,9 +95,9 @@
 	</div>
 </div>
 
-<div bind:this={chart.cpuUsage.el}></div>
-<div bind:this={chart.memory.el}></div>
+<Chart title="vCPU (second)" unit="seconds" series={cpu} />
+<Chart title="Memory (bytes)" unit="bytes" series={memory} />
 {#if deployment.type === 'WebService'}
-	<div bind:this={chart.requests.el}></div>
+	<Chart title="Request (rps)" unit="rps" series={request} />
 {/if}
-<div bind:this={chart.egress.el}></div>
+<Chart title="Egress (bytes)" unit="bytes" series={egress} />

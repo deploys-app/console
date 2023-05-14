@@ -1,0 +1,107 @@
+<script>
+	import { onMount } from 'svelte'
+    import Highcharts, { charts } from 'highcharts'
+	import * as hc from '$lib/hc'
+	import { browser } from '$app/environment'
+
+    /** @type {string} */
+    export let title
+
+    /** @type {string} */
+    export let unit
+
+    /** @typedef {Object} Series */
+    /** @property {string} prefix */
+    /** @property {Array} lines */
+
+    /** @type {Series[]} */
+    export let series
+
+    /** @type {HTMLDivElement} */
+    let el
+
+    /** @type {import('highcharts').Chart} */
+    let chart
+
+    onMount(() => {
+        hc.init()
+
+        chart = Highcharts.chart(el, {
+            title: {
+                text: title
+            },
+            xAxis: {
+                type: 'datetime'
+            },
+            yAxis: {
+				labels: {
+					formatter () {
+                        return formatter(this.value)
+					}
+				}
+			},
+			series: []
+        })
+
+        return () => {
+            chart?.destroy()
+        }
+    })
+
+    $: {
+        // clear()
+        if (series?.length === 0) clear()
+        series?.forEach((s) => {
+            update(s.prefix, s.lines)
+        })
+        chart?.redraw()
+    }
+
+    function update (name, lines) {
+        if (!browser || !chart) return
+        if (!lines) lines = []
+
+        lines.forEach((l) => {
+            const lineName = name + ' ' + l.name
+            const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
+
+            const s = chart.series?.find((it) => it.name === lineName)
+            // already exists, update
+            if (s) {
+                s.setData(data, false)
+                return
+            }
+
+            chart.addSeries({
+                type: 'line',
+                name: lineName,
+                marker: {
+                    enabled: false
+                },
+                data
+            }, false)
+        })
+    }
+
+    function clear () {
+        [...chart?.series ?? []].forEach((x) => x.remove(false))
+    }
+
+    const kib = 1024
+    const mib = 1024 * kib
+    const gib = 1024 * mib
+
+    function formatter (v) {
+        if (unit === 'bytes') {
+            if (v > gib) {
+                return Highcharts.numberFormat(v / gib, 2) + 'Gi'
+            } else if (v > mib) {
+                return Highcharts.numberFormat(v / mib, 2) + 'Mi'
+            }
+            return Highcharts.numberFormat(v / kib, 2) + 'Ki'
+        }
+        return v
+    }
+</script>
+
+<div bind:this={el}></div>
