@@ -128,7 +128,7 @@
 
 	<h6><strong>Keys</strong></h6>
 	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		{#each (serviceAccount.keys || []) as key}
+		{#each (serviceAccount.keys ?? []) as key}
 			<div class="input -has-icon-right">
 				<input value="{key.secret}" readonly>
 				<div class="icon -is-right _cs-pt">

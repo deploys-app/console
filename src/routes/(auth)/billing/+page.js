@@ -5,9 +5,9 @@ export async function load ({ fetch }) {
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').BillingAccount>>} */
 	const billingAccounts = await api.invoke('billing.list', {}, fetch)
 	if (!billingAccounts.ok) {
-		throw error(500, `billingAccounts: ${billingAccounts.error.message}`)
+		throw error(500, `billingAccounts: ${billingAccounts.error?.message}`)
 	}
 	return {
-		billingAccounts: billingAccounts.result.items || []
+		billingAccounts: billingAccounts.result?.items ?? []
 	}
 }

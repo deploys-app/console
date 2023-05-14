@@ -19,7 +19,7 @@ export function memory (v) {
 	if (v === '0') {
 		return 'Shared'
 	}
-	const m = v.match(/^(\d+)(\w+)$/)
+	const m = v.match(/^(\d+)(\w+)$/) ?? []
 	if (m.length !== 3) {
 		return v
 	}
@@ -46,7 +46,7 @@ export function datetime (v) {
  */
 export function gsaBinding (project, name, gsa, locationProject) {
 	const namespace = 'deploys'
-	const matched = gsa.match(/^.*@([^.]+)\.iam.gserviceaccount.com$/) || []
+	const matched = gsa.match(/^.*@([^.]+)\.iam.gserviceaccount.com$/) ?? []
 	const googleProject = matched.length > 1 ? `\n    --project ${matched[1]} \\` : ''
 	return `gcloud iam service-accounts add-iam-policy-binding \\
     --role roles/iam.workloadIdentityUser \\

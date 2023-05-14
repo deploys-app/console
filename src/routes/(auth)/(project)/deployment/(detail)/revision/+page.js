@@ -11,11 +11,11 @@ export async function load ({ parent, fetch }) {
 
 	const revisions = await api.invoke('deployment.revisions', { project, location, name }, fetch)
 	if (!revisions.ok) {
-		throw error(500, `revisions: ${revisions.error.message}`)
+		throw error(500, `revisions: ${revisions.error?.message}`)
 	}
 
 	return {
 		deployment,
-		revisions: revisions.result.items || []
+		revisions: revisions.result.items ?? []
 	}
 }

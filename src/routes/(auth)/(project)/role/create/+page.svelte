@@ -13,9 +13,9 @@
 	$: project = data.project
 
 	const form = {
-		role: role?.role || '',
-		name: role?.name || '',
-		permissions: role?.permissions || []
+		role: role?.role ?? '',
+		name: role?.name ?? '',
+		permissions: role?.permissions ?? []
 	}
 
 	function deleteItem () {

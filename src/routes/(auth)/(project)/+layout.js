@@ -2,15 +2,15 @@ import { error, redirect } from '@sveltejs/kit'
 import api from '$lib/api'
 import { browser } from '$app/environment'
 
-const browserCache = {
-	project: '',
+/** 
+ * @typedef {Object} BrowserCache
+ * @property {string} project
+ * @property {import('$types').Project} projectInfo
+ * @property {import('$types').Location[]} locations
+ */
 
-	/** @type {import('$types').Project | null} */
-	projectInfo: null,
-
-	/** @type {import('$types').Location[] | null} */
-	locations: null
-}
+/** @type {BrowserCache | null} */
+let browserCache = null
 
 export async function load ({ url, data, fetch }) {
 	const project = url.searchParams.get('project')
@@ -25,13 +25,11 @@ export async function load ({ url, data, fetch }) {
 		throw redirect(302, '/project')
 	}
 
-	if (browser) {
-		if (browserCache.project === project) {
-			return {
-				project,
-				projectInfo: browserCache.projectInfo,
-				locations: browserCache.locations
-			}
+	if (browser && browserCache?.project === project) {
+		return {
+			project,
+			projectInfo: browserCache.projectInfo,
+			locations: browserCache.locations
 		}
 	}
 
@@ -54,9 +52,11 @@ export async function load ({ url, data, fetch }) {
 	if (!locations.result) throw error(302, '/project')
 
 	if (browser) {
-		browserCache.project = project
-		browserCache.projectInfo = projectInfo.result
-		browserCache.locations = locations.result.items ?? []
+		browserCache = {
+			project,
+			projectInfo: projectInfo.result,
+			locations: locations.result.items ?? []
+		}
 	}
 
 	return {

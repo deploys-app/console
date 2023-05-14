@@ -16,7 +16,7 @@ export async function load ({ url, parent, fetch }) {
 		/** @type {import('$types').ApiResponse<import('$types').Role>} */
 		const roleInfo = await api.invoke('role.get', { project, role: roleId }, fetch)
 		if (!roleInfo.ok) {
-			throw error(500, `role: ${roleInfo.error.message}`)
+			throw error(500, `role: ${roleInfo.error?.message}`)
 		}
 		role = roleInfo.result
 	}
@@ -24,6 +24,6 @@ export async function load ({ url, parent, fetch }) {
 	return {
 		menu: 'role',
 		role,
-		permissions: permissions.result || []
+		permissions: permissions.result ?? []
 	}
 }

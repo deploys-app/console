@@ -6,14 +6,14 @@ export async function load ({ parent, fetch }) {
 
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Deployment>>} */
 	const deployments = await api.invoke('deployment.list', { project }, fetch)
-	if (!deployments.ok && !deployments.error.forbidden) {
-		throw error(500, `deployments: ${deployments.error.message}`)
+	if (!deployments.ok && !deployments.error?.forbidden) {
+		throw error(500, `deployments: ${deployments.error?.message}`)
 	}
 
 	return {
 		permission: {
 			deployments: !deployments.error?.forbidden
 		},
-		deployments: deployments.result?.items || []
+		deployments: deployments.result?.items ?? []
 	}
 }

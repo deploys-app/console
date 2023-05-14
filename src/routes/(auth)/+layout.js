@@ -4,9 +4,11 @@ import api from '$lib/api'
 export async function load ({ fetch }) {
 	/** @type {import('$types').ApiResponse<import('$types').Profile>} */
 	const me = await api.invoke('me.get', {}, fetch)
-	if (!me.ok && me.error?.unauth) {
-		throw redirect(302, '/auth/signin')
+	if (!me.ok) {
+		if (me.error?.unauth) throw redirect(302, '/auth/signin')
+		throw error(500, me.error?.message)
 	}
+	if (!me.result) throw error(500, 'no profile')
 
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Project>>} */
 	const projects = await api.invoke('project.list', {}, fetch)
@@ -16,6 +18,6 @@ export async function load ({ fetch }) {
 
 	return {
 		profile: me.result,
-		projects: projects.result.items || []
+		projects: projects.result?.items ?? []
 	}
 }

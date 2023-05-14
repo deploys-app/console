@@ -1,7 +1,7 @@
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
-	const state = url.searchParams.get('state')
-	const code = url.searchParams.get('code')
+	const state = url.searchParams.get('state') ?? ''
+	const code = url.searchParams.get('code') ?? ''
 
 	if (state !== cookies.get('state')) {
 		return new Response('invalid state', { status: 400 })

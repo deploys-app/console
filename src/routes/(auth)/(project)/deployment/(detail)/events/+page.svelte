@@ -24,7 +24,7 @@
 			return
 		}
 		const result = await response.json()
-		events = result || []
+		events = result ?? []
 	}
 </script>
 

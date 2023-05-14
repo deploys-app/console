@@ -7,6 +7,9 @@
 
 	export let data
 
+	let locations = data.locations
+	let quota = data.projectInfo.quota
+
 	$: locations = data.locations
 	$: project = data.project
 	$: quota = data.projectInfo.quota
@@ -84,47 +87,62 @@
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
 	}
 
-	$: currentLocation = locations.find((x) => x.id === form.location)
+	$: selectedLocation = locations.find((x) => x.id === form.location)
 
 	async function fetchPullSecrets () {
-		const resp = await api.invoke('pullSecret.list', { project, location: currentLocation.id }, fetch)
+		if (!selectedLocation) {
+			pullSecrets = []
+			return
+		}
+
+		const resp = await api.invoke('pullSecret.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
-			if (resp.error.forbidden) {
+			if (resp.error?.forbidden) {
 				permission.pullSecrets = false
 				return
 			}
 			modal.error({ error: resp.error })
 			return
 		}
-		pullSecrets = resp.result.items || []
+		pullSecrets = resp.result.items ?? []
 		form.pullSecret = form.pullSecret
 	}
 
 	async function fetchWorkloadIdentities () {
-		const resp = await api.invoke('workloadIdentity.list', { project, location: currentLocation.id }, fetch)
+		if (!selectedLocation) {
+			workloadIdentities = []
+			return
+		}
+
+		const resp = await api.invoke('workloadIdentity.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
-			if (resp.error.forbidden) {
+			if (resp.error?.forbidden) {
 				permission.workloadIdentities = false
 				return
 			}
 			modal.error({ error: resp.error })
 			return
 		}
-		workloadIdentities = resp.result.items || []
+		workloadIdentities = resp.result.items ?? []
 		form.workloadIdentity = form.workloadIdentity
 	}
 
 	async function fetchDisks () {
-		const resp = await api.invoke('disk.list', { project, location: currentLocation.id }, fetch)
+		if (!selectedLocation) {
+			disks = []
+			return
+		}
+
+		const resp = await api.invoke('disk.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
-			if (resp.error.forbidden) {
+			if (resp.error?.forbidden) {
 				permission.disks = false
 				return
 			}
 			modal.error({ error: resp.error })
 			return
 		}
-		disks = resp.result.items || []
+		disks = resp.result.items ?? []
 		form.disk.name = form.disk.name
 	}
 
@@ -134,7 +152,7 @@
 		disks = []
 
 		await tick()
-		if (!currentLocation) {
+		if (!selectedLocation) {
 			return
 		}
 		fetchPullSecrets()
@@ -243,7 +261,7 @@
 			</div>
 		{/if}
 
-		{#if currentLocation}
+		{#if selectedLocation}
 			<div class="field">
 				<label for="input-name">Name</label>
 				<div class="input">
@@ -301,7 +319,7 @@
 			</div>
 		{/if}
 
-		{#if currentLocation?.features.workloadIdentity}
+		{#if selectedLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
 				<div class="field">
 					<label for="input-workload_identity">Workload Identity</label>
@@ -400,7 +418,7 @@
 			</div>
 		{/if}
 
-		{#if currentLocation.features.disk}
+		{#if selectedLocation.features.disk}
 			<div class="_dp-g _gg-16px">
 				<br>
 				<hr>
@@ -504,7 +522,7 @@
 			<label for="input-memory">Memory allocated</label>
 			<div class="select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
-					{#each currentLocation.memoryAllocatable as it}
+					{#each selectedLocation.memoryAllocatable as it}
 						<option value={it}>{format.memory(it)}</option>
 					{/each}
 				</select>

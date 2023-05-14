@@ -39,7 +39,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		const list = resp.result.items || []
+		const list = resp.result?.items ?? []
 		domains = list
 			.filter((x) => x.status === 'success')
 	}
@@ -53,7 +53,7 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		const list = resp.result.items || []
+		const list = resp.result.items ?? []
 		deployments = list
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.type === 'WebService')
@@ -70,6 +70,8 @@
 		if (saving) {
 			return
 		}
+
+		if (!selectedDomain) return
 
 		const subdomain = form.subdomain.trim()
 		let domain = form.domain

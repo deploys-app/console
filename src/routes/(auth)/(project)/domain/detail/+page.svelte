@@ -226,7 +226,7 @@
 		{#if domain.verification?.ownership?.type}
 			<hr>
 			<p><strong>Domain Verification</strong></p>
-			{#if (domain.verification.ownership.errors || []).length > 0}
+			{#if (domain.verification.ownership.errors ?? []).length > 0}
 				{#each domain.verification.ownership.errors as e}
 					<p class="_cl-negative-500">{e}</p>
 				{/each}
@@ -253,7 +253,7 @@
 			</div>
 		{/if}
 
-		{#if (domain.verification?.ssl?.records || []).length > 0}
+		{#if (domain.verification?.ssl?.records ?? []).length > 0}
 			<hr>
 			<p><strong>SSL/TLS Verification</strong></p>
 			{#each domain.verification.ssl.records as it, index}
@@ -282,7 +282,7 @@
 
 		{#if domain.status === 'success' || domain.status === 'verify'}
 			<hr>
-			{#if (domain.dnsConfig.ipv4 || []).length > 0}
+			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
 				<div class="field">
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip}
@@ -296,7 +296,7 @@
 					{/each}
 				</div>
 			{/if}
-			{#if (domain.dnsConfig.ipv6 || []).length > 0}
+			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
 				<div class="field">
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip}
@@ -310,7 +310,7 @@
 					{/each}
 				</div>
 			{/if}
-			{#if (domain.dnsConfig.cname || []).length > 0}
+			{#if (domain.dnsConfig.cname ?? []).length > 0}
 				<div class="field">
 					<label for="input-cname">CNAME Record</label>
 					{#each domain.dnsConfig.cname as cname}

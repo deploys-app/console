@@ -21,7 +21,7 @@
 		const resp = await api.invoke('billing.report', {
 			id: billingAccount.id,
 			range: filter.range,
-			projectSids: filter.projectSids || []
+			projectSids: filter.projectSids ?? []
 		}, fetch)
 		if (!resp.ok) {
 			return
@@ -38,7 +38,7 @@
 				x.billingValue = +x.billingValue
 			})
 
-		filter.projectSids = report.projectSids || []
+		filter.projectSids = report.projectSids ?? []
 		initChart()
 	}
 
@@ -143,7 +143,7 @@
 
 	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-32px">
 		<div class="_dp-f _fw-w">
-			{#each (report?.projectList || []) as it}
+			{#each (report?.projectList ?? []) as it}
 				<div class="checkbox _mgbt-8px _mgr-12px">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} on:change={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
@@ -168,7 +168,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each (report?.list || []) as it}
+				{#each (report?.list ?? []) as it}
 					<tr>
 						<td>{it.projectSid}</td>
 						<td>{it.name}</td>
