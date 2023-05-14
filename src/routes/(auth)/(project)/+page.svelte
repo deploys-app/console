@@ -12,7 +12,7 @@
 	const unitGiB = 1024 * 1024 * 1024
 
 	$: billing = {
-		price: price.price.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+		price: price.price?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '?',
 		cpu: usage.cpuUsage.toLocaleString(undefined, { maximumFractionDigits: 2 }),
 		memory: (usage.memory / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
 		egress: (usage.egress / unitGiB).toLocaleString(undefined, { maximumFractionDigits: 2 }),
