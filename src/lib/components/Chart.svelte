@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
-    import Highcharts, { charts } from 'highcharts'
+    import Highcharts from 'highcharts'
 	import * as hc from '$lib/hc'
 	import { browser } from '$app/environment'
 
