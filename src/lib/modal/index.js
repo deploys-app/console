@@ -38,7 +38,7 @@ export async function confirm ({ title, html, yes, callback }) {
 
 /**
  * @typedef {Object} ModalErrorOptions
- * @property {string | import('$types').Error} [error]
+ * @property {string | import('$types').Error | unknown} [error]
  * @property {Function} [callback]
  */
 
@@ -55,11 +55,13 @@ export async function error ({ error, callback }) {
 	let msg = ''
 	if (typeof error === 'string') {
 		msg = error
-	} else {
-		if (error.message) {
+	} else if (error instanceof Error) {
+		msg = error.message
+	} else if (typeof error === 'object') {
+		if ('message' in error && typeof error.message === 'string') {
 			msg = error.message
 		}
-		if (error.validate) {
+		if ('validate' in error && Array.isArray(error.validate)) {
 			msg = error.validate.join('<br>')
 		}
 	}

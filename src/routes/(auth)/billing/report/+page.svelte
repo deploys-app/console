@@ -28,28 +28,16 @@
 		}
 		report = resp.result
 
-		report.chart.series
-			?.forEach((x) => {
-				x.data = x.data.map(Number)
-			})
-		report.list
-			?.forEach((x) => {
-				x.usageValue = +x.usageValue
-				x.billingValue = +x.billingValue
-			})
-
 		filter.projectSids = report.projectSids ?? []
 		initChart()
 	}
 
-	const reportChart = {
-		el: null,
-		chart: null
-	}
+	let chartEl = null
+	let chart = null
 
 	function initChart () {
-		reportChart.chart && reportChart.chart.destroy()
-		reportChart.chart = Highcharts.chart(reportChart.el, {
+		chart?.destroy()
+		chart = Highcharts.chart(chartEl, {
 			chart: {
 				type: 'spline',
 				scrollablePlotArea: {
@@ -152,7 +140,7 @@
 		</div>
 	</div>
 
-	<div bind:this={reportChart.el} class="_mgv-12px"></div>
+	<div bind:this={chartEl} class="_mgv-12px"></div>
 
 	<br>
 

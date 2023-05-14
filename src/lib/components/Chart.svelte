@@ -17,6 +17,9 @@
     /** @type {Series[]} */
     export let series
 
+    /** @type {'line' | 'spline'} */
+    export let type = 'line'
+
     /** @type {HTMLDivElement} */
     let el
 
@@ -49,7 +52,6 @@
     })
 
     $: {
-        // clear()
         if (series?.length === 0) clear()
         series?.forEach((s) => {
             update(s.prefix, s.lines)
@@ -73,7 +75,7 @@
             }
 
             chart.addSeries({
-                type: 'line',
+                type,
                 name: lineName,
                 marker: {
                     enabled: false
