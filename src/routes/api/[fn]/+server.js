@@ -13,14 +13,14 @@ export async function POST ({ locals, params, request }) {
 		duplex: 'half',
 		headers: {
 			accept: 'application/json',
-			'content-type': request.headers.get('content-type'),
+			'content-type': request.headers.get('content-type') ?? 'application/json',
 			authorization: `bearer ${token}`
 		}
 	})
 	return new Response(resp.body, {
 		status: resp.status,
 		headers: {
-			'content-type': resp.headers.get('content-type')
+			'content-type': resp.headers.get('content-type') ?? ''
 		}
 	})
 }

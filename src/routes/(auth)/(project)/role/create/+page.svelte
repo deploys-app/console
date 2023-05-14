@@ -19,6 +19,8 @@
 	}
 
 	function deleteItem () {
+		if (!role) return
+
 		modal.confirm({
 			title: `Delete ${role.role} and its users ?`,
 			yes: 'Delete',

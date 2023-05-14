@@ -9,10 +9,10 @@ export async function load ({ url, parent, fetch }) {
 	if (id) {
 		serviceAccount = await api.invoke('serviceAccount.get', { project, id }, fetch)
 		if (!serviceAccount.ok) {
-			if (serviceAccount.error.notFound) {
+			if (serviceAccount.error?.notFound) {
 				throw redirect(302, `/service-account?project=${project}`)
 			}
-			throw error(500, `serviceAccount: ${serviceAccount.error.message}`)
+			throw error(500, `serviceAccount: ${serviceAccount.error?.message}`)
 		}
 	}
 

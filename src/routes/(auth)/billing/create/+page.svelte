@@ -5,7 +5,6 @@
 
 	export let data
 
-	/** @type {import('$types').BillingAccount} */
 	const billingAccount = data.billingAccount
 
 	const form = {

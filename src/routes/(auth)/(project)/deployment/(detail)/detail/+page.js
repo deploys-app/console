@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { redirect, error } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
@@ -13,6 +13,7 @@ export async function load ({ parent, fetch }) {
 	if (!locationInfo.ok) {
 		throw error(500, `location: ${locationInfo.error?.message}`)
 	}
+	if (!locationInfo.result) throw redirect(302, `/deployment?project=${project}`)
 
 	return {
 		location: locationInfo.result,
