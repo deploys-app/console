@@ -3,8 +3,7 @@ import { env } from '$env/dynamic/public'
 
 if (env.PUBLIC_SENTRY_DSN) {
 	Sentry.init({
-		dsn: env.PUBLIC_SENTRY_DSN,
-		tracesSampleRate: 1
+		dsn: env.PUBLIC_SENTRY_DSN
 	})
 }
 
