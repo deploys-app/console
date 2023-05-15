@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit'
 import api from '$lib/api'
 import { browser } from '$app/environment'
 
-/** 
+/**
  * @typedef {Object} BrowserCache
  * @property {string} project
  * @property {import('$types').Project} projectInfo
