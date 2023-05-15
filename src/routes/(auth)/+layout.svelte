@@ -11,7 +11,7 @@
 	export let data
 
 	$: profile = data.profile
-	$: projects = data.projects
+	$: projects = data.projects ?? []
 
 	let showSidebar = false
 	$: $page, showSidebar = false
