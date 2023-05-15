@@ -31,11 +31,11 @@
     "sweetalert2": "^11.7.5",
     "typescript": "~5.0.4",
     "valid-url": "^1.0.9",
-    "vite": "^4.3.5"
+    "vite": "^4.3.6"
   },
   "type": "module",
   "packageManager": "yarn@3.5.1",
   "dependencies": {
-    "@sentry/sveltekit": "^7.51.2"
+    "@sentry/sveltekit": "^7.52.0"
   }
 }
