@@ -9,7 +9,7 @@ export async function load ({ url, parent, fetch }) {
 		if (serviceAccount.error?.message === 'api: service account not found') {
 			throw redirect(302, `/service-account?project=${project}`)
 		}
-		throw error(500, `serviceAccount: ${serviceAccount.error?.message}`)
+		throw error(500, serviceAccount.error?.message)
 	}
 	return {
 		id,

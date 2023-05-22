@@ -12,9 +12,7 @@ export async function load ({ fetch }) {
 
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Project>>} */
 	const projects = await api.invoke('project.list', {}, fetch)
-	if (!projects.ok) {
-		throw error(500, projects.error?.message)
-	}
+	if (!projects.ok) throw error(500, projects.error?.message)
 
 	return {
 		profile: me.result,

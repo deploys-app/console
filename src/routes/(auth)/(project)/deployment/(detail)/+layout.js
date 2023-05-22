@@ -10,8 +10,9 @@ export async function load ({ url, parent, fetch }) {
 		if (deployment.error?.notFound) {
 			throw redirect(302, `/deployment?project=${project}`)
 		}
-		throw error(500, `deployment: ${deployment.error?.message}`)
+		throw error(500, deployment.error?.message)
 	}
+
 	return {
 		location,
 		name,

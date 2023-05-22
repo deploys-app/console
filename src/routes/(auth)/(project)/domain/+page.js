@@ -6,7 +6,7 @@ export async function load ({ parent, fetch }) {
 
 	const domains = await api.invoke('domain.list', { project }, fetch)
 	if (!domains.ok && !domains.error?.forbidden) {
-		throw error(500, `domains: ${domains.error?.message}`)
+		throw error(500, domains.error?.message)
 	}
 
 	return {

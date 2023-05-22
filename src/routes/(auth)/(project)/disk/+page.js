@@ -6,7 +6,7 @@ export async function load ({ parent, fetch }) {
 
 	const disks = await api.invoke('disk.list', { project }, fetch)
 	if (!disks.ok && !disks.error?.forbidden) {
-		throw error(500, `disks: ${disks.error?.message}`)
+		throw error(500, disks.error?.message)
 	}
 
 	return {

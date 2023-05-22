@@ -8,10 +8,8 @@ export async function load ({ url, parent, fetch }) {
 
 	const disk = await api.invoke('disk.get', { project, location, name }, fetch)
 	if (!disk.ok) {
-		if (disk.error?.notFound) {
-			throw redirect(302, `/disk?project=${project}`)
-		}
-		throw error(500, `disk: ${disk.error?.message}`)
+		if (disk.error?.notFound) throw redirect(302, `/disk?project=${project}`)
+		throw error(500, disk.error?.message)
 	}
 	if (!disk.result) throw redirect(302, `/disk?project=${project}`)
 

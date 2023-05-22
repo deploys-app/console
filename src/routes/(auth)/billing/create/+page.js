@@ -9,10 +9,8 @@ export async function load ({ url, fetch }) {
 		/** @type {import('$types').ApiResponse<import('$types').BillingAccount>} */
 		const res = await api.invoke('billing.get', { id }, fetch)
 		if (!res.ok) {
-			if (res.error?.notFound) {
-				throw redirect(302, '/billing')
-			}
-			throw error(500, `billingAccount: ${res.error?.message}`)
+			if (res.error?.notFound) throw redirect(302, '/billing')
+			throw error(500, res.error?.message)
 		}
 		if (!res.result) throw redirect(302, '/billing')
 
