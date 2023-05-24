@@ -26,6 +26,10 @@ jobs:
       with:
         push: true
         tags: asia-southeast1-docker.pkg.dev/deploys-app/public/console:${{ github.sha }}
+        build-args: |
+          SENTRY_ORG=${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
   deploy:
     runs-on: ubuntu-latest
     name: Deploy

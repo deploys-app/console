@@ -1,5 +1,9 @@
 FROM node:18-slim
 
+ENV SENTRY_ORG
+ENV SENTRY_PROJECT
+ENV SENTRY_AUTH_TOKEN
+
 WORKDIR /workspace
 ADD package.json yarn.lock .yarnrc.yml ./
 ADD .yarn .yarn

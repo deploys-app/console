@@ -1,6 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite'
 import { defineConfig } from 'vite'
+import { sentrySvelteKit } from '@sentry/sveltekit'
 
 export default defineConfig({
-	plugins: [sveltekit()]
+	plugins: [
+		process.env.SENTRY_AUTH_TOKEN ? sentrySvelteKit() : null,
+		sveltekit()
+	]
 })
