@@ -1,15 +1,37 @@
+@import '@nomimono/nomimono-theme/light.css';
 @import 'theme';
-@import 'reset';
+
+@import '@nomimono/nomimono-css/reset.css';
+@import '@nomimono/nomimono-css/atomic.css';
+@import '@nomimono/nomimono-css/layout.css';
+@import '@nomimono/nomimono-css/component.css';
 
 @import 'atomic/all';
 @import 'utility/all';
-@import 'layout/all';
 @import 'component/all';
 
-// @import 'fontawesome/fontawesome';
-// @import 'fontawesome/solid';
-// @import 'fontawesome/light';
-// @import 'fontawesome/brands';
+html, body {
+    background-color: hsl(226, 39%, 15%);
+}
+
+body, h1, h2, h3, h4, h4, h5, h6 {
+	line-height: 1.25;
+}
+
+[disabled] {
+	cursor: not-allowed;
+}
+
+ul, ol {
+	list-style: none;
+}
+
+.lo-grid-span-horizontal {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 1rem;
+	justify-content: start;
+}
 
 .sidebar-menus {
     .menu-item {

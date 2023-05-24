@@ -37,7 +37,7 @@
 
 <h6>Dashboard</h6>
 <br>
-<div class="lo-12 lo-6-md _gg-24px _alit-st">
+<div class="lo-12 lo-6:md _gg-24px _alit-st">
 	<div class="panel lo-12 _gg-24px">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
@@ -84,7 +84,7 @@
 				<strong class="_mgl-16px">Billing</strong>
 			</h6>
 			<hr>
-			<div class="lo-12 lo-6-sm _gg-12px">
+			<div class="lo-12 lo-6:sm _gg-12px">
 				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
 					<h4 class="_cl-primary-500">CPU</h4>
 					<div class="_mgt-8px">
