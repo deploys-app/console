@@ -2,8 +2,8 @@
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 
-	/** @type {import('$types').Profile} */
-	export let profile
+	/** @type {import('$types').Profile | null} */
+	export let profile = null
 
 	let active = false
 
@@ -38,7 +38,7 @@
 
 	<div class="_mgl-at">
 		<div class="avatar" on:click|stopPropagation={toggle} on:keypress={toggle} tabindex="0" role="button">
-			<img src={gravatarUrl(profile.email)} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous">
+			<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous">
 		</div>
 
 		{#if active}
