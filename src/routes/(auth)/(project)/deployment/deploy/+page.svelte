@@ -538,13 +538,13 @@
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
 			<div class="nm-table-container">
-				<table class="table -ruled">
+				<table class="nm-table">
 					<thead>
 						<tr>
 							<th>Key</th>
-							<th class="collapsed _pd-0"></th>
+							<th class="is-collapse _pd-0"></th>
 							<th>Value</th>
-							<th class="collapsed"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -561,7 +561,7 @@
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
 								</td>
-								<td class="table-action-container" style="padding: 19px 12px;">
+								<td style="padding: 19px 12px;">
 									<button class="icon-button" type="button"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
@@ -599,13 +599,13 @@
 		<h6><strong>Mount Data</strong></h6>
 		<div>
 			<div class="nm-table-container">
-				<table class="table -ruled">
+				<table class="nm-table">
 					<thead>
 						<tr>
 							<th>Path</th>
-							<th class="collapsed _pd-0"></th>
+							<th class="is-collapse _pd-0"></th>
 							<th>Data</th>
-							<th class="collapsed"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -622,7 +622,7 @@
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>
-								<td class="table-action-container" style="padding: 19px 12px;">
+								<td style="padding: 19px 12px;">
 									<button class="icon-button" type="button"
 										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
 										<i class="fa-solid fa-trash-alt"></i>

@@ -194,6 +194,8 @@ $colors: (
 	--tab-box-shadow: var(--ui-box-shadow-1);
 	/* table */
 	--table-border-width: 0;
+	--table-head-background: hsl(var(--hsl-base-400)/0.3);
+	--table-data-font-size: var(--fs-4);
 }
 
 [data-theme=light] {
@@ -339,4 +341,7 @@ $colors: (
 	--tab-content-border-radius: 0.5rem;
 	--tab-box-shadow: var(--ui-box-shadow-1);
 	/* table */
+	--table-border-width: 0;
+	--table-head-background: hsl(var(--hsl-base-400)/0.3);
+	--table-data-font-size: var(--fs-4);
 }

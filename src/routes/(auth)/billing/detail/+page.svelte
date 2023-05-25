@@ -48,7 +48,7 @@
 
 	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="nm-table-container _mgt-6">
-			<table class="table">
+			<table class="nm-table" style="--table-data-border-color: none">
 				<tbody>
 				<tr>
 					<td>Account name</td>

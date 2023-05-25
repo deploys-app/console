@@ -25,6 +25,10 @@
 		form.roles = [...form.roles, role]
 	}
 
+	function removeRole (role) {
+		form.roles = form.roles.filter((x) => x !== role)
+	}
+
 	function selectRoleChanged (e) {
 		addRole(e.target.value)
 		e.target.value = ''
@@ -77,7 +81,7 @@
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		<div class="field">
 			<div class="input">
-				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email}>
+				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
 			</div>
 		</div>
 		<div class="field">
@@ -93,12 +97,12 @@
 			</div>
 		</div>
 
-		<div class="table-responsive">
-			<table class="table table-sm">
+		<div class="nm-table-container">
+			<table class="nm-table is-variant-compact">
 				<thead>
 				<tr>
 					<th>Role</th>
-					<th></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 				</thead>
 				<tbody>
@@ -106,10 +110,10 @@
 					<tr>
 						<td>{it}</td>
 						<td>
-							<button type="button" class="js-delete-role button -danger -small"
-								on:click={() => form.roles = form.roles.filter((x) => x !== it)}>
-								Delete
-							</button>
+							<div class="icon-button"
+								on:click={() => removeRole(it)} on:keypress={() => removeRole(it)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</div>
 						</td>
 					</tr>
 				{:else}
@@ -120,6 +124,8 @@
 				</tbody>
 			</table>
 		</div>
-		<button class="button -success" class:-loading={saving}>Save</button>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
+			Save
+		</button>
 	</form>
 </div>

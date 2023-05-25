@@ -53,13 +53,13 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Name</th>
 					<th>ID</th>
 					<th>Number</th>
-					<th class="collapse _tal-r"></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -72,7 +72,7 @@
 						</td>
 						<td>{it.project}</td>
 						<td>{it.id}</td>
-						<td class="table-action-container">
+						<td>
 							<a href={`/project/create?project=${it.project}`}>
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>

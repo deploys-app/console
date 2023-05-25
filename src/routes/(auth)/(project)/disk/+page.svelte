@@ -33,14 +33,14 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Disk name</th>
 				<th>Size</th>
 				<th>Location</th>
 				<th>Created at</th>
-				<th></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -58,7 +58,7 @@
 						<td>{it.size} GiB</td>
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
-						<td class="table-action-container">
+						<td>
 							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>

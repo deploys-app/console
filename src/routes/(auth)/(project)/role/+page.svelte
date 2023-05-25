@@ -27,14 +27,14 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Role</th>
 				<th>Name</th>
 				<th>Created At</th>
 				<th>Created By</th>
-				<th class="collapsed _tal-r"></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -55,7 +55,7 @@
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>{it.createdBy}</td>
-						<td class="table-action-container">
+						<td>
 							{#if roleCanUpdate(it.role)}
 								<a href={`/role/create?project=${project}&role=${it.role}`}>
 									<div class="icon-button">

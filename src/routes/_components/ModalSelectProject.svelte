@@ -40,10 +40,10 @@
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
-			<table class="table -ruled _fs-2">
+			<table class="nm-table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
 				<thead>
 					<tr>
-						<th class="collapsed"></th>
+						<th class="is-collapse"></th>
 						<th>Name</th>
 						<th>ID</th>
 					</tr>
@@ -79,7 +79,7 @@
 		overflow: auto;
 	}
 
-	.table td {
+	.nm-table td {
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
 	}

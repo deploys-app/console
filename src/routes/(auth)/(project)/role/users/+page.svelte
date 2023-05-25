@@ -43,12 +43,12 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Email</th>
 					<th>Roles</th>
-					<th class="collapse _tal-r"></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -63,7 +63,7 @@
 									{r}<br>
 								{/each}
 							</td>
-							<td class="table-action-container">
+							<td>
 								<a href={`/role/bind?project=${project}&email=${it.email}`}>
 									<div class="icon-button">
 										<i class="fa-solid fa-pen"></i>

@@ -18,12 +18,12 @@
 	</div>
 	<br>
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table">
 			<thead>
 				<tr>
 					<th>Billing name</th>
 					<th>Billing ID</th>
-					<th class="collapse _tal-ct">Active</th>
+					<th class="is-align-center">Active</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -33,7 +33,7 @@
 						<a class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
-					<td class="_tal-ct">
+					<td class="is-align-center">
 						{#if it.active}
 							<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 						{:else}

@@ -44,7 +44,7 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -53,7 +53,7 @@
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
-				<th></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -83,7 +83,7 @@
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
-						<td class="table-action-container">
+						<td>
 							<button class="icon-button" on:click={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>

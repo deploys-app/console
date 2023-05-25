@@ -155,18 +155,18 @@
 			</div>
 
 			<div class="nm-table-container">
-				<table class="table -ruled">
+				<table class="nm-table is-variant-compact">
 					<thead>
 						<tr>
 							<th>Permission</th>
-							<th class="collapsed _tal-r"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each form.permissions as it}
 							<tr>
 								<td>{it}</td>
-								<td class="table-action-container">
+								<td>
 									<div class="icon-button"
 										on:click={() => removePermission(it)} on:keypress={() => removePermission(it)}>
 										<i class="fa-solid fa-trash-alt"></i>

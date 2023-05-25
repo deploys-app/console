@@ -21,7 +21,7 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table">
 			<thead>
 			<tr>
 				<th>Domain</th>

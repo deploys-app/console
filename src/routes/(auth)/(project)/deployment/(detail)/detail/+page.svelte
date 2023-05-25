@@ -44,7 +44,7 @@
 
 <h6><strong>Deployment details</strong></h6>
 <div class="nm-table-container">
-	<table class="table">
+	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		{#if deployment.type === 'WebService'}
 			{#if !deployment.internal}
 				<tr>
@@ -208,10 +208,10 @@
 
 <h6><strong>Environment variables</strong></h6>
 <div class="nm-table-container">
-	<table class="table">
+	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
-			<th>Env</th>
+			<th class="is-collapse" style="min-width: 256px">Env</th>
 			<th>Value</th>
 		</tr>
 		</thead>
@@ -234,10 +234,10 @@
 
 <h6><strong>Mount Data</strong></h6>
 <div class="nm-table-container">
-	<table class="table">
+	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
-			<th>Path</th>
+			<th class="is-collapse" style="min-width: 256px">Path</th>
 			<th>Data</th>
 		</tr>
 		</thead>

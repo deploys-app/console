@@ -23,13 +23,13 @@
 	</div>
 
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Email</th>
 				<th>Name</th>
 				<th>Created At</th>
-				<th class="collapsed _tal-r"></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -46,13 +46,11 @@
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
-							<div class="table-action-container">
-								<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
-									<div class="icon-button -secondary">
-										<i class="fa-solid fa-pen"></i>
-									</div>
-								</a>
-							</div>
+							<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
+								<div class="icon-button -secondary">
+									<i class="fa-solid fa-pen"></i>
+								</div>
+							</a>
 						</td>
 					</tr>
 				{:else}

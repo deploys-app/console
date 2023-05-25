@@ -149,7 +149,7 @@
 
 	<h5><strong>Billings</strong></h5>
 	<div class="nm-table-container _mgt-6">
-		<table class="table -ruled">
+		<table class="nm-table">
 			<thead>
 				<tr>
 					<th>Project</th>
