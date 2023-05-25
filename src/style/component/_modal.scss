@@ -1,4 +1,4 @@
-.#{$prefix}modal {
+.modal {
 	position: fixed;
 	z-index: 999;
 	top: 0;
@@ -29,7 +29,7 @@
 		content: '';
 	}
 
-	.#{$prefix}modal-panel {
+	.modal-panel {
 		position: relative;
 		width: 100%;
 		max-width: 48rem;
@@ -40,7 +40,7 @@
 		background: hsl(var(--hsl-base-300));
 	}
 
-	.#{$prefix}modal-close {
+	.modal-close {
 		position: absolute;
 		top: 0.5rem;
 		right: 0.5rem;
@@ -58,7 +58,7 @@
 		pointer-events: all;
 		opacity: 1;
 
-		.#{$prefix}modal-panel {
+		.modal-panel {
 			transform: translate3d(0, 0, 0);
 		}
 	}

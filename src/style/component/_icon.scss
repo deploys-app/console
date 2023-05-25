@@ -4,7 +4,7 @@ $components-colors: (
 	'negative',
 );
 
-.#{$prefix}icon-button {
+.icon-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -40,7 +40,7 @@ $components-colors: (
     }
 }
 
-.#{$prefix}icon-link {
+.icon-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;

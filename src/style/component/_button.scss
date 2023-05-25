@@ -72,7 +72,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}button {
+.button {
 	@extend %base-button;
 
 	color: var(--color-light-primary);
@@ -305,7 +305,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}input > button.#{$prefix}icon-button {
+.input > button.icon-button {
 	background-color: transparent;
 	box-shadow: none;
 
