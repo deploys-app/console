@@ -79,7 +79,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if id}
 			<div class="field">
 				<label for="input-email">Email</label>

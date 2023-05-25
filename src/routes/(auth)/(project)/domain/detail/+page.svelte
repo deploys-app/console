@@ -177,7 +177,7 @@
 
 	<hr>
 
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-gsa">Domain</label>
 			<div class="input">
@@ -325,36 +325,37 @@
 				</div>
 			{/if}
 		{/if}
-	</div>
 
-	{#if domain.cdn && domain.status === 'success'}
-	<div>
-		<div class="_mgbt-5">
-			<strong>Purge Cache</strong>
-		</div>
-		<div class="_bgcl-neutral-800 _pd-7 _bdw-1 _bdcl-negative-900 _bdrd-4 _mxw-512px">
-			<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
-				<div class="_f-1 lo-12 _g-3">
-					<div><strong>Purge everything</strong></div>
-					<p class="_fs-300 _opct-80">Remove all cached resources</p>
+		{#if domain.cdn && domain.status === 'success'}
+			<hr>
+			<div>
+				<div class="_mgbt-5">
+					<strong>Purge Cache</strong>
 				</div>
-				<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
-					Purge everything
-				</button>
-			</div>
-			<hr class="_mgv-7">
-			<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
-				<div class="_f-1 lo-12 _g-3">
-					<div><strong>Purge prefix</strong></div>
-					<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
+				<div class="_bgcl-neutral-800 _pd-7 _bdw-1 _bdcl-negative-900 _bdrd-4">
+					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+						<div class="_f-1 lo-12 _g-3">
+							<div><strong>Purge everything</strong></div>
+							<p class="_fs-300 _opct-80">Remove all cached resources</p>
+						</div>
+						<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
+							Purge everything
+						</button>
+					</div>
+					<hr class="_mgv-7">
+					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+						<div class="_f-1 lo-12 _g-3">
+							<div><strong>Purge prefix</strong></div>
+							<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
+						</div>
+						<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
+							Purge prefix
+						</button>
+					</div>
 				</div>
-				<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
-					Purge prefix
-				</button>
 			</div>
-		</div>
+		{/if}
 	</div>
-	{/if}
 
 	{#if !domain.cdn}
 		<hr>

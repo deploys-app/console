@@ -70,7 +70,7 @@
 		</div>
 	</div>
 	<hr>
-	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-name">Account name</label>
 			<div class="input">

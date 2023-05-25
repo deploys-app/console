@@ -55,7 +55,7 @@
 		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
 	</div>
 	<hr>
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-gsa">GSA</label>
 			<div class="input">
@@ -80,21 +80,21 @@
 				{workloadIdentity.createdBy}
 			</div>
 		</div>
-	</div>
 
-	<hr>
+		<hr>
 
-	<div class="field">
-		<label for="pre-command">Command</label>
-		<pre id="pre-command">
-			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
-			{#if projectInfo}
-				<code id="command">{format.gsaBinding(projectInfo.id, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
-			{/if}
-		</pre>
-	</div>
+		<div class="field">
+			<label for="pre-command">Command</label>
+			<pre id="pre-command">
+				<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
+				{#if projectInfo}
+					<code id="command">{format.gsaBinding(projectInfo.id, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
+				{/if}
+			</pre>
+		</div>
 
-	<div class="_mgl-at:lg">
-		<button class="button -danger" on:click={deleteItem}>Delete</button>
+		<div class="_mgl-at:lg">
+			<button class="button -danger" on:click={deleteItem}>Delete</button>
+		</div>
 	</div>
 </div>

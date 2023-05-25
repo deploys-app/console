@@ -237,7 +237,7 @@
 	</div>
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct _mxw-700px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if deployment}
 			<div class="field">
 				<label for="input-location-readonly">Location</label>
@@ -551,13 +551,13 @@
 					<tbody>
 						{#each form.env as it, i}
 							<tr>
-								<td class="_mnw-128px">
+								<td>
 									<div class="input">
 										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
-								<td class="_mnw-128px _pdl-5">
+								<td class="_pdl-5">
 									<div class="input">
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
@@ -612,13 +612,13 @@
 					<tbody>
 						{#each form.mountData as it, i}
 							<tr>
-								<td class="_mnw-128px">
+								<td>
 									<div class="input">
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
-								<td class="_mnw-128px _pdl-5">
+								<td class="_pdl-5">
 									<div class="textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>

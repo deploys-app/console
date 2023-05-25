@@ -91,7 +91,7 @@
 
 	<hr>
 
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-email">Email</label>
 			<div class="input">
@@ -122,27 +122,28 @@
 				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
-	</div>
 
-	<hr class="_w-100pct _mxw-512px">
+		<hr>
 
-	<h6><strong>Keys</strong></h6>
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
-		{#each (serviceAccount.keys ?? []) as key}
-			<div class="input -has-icon-right">
-				<input value="{key.secret}" readonly>
-				<div class="icon -is-right _cs-pt">
-					<button class="_bgcl-tpr _cs-pt _bdw-0 _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
-						<i class="fa-solid fa-trash-alt"></i>
-					</button>
+		<h6><strong>Keys</strong></h6>
+		<div class="_dp-g _g-6 _w-100pct">
+			{#each (serviceAccount.keys ?? []) as key}
+				<div class="input -has-icon-right">
+					<input value="{key.secret}" readonly>
+					<div class="icon -is-right _cs-pt">
+						<button class="_bgcl-tpr _cs-pt _bdw-0 _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
+							<i class="fa-solid fa-trash-alt"></i>
+						</button>
+					</div>
 				</div>
+			{/each}
+
+			<div class="_dp-g _g-6 _w-100pct">
+				<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+					<i class="fa-solid fa-plus _mgr-5"></i>
+					Create key
+				</button>
 			</div>
-		{/each}
-		<div class="_dp-g _g-6 _w-100pct _mxw-512px">
-			<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
-				<i class="fa-solid fa-plus _mgr-5"></i>
-				Create key
-			</button>
 		</div>
 	</div>
 </div>

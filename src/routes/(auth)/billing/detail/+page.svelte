@@ -48,7 +48,7 @@
 
 	<hr>
 
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="table-container">
 			<table class="table">
 				<tbody>
