@@ -34,16 +34,16 @@
 	}
 </script>
 
-<div class="modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
-	<div class="modal-panel u-raised-1">
-		<div class="modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
+<div class="nm-modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
+	<div class="nm-modal-panel">
+		<div class="nm-modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
-		<div class="table-container">
-			<table class="table -ruled _fs-300">
+		<div class="nm-table-container _mgt-6">
+			<table class="nm-table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
 				<thead>
 					<tr>
-						<th class="collapsed"></th>
+						<th class="is-collapse"></th>
 						<th>Name</th>
 						<th>ID</th>
 					</tr>
@@ -53,13 +53,13 @@
 					<tr>
 						<td>
 							{#if project === it.project}
-								<i class="fas fa-check _cl-primary-500 _fs-600"></i>
+								<i class="fas fa-check _cl-primary _fs-6"></i>
 							{/if}
 						</td>
 						<td>
 							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
 								tabindex="0" role="link"
-								class="_tdcrt-udl _cs-pt _cl-primary-500-hover"
+								class="_tdcrt-udl _cs-pt _cl-primary:hover"
 								style="font-weight: 500">
 								{it.name}
 							</div>
@@ -74,13 +74,19 @@
 </div>
 
 <style lang="scss">
-	.table-container {
+	.nm-table-container {
 		max-height: 405px;
 		overflow: auto;
 	}
 
-	.table td {
+	.nm-table td {
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
+	}
+
+	.nm-modal-panel {
+		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
+		width: 100%;
+		max-width: 48rem;
 	}
 </style>

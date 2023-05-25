@@ -34,17 +34,17 @@
 
 <h6>Domains</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/domain/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -53,7 +53,7 @@
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
-				<th></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -64,27 +64,27 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
-							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
+							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
 						</td>
 						<td>
 							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
 							{/if}
 						</td>
 						<td>
 							{#if it.cdn}
-								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
 							{/if}
 						</td>
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button -negative" on:click={() => deleteDomain(it)}>
+							<button class="icon-button" on:click={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

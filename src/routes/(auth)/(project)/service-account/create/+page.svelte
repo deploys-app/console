@@ -39,35 +39,33 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		{#if id}
-			<li>
-				<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
-			</li>
-		{:else}
-			<li>
-				<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
-			</li>
-		{/if}
-		<li>
-			<h6>
-				{#if id}
-					Update
-				{:else}
-					Create
-				{/if}
-			</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	{#if id}
+		<div class="nm-breadcrumb-item">
+			<a href={`/service-account?project=${project}&id=${id}`} class="nm-link"><h6>{serviceAccount.sid}</h6></a>
+		</div>
+	{:else}
+		<div class="nm-breadcrumb-item">
+			<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>
+			{#if id}
+				Update
+			{:else}
+				Create
+			{/if}
+		</h6>
+	</div>
 </div>
 
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>
 				{#if id}
 					Update service account "{serviceAccount.sid}"
 				{:else}
@@ -79,7 +77,7 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if id}
 			<div class="field">
 				<label for="input-email">Email</label>

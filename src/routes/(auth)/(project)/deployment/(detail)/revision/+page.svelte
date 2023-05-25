@@ -32,15 +32,15 @@
 </script>
 
 <h6><strong>Revision</strong></h6>
-<div class="table-container _wsp-nw">
-	<table class="table">
+<div class="nm-table-container _mgt-6 _wsp-nw">
+	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th>Revision</th>
 			<th>Image</th>
 			<th>Deployed At</th>
 			<th>Deployed By</th>
-			<th></th>
+			<th class="is-collapse is-align-right"></th>
 		</tr>
 		</thead>
 		<tbody>

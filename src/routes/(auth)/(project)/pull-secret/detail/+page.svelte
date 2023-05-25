@@ -35,20 +35,19 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/pull-secret?project=${project}`} class="link"><h6>Pull Secrets</h6></a>
-		</li>
-		<li>
-			<h6>{pullSecret.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/pull-secret?project=${project}`} class="nm-link"><h6>Pull Secrets</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{pullSecret.name}</h6>
+	</div>
 </div>
+
 <br>
-<div class="panel _dp-g _gg-16px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+<div class="nm-panel is-level-300 _dp-g _g-6">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
 			<div class="_dp-f">
 				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
@@ -58,7 +57,7 @@
 
 	<hr>
 
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-name">Name</label>
 			<div class="input">
@@ -75,7 +74,7 @@
 			<label for="input-server">Server</label>
 			<div class="input -has-icon-right">
 				<input id="input-server" value={pullSecret.spec.server} readonly disabled>
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.server}>
 					<i class="fa-light fa-copy"></i>
 				</span>
@@ -85,7 +84,7 @@
 			<label for="input-username">Username</label>
 			<div class="input -has-icon-right">
 				<input id="input-username" value={pullSecret.spec.username} readonly disabled>
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-12px _fs-600 icon -is-right copy"
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.username}>
 					<i class="fa-light fa-copy"></i>
 				</span>
@@ -96,7 +95,7 @@
 			<div class="input -has-icon-right">
 				<input id="input-password" type="password" value={pullSecret.spec.password} readonly disabled>
 				<div class="icon -is-right">
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _fs-600 copy"
+					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _fs-6 copy"
 						data-clipboard-text={pullSecret.spec.password}>
 						<i class="fa-light fa-copy"></i>
 					</span>

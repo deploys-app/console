@@ -39,23 +39,22 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
-		</li>
-		<li>
-			<h6>{workloadIdentity.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/workload-identity?project=${project}`} class="nm-link"><h6>Workload Identities</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{workloadIdentity.name}</h6>
+	</div>
 </div>
+
 <br>
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _jtfit-st _g-5">
 		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
 	</div>
 	<hr>
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-gsa">GSA</label>
 			<div class="input">
@@ -80,21 +79,21 @@
 				{workloadIdentity.createdBy}
 			</div>
 		</div>
-	</div>
 
-	<hr>
+		<hr>
 
-	<div class="field">
-		<label for="pre-command">Command</label>
-		<pre id="pre-command">
-			<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
-			{#if projectInfo}
-				<code id="command">{format.gsaBinding(projectInfo.id, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
-			{/if}
-		</pre>
-	</div>
+		<div class="field">
+			<label for="pre-command">Command</label>
+			<pre id="pre-command">
+				<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>
+				{#if projectInfo}
+					<code id="command">{format.gsaBinding(projectInfo.id, workloadIdentity.name, workloadIdentity.gsa, 'acoshift-1362')}</code>
+				{/if}
+			</pre>
+		</div>
 
-	<div class="_mgl-at-lg">
-		<button class="button -danger" on:click={deleteItem}>Delete</button>
+		<div class="_mgl-at:lg">
+			<button class="button -danger" on:click={deleteItem}>Delete</button>
+		</div>
 	</div>
 </div>

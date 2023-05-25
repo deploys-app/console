@@ -20,7 +20,7 @@ $components-colors: (
 	min-height: 2.875rem;
 	padding: 0.5rem 1.5rem;
 
-	font-family: var(--font-family-secondary);
+	font-family: var(--ffml-secondary);
 	font-weight: 600;
 	font-size: 1rem;
 	line-height: 100%;
@@ -72,32 +72,32 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}button {
+.button {
 	@extend %base-button;
 
-	color: var(--color-light-primary);
-	background-color: var(--color-primary-500);
+	color: hsl(var(--hsl-content));
+	background-color: hsl(var(--hsl-primary));
 
 	&:focus {
 		box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
 	}
 
 	&:hover {
-		background-color: var(--color-primary-600);
+		background-color: hsl(var(--hsl-primary-active));
 	}
 
 	&.-loading {
 		color: transparent;
 
 		&:after {
-			border-right-color: var(--color-light-primary);
-			border-top-color: var(--color-light-primary);
+			border-right-color: hsl(var(--hsl-content));
+			border-top-color: hsl(var(--hsl-content));
 		}
 	}
 
 	@each $key, $value in $components-colors {
 		&.-#{$key} {
-			color: var(--color-light-primary);
+			color: hsl(var(--hsl-content));
 			background-color: var(--color-#{$key}-500);
 
 			&:focus {
@@ -112,8 +112,8 @@ $components-colors: (
 				color: transparent;
 
 				&:after {
-					border-right-color: var(--color-light-primary);
-					border-top-color: var(--color-light-primary);
+					border-right-color: hsl(var(--hsl-content));
+					border-top-color: hsl(var(--hsl-content));
 				}
 			}
 
@@ -157,7 +157,7 @@ $components-colors: (
 		}
 
 		&.-white {
-			color: var(--color-primary-600);
+			color: hsl(var(--hsl-primary-active));
 			background-color: white;
 
 			&:focus {
@@ -172,8 +172,8 @@ $components-colors: (
 				color: transparent;
 
 				&:after {
-					border-right-color: var(--color-primary-600);
-					border-top-color: var(--color-primary-600);
+					border-right-color: hsl(var(--hsl-primary-active));
+					border-top-color: hsl(var(--hsl-primary-active));
 				}
 			}
 
@@ -201,7 +201,7 @@ $components-colors: (
 			}
 
 			&.-tertiary {
-				color: var(--color-primary-600);
+				color: hsl(var(--hsl-primary-active));
 				border: none;
 				background: transparent;
 
@@ -213,8 +213,8 @@ $components-colors: (
 					color: transparent;
 
 					&:after {
-						border-right-color: var(--color-primary-600);
-						border-top-color: var(--color-primary-600);
+						border-right-color: hsl(var(--hsl-primary-active));
+						border-top-color: hsl(var(--hsl-primary-active));
 					}
 				}
 			}
@@ -222,7 +222,7 @@ $components-colors: (
 	}
 
 	&.-secondary {
-		color: var(--color-primary-500);
+		color: hsl(var(--hsl-primary));
 		border: 1px solid var(--color-gray-300);
 		background: transparent;
 
@@ -244,8 +244,8 @@ $components-colors: (
 			color: transparent;
 
 			&:after {
-				border-right-color: var(--color-primary-600);
-				border-top-color: var(--color-primary-600);
+				border-right-color: hsl(var(--hsl-primary-active));
+				border-top-color: hsl(var(--hsl-primary-active));
 			}
 		}
 
@@ -305,7 +305,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}input > button.#{$prefix}icon-button {
+.input > button.icon-button {
 	background-color: transparent;
 	box-shadow: none;
 

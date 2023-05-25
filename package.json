@@ -13,6 +13,7 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "devDependencies": {
+    "@nomimono/nomimono-css": "^0.4.15",
     "@sveltejs/adapter-node": "^1.2.4",
     "@sveltejs/kit": "=1.18.0",
     "clipboard": "^2.0.11",

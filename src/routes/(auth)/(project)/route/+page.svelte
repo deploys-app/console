@@ -34,17 +34,17 @@
 
 <h6>Routes</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/route/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Route</th>
@@ -52,7 +52,7 @@
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
-				<th></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -62,14 +62,14 @@
 				{#each routes as it}
 					<tr>
 						<td>
-							<a class="link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
+							<a class="nm-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
 						</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button -negative" on:click={() => deleteRoute(it)}>
+							<button class="icon-button" on:click={() => deleteRoute(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

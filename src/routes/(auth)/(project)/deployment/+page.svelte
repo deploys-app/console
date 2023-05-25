@@ -23,17 +23,17 @@
 
 <h6>Deployments</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/deployment/deploy?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -54,7 +54,7 @@
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
-							<a class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

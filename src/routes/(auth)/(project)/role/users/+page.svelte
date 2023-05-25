@@ -33,22 +33,22 @@
 
 <h6>Users</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/role/bind?project=${project}`}>
 				Add
 			</a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Email</th>
 					<th>Roles</th>
-					<th class="collapse _tal-r"></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -63,13 +63,13 @@
 									{r}<br>
 								{/each}
 							</td>
-							<td class="table-action-container">
+							<td>
 								<a href={`/role/bind?project=${project}&email=${it.email}`}>
-									<div class="icon-button -secondary">
+									<div class="icon-button">
 										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
-								<button class="icon-button -negative" on:click={() => deleteUser(it.email)}>
+								<button class="icon-button" on:click={() => deleteUser(it.email)}>
 									<i class="fa-solid fa-trash-alt"></i>
 								</button>
 							</td>

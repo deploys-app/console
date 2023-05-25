@@ -17,24 +17,24 @@
 
 <h6>Roles</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/role/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Role</th>
 				<th>Name</th>
 				<th>Created At</th>
 				<th>Created By</th>
-				<th class="collapsed _tal-r"></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -45,7 +45,7 @@
 					<tr>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href={`/role/create?project=${project}&role=${it.role}`} class="link">
+								<a href={`/role/create?project=${project}&role=${it.role}`} class="nm-link">
 									<strong>{it.role}</strong>
 								</a>
 							{:else}
@@ -56,15 +56,13 @@
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>{it.createdBy}</td>
 						<td>
-							<div class="table-action-container">
-								{#if roleCanUpdate(it.role)}
-									<a href={`/role/create?project=${project}&role=${it.role}`}>
-										<div class="icon-button -secondary">
-											<i class="fa-solid fa-pen"></i>
-										</div>
-									</a>
-								{/if}
-							</div>
+							{#if roleCanUpdate(it.role)}
+								<a href={`/role/create?project=${project}&role=${it.role}`}>
+									<div class="icon-button">
+										<i class="fa-solid fa-pen"></i>
+									</div>
+								</a>
+							{/if}
 						</td>
 					</tr>
 				{:else}

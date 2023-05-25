@@ -63,22 +63,21 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
-		</li>
-		<li>
-			<h6>{serviceAccount.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{serviceAccount.name}</h6>
+	</div>
 </div>
+
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
 				<strong>{serviceAccount.name}</strong>
 			</h3>
 			<div class="_dp-f">
@@ -91,7 +90,7 @@
 
 	<hr>
 
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px _mgbt-20px">
+	<div class="content _dp-g _g-6 _w-100pct">
 		<div class="field">
 			<label for="input-email">Email</label>
 			<div class="input">
@@ -122,27 +121,26 @@
 				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
-	</div>
 
-	<hr class="_w-100pct _mxw-512px">
+		<hr>
 
-	<h6><strong>Keys</strong></h6>
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-		{#each (serviceAccount.keys ?? []) as key}
-			<div class="input -has-icon-right">
-				<input value="{key.secret}" readonly>
-				<div class="icon -is-right _cs-pt">
-					<button class="_bgcl-tpr _cs-pt _bdw-0px _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
+		<h6><strong>Keys</strong></h6>
+		<div class="_dp-g _g-6 _w-100pct">
+			{#each (serviceAccount.keys ?? []) as key}
+				<div class="input -has-icon-right">
+					<input value="{key.secret}" readonly>
+					<button class="icon-button icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>
+			{/each}
+
+			<div class="_dp-g _g-6 _w-100pct">
+				<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+					<i class="fa-solid fa-plus _mgr-5"></i>
+					Create key
+				</button>
 			</div>
-		{/each}
-		<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
-			<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
-				<i class="fa-solid fa-plus _mgr-12px"></i>
-				Create key
-			</button>
 		</div>
 	</div>
 </div>

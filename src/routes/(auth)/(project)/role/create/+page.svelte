@@ -80,30 +80,29 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/role?project=${project}`} class="link"><h6>Roles</h6></a>
-		</li>
-		{#if role}
-			<li>
-				<h6>{role.role}</h6>
-			</li>
-			<li>
-				<h6>Update</h6>
-			</li>
-		{:else}
-			<li>
-				<h6>Create</h6>
-			</li>
-		{/if}
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/role?project=${project}`} class="nm-link"><h6>Roles</h6></a>
+	</div>
+	{#if role}
+		<div class="nm-breadcrumb-item">
+			<h6>{role.role}</h6>
+		</div>
+		<div class="nm-breadcrumb-item">
+			<h6>Update</h6>
+		</div>
+	{:else}
+		<div class="nm-breadcrumb-item">
+			<h6>Create</h6>
+		</div>
+	{/if}
 </div>
+
 <br>
 
-<div class="panel _dp-g _gg-16px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+<div class="nm-panel is-level-300 _dp-g _g-6">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3><strong>
 				{#if role}
 					Update role "{form.role}"
@@ -122,7 +121,7 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-role">Role ID</label>
 			<div class="input">
@@ -141,10 +140,10 @@
 		<hr>
 		<br>
 
-		<div class="_dp-g _gg-16px">
+		<div class="_dp-g _g-6">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="field _dp-f _mgbt-12px">
+			<div class="field _dp-f _mgbt-5">
 				<div class="select _f-1">
 					<select on:change={selectPermissionChanged}>
 						<option value="" disabled selected>---Select Permission---</option>
@@ -155,20 +154,20 @@
 				</div>
 			</div>
 
-			<div class="table-container">
-				<table class="table -ruled">
+			<div class="nm-table-container">
+				<table class="nm-table is-variant-compact">
 					<thead>
 						<tr>
 							<th>Permission</th>
-							<th class="collapsed _tal-r"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each form.permissions as it}
 							<tr>
 								<td>{it}</td>
-								<td class="table-action-container">
-									<div class="icon-button -negative"
+								<td>
+									<div class="icon-button"
 										on:click={() => removePermission(it)} on:keypress={() => removePermission(it)}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
@@ -184,7 +183,7 @@
 
 		<hr>
 
-		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
 			{#if role}Update{:else}Create{/if}
 		</button>
 	</form>

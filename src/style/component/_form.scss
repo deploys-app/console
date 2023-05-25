@@ -20,14 +20,14 @@
 	padding-left: .75rem;
 	padding-right: .75rem;
 
-    color: var(--color-light-primary);
+    color: hsl(var(--hsl-content));
 
-	background-color: var(--color-neutral-500);
+	background-color: hsl(var(--hsl-base-400)/0.2);
 	font-size: 0.9375rem; // 15px
 	vertical-align: top;
 
 	border-radius: inherit;
-	border: 1px solid var(--color-neutral-400);
+	border: 1px solid hsl(var(--hsl-base-400)/0.3);
 
 	outline: none;
     transition: all var(--timing-normal) ease;
@@ -35,11 +35,11 @@
     box-shadow: var(--raised-z6);
 
     &:hover {
-        border: 1px solid var(--color-neutral-300);
+        border: 1px solid hsl(var(--hsl-base-400)/0.7);
     }
 
     &:focus, :active {
-		border-color: var(--color-primary-400);
+		border-color: hsl(var(--hsl-primary)/0.6);
 		box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.125);
 	}
 
@@ -49,24 +49,24 @@
 
 	// size
 	&.-big {
-		.#{$prefix}input,
-		.#{$prefix}select:not(.-multiple) {
+		.input,
+		.select:not(.-multiple) {
 			height: 3rem;
 		}
-		.#{$prefix}input > input,
-		.#{$prefix}select:not(.-multiple) > select {
+		.input > input,
+		.select:not(.-multiple) > select {
 			font-size: 1.25rem;
 			height: 100%;
 		}
 	}
 
 	&.-small {
-		.#{$prefix}input,
-		.#{$prefix}select:not(.-multiple) {
+		.input,
+		.select:not(.-multiple) {
 			height: 1.875em;
 		}
-		.#{$prefix}input > input,
-		.#{$prefix}select:not(.-multiple) > select {
+		.input > input,
+		.select:not(.-multiple) > select {
 			font-size: 0.75rem;
 			height: 100%;
 		}
@@ -80,7 +80,7 @@ $components-colors: (
 	'info',
 );
 
-.#{$prefix}field {
+.field {
 	label {
 		font-weight: 600;
 		display: inline-block;
@@ -96,9 +96,9 @@ $components-colors: (
 	// color
 	@each $key, $value in $components-colors {
 		&.-#{$key} {
-			.#{$prefix}input input,
-			.#{$prefix}textarea textarea,
-			.#{$prefix}select select {
+			.input input,
+			.textarea textarea,
+			.select select {
 				color: var(--color-#{$key}-700);
 				border-color: var(--color-#{$key}-400);
 
@@ -115,26 +115,26 @@ $components-colors: (
 
 	// size
 	&.-big {
-		.#{$prefix}input,
-		.#{$prefix}select:not(.-multiple) {
+		.input,
+		.select:not(.-multiple) {
 			height: 3rem;
 		}
 
-		.#{$prefix}input input,
-		.#{$prefix}select:not(.-multiple) select {
+		.input input,
+		.select:not(.-multiple) select {
 			font-size: 1.25rem;
 			height: 100%;
 		}
 	}
 
 	&.-small {
-		.#{$prefix}input,
-		.#{$prefix}select:not(.-multiple) {
+		.input,
+		.select:not(.-multiple) {
 			height: 1.875em;
 		}
 
-		.#{$prefix}input input,
-		.#{$prefix}select:not(.-multiple) select {
+		.input input,
+		.select:not(.-multiple) select {
 			font-size: .75rem;
 			height: 100%;
 		}
@@ -144,9 +144,9 @@ $components-colors: (
 	&.-disabled,
 	.disabled,
 	[disabled] {
-		.#{$prefix}input input,
-		.#{$prefix}textarea textarea,
-		.#{$prefix}select select {
+		.input input,
+		.textarea textarea,
+		.select select {
 			cursor: not-allowed;
 			background-color: var(--color-gray-100);
 			border-color: var(--color-gray-300);
@@ -156,42 +156,27 @@ $components-colors: (
 				border-color: var(--color-gray-300);
 			}
 		}
-
-		small {
-			color: var(--color-dark-primary);
-		}
 	}
 
-
-	// input:not(:placeholder-shown):invalid,
-	// textarea:not(:placeholder-shown):invalid,
-	// select:not(:placeholder-shown):invalid {
-	// 	color: var(--color-negative-700);
-	// 	border-color: var(--color-negative-400);
-
-	// 	&:focus, :active {
-	// 		box-shadow: 0 0 0 .175rem var(--color-negative-300);
-	// 	}
-	// }
-
 	.required {
-		color: var(--color-negative-500);
+		color: var(--hsl-negative);
+		opacity: 0.9;
 	}
 }
 
-.#{$prefix}input,
-.#{$prefix}textarea,
-.#{$prefix}select {
+.input,
+.textarea,
+.select {
 	border-radius: 4px;
 }
 
-.#{$prefix}input input,
-.#{$prefix}textarea textarea,
-.#{$prefix}select select {
+.input input,
+.textarea textarea,
+.select select {
 	@extend %base-input;
 }
 
-.#{$prefix}select {
+.select {
 	position: relative;
 
 	select {
@@ -201,30 +186,30 @@ $components-colors: (
 
 	&:after {
 		content: '';
-		border-left: 2px solid var(--color-neutral-200);
-		border-bottom: 2px solid var(--color-neutral-200);
+		border-left: 2px solid hsl(var(--hsl-base-400)/0.3);
+		border-bottom: 2px solid hsl(var(--hsl-base-400)/0.3);
 		height: 0.5rem;
 		width: 0.5rem;
 		position: absolute;
 		right: 0.5rem;
 		top: 50%;
-		border-color: var(--color-neutral-200);
+		border-color: hsl(var(--hsl-base-400)/0.3);
 		transform: rotate(-45deg) translate(0, calc(-50% - 4px));
 		pointer-events: none;
 	}
 }
 
-.#{$prefix}textarea textarea {
+.textarea textarea {
 	padding: 8px .75rem;
 	line-height: 1.25;
 }
 
-.#{$prefix}input,
-.#{$prefix}select {
+.input,
+.select {
 	height: 2.5rem;
 }
 
-.#{$prefix}radio {
+.radio {
 	> input[type='radio'] {
 		position: absolute;
 		z-index: -1;
@@ -239,7 +224,7 @@ $components-colors: (
 
 		&:focus {
 			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
+				box-shadow: 0 0 0 .175rem hsl(var(--hsl-primary)/0.5);
 			}
 		}
 	}
@@ -263,7 +248,7 @@ $components-colors: (
 			width: 22px;
 			height: 22px;
 			left: 0px;
-			border: 2px solid var(--color-primary-500);
+			border: 2px solid hsl(var(--hsl-primary));
 			border-radius: 50%;
 			background-color: white;
 		}
@@ -274,15 +259,15 @@ $components-colors: (
 			width: .75rem;
 			top: 5px;
 			left: 5px;
-			background-color: var(--color-primary-500);
+			background-color: hsl(var(--hsl-primary));
 			border-radius: 50%;
 		}
 	}
 }
 
-.#{$prefix}field {
+.field {
 	&.-disabled {
-		.#{$prefix}radio {
+		.radio {
 			> label {
 				cursor: not-allowed;
 				color: var(--color-gray-400);
@@ -299,7 +284,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}checkbox {
+.checkbox {
 	> input[type='checkbox'] {
 		position: absolute;
 		opacity: 0;
@@ -309,8 +294,8 @@ $components-colors: (
 
 		&:checked {
 			+ label:before {
-				background: var(--color-primary-500);
-				border: 1px solid var(--color-primary-500);
+				background: hsl(var(--hsl-primary));
+				border: 1px solid hsl(var(--hsl-primary));
 			}
 
 			+ label:after {
@@ -320,7 +305,7 @@ $components-colors: (
 
 		&:focus {
 			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
+				box-shadow: 0 0 0 .175rem hsl(var(--hsl-primary)/0.5);
 			}
 		}
 	}
@@ -345,7 +330,7 @@ $components-colors: (
 			width: 20px;
 			height: 20px;
 			left: 0px;
-			background-color:var(--color-light-primary);
+			background-color: hsl(var(--hsl-content));
 			border: 1px solid var(--color-gray-300);
 			border-radius: 4px;
 			box-sizing: border-box;
@@ -361,7 +346,7 @@ $components-colors: (
 			border-bottom-width: 2px;
 			border-left-style: solid;
 			border-bottom-style: solid;
-			border-color: var(--color-light-primary);
+			border-color: hsl(var(--hsl-content));
 			transform: rotate(-45deg);
 		}
 
@@ -371,141 +356,10 @@ $components-colors: (
 	}
 }
 
-
-.#{$prefix}toggle-tag {
-	> input[type='radio'],
-	> input[type='checkbox'] {
-		position: absolute;
-		z-index: -1;
-
-		opacity: 0;
-		cursor: pointer;
-		pointer-events: none;
-
-		&:checked + label:after {
-			content: '';
-		}
-
-		&:focus {
-			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
-			}
-		}
-	}
-
-	> input[type='radio'] + label,
-	> input[type='checkbox'] + label {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-
-		padding: .375rem 1rem;
-
-		color: var(--color-dark-secondary);
-		background: white;
-
-		border: 1px solid var(--color-gray-300);
-		border-radius: 4px;
-
-		font-family: var(--font-family-secondary);
-
-		user-select: none;
-		cursor: pointer;
-
-		&:hover {
-			background: var(--color-gray-100);
-		}
-	}
-
-	> input[type='radio']:checked + label,
-	> input[type='checkbox']:checked + label {
-		color: var(--color-primary-500);
-		background: var(--color-primary-100);
-
-		border: 1px solid var(--color-primary-500);
-		border-radius: 4px;
-
-		font-family: var(--font-family-secondary);
-
-		cursor: pointer;
-	}
-}
-
-// Switch
-.#{$prefix}switch {
-	display: inline-flex;
-	align-items: center;
-
-	> input[type="checkbox"],
-	> input[type="radio"] {
-		appearance: none;
-
-		position: relative;
-		background-color: hsl(0, 0%, 93%);
-
-		width: 2.75rem;
-		height: 26px;
-		border-radius: 999px;
-
-		transition: all var(--timing-normal) ease-in-out;
-		cursor: pointer;
-		outline: none;
-
-		&:checked {
-			background-color: var(--color-primary-500);
-		}
-
-		&:after {
-			content: '';
-			position: absolute;
-			border-radius: 50%;
-			background-color: white;
-			height: 2rem;
-			width: 2rem;
-			left: -2px;
-			top: -3px;
-			box-shadow: 0 0 7px rgba(0,0,0,.5);
-			transform: scale(.64);
-			transition: all var(--timing-faster) ease-in-out;
-		}
-
-		&:checked:after {
-			left: calc(100% - 30px);
-		}
-	}
-
-	> label {
-		margin-left: 8px;
-	}
-}
-
-.#{$prefix}field {
-	&.-disabled {
-		.#{$prefix}checkbox {
-			opacity: .5;
-
-			> input[type='checkbox'],
-			> label {
-				cursor: not-allowed;
-
-				&:before {
-					opacity: .5;
-					border-color: var(--color-dark-primary);
-				}
-
-				&:after {
-					opacity: .5;
-					border-color: var(--color-dark-primary);
-				}
-			}
-		}
-	}
-}
-
 // input icon
-.#{$prefix}input.-has-icon-left,
-.#{$prefix}select.-has-icon-left,
-.#{$prefix}input.-has-icon-right {
+.input.-has-icon-left,
+.select.-has-icon-left,
+.input.-has-icon-right {
 	position: relative;
 
 	> .icon {
@@ -525,7 +379,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}input.-has-icon-left {
+.input.-has-icon-left {
 	> input {
 		padding-left: 2.625rem;
 	}
@@ -535,7 +389,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}select.-has-icon-left {
+.select.-has-icon-left {
 	> select {
 		padding-left: 2.625rem;
 	}
@@ -545,7 +399,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}input.-has-icon-right {
+.input.-has-icon-right {
 	> input {
 		padding-right: 2.625rem;
 	}
@@ -556,8 +410,8 @@ $components-colors: (
 }
 
 
-.#{$prefix}field.-small {
-	.#{$prefix}input.-has-icon-left {
+.field.-small {
+	.input.-has-icon-left {
 		> input {
 			padding-left: 2rem;
 		}
@@ -570,7 +424,7 @@ $components-colors: (
 			font-size: .875rem;
 		}
 	}
-	.#{$prefix}select.-has-icon-left {
+	.select.-has-icon-left {
 		> select {
 			padding-left: 2rem;
 		}
@@ -583,7 +437,7 @@ $components-colors: (
 			font-size: .875rem;
 		}
 	}
-	.#{$prefix}input.-has-icon-right {
+	.input.-has-icon-right {
 		> input {
 			padding-right: 2rem;
 		}
@@ -598,8 +452,8 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}field.-big {
-	.#{$prefix}input.-has-icon-left {
+.field.-big {
+	.input.-has-icon-left {
 		> input {
 			padding-left: 3rem;
 		}
@@ -612,7 +466,7 @@ $components-colors: (
 			font-size: 1.33333rem;
 		}
 	}
-	.#{$prefix}select.-has-icon-left {
+	.select.-has-icon-left {
 		> select {
 			padding-left: 3rem;
 		}
@@ -625,7 +479,7 @@ $components-colors: (
 			font-size: 1.33333rem;
 		}
 	}
-	.#{$prefix}input.-has-icon-right {
+	.input.-has-icon-right {
 		> input {
 			padding-right: 3rem;
 		}
@@ -640,7 +494,7 @@ $components-colors: (
 	}
 }
 
-.#{$prefix}input>input[type=file] {
+.input>input[type=file] {
 	padding: 8px 12px;
 }
 

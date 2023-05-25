@@ -47,28 +47,26 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
-		</li>
-		{#if disk}
-			<li>
-				<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="link"><h6>{disk.name}</h6></a>
-			</li>
-		{/if}
-		<li>
-			<h6>{#if disk}Update{:else}Create{/if}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="nm-link"><h6>Disks</h6></a>
+	</div>
+	{#if disk}
+		<div class="nm-breadcrumb-item">
+			<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="nm-link"><h6>{disk.name}</h6></a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>{#if disk}Update{:else}Create{/if}</h6>
+	</div>
 </div>
 
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>
 				{#if disk}
 					Update Disk {disk.name}
 				{:else}
@@ -80,14 +78,14 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-name">Disk name</label>
 			<div class="input">
 				<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!disk}>
 			</div>
 		</div>
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<label for="input-location">Location</label>
 			{#if disk}
 				<div class="input">

@@ -20,17 +20,17 @@
 
 <h6>Workload Identities</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/workload-identity/create?project=${project}`}>
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -46,7 +46,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

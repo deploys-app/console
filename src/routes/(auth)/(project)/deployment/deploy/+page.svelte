@@ -208,27 +208,26 @@
 	})
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
-		</li>
-		{#if deployment}
-			<li>
-				<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
-					<h6>{deployment.name}</h6>
-				</a>
-			</li>
-		{/if}
-		<li>
-			<h6>Deploy</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/deployment?project=${project}`} class="nm-link"><h6>Deployments</h6></a>
+	</div>
+	{#if deployment}
+		<div class="nm-breadcrumb-item">
+			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="nm-link">
+				<h6>{deployment.name}</h6>
+			</a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>Deploy</h6>
+	</div>
 </div>
+
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _jtfit-st _g-5">
 		{#if deployment}
 			<h5><strong>Deploy new revision</strong></h5>
 		{:else}
@@ -237,7 +236,7 @@
 	</div>
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-700px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if deployment}
 			<div class="field">
 				<label for="input-location-readonly">Location</label>
@@ -246,7 +245,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="field _mgbt-20px">
+			<div class="field">
 				<label for="input-location">Location</label>
 				<div class="select">
 					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
@@ -315,7 +314,7 @@
 				<div class="input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
-				<p class="_fs-200">* You don't have permission to list pull secrets</p>
+				<p class="_fs-1">* You don't have permission to list pull secrets</p>
 			</div>
 		{/if}
 
@@ -338,7 +337,7 @@
 					<div class="input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
-					<p class="_fs-200">* You don't have permission to list workload identities</p>
+					<p class="_fs-1">* You don't have permission to list workload identities</p>
 				</div>
 			{/if}
 		{/if}
@@ -373,11 +372,11 @@
 
 		<div class="field">
 			<label for="div-command">Command</label>
-			<div id="div-command" class="_pdbt-8px">
+			<div id="div-command" class="_pdbt-4">
 				{#each form.command as _, i}
-					<div class="input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
-						<button class="icon-button icon -is-right _cs-pt" type="button"
+						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
@@ -385,18 +384,18 @@
 				{/each}
 			</div>
 			<button class="button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
-				<i class="fa-solid fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
 
 		<div class="field">
 			<label for="div-args">Args</label>
-			<div id="div-args" class="_pdbt-8px">
+			<div id="div-args" class="_pdbt-4">
 				{#each form.args as _, i}
-					<div class="input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
-						<button class="icon-button icon -is-right _cs-pt" type="button"
+						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
@@ -404,7 +403,7 @@
 				{/each}
 			</div>
 			<button class="button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
-				<i class="fa-solid fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
 		</div>
@@ -419,7 +418,7 @@
 		{/if}
 
 		{#if selectedLocation.features.disk}
-			<div class="_dp-g _gg-16px">
+			<div class="_dp-g _g-6">
 				<br>
 				<hr>
 				<br>
@@ -444,7 +443,7 @@
 						<div class="input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
-						<p class="_fs-200">* You don't have permission to list disks</p>
+						<p class="_fs-1">* You don't have permission to list disks</p>
 					</div>
 				{/if}
 
@@ -467,13 +466,13 @@
 
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
-				<div class="_dp-g _gg-16px">
+				<div class="_dp-g _g-6">
 					<br>
 					<hr>
 					<br>
 
 					<h6><strong>Autoscaling</strong></h6>
-					<div class="lo-6 _gg-16px">
+					<div class="lo-6 _g-6">
 						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
 							<div class="input">
@@ -513,7 +512,7 @@
 <!--		{{/*                    {{end}}*/}}-->
 <!--		{{/*                </select>*/}}-->
 <!--		{{/*            </div>*/}}-->
-<!--		{{/*            <small class="_cl-light-secondary">*/}}-->
+<!--		{{/*            <small class="helper">*/}}-->
 <!--		{{/*                Number of vCPUs allocated to each container instance.*/}}-->
 <!--		{{/*            </small>*/}}-->
 <!--		{{/*        </div>*/}}-->
@@ -527,7 +526,7 @@
 					{/each}
 				</select>
 			</div>
-			<small class="_cl-light-secondary">
+			<small class="helper">
 				Memory to allocate to each container instance.
 			</small>
 		</div>
@@ -538,32 +537,32 @@
 
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
-			<div class="table-container">
-				<table class="table -ruled">
+			<div class="nm-table-container">
+				<table class="nm-table">
 					<thead>
 						<tr>
 							<th>Key</th>
-							<th class="collapsed _pd-0px"></th>
+							<th class="is-collapse _pd-0"></th>
 							<th>Value</th>
-							<th class="collapsed"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each form.env as it, i}
 							<tr>
-								<td class="_mnw-128px">
+								<td>
 									<div class="input">
 										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
 									</div>
 								</td>
-								<td class="_pd-0px _pdl-12px">:</td>
-								<td class="_mnw-128px _pdl-12px">
+								<td class="_pd-0 _pdl-5">:</td>
+								<td class="_pdl-5">
 									<div class="input">
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
 								</td>
-								<td class="table-action-container" style="padding: 19px 12px;">
-									<button class="icon-button -negative" type="button"
+								<td style="padding: 19px 12px;">
+									<button class="icon-button" type="button"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
@@ -576,7 +575,7 @@
 							<td colspan="4">
 								<button class="button -small _mg-at" type="button"
 									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
-									<i class="fa-solid fa-plus _mgr-12px"></i>
+									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
 								</button>
 							</td>
@@ -589,7 +588,7 @@
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="textarea _mgt-12px">
+				<div class="textarea _mgt-5">
 					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -599,32 +598,32 @@
 
 		<h6><strong>Mount Data</strong></h6>
 		<div>
-			<div class="table-container">
-				<table class="table -ruled">
+			<div class="nm-table-container">
+				<table class="nm-table">
 					<thead>
 						<tr>
 							<th>Path</th>
-							<th class="collapsed _pd-0px"></th>
+							<th class="is-collapse _pd-0"></th>
 							<th>Data</th>
-							<th class="collapsed"></th>
+							<th class="is-collapse is-align-right"></th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each form.mountData as it, i}
 							<tr>
-								<td class="_mnw-128px">
+								<td>
 									<div class="input">
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
-								<td class="_pd-0px _pdl-12px">:</td>
-								<td class="_mnw-128px _pdl-12px">
+								<td class="_pd-0 _pdl-5">:</td>
+								<td class="_pdl-5">
 									<div class="textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>
-								<td class="table-action-container" style="padding: 19px 12px;">
-									<button class="icon-button -negative" type="button"
+								<td style="padding: 19px 12px;">
+									<button class="icon-button" type="button"
 										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
@@ -637,7 +636,7 @@
 						<td colspan="4">
 							<button class="button -small _mg-at" type="button"
 								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
-								<i class="fa-solid fa-plus _mgr-12px"></i>
+								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
 							</button>
 						</td>
@@ -649,7 +648,7 @@
 
 		<hr>
 
-		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
 			Deploy
 		</button>
 	{/if}

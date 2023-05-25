@@ -16,18 +16,18 @@
 	}, 4000))
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
-		</li>
-		<li>
-			<h6>{deployment.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/deployment?project=${project}`} class="nm-link"><h6>Deployments</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{deployment.name}</h6>
+	</div>
 </div>
+
 <br>
-<div class="panel _dp-g _gg-24px">
+
+<div class="nm-panel is-level-300 _dp-g _g-7">
 	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
 
 	<slot />

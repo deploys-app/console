@@ -36,23 +36,21 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
-		</li>
-		<li>
-			<h6>{disk.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="nm-link"><h6>Disks</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{disk.name}</h6>
+	</div>
 </div>
 
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
-			<h3 class="_mgr-24px _mgbt-0px-lg">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
+			<h3 class="_mgr-7 _mgbt-0:lg">
 				<StatusIcon status={disk.status} />
 				<strong>Disk: {disk.name}</strong>
 			</h3>
@@ -66,7 +64,7 @@
 
 	<hr>
 
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 		<div class="field">
 			<label for="input-name">Name</label>
 			<div class="input">

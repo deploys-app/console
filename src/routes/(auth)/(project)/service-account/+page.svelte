@@ -13,23 +13,23 @@
 
 <h6>Service Accounts</h6>
 <br>
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/service-account/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="table-container">
-		<table class="table -ruled">
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Email</th>
 				<th>Name</th>
 				<th>Created At</th>
-				<th class="collapsed _tal-r"></th>
+				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -39,20 +39,18 @@
 				{#each serviceAccounts as it}
 					<tr>
 						<td>
-							<a class="link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
+							<a class="nm-link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
 								{it.email}
 							</a>
 						</td>
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
-							<div class="table-action-container">
-								<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
-									<div class="icon-button -secondary">
-										<i class="fa-solid fa-pen"></i>
-									</div>
-								</a>
-							</div>
+							<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
+								<div class="icon-button -secondary">
+									<i class="fa-solid fa-pen"></i>
+								</div>
+							</a>
 						</td>
 					</tr>
 				{:else}

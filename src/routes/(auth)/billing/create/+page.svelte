@@ -41,36 +41,34 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href="/billing" class="link"><h6>Billing</h6></a>
-		</li>
-		{#if billingAccount}
-			<li>
-				<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
-			</li>
-			<li>
-				<h6>Update</h6>
-			</li>
-		{:else}
-			<li>
-				<h6>Create</h6>
-			</li>
-		{/if}
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href="/billing" class="nm-link"><h6>Billing</h6></a>
+	</div>
+	{#if billingAccount}
+		<div class="nm-breadcrumb-item">
+			<a href={`/billing/detail?id=${billingAccount.id}`} class="nm-link"><h6>{billingAccount.name}</h6></a>
+		</div>
+		<div class="nm-breadcrumb-item">
+			<h6>Update</h6>
+		</div>
+	{:else}
+		<div class="nm-breadcrumb-item">
+			<h6>Create</h6>
+		</div>
+	{/if}
 </div>
 
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Account information</strong></h3>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Account information</strong></h3>
 		</div>
 	</div>
 	<hr>
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-name">Account name</label>
 			<div class="input">
@@ -78,7 +76,7 @@
 			</div>
 		</div>
 
-		<h4 class="_mgt-30px _mgbt-12px">Billing Information</h4>
+		<h4 class="_mgbt-5">Billing Information</h4>
 
 		<div class="field">
 			<label for="input-tax_id">Tax ID</label>

@@ -37,11 +37,11 @@
 
 <h6>Dashboard</h6>
 <br>
-<div class="lo-12 lo-6-md _gg-24px _alit-st">
-	<div class="panel lo-12 _gg-24px">
+<div class="lo-12 lo-6:md _g-7 _alit-st">
+	<div class="nm-panel is-level-300 lo-12 _g-7">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
-			<strong class="_mgl-16px">Project Info</strong>
+			<strong class="_mgl-6">Project Info</strong>
 		</h6>
 		<hr>
 		<div class="field">
@@ -71,58 +71,58 @@
 
 <!--		<hr>-->
 
-<!--		<a class="_dp-f _alit-ct link" href="">-->
+<!--		<a class="nm-link _dp-f _alit-ct" href="">-->
 <!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
-<!--			<span class="_mgl-16px">Project Settings</span>-->
+<!--			<span class="_mgl-6">Project Settings</span>-->
 <!--		</a>-->
 	</div>
 
 	{#if permission.billing}
-		<div class="panel lo-12 _gg-24px">
+		<div class="nm-panel is-level-300 lo-12 _g-7">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
-				<strong class="_mgl-16px">Billing</strong>
+				<strong class="_mgl-6">Billing</strong>
 			</h6>
 			<hr>
-			<div class="lo-12 lo-6-sm _gg-12px">
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">CPU</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.cpu}</span>
+			<div class="lo-12 lo-6:sm _g-5">
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">CPU</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.cpu}</span>
 						<span>&nbsp;seconds</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">Memory</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.memory}</span>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">Memory</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.memory}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">Egress</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.egress}</span>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">Egress</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.egress}</span>
 						<span>&nbsp;GiB</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">Disk</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.disk}</span>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">Disk</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.disk}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">Replica</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.replica}</span>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">Replica</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.replica}</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
-					<h4 class="_cl-primary-500">Price</h4>
-					<div class="_mgt-8px">
-						<span class="_fs-600">{billing?.price}</span>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary">Price</h4>
+					<div class="_mgt-4">
+						<span class="_fs-6">{billing?.price}</span>
 						<span>&nbsp;THB</span>
 					</div>
 				</div>

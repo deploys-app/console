@@ -32,7 +32,7 @@
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
+	<div class="icon-nav-menu _dp-n:md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
@@ -80,7 +80,7 @@
 		overflow: hidden;
 
 		background: white;
-		color: var(--color-dark-primary);
+		color: hsl(var(--hsl-black)/var(--cl-opacity));
 	}
 
 	ul.user-menu > li {
@@ -91,12 +91,16 @@
 		padding: .75rem .5rem;
 	}
 
+	a.item {
+		color: inherit;
+	}
+
 	ul.user-menu > li:not(:last-child) .item {
 		border-bottom: 1px solid rgb(238, 238, 238);
 	}
 
 	ul.user-menu > li:hover {
-		background-color: var(--color-primary-100);
+		background-color: hsl(var(--hsl-primary)/0.05);
 		cursor: pointer;
 	}
 
@@ -104,7 +108,7 @@
 		display: flex;
 		width: 100%;
 		height: var(--height-navbar, 20rem);
-		background-color: var(--color-neutral-600);
+		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
 		align-items: center;
 		justify-content: space-between;

@@ -25,6 +25,10 @@
 		form.roles = [...form.roles, role]
 	}
 
+	function removeRole (role) {
+		form.roles = form.roles.filter((x) => x !== role)
+	}
+
 	function selectRoleChanged (e) {
 		addRole(e.target.value)
 		e.target.value = ''
@@ -55,33 +59,32 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/role/users?project=${project}`} class="link"><h6>Users</h6></a>
-		</li>
-		<li>
-			<h6>Add</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/role/users?project=${project}`} class="nm-link"><h6>Users</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>Add</h6>
+	</div>
 </div>
+
 <br>
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Add member to "{project}" project</strong></h3>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Add member to "{project}" project</strong></h3>
 		</div>
 	</div>
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		<div class="field">
 			<div class="input">
-				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email}>
+				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
 			</div>
 		</div>
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<div class="select">
 				<select on:change={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
@@ -94,12 +97,12 @@
 			</div>
 		</div>
 
-		<div class="table-responsive _mgbt-50px">
-			<table class="table table-sm">
+		<div class="nm-table-container">
+			<table class="nm-table is-variant-compact">
 				<thead>
 				<tr>
 					<th>Role</th>
-					<th></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 				</thead>
 				<tbody>
@@ -107,10 +110,10 @@
 					<tr>
 						<td>{it}</td>
 						<td>
-							<button type="button" class="js-delete-role button -danger -small"
-								on:click={() => form.roles = form.roles.filter((x) => x !== it)}>
-								Delete
-							</button>
+							<div class="icon-button"
+								on:click={() => removeRole(it)} on:keypress={() => removeRole(it)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</div>
 						</td>
 					</tr>
 				{:else}
@@ -121,6 +124,8 @@
 				</tbody>
 			</table>
 		</div>
-		<button class="button -success" class:-loading={saving}>Save</button>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
+			Save
+		</button>
 	</form>
 </div>
