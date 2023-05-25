@@ -65,8 +65,8 @@
 
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
+<div class="panel _dp-g _g-7">
+	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
 				{#if disk}
@@ -80,7 +80,7 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-name">Disk name</label>
 			<div class="input">

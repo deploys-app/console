@@ -68,7 +68,7 @@
 	</div>
 
 	<div class="_f-1">
-		<div class="lo-12 _gg-12px _pdh-12px _mgt-32px">
+		<div class="lo-12 _g-5 _pdh-12px _mgt-32px">
 			<small class="_dp-f _jtfct-spbtw">
 				<strong>CURRENT PROJECT</strong>
 			</small>
@@ -215,7 +215,7 @@
 			<hr>
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
-			<div class="_dp-f _jtfct-fe _alit-ct _gg-8px _w-100pct _pdh-16px">
+			<div class="_dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-16px">
 				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
 					<i class="fa-brands fa-github"></i>
 				</a>

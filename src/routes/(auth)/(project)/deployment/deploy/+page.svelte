@@ -227,8 +227,8 @@
 </div>
 <br>
 
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
+<div class="panel _dp-g _g-7">
+	<div class="lo-12 _jtfit-st _g-5">
 		{#if deployment}
 			<h5><strong>Deploy new revision</strong></h5>
 		{:else}
@@ -237,7 +237,7 @@
 	</div>
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-700px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-700px" on:submit|preventDefault={save}>
 		{#if deployment}
 			<div class="field">
 				<label for="input-location-readonly">Location</label>
@@ -419,7 +419,7 @@
 		{/if}
 
 		{#if selectedLocation.features.disk}
-			<div class="_dp-g _gg-16px">
+			<div class="_dp-g _g-6">
 				<br>
 				<hr>
 				<br>
@@ -467,13 +467,13 @@
 
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
-				<div class="_dp-g _gg-16px">
+				<div class="_dp-g _g-6">
 					<br>
 					<hr>
 					<br>
 
 					<h6><strong>Autoscaling</strong></h6>
-					<div class="lo-6 _gg-16px">
+					<div class="lo-6 _g-6">
 						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
 							<div class="input">

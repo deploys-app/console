@@ -101,9 +101,9 @@
 </div>
 <br>
 
-<div class="panel _dp-g _gg-16px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+<div class="panel _dp-g _g-6">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3><strong>
 				{#if role}
 					Update role "{form.role}"
@@ -122,7 +122,7 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-role">Role ID</label>
 			<div class="input">
@@ -141,7 +141,7 @@
 		<hr>
 		<br>
 
-		<div class="_dp-g _gg-16px">
+		<div class="_dp-g _g-6">
 			<h6><strong>Permissions</strong></h6>
 
 			<div class="field _dp-f _mgbt-12px">

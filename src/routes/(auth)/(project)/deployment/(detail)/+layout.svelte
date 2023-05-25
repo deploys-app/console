@@ -27,7 +27,7 @@
 	</ul>
 </div>
 <br>
-<div class="panel _dp-g _gg-24px">
+<div class="panel _dp-g _g-7">
 	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
 
 	<slot />

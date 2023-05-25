@@ -22,7 +22,7 @@
 <br>
 <div class="panel">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _gg-8px _mgl-at">
+		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
 			<a class="button -small" href={`/workload-identity/create?project=${project}`}>
                 Create
             </a>

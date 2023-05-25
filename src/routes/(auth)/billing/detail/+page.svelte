@@ -36,9 +36,9 @@
 
 <br>
 
-<div class="panel _dp-g _gg-16px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+<div class="panel _dp-g _g-6">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>"{billingAccount.name}" account information</strong></h3>
 			<div class="_dp-f">
 				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete account</button>
@@ -48,7 +48,7 @@
 
 	<hr>
 
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 		<div class="table-container _mgbt-30px">
 			<table class="table">
 				<tbody>

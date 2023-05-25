@@ -50,12 +50,12 @@
 	</ul>
 </div>
 <br>
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
+<div class="panel _dp-g _g-7">
+	<div class="lo-12 _jtfit-st _g-5">
 		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
 	</div>
 	<hr>
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 		<div class="field">
 			<label for="input-gsa">GSA</label>
 			<div class="input">

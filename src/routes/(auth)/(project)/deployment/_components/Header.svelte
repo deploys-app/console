@@ -53,8 +53,8 @@
 	}
 </script>
 
-<div class="lo-12 _gg-12px">
-	<div class="_dp-g _gg-12px _gatf-r _gatf-cl-lg">
+<div class="lo-12 _g-5">
+	<div class="_dp-g _g-5 _gatf-r _gatf-cl:lg">
 		<h3 class="_dp-f _fw-w _alit-fst _mgr-24px _mgbt-16px _mgbt-0px-lg">
 			<div>
 				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} />
@@ -89,7 +89,7 @@
 
 <hr>
 
-<div class="nav-tabs-wrap _fdrt-cl _fdrt-r-md">
+<div class="nav-tabs-wrap _fdrt-cl _fdrt-r:md">
 	<ul class="nav nav-tabs _mgbt-20px _mgbt-0px-lg _w-100pct">
 		<li class="nav-item">
 			<a class="nav-link" class:active={$page.url.pathname === '/deployment/metrics'} href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Metric</a>

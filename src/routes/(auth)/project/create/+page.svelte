@@ -61,8 +61,8 @@
 	</ul>
 </div>
 <br>
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _jtfit-st _gg-12px">
+<div class="panel _dp-g _g-7">
+	<div class="lo-12 _jtfit-st _g-5">
 		{#if project}
 			<h5><strong>Update Project: {project.name}</strong></h5>
 		{:else}
@@ -72,7 +72,7 @@
 
 	<hr>
 
-	<form class="_dp-g _gg-16px _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
 		<div class="field">
 			<label for="input-project">ID</label>
 			<div class="input">

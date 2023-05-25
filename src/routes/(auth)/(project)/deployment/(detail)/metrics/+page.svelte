@@ -76,7 +76,7 @@
 
 <h6><strong>Metric</strong></h6>
 
-<div class="_dp-g _gg-16px _jtfct-fst">
+<div class="_dp-g _g-6 _jtfct-fst">
 	<div class="select">
 		<select bind:value={filter.range} on:change={() => fetchMetrics(true)}>
 			<option value="1h">1 Hour</option>

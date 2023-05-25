@@ -32,7 +32,7 @@
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu _dp-n-md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
+	<div class="icon-nav-menu _dp-n:md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
@@ -89,6 +89,10 @@
 
 	ul.user-menu > li > .item {
 		padding: .75rem .5rem;
+	}
+
+	a.item {
+		color: inherit;
 	}
 
 	ul.user-menu > li:not(:last-child) .item {

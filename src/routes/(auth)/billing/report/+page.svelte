@@ -119,8 +119,8 @@
 <br>
 
 <div class="panel">
-	<div class="lo-grid-span-horizontal _gg-12px">
-		<div class="lo-grid-span-horizontal _gg-8px">
+	<div class="lo-grid-span-horizontal _g-5">
+		<div class="lo-grid-span-horizontal _g-4">
 			<div class="select">
 				<select bind:value={filter.range} on:change={fetchReport}>
 					<option value="this_month">This month</option>

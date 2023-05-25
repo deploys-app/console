@@ -161,9 +161,9 @@
 	</ul>
 </div>
 <br>
-<div class="panel _dp-g _gg-24px">
-	<div class="lo-12 _gg-12px">
-		<div class="_dp-g _gg-16px _gatf-r _gatf-cl-lg _jtfct-spbtw">
+<div class="panel _dp-g _g-7">
+	<div class="lo-12 _g-5">
+		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
 				<strong>Domain: {domain.domain}</strong>
 			</h3>
@@ -177,7 +177,7 @@
 
 	<hr>
 
-	<div class="_dp-g _gg-16px _w-100pct _mxw-512px">
+	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 		<div class="field">
 			<label for="input-gsa">Domain</label>
 			<div class="input">
@@ -333,8 +333,8 @@
 			<strong>Purge Cache</strong>
 		</div>
 		<div class="_bgcl-neutral-800 _pd-24px _bdw-1px _bdcl-negative-900 _bdrd-8px _mxw-512px">
-			<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct-md">
-				<div class="_f-1 lo-12 _gg-4px">
+			<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+				<div class="_f-1 lo-12 _g-3">
 					<div><strong>Purge everything</strong></div>
 					<p class="_fs-300 _opct-80">Remove all cached resources</p>
 				</div>
@@ -343,8 +343,8 @@
 				</button>
 			</div>
 			<hr class="_mgv-24px">
-			<div class="_dp-f _fdrt-r-md _fdrt-cl _gg-24px _alit-ct-md">
-				<div class="_f-1 lo-12 _gg-4px">
+			<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+				<div class="_f-1 lo-12 _g-3">
 					<div><strong>Purge prefix</strong></div>
 					<p class="_fs-300 _opct-80">Remove cached resources at prefix path</p>
 				</div>
