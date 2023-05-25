@@ -71,6 +71,8 @@
 				return
 			}
 			podStatus = await response.json()
+		} catch (err) {
+			// ignore
 		} finally {
 			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 5000)
 		}
