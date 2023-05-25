@@ -30,42 +30,6 @@ ul, ol {
 	justify-content: start;
 }
 
-.sidebar-menus {
-	.menu-item {
-		display: grid;
-		grid-auto-flow: column;
-		grid-gap: .75rem;
-
-		justify-content: start;
-		align-items: center;
-
-		padding: .75rem 1rem;
-
-		font-size: var(--fs-2);
-		color: hsl(227, 46%, 73%);
-
-		cursor: pointer;
-
-		&:hover {
-			background: hsl(var(--hsl-base-200));
-		}
-
-		&.is-active {
-			color: var(--color-light-primary);
-			background: hsl(var(--hsl-base-200));
-		}
-	}
-
-	.menu-icon {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-
-		width: 1.5rem;
-		height: 1.5rem;
-	}
-}
-
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -75,7 +39,7 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--color-light-primary);;
+  -webkit-text-fill-color: hsl(var(--hsl-content));
   -webkit-box-shadow: 0 0 0px 1000px hsl(var(--hsl-base-400)/0.2) inset;
   transition: background-color 5000s ease-in-out 0s;
 }

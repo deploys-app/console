@@ -25,6 +25,42 @@
 		box-shadow: var(--raised-z10);
 	}
 
+	.sidebar-menus {
+		.menu-item {
+			display: grid;
+			grid-auto-flow: column;
+			grid-gap: .75rem;
+
+			justify-content: start;
+			align-items: center;
+
+			padding: .75rem 1rem;
+
+			font-size: var(--fs-2);
+			color: hsl(var(--hsl-content)/0.75);
+
+			cursor: pointer;
+
+			&:hover {
+				background: hsl(var(--hsl-base-200));
+			}
+
+			&.is-active {
+				color: hsl(var(--hsl-content));
+				background: hsl(var(--hsl-base-200));
+			}
+		}
+
+		.menu-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+	}
+
 	.site-logo {
 		margin: 0 auto;
 		width: 100px;
@@ -43,7 +79,7 @@
 		font-size: 0.9375rem;
 		border-radius: 4px;
 		border: 1px solid hsl(var(--hsl-base-400)/0.3);
-		color: var(--color-light-primary);
+		color: hsl(var(--hsl-content));
 		outline: none;
 		transition: all var(--timing-normal) ease;
 		box-shadow: var(--raised-z6);

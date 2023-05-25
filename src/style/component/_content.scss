@@ -19,7 +19,7 @@ pre {
 		cursor: pointer;
 		user-select: none;
 		border: 0;
-		color: var(--color-light-primary);
+		color: hsl(var(--hsl-content));
 		outline: 0;
 
 		&:hover {

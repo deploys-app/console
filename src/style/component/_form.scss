@@ -20,7 +20,7 @@
 	padding-left: .75rem;
 	padding-right: .75rem;
 
-    color: var(--color-light-primary);
+    color: hsl(var(--hsl-content));
 
 	background-color: hsl(var(--hsl-base-400)/0.2);
 	font-size: 0.9375rem; // 15px
@@ -330,7 +330,7 @@ $components-colors: (
 			width: 20px;
 			height: 20px;
 			left: 0px;
-			background-color:var(--color-light-primary);
+			background-color: hsl(var(--hsl-content));
 			border: 1px solid var(--color-gray-300);
 			border-radius: 4px;
 			box-sizing: border-box;
@@ -346,7 +346,7 @@ $components-colors: (
 			border-bottom-width: 2px;
 			border-left-style: solid;
 			border-bottom-style: solid;
-			border-color: var(--color-light-primary);
+			border-color: hsl(var(--hsl-content));
 			transform: rotate(-45deg);
 		}
 
