@@ -40,7 +40,7 @@
 		<h4>Projects</h4>
 
 		<div class="table-container">
-			<table class="table -ruled _fs-300">
+			<table class="table -ruled _fs-2">
 				<thead>
 					<tr>
 						<th class="collapsed"></th>
@@ -53,7 +53,7 @@
 					<tr>
 						<td>
 							{#if project === it.project}
-								<i class="fas fa-check _cl-primary-500 _fs-600"></i>
+								<i class="fas fa-check _cl-primary-500 _fs-6"></i>
 							{/if}
 						</td>
 						<td>

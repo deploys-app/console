@@ -88,41 +88,41 @@
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">CPU</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.cpu}</span>
+						<span class="_fs-6">{billing?.cpu}</span>
 						<span>&nbsp;seconds</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Memory</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.memory}</span>
+						<span class="_fs-6">{billing?.memory}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Egress</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.egress}</span>
+						<span class="_fs-6">{billing?.egress}</span>
 						<span>&nbsp;GiB</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Disk</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.disk}</span>
+						<span class="_fs-6">{billing?.disk}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Replica</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.replica}</span>
+						<span class="_fs-6">{billing?.replica}</span>
 					</div>
 				</div>
 				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Price</h4>
 					<div class="_mgt-4">
-						<span class="_fs-600">{billing?.price}</span>
+						<span class="_fs-6">{billing?.price}</span>
 						<span>&nbsp;THB</span>
 					</div>
 				</div>

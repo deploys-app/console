@@ -315,7 +315,7 @@
 				<div class="input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
-				<p class="_fs-200">* You don't have permission to list pull secrets</p>
+				<p class="_fs-1">* You don't have permission to list pull secrets</p>
 			</div>
 		{/if}
 
@@ -338,7 +338,7 @@
 					<div class="input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
-					<p class="_fs-200">* You don't have permission to list workload identities</p>
+					<p class="_fs-1">* You don't have permission to list workload identities</p>
 				</div>
 			{/if}
 		{/if}
@@ -444,7 +444,7 @@
 						<div class="input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
-						<p class="_fs-200">* You don't have permission to list disks</p>
+						<p class="_fs-1">* You don't have permission to list disks</p>
 					</div>
 				{/if}
 
