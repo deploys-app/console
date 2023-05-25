@@ -43,7 +43,7 @@
 </script>
 
 <h6><strong>Deployment details</strong></h6>
-<div class="table-container">
+<div class="nm-table-container">
 	<table class="table">
 		{#if deployment.type === 'WebService'}
 			{#if !deployment.internal}
@@ -207,7 +207,7 @@
 </div>
 
 <h6><strong>Environment variables</strong></h6>
-<div class="table-container">
+<div class="nm-table-container">
 	<table class="table">
 		<thead>
 		<tr>
@@ -233,7 +233,7 @@
 </div>
 
 <h6><strong>Mount Data</strong></h6>
-<div class="table-container">
+<div class="nm-table-container">
 	<table class="table">
 		<thead>
 		<tr>

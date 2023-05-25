@@ -32,7 +32,7 @@
 </script>
 
 <h6><strong>Revision</strong></h6>
-<div class="table-container _wsp-nw">
+<div class="nm-table-container _mgt-6 _wsp-nw">
 	<table class="table">
 		<thead>
 		<tr>

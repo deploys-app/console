@@ -537,7 +537,7 @@
 
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
-			<div class="table-container">
+			<div class="nm-table-container">
 				<table class="table -ruled">
 					<thead>
 						<tr>
@@ -598,7 +598,7 @@
 
 		<h6><strong>Mount Data</strong></h6>
 		<div>
-			<div class="table-container">
+			<div class="nm-table-container">
 				<table class="table -ruled">
 					<thead>
 						<tr>

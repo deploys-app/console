@@ -47,7 +47,7 @@
 	<hr>
 
 	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="table-container">
+		<div class="nm-table-container _mgt-6">
 			<table class="table">
 				<tbody>
 				<tr>

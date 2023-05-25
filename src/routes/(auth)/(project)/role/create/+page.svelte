@@ -154,7 +154,7 @@
 				</div>
 			</div>
 
-			<div class="table-container">
+			<div class="nm-table-container">
 				<table class="table -ruled">
 					<thead>
 						<tr>

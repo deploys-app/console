@@ -30,7 +30,7 @@
 
 <h6><strong>Events</strong></h6>
 
-<div class="table-container">
+<div class="nm-table-container _mgt-6">
 	<table class="table">
 		<thead>
 		<tr>

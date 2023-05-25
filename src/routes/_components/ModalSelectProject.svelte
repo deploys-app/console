@@ -39,7 +39,7 @@
 		<div class="modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
-		<div class="table-container">
+		<div class="nm-table-container _mgt-6">
 			<table class="table -ruled _fs-2">
 				<thead>
 					<tr>
@@ -74,7 +74,7 @@
 </div>
 
 <style lang="scss">
-	.table-container {
+	.nm-table-container {
 		max-height: 405px;
 		overflow: auto;
 	}

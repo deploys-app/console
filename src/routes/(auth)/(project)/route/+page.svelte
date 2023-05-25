@@ -43,7 +43,7 @@
 		</div>
 	</div>
 
-	<div class="table-container">
+	<div class="nm-table-container _mgt-6">
 		<table class="table -ruled">
 			<thead>
 			<tr>
