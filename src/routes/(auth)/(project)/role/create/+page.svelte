@@ -144,7 +144,7 @@
 		<div class="_dp-g _g-6">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="field _dp-f _mgbt-12px">
+			<div class="field _dp-f _mgbt-5">
 				<div class="select _f-1">
 					<select on:change={selectPermissionChanged}>
 						<option value="" disabled selected>---Select Permission---</option>
@@ -184,7 +184,7 @@
 
 		<hr>
 
-		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
 			{#if role}Update{:else}Create{/if}
 		</button>
 	</form>

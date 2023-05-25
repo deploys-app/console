@@ -87,7 +87,7 @@
 			</div>
 		</div>
 
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<label for="input-billing_account">Billing Account</label>
 			<div class="select">
 				<select id="input-billing_account" bind:value={form.billingAccount} required>
@@ -99,7 +99,7 @@
 			</div>
 		</div>
 
-		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
 			{#if project}
 				Update Project
 			{:else}

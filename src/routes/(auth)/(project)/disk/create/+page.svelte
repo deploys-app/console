@@ -68,7 +68,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>
 				{#if disk}
 					Update Disk {disk.name}
 				{:else}
@@ -87,7 +87,7 @@
 				<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!disk}>
 			</div>
 		</div>
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<label for="input-location">Location</label>
 			{#if disk}
 				<div class="input">

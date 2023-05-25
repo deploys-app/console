@@ -246,7 +246,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="field _mgbt-20px">
+			<div class="field">
 				<label for="input-location">Location</label>
 				<div class="select">
 					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
@@ -373,9 +373,9 @@
 
 		<div class="field">
 			<label for="div-command">Command</label>
-			<div id="div-command" class="_pdbt-8px">
+			<div id="div-command" class="_pdbt-4">
 				{#each form.command as _, i}
-					<div class="input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right _cs-pt" type="button"
 							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
@@ -385,16 +385,16 @@
 				{/each}
 			</div>
 			<button class="button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
-				<i class="fa-solid fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
 
 		<div class="field">
 			<label for="div-args">Args</label>
-			<div id="div-args" class="_pdbt-8px">
+			<div id="div-args" class="_pdbt-4">
 				{#each form.args as _, i}
-					<div class="input -has-icon-right _mgbt-8px">
+					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right _cs-pt" type="button"
 							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
@@ -404,7 +404,7 @@
 				{/each}
 			</div>
 			<button class="button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
-				<i class="fa-solid fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
 		</div>
@@ -543,7 +543,7 @@
 					<thead>
 						<tr>
 							<th>Key</th>
-							<th class="collapsed _pd-0px"></th>
+							<th class="collapsed _pd-0"></th>
 							<th>Value</th>
 							<th class="collapsed"></th>
 						</tr>
@@ -556,8 +556,8 @@
 										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
 									</div>
 								</td>
-								<td class="_pd-0px _pdl-12px">:</td>
-								<td class="_mnw-128px _pdl-12px">
+								<td class="_pd-0 _pdl-5">:</td>
+								<td class="_mnw-128px _pdl-5">
 									<div class="input">
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
@@ -576,7 +576,7 @@
 							<td colspan="4">
 								<button class="button -small _mg-at" type="button"
 									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
-									<i class="fa-solid fa-plus _mgr-12px"></i>
+									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
 								</button>
 							</td>
@@ -589,7 +589,7 @@
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="textarea _mgt-12px">
+				<div class="textarea _mgt-5">
 					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -604,7 +604,7 @@
 					<thead>
 						<tr>
 							<th>Path</th>
-							<th class="collapsed _pd-0px"></th>
+							<th class="collapsed _pd-0"></th>
 							<th>Data</th>
 							<th class="collapsed"></th>
 						</tr>
@@ -617,8 +617,8 @@
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
-								<td class="_pd-0px _pdl-12px">:</td>
-								<td class="_mnw-128px _pdl-12px">
+								<td class="_pd-0 _pdl-5">:</td>
+								<td class="_mnw-128px _pdl-5">
 									<div class="textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
@@ -637,7 +637,7 @@
 						<td colspan="4">
 							<button class="button -small _mg-at" type="button"
 								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
-								<i class="fa-solid fa-plus _mgr-12px"></i>
+								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
 							</button>
 						</td>
@@ -649,7 +649,7 @@
 
 		<hr>
 
-		<button class="button _mgt-16px _mgr-at" class:-loading={saving}>
+		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
 			Deploy
 		</button>
 	{/if}

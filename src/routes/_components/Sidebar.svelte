@@ -62,13 +62,13 @@
 	}
 </style>
 
-<nav class="sidebar _pdt-16px _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
+<nav class="sidebar _pdt-6 _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
 	<div class="site-logo">
 		<img src="/images/logo.png" alt="Deploys.app" draggable="false">
 	</div>
 
 	<div class="_f-1">
-		<div class="lo-12 _g-5 _pdh-12px _mgt-32px">
+		<div class="lo-12 _g-5 _pdh-5 _mgt-8">
 			<small class="_dp-f _jtfct-spbtw">
 				<strong>CURRENT PROJECT</strong>
 			</small>
@@ -81,7 +81,7 @@
 						&#45;&#45;PROJECT&#45;&#45;
 					{/if}
 				</span>
-				<i class="fa-solid fa-caret-down _mgl-4px"></i>
+				<i class="fa-solid fa-caret-down _mgl-3"></i>
 			</div>
 
 			<div class="u-halign-right">
@@ -210,19 +210,19 @@
 		</div>
 	</div>
 
-	<div class="_mgt-16px _pdbt-12px">
-		<div class="_pdh-12px _mgbt-12px">
+	<div class="_mgt-6 _pdbt-5">
+		<div class="_pdh-5 _mgbt-5">
 			<hr>
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
-			<div class="_dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-16px">
-				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
+			<div class="_dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
+				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-github"></i>
 				</a>
-				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-discord"></i>
 				</a>
-				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-4px _w-32px _h-32px">
+				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
 					<i class="fa-solid fa-envelope"></i>
 				</a>
 			</div>

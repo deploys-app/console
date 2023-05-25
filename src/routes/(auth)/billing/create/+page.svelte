@@ -66,7 +66,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Account information</strong></h3>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Account information</strong></h3>
 		</div>
 	</div>
 	<hr>
@@ -78,7 +78,7 @@
 			</div>
 		</div>
 
-		<h4 class="_mgt-30px _mgbt-12px">Billing Information</h4>
+		<h4 class="_mgbt-5">Billing Information</h4>
 
 		<div class="field">
 			<label for="input-tax_id">Tax ID</label>

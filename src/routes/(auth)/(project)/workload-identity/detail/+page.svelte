@@ -94,7 +94,7 @@
 		</pre>
 	</div>
 
-	<div class="_mgl-at-lg">
+	<div class="_mgl-at:lg">
 		<button class="button -danger" on:click={deleteItem}>Delete</button>
 	</div>
 </div>

@@ -13,4 +13,4 @@
 	$: iconClass = iconClassByStatus[status] || 'fa-solid fa-minus _cl-light'
 </script>
 
-<i class={`${iconClass} _mgh-12px`}></i>
+<i class={`${iconClass} _mgh-5`}></i>

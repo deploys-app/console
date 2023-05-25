@@ -52,7 +52,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-24px _mgbt-0px-lg">
+			<h3 class="_mgr-7 _mgbt-0:lg">
 				<StatusIcon status={disk.status} />
 				<strong>Disk: {disk.name}</strong>
 			</h3>

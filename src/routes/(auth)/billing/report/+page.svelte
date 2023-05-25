@@ -133,10 +133,10 @@
 		</div>
 	</div>
 
-	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-32px">
+	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-8">
 		<div class="_dp-f _fw-w">
 			{#each (report?.projectList ?? []) as it}
-				<div class="checkbox _mgbt-8px _mgr-12px">
+				<div class="checkbox _mgbt-4 _mgr-5">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} on:change={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>
@@ -144,7 +144,7 @@
 		</div>
 	</div>
 
-	<div bind:this={chartEl} class="_mgv-12px"></div>
+	<div bind:this={chartEl} class="_mgv-5"></div>
 
 	<br>
 

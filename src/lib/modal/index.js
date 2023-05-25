@@ -23,9 +23,9 @@ export async function confirm ({ title, html, yes, callback }) {
 		buttonsStyling: false,
 		confirmButtonText: yes || 'Yes',
 		customClass: {
-			confirmButton: 'button _cl-white -danger _mgr-16px',
+			confirmButton: 'button _cl-white -danger _mgr-6',
 			cancelButton: 'button -negative -tertiary',
-			actions: '_mgt-24px'
+			actions: '_mgt-7'
 		}
 	})
 	if (!result.value) {
@@ -71,7 +71,7 @@ export async function error ({ error, callback }) {
 		html: msg,
 		icon: 'error',
 		customClass: {
-			actions: '_mgt-24px'
+			actions: '_mgt-7'
 		}
 	})
 	callback?.()

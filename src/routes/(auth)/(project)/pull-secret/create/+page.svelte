@@ -66,7 +66,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Create pull secret</strong></h3>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Create pull secret</strong></h3>
 		</div>
 	</div>
 
@@ -79,7 +79,7 @@
 				<input id="input-name" placeholder="name" bind:value={form.name}>
 			</div>
 		</div>
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<label for="input-location">Location</label>
 			<div class="select">
 				<select id="input-location" bind:value={form.location} required>

@@ -78,7 +78,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg">
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
 				<strong>{serviceAccount.name}</strong>
 			</h3>
 			<div class="_dp-f">
@@ -91,7 +91,7 @@
 
 	<hr>
 
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px _mgbt-20px">
+	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 		<div class="field">
 			<label for="input-email">Email</label>
 			<div class="input">
@@ -132,7 +132,7 @@
 			<div class="input -has-icon-right">
 				<input value="{key.secret}" readonly>
 				<div class="icon -is-right _cs-pt">
-					<button class="_bgcl-tpr _cs-pt _bdw-0px _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
+					<button class="_bgcl-tpr _cs-pt _bdw-0 _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>
@@ -140,7 +140,7 @@
 		{/each}
 		<div class="_dp-g _g-6 _w-100pct _mxw-512px">
 			<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
-				<i class="fa-solid fa-plus _mgr-12px"></i>
+				<i class="fa-solid fa-plus _mgr-5"></i>
 				Create key
 			</button>
 		</div>

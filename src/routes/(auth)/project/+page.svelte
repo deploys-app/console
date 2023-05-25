@@ -22,9 +22,9 @@
 			buttonsStyling: false,
 			confirmButtonText: 'Delete',
 			customClass: {
-				confirmButton: 'button _cl-white -danger _mgr-16px',
+				confirmButton: 'button _cl-white -danger _mgr-6',
 				cancelButton: 'button -negative -tertiary',
-				actions: '_mgt-24px'
+				actions: '_mgt-7'
 			},
 			preConfirm: (input) => input === project
 		})

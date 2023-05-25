@@ -69,7 +69,7 @@
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-24px _mgbt-16px _mgbt-0px-lg"><strong>Add member to "{project}" project</strong></h3>
+			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Add member to "{project}" project</strong></h3>
 		</div>
 	</div>
 
@@ -81,7 +81,7 @@
 				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email}>
 			</div>
 		</div>
-		<div class="field _mgbt-20px">
+		<div class="field">
 			<div class="select">
 				<select on:change={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
@@ -94,7 +94,7 @@
 			</div>
 		</div>
 
-		<div class="table-responsive _mgbt-50px">
+		<div class="table-responsive">
 			<table class="table table-sm">
 				<thead>
 				<tr>

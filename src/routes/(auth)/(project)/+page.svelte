@@ -41,7 +41,7 @@
 	<div class="panel lo-12 _g-7">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
-			<strong class="_mgl-16px">Project Info</strong>
+			<strong class="_mgl-6">Project Info</strong>
 		</h6>
 		<hr>
 		<div class="field">
@@ -73,7 +73,7 @@
 
 <!--		<a class="_dp-f _alit-ct link" href="">-->
 <!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
-<!--			<span class="_mgl-16px">Project Settings</span>-->
+<!--			<span class="_mgl-6">Project Settings</span>-->
 <!--		</a>-->
 	</div>
 
@@ -81,47 +81,47 @@
 		<div class="panel lo-12 _g-7">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
-				<strong class="_mgl-16px">Billing</strong>
+				<strong class="_mgl-6">Billing</strong>
 			</h6>
 			<hr>
 			<div class="lo-12 lo-6:sm _g-5">
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">CPU</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.cpu}</span>
 						<span>&nbsp;seconds</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Memory</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.memory}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Egress</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.egress}</span>
 						<span>&nbsp;GiB</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Disk</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.disk}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Replica</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.replica}</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-4px _pd-16px">
+				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
 					<h4 class="_cl-primary-500">Price</h4>
-					<div class="_mgt-8px">
+					<div class="_mgt-4">
 						<span class="_fs-600">{billing?.price}</span>
 						<span>&nbsp;THB</span>
 					</div>
