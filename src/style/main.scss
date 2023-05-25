@@ -7,7 +7,6 @@
 @import '@nomimono/nomimono-css/component.css';
 
 @import 'atomic/all';
-@import 'utility/all';
 @import 'component/all';
 
 html, body {
@@ -69,10 +68,6 @@ ul, ol {
     }
 }
 
-.u-raised-z1 {
-    box-shadow: var(--raised-z12);
-}
-
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -91,4 +86,8 @@ select:-webkit-autofill:focus {
     form, .content {
         max-width: 768px;
     }
+}
+
+.cl-text-mute {
+    color: #90959a;
 }

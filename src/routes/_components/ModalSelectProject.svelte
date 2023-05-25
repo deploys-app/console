@@ -35,7 +35,7 @@
 </script>
 
 <div class="modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
-	<div class="modal-panel u-raised-1">
+	<div class="modal-panel">
 		<div class="modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
@@ -82,5 +82,9 @@
 	.table td {
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
+	}
+
+	.modal-panel {
+		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
 	}
 </style>

@@ -24,7 +24,6 @@
 	$color-text: #e6e6e6;
 	$color-text-light: hsla(0, 0%, 100%, 1);
 	$color-text-dark: hsla(0, 0%, 20%, 0.97);
-	$color-text-mute: #90959a;
 
 	$color-primary-100: #81c3f8;
 	$color-primary-200: #64b5f7;
@@ -56,7 +55,6 @@ $colors: (
 	'text': $color-text,
 	'text-light': $color-text-light,
 	'text-dark': $color-text-dark,
-	'text-mute': $color-text-mute,
 
 	'primary-100': $color-primary-100,
 	'primary-200': $color-primary-200,
@@ -72,35 +70,6 @@ $colors: (
 	'tpr': transparent
 );
 
-$radiuses: (
-	'0px': 0px,
-	'50pct': 50%,
-	'max': 9999px,
-	'at': auto
-);
-
-$spacings: (
-	'0px': 0px,
-	'5px': 5px,
-	'8px': 8px,
-	'10px': 10px,
-	'12px': 12px,
-	'14px': 14px,
-	'20px': 20px,
-	'30px': 30px,
-	'35px': 35px,
-	'40px': 40px,
-	'50px': 50px,
-	'60px': 60px,
-	'180px': 180px,
-	'500px': 500px,
-	'50pct': 50%,
-	'100pct': 100%,
-	'100vw': 100vw,
-	'100vh': 100vh,
-	'at': auto,
-);
-
 /*
  |-------------------------------------------------------------------------------
  | Typography
@@ -114,29 +83,10 @@ $spacings: (
 	--font-family-secondary: 'Nunito', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
-$font-families: (
-	'primary': var(--font-family-primary),
-	'secondary': var(--font-family-secondary)
-);
-
 :root {
 	--line-height-default: 1.25;
 	--line-height-paragraph: 1.55;
 }
-
-$font-sizes: (
-	'12': 12px,
-	'14': 14px,
-	'16': 16px,
-	'18': 18px,
-	'20': 20px,
-	'24': 24px,
-	'30': 30px,
-	'36': 36px,
-	'48': 48px,
-	'60': 60px,
-	'72': 72px,
-);
 
 /*-------------------------------------------------------------------------------
 | Layout
@@ -144,13 +94,11 @@ $font-sizes: (
 $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
-$breakpoint-xl: 1280px;
 
 $breakpoints: (
 	'sm': $breakpoint-sm,
 	'md': $breakpoint-md,
-	'lg': $breakpoint-lg,
-	'xl': $breakpoint-xl
+	'lg': $breakpoint-lg
 );
 
 @import 'elements';

@@ -53,7 +53,7 @@
 						<a class="link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
 							{`https://${deployment.url}`}
 						</a>
-						<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`https://${deployment.url}`}>
+						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`https://${deployment.url}`}>
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
@@ -63,7 +63,7 @@
 				<td>Internal URL</td>
 				<td>
 					http://{deployment.internalUrl}
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`http://${deployment.internalUrl}`}>
+					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`http://${deployment.internalUrl}`}>
 						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
@@ -80,7 +80,7 @@
 				<td>Internal Address</td>
 				<td>
 					{deployment.internalAddress}:{deployment.port}
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.internalAddress}:${deployment.port}`}>
+					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.internalAddress}:${deployment.port}`}>
 						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
@@ -99,7 +99,7 @@
 			<td>Location</td>
 			<td>
 				{deployment.location}
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.location}`}>
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.location}`}>
 					<i class="fa-light fa-copy"></i>
 				</span>
 			</td>
@@ -108,7 +108,7 @@
 			<td>Image</td>
 			<td>
 				{deployment.image}
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.image}`}>
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`${deployment.image}`}>
 					<i class="fa-light fa-copy"></i>
 				</span>
 			</td>

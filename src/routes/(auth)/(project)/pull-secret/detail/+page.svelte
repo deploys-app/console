@@ -75,7 +75,7 @@
 			<label for="input-server">Server</label>
 			<div class="input -has-icon-right">
 				<input id="input-server" value={pullSecret.spec.server} readonly disabled>
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.server}>
 					<i class="fa-light fa-copy"></i>
 				</span>
@@ -85,7 +85,7 @@
 			<label for="input-username">Username</label>
 			<div class="input -has-icon-right">
 				<input id="input-username" value={pullSecret.spec.username} readonly disabled>
-				<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.username}>
 					<i class="fa-light fa-copy"></i>
 				</span>
@@ -96,7 +96,7 @@
 			<div class="input -has-icon-right">
 				<input id="input-password" type="password" value={pullSecret.spec.password} readonly disabled>
 				<div class="icon -is-right">
-					<span class="_cl-text-mute _cl-white-hover _cs-pt _ussl-n _fs-6 copy"
+					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _fs-6 copy"
 						data-clipboard-text={pullSecret.spec.password}>
 						<i class="fa-light fa-copy"></i>
 					</span>

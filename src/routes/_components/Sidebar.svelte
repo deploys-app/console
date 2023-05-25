@@ -84,7 +84,7 @@
 				<i class="fa-solid fa-caret-down _mgl-3"></i>
 			</div>
 
-			<div class="u-halign-right">
+			<div class="_dp-f _jtfct-fe">
 				<a href="/project">
 					<small class="link">View all projects</small>
 				</a>
