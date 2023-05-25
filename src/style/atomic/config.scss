@@ -2,29 +2,12 @@
  * Color
  *********************************************/
  $colors: (
-	'primary-100': var(--color-primary-100),
-	'primary-300': var(--color-primary-300),
-	'primary-400': var(--color-primary-400),
-	'primary-500': var(--color-primary-500),
 	'primary-600': var(--color-primary-600),
 
-	'neutral-100': var(--color-neutral-100),
-	'neutral-200': var(--color-neutral-200),
-	'neutral-300': var(--color-neutral-300),
-	'neutral-400': var(--color-neutral-400),
-	'neutral-500': var(--color-neutral-500),
-	'neutral-600': var(--color-neutral-600),
-	'neutral-700': var(--color-neutral-700),
-	'neutral-800': var(--color-neutral-800),
-	'neutral-900': var(--color-neutral-900),
-
-	'white': white,
 	'light-primary': var(--color-light-primary),
 	'light-secondary': var(--color-light-secondary),
 	'dark-primary': var(--color-dark-primary),
-	'dark-secondary': var(--color-dark-secondary),
-
-	'tpr': transparent
+	'dark-secondary': var(--color-dark-secondary)
 );
 
 $sm: 768px;

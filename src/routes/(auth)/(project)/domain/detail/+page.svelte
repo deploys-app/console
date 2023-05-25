@@ -332,7 +332,7 @@
 				<div class="_mgbt-5">
 					<strong>Purge Cache</strong>
 				</div>
-				<div class="_bgcl-neutral-800 _pd-7 _bdw-1 _bdcl-negative _bdcl-opacity-70 _bdrd-4">
+				<div class="_bgcl-base-100 _pd-7 _bdw-1 _bdcl-negative _bdcl-opacity-70 _bdrd-4">
 					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
 						<div class="_f-1 lo-12 _g-3">
 							<div><strong>Purge everything</strong></div>

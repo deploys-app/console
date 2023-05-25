@@ -2,21 +2,7 @@
  * Color
  *********************************************/
  :root {
-    --color-primary-100: hsl(342, 80%, 95%);
-    --color-primary-300: hsl(342, 80%, 88%);
-    --color-primary-400: hsl(342, 80%, 64%);
-    --color-primary-500: hsl(342, 80%, 58%);
     --color-primary-600: hsl(342, 80%, 54%);
-
-	--color-neutral-100: hsl(226, 30%, 52%);
-	--color-neutral-200: hsl(226, 30%, 46%);
-    --color-neutral-300: hsl(226, 30%, 40%);
-	--color-neutral-400: hsl(226, 36%, 28%);
-	--color-neutral-500: hsl(226, 36%, 25%);
-    --color-neutral-600: hsl(226, 36%, 20%);
-	--color-neutral-700: hsl(226, 39%, 17%);
-	--color-neutral-800: hsl(226, 39%, 15%);
-	--color-neutral-900: hsl(226, 39%, 11%);
 
 	--color-light-primary: hsl(227, 100%, 93%);
 	--color-light-secondary: hsl(227, 46%, 73%);
@@ -62,7 +48,7 @@
 }
 
 [data-theme=dark] {
-	--hue-primary: 333;
+	--hue-primary: 342;
 	--hsl-primary: var(--hue-primary) 80% 65%;
 	--hsl-primary-active: var(--hue-primary) 80% 58%;
 	--hsl-primary-content: var(--hue-primary) 80% 98%;
@@ -70,11 +56,11 @@
 	--hsl-accent: var(--hue-accent) 93% 65%;
 	--hsl-accent-active: var(--hue-accent) 93% 60%;
 	--hsl-accent-content: var(--hue-accent) 93% 98%;
-	--hue-base: 222;
-	--hsl-base-100: var(--hue-base) 30% 100%;
-	--hsl-base-200: var(--hue-base) 30% 97%;
-	--hsl-base-300: var(--hue-base) 30% 92%;
-	--hsl-base-400: var(--hue-base) 30% 87%;
+	--hue-base: 226;
+	--hsl-base-100: var(--hue-base) 39% 11%;
+	--hsl-base-200: var(--hue-base) 39% 15%;
+	--hsl-base-300: var(--hue-base) 39% 20%;
+	--hsl-base-400: var(--hue-base) 39% 46%;
 	--hsl-line: 227 30% 35%;
 	--hsl-content: 227 100% 93%;
 	--hsl-content-inv: 0 0% 85%;
@@ -156,7 +142,7 @@
 		0 4rem 4rem hsl(var(--bsd-hsl) / 0.15);
   }
 
-  [data-theme=dark] {
+[data-theme=dark] {
 	--lo-container-side-padding: 24px;
 	--lo-page-aside-content--aside-width: 18.75rem;
 	--form-element-small-font-size: 0.75rem;
@@ -204,4 +190,149 @@
 	--tab-content-border-radius: 0.5rem;
 	--tab-box-shadow: var(--ui-box-shadow-1);
 	/* table */
-  }
+}
+
+[data-theme=light] {
+	--hue-primary: 333;
+	--hsl-primary: var(--hue-primary) 80% 65%;
+	--hsl-primary-active: var(--hue-primary) 80% 58%;
+	--hsl-primary-content: var(--hue-primary) 80% 98%;
+	--hue-accent: 267;
+	--hsl-accent: var(--hue-accent) 93% 65%;
+	--hsl-accent-active: var(--hue-accent) 93% 60%;
+	--hsl-accent-content: var(--hue-accent) 93% 98%;
+	--hue-base: 222;
+	--hsl-base-100: var(--hue-base) 30% 100%;
+	--hsl-base-200: var(--hue-base) 30% 97%;
+	--hsl-base-300: var(--hue-base) 30% 92%;
+	--hsl-base-400: var(--hue-base) 30% 87%;
+	--hsl-line: 222 30% 90%;
+	--hsl-content: 215 15% 25%;
+	--hsl-content-inv: 0 0% 85%;
+	--hsl-positive: 168 72% 35%;
+	--hsl-positive-content: 168 80% 95%;
+	--hsl-negative: 5 78% 50%;
+	--hsl-negative-content: 5 80% 97.5%;
+	--hsl-warning: 45 90% 48%;
+	--hsl-warning-content: 45 80% 97%;
+	--hsl-info: 197 70% 54%;
+	--hsl-info-content: 197 90% 97%;
+	--hsl-black: 0 0% 0%;
+	--hsl-white: 0 0% 100%;
+	/*
+	* Typography
+	*********************************************/
+	--ffml-primary: "Inter", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+	--ffml-secondary: "Inter", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+	--fs-14: 4.5rem;
+	--fs-13: 3.5rem;
+	--fs-12: 3rem;
+	--fs-11: 2.5rem;
+	--fs-10: 2.25rem;
+	--fs-9: 2rem;
+	--fs-8: 1.75rem;
+	--fs-7: 1.5rem;
+	--fs-6: 1.25rem;
+	--fs-5: 1.125rem;
+	--fs-4: 1rem;
+	--fs-3: 0.9375rem;
+	--fs-2: 0.875rem;
+	--fs-1: 0.75rem;
+	/*
+	* Spacing
+	*********************************************/
+	--spc-0: 0rem;
+	--spc-1: 0.0625rem;
+	--spc-2: 0.125rem;
+	--spc-3: 0.25rem;
+	--spc-4: 0.5rem;
+	--spc-5: 0.75rem;
+	--spc-6: 1rem;
+	--spc-7: 1.5rem;
+	--spc-8: 2rem;
+	--spc-9: 2.5rem;
+	--spc-10: 3rem;
+	--spc-11: 4rem;
+	--spc-12: 6rem;
+	--spc-13: 8rem;
+	/*
+	 * Box shadow
+	 *********************************************/
+	--bsd-hsl: 333deg 0% 50%;
+	--bsd-100:
+		0 0.0625rem 0.0625rem hsl(var(--bsd-hsl) / 0.05),
+		0 0.125rem 0.125rem hsl(var(--bsd-hsl) / 0.05),
+		0 0.25rem 0.25rem hsl(var(--bsd-hsl) / 0.05),
+		0 0.5rem 0.5rem hsl(var(--bsd-hsl) / 0.05);
+	--bsd-200:
+		0 0.0625rem 0.0625rem hsl(var(--bsd-hsl) / 0.075),
+		0 0.125rem 0.125rem hsl(var(--bsd-hsl) / 0.075),
+		0 0.25rem 0.25rem hsl(var(--bsd-hsl) / 0.075),
+		0 0.5rem 0.5rem hsl(var(--bsd-hsl) / 0.075),
+		0 1rem 1rem hsl(var(--bsd-hsl) / 0.075);
+	--bsd-300:
+		0 0.0625rem 0.0625rem hsl(var(--bsd-hsl) / 0.1),
+		0 0.125rem 0.125rem hsl(var(--bsd-hsl) / 0.1),
+		0 0.25rem 0.25rem hsl(var(--bsd-hsl) / 0.1),
+		0 0.5rem 0.5rem hsl(var(--bsd-hsl) / 0.1),
+		0 1rem 1rem hsl(var(--bsd-hsl) / 0.1),
+		0 2rem 2rem hsl(var(--bsd-hsl) / 0.1);
+	--bsd-400:
+		0 0.0625rem 0.0625rem hsl(var(--bsd-hsl) / 0.15),
+		0 0.125rem 0.125rem hsl(var(--bsd-hsl) / 0.15),
+		0 0.25rem 0.25rem hsl(var(--bsd-hsl) / 0.15),
+		0 0.5rem 0.5rem hsl(var(--bsd-hsl) / 0.15),
+		0 1rem 1rem hsl(var(--bsd-hsl) / 0.15),
+		0 2rem 2rem hsl(var(--bsd-hsl) / 0.15),
+		0 4rem 4rem hsl(var(--bsd-hsl) / 0.15);
+}
+
+[data-theme=light] {
+	--lo-container-side-padding: 24px;
+	--lo-page-aside-content--aside-width: 18.75rem;
+	--form-element-small-font-size: 0.75rem;
+	--form-element-medium-font-size: 0.875rem;
+	--form-element-large-font-size: 1rem;
+	/* form elements height */
+	--form-element-small-height: 1.75em;
+	--form-element-medium-height: 2.5em;
+	--form-element-large-height: 3em;
+	--form-element-border-radius: 0.375em;
+	--form-element-label-font-size: 0.875rem;
+	--form-element-label-font-family: var(--font-family-secondary);
+	--form-element-label-font-weight: 600;
+	--select-font-weight: 400;
+	/* message */
+	--message-font-size: 0.9375rem;
+	--message-icon-font-size: 1.375rem;
+	/* button */
+	--button-border-radius: 0.5rem;
+	--button-font-weight: 600;
+	--button-font-family: var(--font-family-primary);
+	--button-small-height: 1.75rem;
+	--button-small-font-size: 0.8125rem;
+	--button-medium-height: 2.5rem;
+	--button-medium-font-size: 0.9375rem;
+	--button-large-height: 3rem;
+	--button-large-font-size: 1.125rem;
+	/* select-button */
+	--select-button-font-weight: 400;
+	--select-button-font-family: var(--font-family-primary);
+	--select-button-small-height: 1.75rem;
+	--select-button-small-font-size: 0.75rem;
+	--select-button-medium-height: 2rem;
+	--select-button-medium-font-size: 0.875rem;
+	--select-button-large-height: 2.625rem;
+	--select-button-large-font-size: 1.125rem;
+	/* tab */
+	--tab-font-weight: 500;
+	--tab-font-size: 0.9375rem;
+	--tab-font-family: var(--font-family-secondary);
+	--tab-height: 2.5rem;
+	--tab-padding: 0 1.25rem;
+	--tab-border-radius: 0.5rem;
+	--tab-border-width: 0.0625rem;
+	--tab-content-border-radius: 0.5rem;
+	--tab-box-shadow: var(--ui-box-shadow-1);
+	/* table */
+}

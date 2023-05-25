@@ -12,8 +12,8 @@ $components-colors: (
         font-weight: 500;
 
 		color: var(--color-light-primary);
-		background-color: var(--color-primary-500);
-		// border: 1px solid var(--color-primary-500);
+		background-color: hsl(var(--hsl-primary-active));
+		// border: 1px solid hsl(var(--hsl-primary-active));
 
 		&.-#{$key} {
             color: var(--color-#{$key}-700);

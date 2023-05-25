@@ -80,7 +80,7 @@
 		overflow: hidden;
 
 		background: white;
-		color: var(--color-dark-primary);
+		color: hsl(var(--hsl-black)/var(--cl-opacity));
 	}
 
 	ul.user-menu > li {
@@ -100,7 +100,7 @@
 	}
 
 	ul.user-menu > li:hover {
-		background-color: var(--color-primary-100);
+		background-color: hsl(var(--hsl-primary)/0.1);
 		cursor: pointer;
 	}
 
@@ -108,7 +108,7 @@
 		display: flex;
 		width: 100%;
 		height: var(--height-navbar, 20rem);
-		background-color: var(--color-neutral-600);
+		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
 		align-items: center;
 		justify-content: space-between;

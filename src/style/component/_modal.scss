@@ -37,7 +37,7 @@
 		transition: all 0.16s ease-in-out;
 		transform: translate3d(0, -12px, 0);
 		border-radius: 0.75rem;
-		background: var(--color-neutral-600);
+		background: hsl(var(--hsl-base-300));
 	}
 
 	.#{$prefix}modal-close {

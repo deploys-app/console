@@ -76,7 +76,7 @@ $components-colors: (
 	@extend %base-button;
 
 	color: var(--color-light-primary);
-	background-color: var(--color-primary-500);
+	background-color: hsl(var(--hsl-primary-active));
 
 	&:focus {
 		box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.15);
@@ -222,7 +222,7 @@ $components-colors: (
 	}
 
 	&.-secondary {
-		color: var(--color-primary-500);
+		color: hsl(var(--hsl-primary-active));
 		border: 1px solid var(--color-gray-300);
 		background: transparent;
 

@@ -21,7 +21,7 @@
 		width: var(--width-sidebar, 300px);
 		min-height: 100vh;
 
-		background-color: var(--color-neutral-600);
+		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
 	}
 
@@ -39,17 +39,17 @@
 	.project-box {
 		display: flex;
 		padding: 10px 12px;
-		background-color: var(--color-neutral-500);
+		background-color: hsl(var(--hsl-base-400)/0.2);
 		font-size: 0.9375rem;
 		border-radius: 4px;
-		border: 1px solid var(--color-neutral-400);
+		border: 1px solid hsl(var(--hsl-base-400)/0.3);
 		color: var(--color-light-primary);
 		outline: none;
 		transition: all var(--timing-normal) ease;
 		box-shadow: var(--raised-z6);
 
 		&:hover {
-			border: 1px solid var(--color-neutral-300);
+			border: 1px solid hsl(var(--hsl-base-400)/0.7);
 		}
 
 		span {
@@ -58,6 +58,14 @@
 			text-overflow: ellipsis;
 			white-space: nowrap;
 			overflow-x: hidden;
+		}
+	}
+
+	.social > a {
+		background-color: hsl(226, 30%, 52%);
+
+		&:hover {
+			background-color: hsl(226, 30%, 46%);
 		}
 	}
 </style>
@@ -215,14 +223,14 @@
 			<hr>
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
-			<div class="_dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
-				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
+			<div class="social _dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
+				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-github"></i>
 				</a>
-				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-discord"></i>
 				</a>
-				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bgcl-neutral-100 _bgcl-neutral-200-hover _bdrd-3 _w-8 _h-8">
+				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
 					<i class="fa-solid fa-envelope"></i>
 				</a>
 			</div>

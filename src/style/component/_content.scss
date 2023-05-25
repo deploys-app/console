@@ -6,13 +6,13 @@ pre {
 	margin-bottom: 30px;
 	white-space: pre-wrap;
 	word-wrap: break-word;
-	background-color: var(--color-neutral-900);
+	background-color: hsl(var(--hsl-base-200));
 
 	.copy {
 		position: absolute;
 		top: 0;
 		right: 0;
-		background-color: var(--color-neutral-900);
+		background-color: inherit;
 		padding: 6px 10px;
 		font-size: 16px;
 		font-weight: 600;
@@ -23,18 +23,17 @@ pre {
 		outline: 0;
 
 		&:hover {
-			background-color: var(--color-neutral-900);
+			background-color: hsl(var(--hsl-base-100));
 		}
 
 		&:hover:active {
-			background-color: var(--color-neutral-900);
+			background-color: hsl(var(--hsl-base-100));
 		}
 	}
 
 	code {
 		white-space: pre-wrap;
 		display: block;
-		background-color: var(--color-neutral-900);
 	}
 
 	&.pre-scoll {

@@ -10,7 +10,7 @@
 @import 'component/all';
 
 html, body {
-    background-color: hsl(226, 39%, 15%);
+    background-color: hsl(var(--hsl-base-200));
 }
 
 body, h1, h2, h3, h4, h4, h5, h6 {
@@ -49,12 +49,12 @@ ul, ol {
         cursor: pointer;
 
         &:hover {
-            background: var(--color-neutral-800);
+            background: hsl(var(--hsl-base-200));
         }
 
         &.is-active {
             color: var(--color-light-primary);
-            background: var(--color-neutral-800);
+            background: hsl(var(--hsl-base-200));
         }
     }
 
@@ -78,7 +78,7 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   -webkit-text-fill-color: var(--color-light-primary);;
-  -webkit-box-shadow: 0 0 0px 1000px var(--color-neutral-500) inset;
+  -webkit-box-shadow: 0 0 0px 1000px hsl(var(--hsl-base-400)/0.2) inset;
   transition: background-color 5000s ease-in-out 0s;
 }
 

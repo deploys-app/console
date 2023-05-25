@@ -85,42 +85,42 @@
 			</h6>
 			<hr>
 			<div class="lo-12 lo-6:sm _g-5">
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">CPU</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">CPU</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.cpu}</span>
 						<span>&nbsp;seconds</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">Memory</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">Memory</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.memory}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">Egress</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">Egress</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.egress}</span>
 						<span>&nbsp;GiB</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">Disk</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">Disk</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.disk}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">Replica</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">Replica</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.replica}</span>
 					</div>
 				</div>
-				<div class="_bgcl-neutral-700 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-500">Price</h4>
+				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
+					<h4 class="_cl-primary-active">Price</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.price}</span>
 						<span>&nbsp;THB</span>

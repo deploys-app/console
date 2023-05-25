@@ -22,12 +22,12 @@
 
     color: var(--color-light-primary);
 
-	background-color: var(--color-neutral-500);
+	background-color: hsl(var(--hsl-base-400)/0.2);
 	font-size: 0.9375rem; // 15px
 	vertical-align: top;
 
 	border-radius: inherit;
-	border: 1px solid var(--color-neutral-400);
+	border: 1px solid hsl(var(--hsl-base-400)/0.3);
 
 	outline: none;
     transition: all var(--timing-normal) ease;
@@ -35,11 +35,11 @@
     box-shadow: var(--raised-z6);
 
     &:hover {
-        border: 1px solid var(--color-neutral-300);
+        border: 1px solid hsl(var(--hsl-base-400)/0.7);
     }
 
     &:focus, :active {
-		border-color: var(--color-primary-400);
+		border-color: hsl(var(--hsl-primary)/0.6);
 		box-shadow: 0 0 0 .175rem rgba(255, 255, 255, 0.125);
 	}
 
@@ -190,14 +190,14 @@ $components-colors: (
 
 	&:after {
 		content: '';
-		border-left: 2px solid var(--color-neutral-200);
-		border-bottom: 2px solid var(--color-neutral-200);
+		border-left: 2px solid hsl(var(--hsl-base-400)/0.3);
+		border-bottom: 2px solid hsl(var(--hsl-base-400)/0.3);
 		height: 0.5rem;
 		width: 0.5rem;
 		position: absolute;
 		right: 0.5rem;
 		top: 50%;
-		border-color: var(--color-neutral-200);
+		border-color: hsl(var(--hsl-base-400)/0.3);
 		transform: rotate(-45deg) translate(0, calc(-50% - 4px));
 		pointer-events: none;
 	}
@@ -228,7 +228,7 @@ $components-colors: (
 
 		&:focus {
 			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
+				box-shadow: 0 0 0 .175rem hsl(var(--hsl-primary)/0.5);
 			}
 		}
 	}
@@ -252,7 +252,7 @@ $components-colors: (
 			width: 22px;
 			height: 22px;
 			left: 0px;
-			border: 2px solid var(--color-primary-500);
+			border: 2px solid hsl(var(--hsl-primary-active));
 			border-radius: 50%;
 			background-color: white;
 		}
@@ -263,7 +263,7 @@ $components-colors: (
 			width: .75rem;
 			top: 5px;
 			left: 5px;
-			background-color: var(--color-primary-500);
+			background-color: hsl(var(--hsl-primary-active));
 			border-radius: 50%;
 		}
 	}
@@ -298,8 +298,8 @@ $components-colors: (
 
 		&:checked {
 			+ label:before {
-				background: var(--color-primary-500);
-				border: 1px solid var(--color-primary-500);
+				background: hsl(var(--hsl-primary-active));
+				border: 1px solid hsl(var(--hsl-primary-active));
 			}
 
 			+ label:after {
@@ -309,7 +309,7 @@ $components-colors: (
 
 		&:focus {
 			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
+				box-shadow: 0 0 0 .175rem hsl(var(--hsl-primary)/0.5);
 			}
 		}
 	}
@@ -377,7 +377,7 @@ $components-colors: (
 
 		&:focus {
 			+ label:before {
-				box-shadow: 0 0 0 .175rem var(--color-primary-300);
+				box-shadow: 0 0 0 .175rem hsl(var(--hsl-primary)/0.5);
 			}
 		}
 	}
@@ -408,10 +408,10 @@ $components-colors: (
 
 	> input[type='radio']:checked + label,
 	> input[type='checkbox']:checked + label {
-		color: var(--color-primary-500);
-		background: var(--color-primary-100);
+		color: hsl(var(--hsl-primary-active));
+		background: hsl(var(--hsl-primary)/0.1);
 
-		border: 1px solid var(--color-primary-500);
+		border: 1px solid hsl(var(--hsl-primary-active));
 		border-radius: 4px;
 
 		font-family: var(--ffml-secondary);
@@ -441,7 +441,7 @@ $components-colors: (
 		outline: none;
 
 		&:checked {
-			background-color: var(--color-primary-500);
+			background-color: hsl(var(--hsl-primary-active));
 		}
 
 		&:after {

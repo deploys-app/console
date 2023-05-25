@@ -28,7 +28,7 @@
 
 	thead {
         font-size: 14px;
-        background: var(--color-neutral-400);
+        background: hsl(var(--hsl-base-400)/0.3);
 	}
 
 	td, th {
@@ -53,7 +53,7 @@
 
 	&.-ruled {
 		tbody tr td {
-			border-top: 1px solid var(--color-neutral-400);
+			border-top: 1px solid hsl(var(--hsl-base-400)/0.3);
 		}
 
 		thead tr {
@@ -64,7 +64,7 @@
 
 	&.-striped {
 		tbody tr:nth-child(even) {
-			background-color: var(--color-neutral-500);
+			background-color: hsl(var(--hsl-base-400)/0.2);
 		}
 	}
 
@@ -82,7 +82,7 @@
     }
 
 	.row-error {
-	  	background-color: var(--color-primary-400);
+	  	background-color: hsl(var(--hsl-primary)/0.6);
 	}
 }
 
