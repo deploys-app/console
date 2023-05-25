@@ -196,6 +196,9 @@ $colors: (
 	--table-border-width: 0;
 	--table-head-background: hsl(var(--hsl-base-400)/0.3);
 	--table-data-font-size: var(--fs-4);
+
+	--modal-background: rgb(0 0 0 / 0.5);
+	--modal-panel-background: hsl(var(--hsl-base-300));
 }
 
 [data-theme=light] {
@@ -344,4 +347,7 @@ $colors: (
 	--table-border-width: 0;
 	--table-head-background: hsl(var(--hsl-base-400)/0.3);
 	--table-data-font-size: var(--fs-4);
+
+	--modal-background: rgb(0 0 0 / 0.5);
+	--modal-panel-background: hsl(var(--hsl-base-300));
 }

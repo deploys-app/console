@@ -34,9 +34,9 @@
 	}
 </script>
 
-<div class="modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
-	<div class="modal-panel">
-		<div class="modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
+<div class="nm-modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
+	<div class="nm-modal-panel">
+		<div class="nm-modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
@@ -84,7 +84,9 @@
 		padding-bottom: 0.5rem;
 	}
 
-	.modal-panel {
+	.nm-modal-panel {
 		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
+		width: 100%;
+		max-width: 48rem;
 	}
 </style>
