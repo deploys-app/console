@@ -23,15 +23,13 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href="/billing" class="link"><h6>Billing</h6></a>
-		</li>
-		<li>
-			<h6>{billingAccount.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href="/billing" class="link"><h6>Billing</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{billingAccount.name}</h6>
+	</div>
 </div>
 
 <br>

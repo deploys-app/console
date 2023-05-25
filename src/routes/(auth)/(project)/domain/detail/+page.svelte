@@ -150,16 +150,15 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
-		</li>
-		<li>
-			<h6>{domain.domain}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{domain.domain}</h6>
+	</div>
 </div>
+
 <br>
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _g-5">

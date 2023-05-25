@@ -47,20 +47,18 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
-		</li>
-		{#if disk}
-			<li>
-				<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="link"><h6>{disk.name}</h6></a>
-			</li>
-		{/if}
-		<li>
-			<h6>{#if disk}Update{:else}Create{/if}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
+	</div>
+	{#if disk}
+		<div class="nm-breadcrumb-item">
+			<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="link"><h6>{disk.name}</h6></a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>{#if disk}Update{:else}Create{/if}</h6>
+	</div>
 </div>
 
 <br>

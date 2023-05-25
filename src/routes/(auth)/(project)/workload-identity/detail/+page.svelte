@@ -39,16 +39,15 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
-		</li>
-		<li>
-			<h6>{workloadIdentity.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{workloadIdentity.name}</h6>
+	</div>
 </div>
+
 <br>
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _jtfit-st _g-5">

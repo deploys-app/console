@@ -63,16 +63,15 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
-		</li>
-		<li>
-			<h6>{serviceAccount.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{serviceAccount.name}</h6>
+	</div>
 </div>
+
 <br>
 
 <div class="panel _dp-g _g-7">

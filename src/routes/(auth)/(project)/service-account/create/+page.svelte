@@ -39,27 +39,25 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		{#if id}
-			<li>
-				<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
-			</li>
-		{:else}
-			<li>
-				<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
-			</li>
-		{/if}
-		<li>
-			<h6>
-				{#if id}
-					Update
-				{:else}
-					Create
-				{/if}
-			</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	{#if id}
+		<div class="nm-breadcrumb-item">
+			<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
+		</div>
+	{:else}
+		<div class="nm-breadcrumb-item">
+			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>
+			{#if id}
+				Update
+			{:else}
+				Create
+			{/if}
+		</h6>
+	</div>
 </div>
 
 <br>

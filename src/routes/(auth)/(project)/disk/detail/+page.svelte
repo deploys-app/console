@@ -36,15 +36,13 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
-		</li>
-		<li>
-			<h6>{disk.name}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{disk.name}</h6>
+	</div>
 </div>
 
 <br>

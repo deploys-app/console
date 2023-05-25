@@ -45,21 +45,20 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href="/project" class="link"><h6>Projects</h6></a>
-		</li>
-		{#if project}
-			<li>
-				<a href={`/?project=${project.project}`} class="link"><h6>{project.name}</h6></a>
-			</li>
-		{/if}
-		<li>
-			<h6>{#if project}Update{:else}Create{/if}</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href="/project" class="link"><h6>Projects</h6></a>
+	</div>
+	{#if project}
+		<div class="nm-breadcrumb-item">
+			<a href={`/?project=${project.project}`} class="link"><h6>{project.name}</h6></a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>{#if project}Update{:else}Create{/if}</h6>
+	</div>
 </div>
+
 <br>
 <div class="panel _dp-g _g-7">
 	<div class="lo-12 _jtfit-st _g-5">

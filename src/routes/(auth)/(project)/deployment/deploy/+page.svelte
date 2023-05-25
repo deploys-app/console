@@ -208,23 +208,22 @@
 	})
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
-		</li>
-		{#if deployment}
-			<li>
-				<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
-					<h6>{deployment.name}</h6>
-				</a>
-			</li>
-		{/if}
-		<li>
-			<h6>Deploy</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
+	</div>
+	{#if deployment}
+		<div class="nm-breadcrumb-item">
+			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
+				<h6>{deployment.name}</h6>
+			</a>
+		</div>
+	{/if}
+	<div class="nm-breadcrumb-item">
+		<h6>Deploy</h6>
+	</div>
 </div>
+
 <br>
 
 <div class="panel _dp-g _g-7">

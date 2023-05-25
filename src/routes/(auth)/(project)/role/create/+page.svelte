@@ -80,25 +80,24 @@
 	}
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href={`/role?project=${project}`} class="link"><h6>Roles</h6></a>
-		</li>
-		{#if role}
-			<li>
-				<h6>{role.role}</h6>
-			</li>
-			<li>
-				<h6>Update</h6>
-			</li>
-		{:else}
-			<li>
-				<h6>Create</h6>
-			</li>
-		{/if}
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/role?project=${project}`} class="link"><h6>Roles</h6></a>
+	</div>
+	{#if role}
+		<div class="nm-breadcrumb-item">
+			<h6>{role.role}</h6>
+		</div>
+		<div class="nm-breadcrumb-item">
+			<h6>Update</h6>
+		</div>
+	{:else}
+		<div class="nm-breadcrumb-item">
+			<h6>Create</h6>
+		</div>
+	{/if}
 </div>
+
 <br>
 
 <div class="panel _dp-g _g-6">

@@ -103,19 +103,18 @@
 	})
 </script>
 
-<div>
-	<ul class="breadcrumb">
-		<li>
-			<a href="/billing" class="link"><h6>Billing</h6></a>
-		</li>
-		<li>
-			<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
-		</li>
-		<li>
-			<h6>Report</h6>
-		</li>
-	</ul>
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href="/billing" class="link"><h6>Billing</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>Report</h6>
+	</div>
 </div>
+
 <br>
 
 <div class="panel">
