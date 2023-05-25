@@ -228,7 +228,7 @@
 			<p><strong>Domain Verification</strong></p>
 			{#if (domain.verification.ownership.errors ?? []).length > 0}
 				{#each domain.verification.ownership.errors as e}
-					<p class="_cl-negative-500">{e}</p>
+					<p class="_cl-negative _cl-opacity-80">{e}</p>
 				{/each}
 			{/if}
 			<div class="field">

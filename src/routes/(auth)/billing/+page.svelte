@@ -35,9 +35,9 @@
 					<td>{it.id}</td>
 					<td class="_tal-ct">
 						{#if it.active}
-							<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+							<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 						{:else}
-							<i class="fa-solid fa-times _cl-negative-500"></i>
+							<i class="fa-solid fa-times _cl-negative _cl-opacity-80"></i>
 						{/if}
 					</td>
 				</tr>

@@ -13,9 +13,9 @@
 
 	const statusIconClass = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
-		success: 'fa-solid fa-check-circle _cl-positive-500',
-		error: 'fa-solid fa-times _cl-negative-500',
-		cancelled: 'fa-solid fa-ban _cl-negative-500'
+		success: 'fa-solid fa-check-circle _cl-positive _cl-opacity-80',
+		error: 'fa-solid fa-times _cl-negative _cl-opacity-80',
+		cancelled: 'fa-solid fa-ban _cl-negative _cl-opacity-80'
 	}
 
 	/** @type {import('$types').PodStatus | null} */
@@ -44,16 +44,16 @@
 		}
 
 		if (action === 'pause') {
-			return 'fa-solid fa-pause _cl-warning-500'
+			return 'fa-solid fa-pause _cl-warning'
 		}
 
 		if (!podStatus) {
 			return 'fa-solid fa-spin fa-spinner _cl-light'
 		}
 		if (podStatus.ready === podStatus.count) {
-			return 'fa-solid fa-check-circle _cl-positive-500'
+			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
 		}
-		return 'fa-solid fa-exclamation-triangle _cl-warning-500'
+		return 'fa-solid fa-exclamation-triangle _cl-warning'
 	}
 
 	let fetchPodStatusTimeout

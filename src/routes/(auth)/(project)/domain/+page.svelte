@@ -68,16 +68,16 @@
 						</td>
 						<td>
 							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
 							{/if}
 						</td>
 						<td>
 							{#if it.cdn}
-								<i class="fa-solid fa-check-circle _cl-positive-500"></i>
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative-500"></i>
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
 							{/if}
 						</td>
 						<td>{it.location}</td>

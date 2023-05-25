@@ -32,102 +32,10 @@
 	--color-neutral-800: hsl(226, 39%, 15%);
 	--color-neutral-900: hsl(226, 39%, 11%);
 
-	--color-positive-100: hsl(163, 75%, 95%);
-	--color-positive-200: hsl(163, 75%, 90%);
-	--color-positive-300: hsl(163, 75%, 83%);
-	--color-positive-400: hsl(163, 100%, 34%);
-	--color-positive-500: hsl(163, 100%, 31%);
-	--color-positive-600: hsl(163, 100%, 27%);
-	--color-positive-700: hsl(163, 80%, 19%);
-	--color-positive-800: hsl(163, 80%, 16%);
-	--color-positive-900: hsl(163, 80%, 13%);
-
-	--color-negative-100: hsl(355, 85%, 96%);
-	--color-negative-200: hsl(355, 85%, 93%);
-	--color-negative-300: hsl(355, 85%, 89%);
-	--color-negative-400: hsl(355, 79%, 70%);
-	--color-negative-500: hsl(353, 79%, 63%);
-	--color-negative-600: hsl(355, 79%, 58%);
-	--color-negative-700: hsl(355, 75%, 42%);
-	--color-negative-800: hsl(355, 75%, 39%);
-	--color-negative-900: hsl(355, 75%, 36%);
-
-	--color-info-100: hsl(200, 90%, 94%);
-	--color-info-200: hsl(200, 90%, 89%);
-	--color-info-300: hsl(200, 90%, 84%);
-	--color-info-400: hsl(200, 83%, 60%);
-	--color-info-500: hsl(200, 83%, 50%);
-	--color-info-600: hsl(200, 83%, 45%);
-	--color-info-700: hsl(200, 75%, 30%);
-	--color-info-800: hsl(200, 75%, 26%);
-	--color-info-900: hsl(200, 75%, 22%);
-
-	--color-warning-100: hsl(48, 80%, 95%);
-	--color-warning-200: hsl(48, 80%, 89%);
-	--color-warning-300: hsl(48, 80%, 85%);
-	--color-warning-400: hsl(48, 70%, 55%);
-	--color-warning-500: hsl(48, 70%, 48%);
-	--color-warning-600: hsl(48, 70%, 45%);
-	--color-warning-700: hsl(48, 90%, 33%);
-	--color-warning-800: hsl(48, 90%, 30%);
-	--color-warning-900: hsl(48, 90%, 27%);
-
 	--color-light-primary: hsl(227, 100%, 93%);
 	--color-light-secondary: hsl(227, 46%, 73%);
 	--color-dark-primary: hsla(215, 15%, 28%, 0.96);
 	--color-dark-secondary: hsla(220, 10%, 47%, 0.95);
-
-	// Secondary Palette
-	--color-golden-poppy: hsl(47, 99%, 50%);
-	--color-dark-cerulean: hsl(210, 96%, 28%);
-	--color-bittersweet: hsl(4, 96%, 67%);
-	--color-facebook: hsl(217, 51%, 45%);
-
-	--color-shader: rgba(0, 0, 0 , 0.12);
-}
-
-/*
- * Font family
- *********************************************/
-:root {
-	--font-family-primary: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-	--font-family-secondary: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-}
-
-/*
- * Typescale
- *********************************************/
-:root {
-	--font-size-1200: 3rem;     // 48px
-	--font-size-1100: 2.5rem;   // 40px
-	--font-size-1000: 2.25rem;  // 36px
-	--font-size-900: 2rem;      // 32px
-	--font-size-800: 1.75rem;   // 28px
-	--font-size-700: 1.5rem;    // 24px
-	--font-size-600: 1.25rem;   // 20px
-	--font-size-500: 1.125rem;  // 18px
-	--font-size-400: 1rem;      // 16px
-	--font-size-300: 0.875rem;  // 14px
-	--font-size-200: 0.75rem;   // 12px
-	--font-size-100: 0.6875rem; // 11px
-}
-
-/*
- * Line height
- *********************************************/
- :root {
-	--line-height-ui: 1;
-	--line-height-default: 1.25;
-	--line-height-paragraph: 1.65;
-}
-
-/*
- * Font weight
- *********************************************/
-:root {
-	--font-weight-default: 400;
-	--font-weight-bold: 600;
-	--font-weight-bolder: 700;
 }
 
 /*
@@ -137,15 +45,6 @@
 	--timing-normal: 320ms;
 	--timing-faster: 160ms;
 	--timing-fastest: 80ms;
-}
-
-/*
- * Breakpoint
- *********************************************/
-:root {
-	--breakpoint-sm: 768px;
-	--breakpoint-md: 1024px;
-	--breakpoint-lg: 1280px;
 }
 
 :root {
@@ -283,7 +182,7 @@
 	--form-element-large-height: 3em;
 	--form-element-border-radius: 0.375em;
 	--form-element-label-font-size: 0.875rem;
-	--form-element-label-font-family: var(--font-family-secondary);
+	--form-element-label-font-family: var(--ffml-secondary);
 	--form-element-label-font-weight: 600;
 	--select-font-weight: 400;
 	/* message */
@@ -292,7 +191,7 @@
 	/* button */
 	--button-border-radius: 0.5rem;
 	--button-font-weight: 600;
-	--button-font-family: var(--font-family-primary);
+	--button-font-family: var(--ffml-primary);
 	--button-small-height: 1.75rem;
 	--button-small-font-size: 0.8125rem;
 	--button-medium-height: 2.5rem;
@@ -301,7 +200,7 @@
 	--button-large-font-size: 1.125rem;
 	/* select-button */
 	--select-button-font-weight: 400;
-	--select-button-font-family: var(--font-family-primary);
+	--select-button-font-family: var(--ffml-primary);
 	--select-button-small-height: 1.75rem;
 	--select-button-small-font-size: 0.75rem;
 	--select-button-medium-height: 2rem;
@@ -311,7 +210,7 @@
 	/* tab */
 	--tab-font-weight: 500;
 	--tab-font-size: 0.9375rem;
-	--tab-font-family: var(--font-family-secondary);
+	--tab-font-family: var(--ffml-secondary);
 	--tab-height: 2.5rem;
 	--tab-padding: 0 1.25rem;
 	--tab-border-radius: 0.5rem;
