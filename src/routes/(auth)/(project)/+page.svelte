@@ -86,41 +86,41 @@
 			<hr>
 			<div class="lo-12 lo-6:sm _g-5">
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">CPU</h4>
+					<h4 class="_cl-primary">CPU</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.cpu}</span>
 						<span>&nbsp;seconds</span>
 					</div>
 				</div>
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">Memory</h4>
+					<h4 class="_cl-primary">Memory</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.memory}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">Egress</h4>
+					<h4 class="_cl-primary">Egress</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.egress}</span>
 						<span>&nbsp;GiB</span>
 					</div>
 				</div>
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">Disk</h4>
+					<h4 class="_cl-primary">Disk</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.disk}</span>
 						<span>&nbsp;GiB-s</span>
 					</div>
 				</div>
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">Replica</h4>
+					<h4 class="_cl-primary">Replica</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.replica}</span>
 					</div>
 				</div>
 				<div class="_bgcl-base-200 _bgcl-opacity-60 _bdrd-3 _pd-6">
-					<h4 class="_cl-primary-active">Price</h4>
+					<h4 class="_cl-primary">Price</h4>
 					<div class="_mgt-4">
 						<span class="_fs-6">{billing?.price}</span>
 						<span>&nbsp;THB</span>

@@ -252,7 +252,7 @@ $components-colors: (
 			width: 22px;
 			height: 22px;
 			left: 0px;
-			border: 2px solid hsl(var(--hsl-primary-active));
+			border: 2px solid hsl(var(--hsl-primary));
 			border-radius: 50%;
 			background-color: white;
 		}
@@ -263,7 +263,7 @@ $components-colors: (
 			width: .75rem;
 			top: 5px;
 			left: 5px;
-			background-color: hsl(var(--hsl-primary-active));
+			background-color: hsl(var(--hsl-primary));
 			border-radius: 50%;
 		}
 	}
@@ -298,8 +298,8 @@ $components-colors: (
 
 		&:checked {
 			+ label:before {
-				background: hsl(var(--hsl-primary-active));
-				border: 1px solid hsl(var(--hsl-primary-active));
+				background: hsl(var(--hsl-primary));
+				border: 1px solid hsl(var(--hsl-primary));
 			}
 
 			+ label:after {
@@ -408,10 +408,10 @@ $components-colors: (
 
 	> input[type='radio']:checked + label,
 	> input[type='checkbox']:checked + label {
-		color: hsl(var(--hsl-primary-active));
+		color: hsl(var(--hsl-primary));
 		background: hsl(var(--hsl-primary)/0.1);
 
-		border: 1px solid hsl(var(--hsl-primary-active));
+		border: 1px solid hsl(var(--hsl-primary));
 		border-radius: 4px;
 
 		font-family: var(--ffml-secondary);
@@ -441,7 +441,7 @@ $components-colors: (
 		outline: none;
 
 		&:checked {
-			background-color: hsl(var(--hsl-primary-active));
+			background-color: hsl(var(--hsl-primary));
 		}
 
 		&:after {

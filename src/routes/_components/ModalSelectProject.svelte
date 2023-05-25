@@ -53,13 +53,13 @@
 					<tr>
 						<td>
 							{#if project === it.project}
-								<i class="fas fa-check _cl-primary-active _fs-6"></i>
+								<i class="fas fa-check _cl-primary _fs-6"></i>
 							{/if}
 						</td>
 						<td>
 							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
 								tabindex="0" role="link"
-								class="_tdcrt-udl _cs-pt _cl-primary-active:hover"
+								class="_tdcrt-udl _cs-pt _cl-primary:hover"
 								style="font-weight: 500">
 								{it.name}
 							</div>

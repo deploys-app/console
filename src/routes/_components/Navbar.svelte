@@ -100,7 +100,7 @@
 	}
 
 	ul.user-menu > li:hover {
-		background-color: hsl(var(--hsl-primary)/0.1);
+		background-color: hsl(var(--hsl-primary)/0.05);
 		cursor: pointer;
 	}
 

@@ -1,18 +1,27 @@
-/*
- * Color
- *********************************************/
- :root {
-    --color-primary-600: hsl(342, 80%, 54%);
+$colors: (
+	'light-primary': var(--color-light-primary),
+	'light-secondary': var(--color-light-secondary),
+	'dark-primary': var(--color-dark-primary),
+	'dark-secondary': var(--color-dark-secondary)
+);
 
+$sm: 768px;
+$md: 1024px;
+$lg: 1280px;
+
+$breakpoints: (
+	'sm': $sm,
+	'md': $md,
+	'lg': $lg
+);
+
+:root {
 	--color-light-primary: hsl(227, 100%, 93%);
 	--color-light-secondary: hsl(227, 46%, 73%);
 	--color-dark-primary: hsla(215, 15%, 28%, 0.96);
 	--color-dark-secondary: hsla(220, 10%, 47%, 0.95);
 }
 
-/*
- * Timing
- *********************************************/
 :root {
 	--timing-normal: 320ms;
 	--timing-faster: 160ms;
@@ -49,8 +58,8 @@
 
 [data-theme=dark] {
 	--hue-primary: 342;
-	--hsl-primary: var(--hue-primary) 80% 65%;
-	--hsl-primary-active: var(--hue-primary) 80% 58%;
+	--hsl-primary: var(--hue-primary) 80% 58%;
+	--hsl-primary-active: var(--hue-primary) 80% 54%;
 	--hsl-primary-content: var(--hue-primary) 80% 98%;
 	--hue-accent: 267;
 	--hsl-accent: var(--hue-accent) 93% 65%;

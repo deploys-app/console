@@ -5,7 +5,7 @@ $components-colors: (
 .#{$prefix}link {
 	position: relative;
 
-	color: hsl(var(--hsl-primary-active));
+	color: hsl(var(--hsl-primary));
 
 	text-decoration: none;
 
@@ -15,7 +15,7 @@ $components-colors: (
 
 	svg, path {
 		transition: fill var(--timing-normal) ease-in-out;
-		fill: hsl(var(--hsl-primary-active));
+		fill: hsl(var(--hsl-primary));
 	}
 
 	&:before, &:after {
@@ -24,10 +24,10 @@ $components-colors: (
 	}
 
 	&:hover, &:focus, &.-active {
-		color: var(--color-primary-600);
+		color: hsl(var(--hsl-primary-active));
 
 		svg, path {
-			fill: var(--color-primary-600);
+			fill: hsl(var(--hsl-primary-active));
 		}
 	}
 
