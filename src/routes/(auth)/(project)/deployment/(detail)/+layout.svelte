@@ -27,7 +27,7 @@
 
 <br>
 
-<div class="panel _dp-g _g-7">
+<div class="nm-panel is-level-300 _dp-g _g-7">
 	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
 
 	<slot />

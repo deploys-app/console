@@ -8,7 +8,7 @@
 @import 'component/all';
 
 html, body {
-    background-color: hsl(var(--hsl-base-200));
+	background-color: hsl(var(--hsl-base-200));
 }
 
 body, h1, h2, h3, h4, h4, h5, h6 {
@@ -31,39 +31,39 @@ ul, ol {
 }
 
 .sidebar-menus {
-    .menu-item {
-        display: grid;
-        grid-auto-flow: column;
-        grid-gap: .75rem;
+	.menu-item {
+		display: grid;
+		grid-auto-flow: column;
+		grid-gap: .75rem;
 
-        justify-content: start;
-        align-items: center;
+		justify-content: start;
+		align-items: center;
 
-        padding: .75rem 1rem;
+		padding: .75rem 1rem;
 
-        font-size: var(--fs-2);
-        color: hsl(227, 46%, 73%);
+		font-size: var(--fs-2);
+		color: hsl(227, 46%, 73%);
 
-        cursor: pointer;
+		cursor: pointer;
 
-        &:hover {
-            background: hsl(var(--hsl-base-200));
-        }
+		&:hover {
+			background: hsl(var(--hsl-base-200));
+		}
 
-        &.is-active {
-            color: var(--color-light-primary);
-            background: hsl(var(--hsl-base-200));
-        }
-    }
+		&.is-active {
+			color: var(--color-light-primary);
+			background: hsl(var(--hsl-base-200));
+		}
+	}
 
-    .menu-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+	.menu-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 
-        width: 1.5rem;
-        height: 1.5rem;
-    }
+		width: 1.5rem;
+		height: 1.5rem;
+	}
 }
 
 input:-webkit-autofill,
@@ -80,14 +80,16 @@ select:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
 }
 
-.panel {
-    form, .content {
-        max-width: 768px;
-    }
+.nm-panel {
+	padding: 1.75rem 1.5rem;
+
+	form, .content {
+		max-width: 768px;
+	}
 }
 
 .cl-text-mute {
-    color: #90959a;
+	color: #90959a;
 }
 
 h1,
@@ -164,13 +166,13 @@ h6 {
 p {
 	font-size: var(--fs-4);
 	margin: 0px;
-    line-height: 1.65;
+	line-height: 1.65;
 }
 
 .field > .helper {
-    color: hsl(227, 46%, 73%);
+	color: hsl(227, 46%, 73%);
 }
 
 .input > .icon > button {
-    color: hsl(227, 100%, 93%);
+	color: hsl(227, 100%, 93%);
 }

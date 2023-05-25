@@ -61,7 +61,7 @@
 
 <br>
 
-<div class="panel _dp-g _g-7">
+<div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-f _alit-ct">
 			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Account information</strong></h3>

@@ -117,7 +117,7 @@
 
 <br>
 
-<div class="panel">
+<div class="nm-panel is-level-300">
 	<div class="lo-grid-span-horizontal _g-5">
 		<div class="lo-grid-span-horizontal _g-4">
 			<div class="select">

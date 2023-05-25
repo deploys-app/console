@@ -60,7 +60,7 @@
 </div>
 
 <br>
-<div class="panel _dp-g _g-7">
+<div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _jtfit-st _g-5">
 		{#if project}
 			<h5><strong>Update Project: {project.name}</strong></h5>

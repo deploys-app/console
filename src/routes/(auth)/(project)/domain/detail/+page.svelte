@@ -160,7 +160,7 @@
 </div>
 
 <br>
-<div class="panel _dp-g _g-7">
+<div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _g-5">
 		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
 			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">

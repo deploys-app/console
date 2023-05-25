@@ -38,7 +38,7 @@
 <h6>Dashboard</h6>
 <br>
 <div class="lo-12 lo-6:md _g-7 _alit-st">
-	<div class="panel lo-12 _g-7">
+	<div class="nm-panel is-level-300 lo-12 _g-7">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="_mgl-6">Project Info</strong>
@@ -78,7 +78,7 @@
 	</div>
 
 	{#if permission.billing}
-		<div class="panel lo-12 _g-7">
+		<div class="nm-panel is-level-300 lo-12 _g-7">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
 				<strong class="_mgl-6">Billing</strong>
