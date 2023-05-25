@@ -89,24 +89,32 @@
 
 <hr>
 
-<div class="nav-tabs-wrap _fdrt-cl _fdrt-r:md">
-	<ul class="nav nav-tabs _mgbt-0:lg _w-100pct">
-		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/metrics'} href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Metric</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/detail'} href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Details</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/revision'} href={`/deployment/revision?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Revision</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/logs'} href={`/deployment/logs?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Logs</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" class:active={$page.url.pathname === '/deployment/events'} href={`/deployment/events?project=${project}&location=${deployment.location}&name=${deployment.name}`}>Events</a>
-		</li>
-	</ul>
+<div class="nm-tabs is-variant-underline _mgbt-0:lg _w-100pct _fdrt-cl _fdrt-r:md">
+	<a class="tab-button"
+		class:is-active={$page.url.pathname === '/deployment/metrics'}
+		href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+		Metric
+	</a>
+	<a class="tab-button"
+		class:is-active={$page.url.pathname === '/deployment/detail'}
+		href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+		Details
+	</a>
+	<a class="tab-button"
+		class:is-active={$page.url.pathname === '/deployment/revision'}
+		href={`/deployment/revision?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+		Revision
+	</a>
+	<a class="tab-button"
+		class:is-active={$page.url.pathname === '/deployment/logs'}
+		href={`/deployment/logs?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+		Logs
+	</a>
+	<a class="tab-button"
+		class:is-active={$page.url.pathname === '/deployment/events'}
+		href={`/deployment/events?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+		Events
+	</a>
 </div>
 
 <style>
