@@ -377,7 +377,7 @@
 				{#each form.command as _, i}
 					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
-						<button class="icon-button icon -is-right _cs-pt" type="button"
+						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
@@ -396,7 +396,7 @@
 				{#each form.args as _, i}
 					<div class="input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
-						<button class="icon-button icon -is-right _cs-pt" type="button"
+						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
@@ -513,7 +513,7 @@
 <!--		{{/*                    {{end}}*/}}-->
 <!--		{{/*                </select>*/}}-->
 <!--		{{/*            </div>*/}}-->
-<!--		{{/*            <small class="_cl-light-secondary">*/}}-->
+<!--		{{/*            <small class="helper">*/}}-->
 <!--		{{/*                Number of vCPUs allocated to each container instance.*/}}-->
 <!--		{{/*            </small>*/}}-->
 <!--		{{/*        </div>*/}}-->
@@ -527,7 +527,7 @@
 					{/each}
 				</select>
 			</div>
-			<small class="_cl-light-secondary">
+			<small class="helper">
 				Memory to allocate to each container instance.
 			</small>
 		</div>
@@ -563,7 +563,7 @@
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<button class="icon-button -negative" type="button"
+									<button class="icon-button" type="button"
 										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
@@ -624,7 +624,7 @@
 									</div>
 								</td>
 								<td class="table-action-container" style="padding: 19px 12px;">
-									<button class="icon-button -negative" type="button"
+									<button class="icon-button" type="button"
 										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>

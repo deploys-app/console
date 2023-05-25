@@ -58,9 +58,9 @@
 						<td>{it.size} GiB</td>
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
-						<td>
+						<td class="table-action-container">
 							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
-								<div class="icon-button -secondary">
+								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>

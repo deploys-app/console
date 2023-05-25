@@ -291,13 +291,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomimono/nomimono-theme@npm:^0.4.2":
-  version: 0.4.2
-  resolution: "@nomimono/nomimono-theme@npm:0.4.2"
-  checksum: f7984208bd5a5c29c03d2872032610f8d6f2cc70c5fc45a12fa9ad3eaf7f0441d66cedcab5255b26222f1d51fa33e864c9ee3cf812c5c5b24ab8853b20c64a48
-  languageName: node
-  linkType: hard
-
 "@npmcli/fs@npm:^2.1.0":
   version: 2.1.0
   resolution: "@npmcli/fs@npm:2.1.0"
@@ -1053,7 +1046,6 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@nomimono/nomimono-css": ^0.4.15
-    "@nomimono/nomimono-theme": ^0.4.2
     "@sentry/sveltekit": ^7.53.0
     "@sveltejs/adapter-node": ^1.2.4
     "@sveltejs/kit": =1.18.0

@@ -61,7 +61,7 @@
 			</div>
 			<div>
 				{deployment.name}
-				<div class="_fs-4 _cl-dark-secondary _mgt-3 _wb-ba">{deployment.image}</div>
+				<div class="image _fs-4 _mgt-3 _wb-ba">{deployment.image}</div>
 			</div>
 		</h3>
 		<div class="_dp-f _alit-ct _fw-w">
@@ -108,3 +108,9 @@
 		</li>
 	</ul>
 </div>
+
+<style>
+	.image {
+		color: hsla(220, 10%, 47%, 0.95);
+	}
+</style>

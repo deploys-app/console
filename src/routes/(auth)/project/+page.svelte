@@ -74,11 +74,11 @@
 						<td>{it.id}</td>
 						<td class="table-action-container">
 							<a href={`/project/create?project=${it.project}`}>
-								<div class="icon-button -secondary">
+								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
-							<button class="icon-button -negative" on:click={() => deleteItem(it.project)}>
+							<button class="icon-button" on:click={() => deleteItem(it.project)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

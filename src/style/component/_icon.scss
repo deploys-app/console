@@ -13,7 +13,7 @@ $components-colors: (
     height: 2rem;
 
   	border: 0;
-    background-color: hsl(var(--hsl-primary));
+    background-color: transparent;
     color: white;
 
     border-radius: 50%;
@@ -27,16 +27,6 @@ $components-colors: (
     &:hover {
         transform: scale(1.1);
         box-shadow: var(--raised-z13);
-    }
-
-    @each $key, $value in $components-colors {
-		&.-#{$key} {
-            background-color: var(--color-#{$key}-500);
-
-            &:hover {
-                background-color: var(--color-#{$key}-600);
-            }
-        }
     }
 }
 

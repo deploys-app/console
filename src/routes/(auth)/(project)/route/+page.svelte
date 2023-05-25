@@ -68,8 +68,8 @@
 						<td>{it.location}</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
-						<td>
-							<button class="icon-button -negative" on:click={() => deleteRoute(it)}>
+						<td class="table-action-container">
+							<button class="icon-button" on:click={() => deleteRoute(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

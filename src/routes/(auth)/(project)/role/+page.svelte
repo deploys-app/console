@@ -55,16 +55,14 @@
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>{it.createdBy}</td>
-						<td>
-							<div class="table-action-container">
-								{#if roleCanUpdate(it.role)}
-									<a href={`/role/create?project=${project}&role=${it.role}`}>
-										<div class="icon-button -secondary">
-											<i class="fa-solid fa-pen"></i>
-										</div>
-									</a>
-								{/if}
-							</div>
+						<td class="table-action-container">
+							{#if roleCanUpdate(it.role)}
+								<a href={`/role/create?project=${project}&role=${it.role}`}>
+									<div class="icon-button">
+										<i class="fa-solid fa-pen"></i>
+									</div>
+								</a>
+							{/if}
 						</td>
 					</tr>
 				{:else}

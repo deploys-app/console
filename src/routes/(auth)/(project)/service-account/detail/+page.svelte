@@ -130,11 +130,9 @@
 			{#each (serviceAccount.keys ?? []) as key}
 				<div class="input -has-icon-right">
 					<input value="{key.secret}" readonly>
-					<div class="icon -is-right _cs-pt">
-						<button class="_bgcl-tpr _cs-pt _bdw-0 _cl-light-primary" style="outline: none;" on:click={() => deleteKey(key.secret)} type="button">
-							<i class="fa-solid fa-trash-alt"></i>
-						</button>
-					</div>
+					<button class="icon-button icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
+						<i class="fa-solid fa-trash-alt"></i>
+					</button>
 				</div>
 			{/each}
 

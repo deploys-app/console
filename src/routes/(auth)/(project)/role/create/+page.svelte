@@ -168,7 +168,7 @@
 							<tr>
 								<td>{it}</td>
 								<td class="table-action-container">
-									<div class="icon-button -negative"
+									<div class="icon-button"
 										on:click={() => removePermission(it)} on:keypress={() => removePermission(it)}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
