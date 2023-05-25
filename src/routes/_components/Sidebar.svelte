@@ -94,7 +94,7 @@
 
 			<div class="_dp-f _jtfct-fe">
 				<a href="/project">
-					<small class="link">View all projects</small>
+					<small class="nm-link">View all projects</small>
 				</a>
 			</div>
 		</div>

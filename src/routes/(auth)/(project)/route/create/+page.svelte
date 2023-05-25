@@ -101,7 +101,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/route?project=${project}`} class="link"><h6>Routes</h6></a>
+		<a href={`/route?project=${project}`} class="nm-link"><h6>Routes</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>Create</h6>

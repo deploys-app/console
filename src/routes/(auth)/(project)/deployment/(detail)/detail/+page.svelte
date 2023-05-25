@@ -50,7 +50,7 @@
 				<tr>
 					<td>URL</td>
 					<td>
-						<a class="link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
+						<a class="nm-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
 							{`https://${deployment.url}`}
 						</a>
 						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 copy" data-clipboard-text={`https://${deployment.url}`}>

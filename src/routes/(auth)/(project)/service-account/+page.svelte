@@ -39,7 +39,7 @@
 				{#each serviceAccounts as it}
 					<tr>
 						<td>
-							<a class="link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
+							<a class="nm-link" href={`/service-account/detail?project=${project}&id=${it.sid}`}>
 								{it.email}
 							</a>
 						</td>

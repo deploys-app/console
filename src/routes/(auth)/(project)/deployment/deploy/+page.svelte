@@ -210,11 +210,11 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
+		<a href={`/deployment?project=${project}`} class="nm-link"><h6>Deployments</h6></a>
 	</div>
 	{#if deployment}
 		<div class="nm-breadcrumb-item">
-			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
+			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="nm-link">
 				<h6>{deployment.name}</h6>
 			</a>
 		</div>

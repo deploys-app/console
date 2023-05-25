@@ -54,7 +54,7 @@
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
-							<a class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

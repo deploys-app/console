@@ -43,11 +43,11 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href="/billing" class="link"><h6>Billing</h6></a>
+		<a href="/billing" class="nm-link"><h6>Billing</h6></a>
 	</div>
 	{#if billingAccount}
 		<div class="nm-breadcrumb-item">
-			<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
+			<a href={`/billing/detail?id=${billingAccount.id}`} class="nm-link"><h6>{billingAccount.name}</h6></a>
 		</div>
 		<div class="nm-breadcrumb-item">
 			<h6>Update</h6>

@@ -30,7 +30,7 @@
 			{#each billingAccounts as it}
 				<tr>
 					<td>
-						<a class="link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
+						<a class="nm-link" href={`/billing/detail?id=${it.id}`}>{it.name}</a>
 					</td>
 					<td>{it.id}</td>
 					<td class="is-align-center">

@@ -47,11 +47,11 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href="/project" class="link"><h6>Projects</h6></a>
+		<a href="/project" class="nm-link"><h6>Projects</h6></a>
 	</div>
 	{#if project}
 		<div class="nm-breadcrumb-item">
-			<a href={`/?project=${project.project}`} class="link"><h6>{project.name}</h6></a>
+			<a href={`/?project=${project.project}`} class="nm-link"><h6>{project.name}</h6></a>
 		</div>
 	{/if}
 	<div class="nm-breadcrumb-item">

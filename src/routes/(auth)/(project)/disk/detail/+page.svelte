@@ -38,7 +38,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
+		<a href={`/disk?project=${project}`} class="nm-link"><h6>Disks</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>{disk.name}</h6>

@@ -62,7 +62,7 @@
 				{#each routes as it}
 					<tr>
 						<td>
-							<a class="link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
+							<a class="nm-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
 						</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>

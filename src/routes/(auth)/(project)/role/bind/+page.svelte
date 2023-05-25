@@ -61,7 +61,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/role/users?project=${project}`} class="link"><h6>Users</h6></a>
+		<a href={`/role/users?project=${project}`} class="nm-link"><h6>Users</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>Add</h6>

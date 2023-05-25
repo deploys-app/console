@@ -42,11 +42,11 @@
 <div class="nm-breadcrumb">
 	{#if id}
 		<div class="nm-breadcrumb-item">
-			<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
+			<a href={`/service-account?project=${project}&id=${id}`} class="nm-link"><h6>{serviceAccount.sid}</h6></a>
 		</div>
 	{:else}
 		<div class="nm-breadcrumb-item">
-			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
+			<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
 		</div>
 	{/if}
 	<div class="nm-breadcrumb-item">

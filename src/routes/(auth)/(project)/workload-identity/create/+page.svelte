@@ -42,7 +42,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/workload-identity?project=${project}`} class="link"><h6>Workload Identities</h6></a>
+		<a href={`/workload-identity?project=${project}`} class="nm-link"><h6>Workload Identities</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>Create</h6>

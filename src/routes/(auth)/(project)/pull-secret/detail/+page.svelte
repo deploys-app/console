@@ -37,7 +37,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/pull-secret?project=${project}`} class="link"><h6>Pull Secrets</h6></a>
+		<a href={`/pull-secret?project=${project}`} class="nm-link"><h6>Pull Secrets</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>{pullSecret.name}</h6>

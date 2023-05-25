@@ -45,7 +45,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
+		<a href={`/domain?project=${project}`} class="nm-link"><h6>Domains</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>Create</h6>

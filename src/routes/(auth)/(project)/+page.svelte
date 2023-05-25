@@ -71,7 +71,7 @@
 
 <!--		<hr>-->
 
-<!--		<a class="_dp-f _alit-ct link" href="">-->
+<!--		<a class="nm-link _dp-f _alit-ct" href="">-->
 <!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
 <!--			<span class="_mgl-6">Project Settings</span>-->
 <!--		</a>-->

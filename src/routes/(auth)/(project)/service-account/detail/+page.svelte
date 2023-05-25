@@ -65,7 +65,7 @@
 
 <div class="nm-breadcrumb">
 	<div class="nm-breadcrumb-item">
-		<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
+		<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
 	</div>
 	<div class="nm-breadcrumb-item">
 		<h6>{serviceAccount.name}</h6>

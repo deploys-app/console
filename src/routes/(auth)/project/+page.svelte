@@ -66,7 +66,7 @@
 				{#each projects as it}
 					<tr>
 						<td>
-							<a href={`/?project=${it.project}`} class="link">
+							<a href={`/?project=${it.project}`} class="nm-link">
 								<strong>{it.name}</strong>
 							</a>
 						</td>

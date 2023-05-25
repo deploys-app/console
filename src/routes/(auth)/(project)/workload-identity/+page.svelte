@@ -46,7 +46,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

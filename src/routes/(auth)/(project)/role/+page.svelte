@@ -45,7 +45,7 @@
 					<tr>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href={`/role/create?project=${project}&role=${it.role}`} class="link">
+								<a href={`/role/create?project=${project}&role=${it.role}`} class="nm-link">
 									<strong>{it.role}</strong>
 								</a>
 							{:else}
