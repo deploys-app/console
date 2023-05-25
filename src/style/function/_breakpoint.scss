@@ -14,15 +14,3 @@
 		@content;
 	}
 }
-
-@mixin mqmw($name, $breakpoints: $breakpoints) {
-	$max: breakpoint-min($name, $breakpoints);
-
-	@if $max {
-		@media (max-width: $max) {
-			@content;
-		}
-	} @else {
-		@content;
-	}
-}

@@ -91,3 +91,80 @@ select:-webkit-autofill:focus {
 .cl-text-mute {
     color: #90959a;
 }
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--ffml-secondary);
+	font-weight: 400;
+	line-height: 1.25;
+}
+
+h1 {
+	font-size: var(--fs-10);
+
+	@media (min-width: 768px) {
+		font-size: var(--fs-10)
+	}
+
+	@media (min-width: 1024px) {
+		font-size: var(--fs-11);
+	}
+
+	@media (min-width: 1280px) {
+		font-size: var(--fs-11);
+	}
+}
+
+h2 {
+	font-size: var(--fs-9);
+
+	@media (min-width: 768px) {
+		font-size: var(--fs-9)
+	}
+
+	@media (min-width: 1024px) {
+		font-size: var(--fs-10);
+	}
+
+	@media (min-width: 1280px) {
+		font-size: var(--fs-10);
+	}
+}
+
+h3 {
+	font-size: var(--fs-8);
+
+	@media (min-width: 768px) {
+		font-size: var(--fs-8)
+	}
+
+	@media (min-width: 1024px) {
+		font-size: var(--fs-9);
+	}
+
+	@media (min-width: 1280px) {
+		font-size: var(--fs-9);
+	}
+}
+
+h4 {
+	font-size: var(--fs-7);
+}
+
+h5 {
+	font-size: var(--fs-6);
+}
+
+h6 {
+	font-size: var(--fs-5);
+}
+
+p {
+	font-size: var(--fs-4);
+	margin: 0px;
+    line-height: 1.65;
+}

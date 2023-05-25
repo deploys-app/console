@@ -1,9 +1,9 @@
 @each $key, $value in $colors {
-	.#{$atom-prefix}bgcl-#{$key} { background-color: #{$value} !important; }
+	._bgcl-#{$key} { background-color: #{$value} !important; }
 };
 
 @each $key, $value in $colors {
-	.#{$atom-prefix}bgcl-#{$key}-hover {
+	._bgcl-#{$key}-hover {
 		&:hover {
 			background-color: #{$value} !important;
 		}
