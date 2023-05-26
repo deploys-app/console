@@ -44,10 +44,10 @@
 
 	<div class="_dp-f _mgl-at">
 		<div class="nm-dropdown _mgl-at _mgt-at _mgbt-at">
-			<button class="nm-button is-icon-left is-size-small is-variant-secondary" tabindex="0">
+			<div class="nm-button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
 				<i class="fa-solid fa-palette"></i>
 				Theme
-			</button>
+			</div>
 			<ul class="nm-menu is-card is-compact">
 				<li><div on:click={() => setTheme('dark')} on:keypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
 				<li><div on:click={() => setTheme('light')} on:keypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
