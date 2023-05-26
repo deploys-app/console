@@ -1,6 +1,7 @@
 <script>
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
+	import Cookie from 'js-cookie'
 
 	/** @type {import('$types').Profile | null} */
 	export let profile = null
@@ -29,6 +30,11 @@
 	function doSignOut () {
 		signOut.submit()
 	}
+
+	function setTheme (value) {
+		document.documentElement.dataset.theme = value
+		Cookie.set('theme', value, { expires: 30 })
+	}
 </script>
 
 <nav class="navbar">
@@ -36,30 +42,43 @@
 		<i class="fa-light fa-bars"></i>
 	</div>
 
-	<div class="_mgl-at">
-		<div class="avatar" on:click|stopPropagation={toggle} on:keypress={toggle} tabindex="0" role="button">
-			<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous">
+	<div class="_dp-f _mgl-at">
+		<div class="nm-dropdown _mgl-at _mgt-at _mgbt-at">
+			<button class="nm-button is-icon-left is-size-small is-variant-secondary">
+				<i class="fa-solid fa-palette"></i>
+				Theme
+			</button>
+			<ul class="nm-menu is-card is-compact">
+				<li><div on:click={() => setTheme('dark')} on:keypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
+				<li><div on:click={() => setTheme('light')} on:keypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
+			</ul>
 		</div>
 
-		{#if active}
-			<div class="popup" transition:scale={{ duration: 160 }}>
-				<ul class="user-menu">
-					<li>
-						<a class="item _dp-b" href="/billing" on:click={close}>
-							Billing accounts
-						</a>
-					</li>
-					<li>
-						<div class="item" on:click={doSignOut} on:keypress={doSignOut} tabindex="0" role="button">
-							Signout
-						</div>
-						<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
-							<button>Sign Out</button>
-						</form>
-					</li>
-				</ul>
+		<div>
+			<div class="avatar" on:click|stopPropagation={toggle} on:keypress={toggle} tabindex="0" role="button">
+				<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous" draggable="false">
 			</div>
-		{/if}
+
+			{#if active}
+				<div class="popup" transition:scale={{ duration: 160 }}>
+					<ul class="user-menu">
+						<li>
+							<a class="item _dp-b" href="/billing" on:click={close}>
+								Billing accounts
+							</a>
+						</li>
+						<li>
+							<div class="item" on:click={doSignOut} on:keypress={doSignOut} tabindex="0" role="button">
+								Signout
+							</div>
+							<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
+								<button>Sign Out</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			{/if}
+		</div>
 	</div>
 </nav>
 

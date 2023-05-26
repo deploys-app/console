@@ -8,6 +8,22 @@ if (env.PUBLIC_SENTRY_DSN) {
 	})
 }
 
+const allowTheme = {
+	dark: true,
+	light: true
+}
+
+/** @type {import('@sveltejs/kit').Handle} */
+async function theme ({ event, resolve }) {
+	let t = event.cookies.get('theme')
+	if (!allowTheme[t]) {
+		t = 'dark'
+	}
+	return resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${t}"`)
+	})
+}
+
 /** @type {import('@sveltejs/kit').Handle} */
 async function handleCookie ({ event, resolve }) {
 	const { cookies, locals } = event
@@ -36,6 +52,7 @@ function storeProject ({ event, resolve }) {
 
 export const handle = sequence(
 	Sentry.sentryHandle(),
+	theme,
 	handleCookie,
 	storeProject
 )
