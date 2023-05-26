@@ -8,11 +8,14 @@
 	$: project = data.project
 	$: deployment = data.deployment
 
+	let lastReload = Date.now()
+
 	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('deployment.get')
-		if (deployment.status !== 'pending') {
-			return 300000
+		if (deployment.status !== 'pending' && Date.now() - lastReload < 120000) {
+			return
 		}
+		await api.invalidate('deployment.get')
+		lastReload = Date.now()
 	}, 4000))
 </script>
 
