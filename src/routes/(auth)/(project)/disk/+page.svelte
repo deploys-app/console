@@ -26,7 +26,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="button -small" href={`/disk/create?project=${project}`}>
+			<a class="nm-button" href={`/disk/create?project=${project}`}>
                 Create
             </a>
 		</div>

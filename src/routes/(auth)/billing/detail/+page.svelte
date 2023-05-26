@@ -36,12 +36,7 @@
 
 <div class="nm-panel is-level-300 _dp-g _g-6">
 	<div class="lo-12 _g-5">
-		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>"{billingAccount.name}" account information</strong></h3>
-			<div class="_dp-f">
-				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete account</button>
-			</div>
-		</div>
+		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>"{billingAccount.name}" account information</strong></h3>
 	</div>
 
 	<hr>
@@ -70,7 +65,10 @@
 			</table>
 		</div>
 
-		<a class="button _mgr-at" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
-		<a class="button _mgr-at" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
+		<div class="_dp-f _g-6">
+			<a class="nm-button" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
+			<a class="nm-button" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
+			<button class="nm-button" type="button" on:click={deleteItem}>Delete account</button>
+		</div>
 	</div>
 </div>

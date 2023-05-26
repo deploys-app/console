@@ -162,16 +162,9 @@
 <br>
 <div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _g-5">
-		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
-				<strong>Domain: {domain.domain}</strong>
-			</h3>
-			<div class="_dp-f">
-				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
-					Delete
-				</button>
-			</div>
-		</div>
+		<h3>
+			<strong>Domain: {domain.domain}</strong>
+		</h3>
 	</div>
 
 	<hr>
@@ -337,7 +330,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="_fs-2 _opct-80">Remove all cached resources</p>
 						</div>
-						<button class="button -negative -small" class:-loading={purging} on:click={purgeCache}>
+						<button class="nm-button" class:is-loading={purging} on:click={purgeCache}>
 							Purge everything
 						</button>
 					</div>
@@ -347,7 +340,7 @@
 							<div><strong>Purge prefix</strong></div>
 							<p class="_fs-2 _opct-80">Remove cached resources at prefix path</p>
 						</div>
-						<button class="button -negative -small" class:-loading={purging} on:click={purgeCachePrefix}>
+						<button class="nm-button" class:is-loading={purging} on:click={purgeCachePrefix}>
 							Purge prefix
 						</button>
 					</div>
@@ -359,7 +352,14 @@
 	{#if !domain.cdn}
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="button -positive _mgr-5" on:click={upgradeCdn}>Add CDN (DDoS Protection)</button>
+			<button class="nm-button" on:click={upgradeCdn}>Add CDN (DDoS Protection)</button>
 		</div>
 	{/if}
+
+	<hr>
+	<div class="_dp-f _g-6">
+		<button class="nm-button" type="button" on:click={deleteItem}>
+			Delete
+		</button>
+	</div>
 </div>

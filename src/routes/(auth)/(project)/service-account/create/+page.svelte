@@ -108,6 +108,6 @@
 			</div>
 		</div>
 
-		<button class="button _mgr-at" class:-loading={saving} disabled={saving}>Save</button>
+		<button class="nm-button _mgr-at" class:is-loading={saving} disabled={saving}>Save</button>
 	</form>
 </div>

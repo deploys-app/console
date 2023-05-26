@@ -76,16 +76,9 @@
 
 <div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _g-5">
-		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
-				<strong>{serviceAccount.name}</strong>
-			</h3>
-			<div class="_dp-f">
-				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
-					Delete
-				</button>
-			</div>
-		</div>
+		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
+			<strong>{serviceAccount.name}</strong>
+		</h3>
 	</div>
 
 	<hr>
@@ -136,11 +129,19 @@
 			{/each}
 
 			<div class="_dp-g _g-6 _w-100pct">
-				<button class="button -small _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+				<button class="nm-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
 					<i class="fa-solid fa-plus _mgr-5"></i>
 					Create key
 				</button>
 			</div>
+		</div>
+
+		<hr>
+
+		<div class="_dp-f">
+			<button class="nm-button" type="button" on:click={deleteItem}>
+				Delete
+			</button>
 		</div>
 	</div>
 </div>

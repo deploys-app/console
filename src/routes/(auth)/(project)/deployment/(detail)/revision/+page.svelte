@@ -52,7 +52,7 @@
 				<td>{it.createdBy}</td>
 				<td>
 					{#if index > 0}
-						<button class="button -tertiary -small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
+						<button class="nm-button is-size-small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
 					{/if}
 				</td>
 			</tr>

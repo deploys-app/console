@@ -98,7 +98,7 @@
 			</div>
 		</div>
 
-		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
+		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
 			{#if project}
 				Update Project
 			{:else}

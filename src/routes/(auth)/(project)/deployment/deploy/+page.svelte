@@ -383,7 +383,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button -small _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
+			<button class="nm-button _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Command</span>
 			</button>
@@ -402,7 +402,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button -small _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
+			<button class="nm-button _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
@@ -573,7 +573,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="button -small _mg-at" type="button"
+								<button class="nm-button _dp-f _mg-at" type="button"
 									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
 									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
@@ -584,7 +584,7 @@
 				</table>
 			</div>
 
-			<button class="button -small _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
+			<button class="nm-button _dp-f _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
@@ -634,7 +634,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="button -small _mg-at" type="button"
+							<button class="nm-button _dp-f _mg-at" type="button"
 								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
 								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
@@ -648,7 +648,7 @@
 
 		<hr>
 
-		<button class="button _mgt-6 _mgr-at" class:-loading={saving}>
+		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
 			Deploy
 		</button>
 	{/if}

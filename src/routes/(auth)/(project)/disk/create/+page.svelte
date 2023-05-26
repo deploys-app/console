@@ -113,9 +113,7 @@
 			</div>
 		</div>
 
-		<hr>
-
-		<button class="button _mgr-at" class:-loading={saving}>
+		<button class="nm-button _mgr-at" class:is-loading={saving}>
 			{#if disk}
 				Save
 			{:else}

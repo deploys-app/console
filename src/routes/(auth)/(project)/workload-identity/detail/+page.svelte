@@ -92,8 +92,10 @@
 			</pre>
 		</div>
 
-		<div class="_mgl-at:lg">
-			<button class="button -danger" on:click={deleteItem}>Delete</button>
+		<hr>
+
+		<div class="_dp-f _g-6">
+			<button class="nm-button" on:click={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>

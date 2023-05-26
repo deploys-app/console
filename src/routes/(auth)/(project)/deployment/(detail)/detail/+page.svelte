@@ -202,7 +202,7 @@
 
 <div class="_dp-f _fw-w _alit-ct _mgv-8">
 	<div class="_mgl-at:lg _mgbt-5 _mgbt-0:lg">
-		<button class="button -danger -small" type="button" on:click={deleteItem}>Delete</button>
+		<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
 	</div>
 </div>
 

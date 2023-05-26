@@ -49,22 +49,15 @@
 
 <div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _g-5">
-		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3 class="_mgr-7 _mgbt-0:lg">
-				<StatusIcon status={disk.status} />
-				<strong>Disk: {disk.name}</strong>
-			</h3>
-			<div class="_dp-f">
-				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>
-					Delete
-				</button>
-			</div>
-		</div>
+		<h3>
+			<StatusIcon status={disk.status} />
+			<strong>Disk: {disk.name}</strong>
+		</h3>
 	</div>
 
 	<hr>
 
-	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
+	<div class="_dp-g _g-6 _w-100pct">
 		<div class="nm-field">
 			<label for="input-name">Name</label>
 			<div class="nm-input">
@@ -99,7 +92,11 @@
 
 	<hr>
 
-	<div class="_dp-f _alit-ct _fw-w">
-		<a class="button -danger -small" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+	<div class="_dp-f _g-6">
+		<a class="nm-button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+
+		<button class="nm-button" type="button" on:click={deleteItem}>
+			Delete
+		</button>
 	</div>
 </div>

@@ -101,7 +101,7 @@
 
 		<hr>
 
-		<button class="button _mgr-at" class:-loading={saving}>Save</button>
+		<button class="nm-button _mgr-at" class:is-loading={saving}>Save</button>
 	</form>
 </div>
 

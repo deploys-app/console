@@ -47,12 +47,7 @@
 <br>
 <div class="nm-panel is-level-300 _dp-g _g-6">
 	<div class="lo-12 _g-5">
-		<div class="_dp-g _g-6 _gatf-r _gatf-cl:lg _jtfct-spbtw">
-			<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
-			<div class="_dp-f">
-				<button class="button -small -negative -tertiary" type="button" on:click={deleteItem}>Delete</button>
-			</div>
-		</div>
+		<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
 	</div>
 
 	<hr>
@@ -101,6 +96,12 @@
 					</span>
 				</div>
 			</div>
+		</div>
+
+		<hr>
+
+		<div class="_dp-f _g-6">
+			<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>
