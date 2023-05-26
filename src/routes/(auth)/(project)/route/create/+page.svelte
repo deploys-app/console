@@ -117,9 +117,9 @@
 	</div>
 	<hr>
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} on:change={fetchLocationData} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
@@ -130,9 +130,9 @@
 		</div>
 
 		{#if form.location}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-domain">Domain</label>
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
 						{#each domains as it}
@@ -143,25 +143,25 @@
 			</div>
 
 			{#if selectedDomain?.wildcard}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-subdomain">Subdomain</label>
-					<div class="input -has-icon-right">
+					<div class="nm-input -has-icon-right">
 						<input id="input-subdomain" bind:value={form.subdomain}>
 						<input class="icon -is-right _pdh-4 _w-at" value={`.${form.domain}`} size={form.domain.length} readonly disabled>
 					</div>
 				</div>
 			{/if}
 
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-path">Path</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-path" bind:value={form.path}>
 				</div>
 			</div>
 
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-target_prefix">Type</label>
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
 						<option value="" selected disabled>Select Type</option>
 						<option value="deployment://">Deployment</option>
@@ -174,9 +174,9 @@
 			</div>
 
 			{#if form.targetPrefix === 'deployment://'}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-target_deployment">Deployments</label>
-					<div class="select">
+					<div class="nm-select">
 						<select id="input-target_deployment" bind:value={form.targetValue} required>
 							<option value="" selected disabled>Select Deployment</option>
 							{#each deployments as it}
@@ -186,9 +186,9 @@
 					</div>
 				</div>
 			{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-target_value">Value</label>
-					<div class="input">
+					<div class="nm-input">
 						<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
 					</div>
 				</div>

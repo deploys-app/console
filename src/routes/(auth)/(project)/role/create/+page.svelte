@@ -122,16 +122,16 @@
 	<hr>
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-role">Role ID</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-role" bind:value={form.role} placeholder="Role" required readonly={!!role}>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" bind:value={form.name} placeholder="Role name" required>
 			</div>
 		</div>
@@ -143,8 +143,8 @@
 		<div class="_dp-g _g-6">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="field _dp-f _mgbt-5">
-				<div class="select _f-1">
+			<div class="nm-field _dp-f _mgbt-5">
+				<div class="nm-select">
 					<select on:change={selectPermissionChanged}>
 						<option value="" disabled selected>---Select Permission---</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it}

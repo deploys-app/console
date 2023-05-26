@@ -72,15 +72,15 @@
 	<hr>
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" placeholder="name" bind:value={form.name}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" disabled selected>Select Location</option>
 					{#each locations as it}
@@ -89,21 +89,21 @@
 				</select>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-server">Server</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-server" bind:value={form.server} placeholder="https://index.docker.io/v2/">
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-username">Username</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-username" bind:value={form.username} placeholder="username or &quot;_json_key&quot;">
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-password">Password</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-password" type="password" bind:value={form.password} placeholder="password or service account json">
 			</div>
 		</div>

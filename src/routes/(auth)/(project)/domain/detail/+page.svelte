@@ -177,39 +177,39 @@
 	<hr>
 
 	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-gsa">Domain</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-gsa" value={domain.domain} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
-		<div class="field _mgt-5">
-			<div class="checkbox">
+		<div class="nm-field _mgt-5">
+			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
 				<label for="input-cdn">CDN (DDoS Protection)</label>
 			</div>
 		</div>
-		<div class="field">
-			<div class="checkbox">
+		<div class="nm-field">
+			<div class="nm-checkbox">
 				<input id="input-wildcard" type="checkbox" bind:checked={domain.wildcard} disabled readonly>
 				<label for="input-wildcard">Wildcard</label>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="text-created_at">Created at</label>
-			<div class="input">
+			<div class="nm-input">
 				<span id="text-created_at">{format.datetime(domain.createdAt)}</span>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="text-creted_by">Created by</label>
-			<div class="input">
+			<div class="nm-input">
 				<span id="text-creted_by">{domain.createdBy}</span>
 			</div>
 		</div>
@@ -230,9 +230,9 @@
 					<p class="_cl-negative _cl-opacity-80">{e}</p>
 				{/each}
 			{/if}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-owner_name">TXT Name</label>
-				<div class="input -has-icon-right _mgbt-3">
+				<div class="nm-input -has-icon-right _mgbt-3">
 					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
 					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
@@ -240,9 +240,9 @@
 					</span>
 				</div>
 			</div>
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-owner_value">TXT Value</label>
-				<div class="input -has-icon-right _mgbt-3">
+				<div class="nm-input -has-icon-right _mgbt-3">
 					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
 					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
@@ -256,9 +256,9 @@
 			<hr>
 			<p><strong>SSL/TLS Verification</strong></p>
 			{#each domain.verification.ssl.records as it, index}
-				<div class="field">
+				<div class="nm-field">
 					<label for={`input-ssl_name_${index}`}>TXT Name</label>
-					<div class="input -has-icon-right _mgbt-3">
+					<div class="nm-input -has-icon-right _mgbt-3">
 						<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
 						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 							data-clipboard-text={it.txtName}>
@@ -266,9 +266,9 @@
 							</span>
 					</div>
 				</div>
-				<div class="field">
+				<div class="nm-field">
 					<label for={`input-ssl_value_${index}`}>TXT Value</label>
-					<div class="input -has-icon-right _mgbt-3">
+					<div class="nm-input -has-icon-right _mgbt-3">
 						<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
 						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 							data-clipboard-text={it.txtValue}>
@@ -282,10 +282,10 @@
 		{#if domain.status === 'success' || domain.status === 'verify'}
 			<hr>
 			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip}
-						<div class="input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -296,10 +296,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip}
-						<div class="input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -310,10 +310,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.cname ?? []).length > 0}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-cname">CNAME Record</label>
 					{#each domain.dnsConfig.cname as cname}
-						<div class="input -has-icon-right">
+						<div class="nm-input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
 							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 								data-clipboard-text={cname}>

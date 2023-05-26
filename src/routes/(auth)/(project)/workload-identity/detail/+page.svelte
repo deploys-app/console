@@ -55,34 +55,34 @@
 	</div>
 	<hr>
 	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-gsa">GSA</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-gsa" value={workloadIdentity.gsa} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-location" value={workloadIdentity.location} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="div-created_at">Created at</label>
-			<div id="div-created_at" class="input">
+			<div id="div-created_at" class="nm-input">
 				{format.datetime(workloadIdentity.createdAt)}
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="div-created_by">Created by</label>
-			<div id="div-created_by" class="input">
+			<div id="div-created_by" class="nm-input">
 				{workloadIdentity.createdBy}
 			</div>
 		</div>
 
 		<hr>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="pre-command">Command</label>
 			<pre id="pre-command">
 				<button class="copy" data-clipboard-action="copy" data-clipboard-target="#command">copy</button>

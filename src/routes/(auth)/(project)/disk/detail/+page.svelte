@@ -65,33 +65,33 @@
 	<hr>
 
 	<div class="_dp-g _g-6 _w-100pct _mxw-512px">
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" value={disk.name} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-location" value={disk.location} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-size">Size (GiB)</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-size" value={disk.size} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-created_at">Created at</label>
-			<div class="input">
+			<div class="nm-input">
 				<span id="input-created_at">{format.datetime(disk.createdAt)}</span>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-created_by">Created by</label>
-			<div class="input">
+			<div class="nm-input">
 				<span id="input-created_by">{disk.createdBy}</span>
 			</div>
 		</div>

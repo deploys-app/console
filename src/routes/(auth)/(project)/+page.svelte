@@ -44,27 +44,27 @@
 			<strong class="_mgl-6">Project Info</strong>
 		</h6>
 		<hr>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-project_name">Project Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-project_name" readonly value={projectInfo.name}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-project_id">Project ID</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-project_id" readonly value={projectInfo.project}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-project_number">Project Number</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-project_number" readonly value={projectInfo.id}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-project_billing">Billing Account ID</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
 			</div>
 		</div>

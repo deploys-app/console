@@ -238,16 +238,16 @@
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if deployment}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-location-readonly">Location</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-location-readonly" value={deployment.location} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-location">Location</label>
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
 						{#each locations as it}
@@ -261,24 +261,24 @@
 		{/if}
 
 		{#if selectedLocation}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-name">Name</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!deployment}>
 				</div>
 			</div>
 
 			{#if deployment}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-type-readonly">Type</label>
-					<div class="input">
+					<div class="nm-input">
 						<input id="input-type-readonly" value={format.deploymentType(deployment.type)} readonly>
 					</div>
 				</div>
 			{:else}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-type">Type</label>
-					<div class="select">
+					<div class="nm-select">
 						<select id="input-type" class="js-type" bind:value={form.type}>
 							<option value="WebService">Web Service</option>
 							<option value="InternalTCPService">Internal TCP Service</option>
@@ -289,17 +289,17 @@
 				</div>
 			{/if}
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-image">Image</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-image" placeholder="image" bind:value={form.image}>
 			</div>
 		</div>
 
 		{#if permission.pullSecrets}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-pull_secret">Pull Secret</label>
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-pull_secret" bind:value={form.pullSecret}>
 						<option value="">No Pull Secret</option>
 						{#each pullSecrets as it}
@@ -309,9 +309,9 @@
 				</div>
 			</div>
 		{:else}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-pull_secret-text">Pull Secret</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
 				<p class="_fs-1">* You don't have permission to list pull secrets</p>
@@ -320,9 +320,9 @@
 
 		{#if selectedLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-workload_identity">Workload Identity</label>
-					<div class="select">
+					<div class="nm-select">
 						<select id="input-workload_identity" bind:value={form.workloadIdentity}>
 							<option value="">No Workload Identity</option>
 							{#each workloadIdentities as it}
@@ -332,9 +332,9 @@
 					</div>
 				</div>
 			{:else}
-				<div class="field">
+				<div class="nm-field">
 					<label for="input-workload_identity-text">Workload Identity</label>
-					<div class="input">
+					<div class="nm-input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
 					<p class="_fs-1">* You don't have permission to list workload identities</p>
@@ -343,18 +343,18 @@
 		{/if}
 
 		{#if ['WebService', 'TCPService', 'InternalTCPService'].includes(form.type)}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-port">Port</label>
-				<div class="input">
+				<div class="nm-input">
 					<input class="-no-arrow" id="input-port" placeholder="8080" type="number" bind:value={form.port}>
 				</div>
 			</div>
 		{/if}
 
 		{#if form.type === 'WebService'}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-protocol">Protocol</label>
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-protocol" bind:value={form.protocol}>
 						<option value="http">http</option>
 						<option value="https">https</option>
@@ -362,19 +362,19 @@
 					</select>
 				</div>
 			</div>
-			<div class="field">
-				<div class="checkbox">
+			<div class="nm-field">
+				<div class="nm-checkbox">
 					<input id="input-internal" type="checkbox" bind:checked={form.internal}>
 					<label for="input-internal">Internal Service</label>
 				</div>
 			</div>
 		{/if}
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="_pdbt-4">
 				{#each form.command as _, i}
-					<div class="input -has-icon-right _mgbt-4">
+					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
@@ -389,11 +389,11 @@
 			</button>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="_pdbt-4">
 				{#each form.args as _, i}
-					<div class="input -has-icon-right _mgbt-4">
+					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right" type="button"
 							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
@@ -409,9 +409,9 @@
 		</div>
 
 		{#if form.type === 'CronJob'}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-schedule">Schedule</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-schedule" placeholder="*/5 * * * *" bind:value={form.schedule}>
 				</div>
 			</div>
@@ -426,9 +426,9 @@
 				<h6><strong>Disk</strong></h6>
 
 				{#if permission.disks}
-					<div class="field">
+					<div class="nm-field">
 						<label for="input-disk_name">Name</label>
-						<div class="select">
+						<div class="nm-select">
 							<select id="input-disk_name" bind:value={form.disk.name}>
 								<option value="">No Disk</option>
 								{#each disks as it}
@@ -438,9 +438,9 @@
 						</div>
 					</div>
 				{:else}
-					<div class="field">
+					<div class="nm-field">
 						<label for="input-disk_name-text">Name</label>
-						<div class="input">
+						<div class="nm-input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
 						<p class="_fs-1">* You don't have permission to list disks</p>
@@ -448,15 +448,15 @@
 				{/if}
 
 				{#if form.disk.name}
-					<div class="field">
+					<div class="nm-field">
 						<label for="input-disk_mount_path">Mount Path</label>
-						<div class="input">
+						<div class="nm-input">
 							<input id="input-disk_mount_path" placeholder="" bind:value={form.disk.mountPath}>
 						</div>
 					</div>
-					<div class="field">
+					<div class="nm-field">
 						<label for="input-disk_sub_path">Sub Path</label>
-						<div class="input">
+						<div class="nm-input">
 							<input id="input-disk_sub_path" placeholder="" bind:value={form.disk.subPath}>
 						</div>
 					</div>
@@ -473,9 +473,9 @@
 
 					<h6><strong>Autoscaling</strong></h6>
 					<div class="lo-6 _g-6">
-						<div class="field">
+						<div class="nm-field">
 							<label for="input-min_replicas">Min Replicas</label>
-							<div class="input">
+							<div class="nm-input">
 								<input id="input-min_replicas"
 									bind:value={form.minReplicas}
 									type="number"
@@ -484,9 +484,9 @@
 							</div>
 						</div>
 
-						<div class="field">
+						<div class="nm-field">
 							<label for="input-max_replicas">Max Replicas</label>
-							<div class="input">
+							<div class="nm-input">
 								<input id="input-max_replicas"
 									bind:value={form.maxReplicas}
 									type="number"
@@ -503,9 +503,9 @@
 		<hr>
 		<br>
 
-<!--		{{/*        <div class="field">*/}}-->
+<!--		{{/*        <div class="nm-field">*/}}-->
 <!--		{{/*            <label for="input-cpu">CPU allocated</label>*/}}-->
-<!--		{{/*            <div class="select">*/}}-->
+<!--		{{/*            <div class="nm-select">*/}}-->
 <!--		{{/*                <select id="input-cpu" name="cpu">*/}}-->
 <!--		{{/*                    {{range .Location.CPUAllocatable}}*/}}-->
 <!--		{{/*                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>*/}}-->
@@ -517,9 +517,9 @@
 <!--		{{/*            </small>*/}}-->
 <!--		{{/*        </div>*/}}-->
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-memory">Memory allocated</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
 					{#each selectedLocation.memoryAllocatable as it}
 						<option value={it}>{format.memory(it)}</option>
@@ -551,13 +551,13 @@
 						{#each form.env as it, i}
 							<tr>
 								<td>
-									<div class="input">
+									<div class="nm-input">
 										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
 								<td class="_pdl-5">
-									<div class="input">
+									<div class="nm-input">
 										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
 									</div>
 								</td>
@@ -588,7 +588,7 @@
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="textarea _mgt-5">
+				<div class="nm-textarea _mgt-5">
 					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -612,13 +612,13 @@
 						{#each form.mountData as it, i}
 							<tr>
 								<td>
-									<div class="input">
+									<div class="nm-input">
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
 								<td class="_pdl-5">
-									<div class="textarea">
+									<div class="nm-textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>

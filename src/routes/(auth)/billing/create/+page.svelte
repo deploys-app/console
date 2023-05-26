@@ -69,32 +69,32 @@
 	</div>
 	<hr>
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Account name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" bind:value={form.name} required>
 			</div>
 		</div>
 
 		<h4 class="_mgbt-5">Billing Information</h4>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-tax_id">Tax ID</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-tax_id" bind:value={form.taxId} required>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-tax_name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-tax_name" bind:value={form.taxName} required>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-tax_address">Address</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-tax_address" bind:value={form.taxAddress} required>
 			</div>
 		</div>

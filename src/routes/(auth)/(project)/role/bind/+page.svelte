@@ -79,13 +79,13 @@
 	<hr>
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
-			<div class="input">
+		<div class="nm-field">
+			<div class="nm-input">
 				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
 			</div>
 		</div>
-		<div class="field">
-			<div class="select">
+		<div class="nm-field">
+			<div class="nm-select">
 				<select on:change={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
 					{#each roles as it}

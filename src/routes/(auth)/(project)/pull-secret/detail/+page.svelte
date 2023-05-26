@@ -58,21 +58,21 @@
 	<hr>
 
 	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" value={pullSecret.name} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-location" value={pullSecret.location} readonly disabled>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-server">Server</label>
-			<div class="input -has-icon-right">
+			<div class="nm-input -has-icon-right">
 				<input id="input-server" value={pullSecret.spec.server} readonly disabled>
 				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.server}>
@@ -80,9 +80,9 @@
 				</span>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-username">Username</label>
-			<div class="input -has-icon-right">
+			<div class="nm-input -has-icon-right">
 				<input id="input-username" value={pullSecret.spec.username} readonly disabled>
 				<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
 					data-clipboard-text={pullSecret.spec.username}>
@@ -90,9 +90,9 @@
 				</span>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-password">Password</label>
-			<div class="input -has-icon-right">
+			<div class="nm-input -has-icon-right">
 				<input id="input-password" type="password" value={pullSecret.spec.password} readonly disabled>
 				<div class="icon -is-right">
 					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _fs-6 copy"

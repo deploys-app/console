@@ -79,31 +79,31 @@
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
 		{#if id}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-email">Email</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-email" value={serviceAccount.email} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="field">
+			<div class="nm-field">
 				<label for="input-sid">ID</label>
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-sid" placeholder="ID" bind:value={sid}>
 				</div>
 			</div>
 		{/if}
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" placeholder="Name" required bind:value={name}>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-description">Description</label>
-			<div class="textarea">
+			<div class="nm-textarea">
 				<textarea id="input-description" rows="5" placeholder="Description" bind:value={desc}></textarea>
 			</div>
 		</div>

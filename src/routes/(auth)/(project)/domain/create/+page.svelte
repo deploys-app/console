@@ -62,15 +62,15 @@
 	</div>
 	<hr>
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-domain">Domain</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-domain" bind:value={form.domain}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
@@ -80,20 +80,20 @@
 			</div>
 		</div>
 
-		<div class="field _mgt-5">
+		<div class="nm-field _mgt-5">
 			<h6><strong>Advanced Settings</strong></h6>
 		</div>
 
 		{#if projectInfo.config.domainWildcard}
-			<div class="field">
-				<div class="checkbox">
+			<div class="nm-field">
+				<div class="nm-checkbox">
 					<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
 					<label for="input-wildcard">Wildcard</label>
 				</div>
 			</div>
 		{/if}
-		<div class="field">
-			<div class="checkbox">
+		<div class="nm-field">
+			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainAllowDisableCdn}>
 				<label for="input-cdn">CDN (DDoS Protection)</label>
 			</div>

@@ -58,15 +58,15 @@
 	</div>
 	<hr>
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" placeholder="name" bind:value={form.name}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it}
@@ -77,9 +77,9 @@
 				</select>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-gsa">GSA</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-gsa" placeholder="email gsa" bind:value={form.gsa}>
 			</div>
 		</div>

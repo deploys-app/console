@@ -47,7 +47,7 @@
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
 							<a href={`/service-account/create?project=${project}&id=${it.sid}`}>
-								<div class="icon-button -secondary">
+								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>

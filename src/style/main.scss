@@ -133,10 +133,138 @@ p {
 	line-height: 1.65;
 }
 
-.field > .helper {
+.nm-field > .helper {
 	color: hsl(227, 46%, 73%);
 }
 
-.input > .icon > button {
+.nm-input > .icon > button {
 	color: hsl(227, 100%, 93%);
+}
+
+*::placeholder,
+*::-moz-placeholder,
+*::webkit-input-placeholder {
+	color: rgba(255, 255, 255, .3);
+}
+
+.nm-input.-has-icon-left,
+.nm-input.-has-icon-right {
+	position: relative;
+
+	> .icon {
+		position: absolute;
+		top: 0;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 2.625rem;
+		height: 100%;
+
+		color: var(--color-gray-400);
+
+		font-size: 1rem;
+	}
+}
+
+.nm-input.-has-icon-left {
+	> input {
+		padding-left: 2.625rem;
+	}
+
+	> .icon:not(.-is-right) {
+		left: 0;
+	}
+}
+
+.nm-input.-has-icon-right {
+	> input {
+		padding-right: 2.625rem;
+	}
+
+	> .icon.-is-right {
+		right: 0;
+	}
+}
+
+input[type=number].-no-arrow {
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+
+	-moz-appearance: textfield;
+}
+
+.icon-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2rem;
+    height: 2rem;
+
+  	border: 0;
+    background-color: transparent;
+    color: white;
+
+    border-radius: 50%;
+    font-size: 12px;
+    cursor: pointer;
+
+    box-shadow: var(--raised-z8);
+
+    transition: all var(--timing-faster) ease;
+
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: var(--raised-z13);
+    }
+}
+
+pre {
+	position: relative;
+	border: none;
+	padding: 20px;
+	border-radius: 3px;
+	margin-bottom: 30px;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	background-color: hsl(var(--hsl-base-200));
+
+	.copy {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: inherit;
+		padding: 6px 10px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		user-select: none;
+		border: 0;
+		color: hsl(var(--hsl-content));
+		outline: 0;
+
+		&:hover {
+			background-color: hsl(var(--hsl-base-100));
+		}
+
+		&:hover:active {
+			background-color: hsl(var(--hsl-base-100));
+		}
+	}
+
+	code {
+		white-space: pre-wrap;
+		display: block;
+	}
+
+	&.pre-scoll {
+		min-height: 800px;
+		max-height: 800px;
+		overflow-y: auto;
+	}
 }

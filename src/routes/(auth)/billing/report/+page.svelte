@@ -120,7 +120,7 @@
 <div class="nm-panel is-level-300">
 	<div class="lo-grid-span-horizontal _g-5">
 		<div class="lo-grid-span-horizontal _g-4">
-			<div class="select">
+			<div class="nm-select">
 				<select bind:value={filter.range} on:change={fetchReport}>
 					<option value="this_month">This month</option>
 					<option value="prev_month">Prev month</option>
@@ -135,7 +135,7 @@
 	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-8">
 		<div class="_dp-f _fw-w">
 			{#each (report?.projectList ?? []) as it}
-				<div class="checkbox _mgbt-4 _mgr-5">
+				<div class="nm-checkbox _mgbt-4 _mgr-5">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} on:change={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>

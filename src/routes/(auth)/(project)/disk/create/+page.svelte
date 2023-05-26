@@ -79,20 +79,20 @@
 	<hr>
 
 	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Disk name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!disk}>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-location">Location</label>
 			{#if disk}
-				<div class="input">
+				<div class="nm-input">
 					<input id="input-location" value={form.location} readonly>
 				</div>
 			{:else}
-				<div class="select">
+				<div class="nm-select">
 					<select id="input-location" bind:value={form.location} required>
 						<option value="">Select Location</option>
 						{#each locations as it}
@@ -106,9 +106,9 @@
 				</div>
 			{/if}
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-size">Disk size (GiB)</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-size" type="number" placeholder="disk size" min="1" max="100" bind:value={form.size}>
 			</div>
 		</div>

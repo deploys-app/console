@@ -91,33 +91,33 @@
 	<hr>
 
 	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-email">Email</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-email" value={serviceAccount.email} readonly>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" value={serviceAccount.name} readonly>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-description">Description</label>
-			<div class="textarea">
+			<div class="nm-textarea">
 				<textarea id="input-description" rows="5" readonly>{serviceAccount.description}</textarea>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-created_at">Created At</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
 			</div>
 		</div>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-created_by">Created By</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
 			</div>
 		</div>
@@ -127,7 +127,7 @@
 		<h6><strong>Keys</strong></h6>
 		<div class="_dp-g _g-6 _w-100pct">
 			{#each (serviceAccount.keys ?? []) as key}
-				<div class="input -has-icon-right">
+				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
 					<button class="icon-button icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>

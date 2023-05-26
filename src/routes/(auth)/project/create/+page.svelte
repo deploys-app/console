@@ -72,23 +72,23 @@
 	<hr>
 
 	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-project">ID</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-project" placeholder="Project ID" bind:value={form.sid} readonly={!!project}>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-name">Name</label>
-			<div class="input">
+			<div class="nm-input">
 				<input id="input-name" placeholder="Project name" bind:value={form.name} required>
 			</div>
 		</div>
 
-		<div class="field">
+		<div class="nm-field">
 			<label for="input-billing_account">Billing Account</label>
-			<div class="select">
+			<div class="nm-select">
 				<select id="input-billing_account" bind:value={form.billingAccount} required>
 					<option value="" selected disabled>Select Billing Account</option>
 					{#each billingAccounts as it}
