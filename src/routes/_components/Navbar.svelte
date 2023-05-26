@@ -44,7 +44,7 @@
 
 	<div class="_dp-f _mgl-at">
 		<div class="nm-dropdown _mgl-at _mgt-at _mgbt-at">
-			<button class="nm-button is-icon-left is-size-small is-variant-secondary">
+			<button class="nm-button is-icon-left is-size-small is-variant-secondary" tabindex="0">
 				<i class="fa-solid fa-palette"></i>
 				Theme
 			</button>
