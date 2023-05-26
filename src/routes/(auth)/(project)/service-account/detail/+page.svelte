@@ -122,7 +122,7 @@
 			{#each (serviceAccount.keys ?? []) as key}
 				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
-					<button class="icon-button icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
+					<button class="icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>

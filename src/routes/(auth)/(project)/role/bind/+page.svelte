@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
 	const {
@@ -117,9 +118,7 @@
 						</td>
 					</tr>
 				{:else}
-					<tr>
-						<td class="_tal-ct _cl-text-mute" colspan="2">No data</td>
-					</tr>
+					<NoDataRow span={2} />
 				{/each}
 				</tbody>
 			</table>

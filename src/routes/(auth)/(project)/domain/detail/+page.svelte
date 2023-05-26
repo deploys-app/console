@@ -227,7 +227,7 @@
 				<label for="input-owner_name">TXT Name</label>
 				<div class="nm-input -has-icon-right _mgbt-3">
 					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
-					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
 						<i class="fa-light fa-copy"></i>
 					</span>
@@ -237,7 +237,7 @@
 				<label for="input-owner_value">TXT Value</label>
 				<div class="nm-input -has-icon-right _mgbt-3">
 					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
-					<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
 						<i class="fa-light fa-copy"></i>
 					</span>
@@ -253,7 +253,7 @@
 					<label for={`input-ssl_name_${index}`}>TXT Name</label>
 					<div class="nm-input -has-icon-right _mgbt-3">
 						<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
-						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+						<span class="icon -is-right copy"
 							data-clipboard-text={it.txtName}>
 								<i class="fa-light fa-copy"></i>
 							</span>
@@ -263,7 +263,7 @@
 					<label for={`input-ssl_value_${index}`}>TXT Value</label>
 					<div class="nm-input -has-icon-right _mgbt-3">
 						<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
-						<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+						<span class="icon -is-right copy"
 							data-clipboard-text={it.txtValue}>
 								<i class="fa-light fa-copy"></i>
 							</span>
@@ -280,7 +280,7 @@
 					{#each domain.dnsConfig.ipv4 as ip}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ip" value={ip} readonly disabled>
-							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
 								<i class="fa-light fa-copy"></i>
 							</span>
@@ -294,7 +294,7 @@
 					{#each domain.dnsConfig.ipv6 as ip}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ipv6" value={ip} readonly disabled>
-							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
 								<i class="fa-light fa-copy"></i>
 							</span>
@@ -308,7 +308,7 @@
 					{#each domain.dnsConfig.cname as cname}
 						<div class="nm-input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
-							<span class="_cl-text-mute _cl-white:hover _cs-pt _ussl-n _mgl-5 _fs-6 icon -is-right copy"
+							<span class="icon -is-right copy"
 								data-clipboard-text={cname}>
 								<i class="fa-light fa-copy"></i>
 							</span>
