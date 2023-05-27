@@ -21,6 +21,8 @@ export async function confirm ({ title, html, yes, callback }) {
 		icon: 'warning',
 		showCancelButton: true,
 		buttonsStyling: false,
+		background: 'var(--modal-panel-background)',
+		color: 'var(--modal-panel-color)',
 		confirmButtonText: yes || 'Yes',
 		customClass: {
 			confirmButton: 'nm-button is-variant-negative _mgr-6',
@@ -70,6 +72,8 @@ export async function error ({ error, callback }) {
 		title: 'Oops...',
 		html: msg,
 		icon: 'error',
+		background: 'var(--modal-panel-background)',
+		color: 'var(--modal-panel-color)',
 		customClass: {
 			actions: '_mgt-7'
 		}
@@ -87,9 +91,11 @@ export async function error ({ error, callback }) {
  * @returns {Promise<void>}
  */
 export async function success ({ content }) {
-	await Swal.fire(
-		'Success',
-		content,
-		'success'
-	)
+	await Swal.fire({
+		title: 'Success',
+		text: content,
+		icon: 'success',
+		background: 'var(--modal-panel-background)',
+		color: 'var(--modal-panel-color)'
+	})
 }

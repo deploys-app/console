@@ -82,6 +82,8 @@
 			input: 'text',
 			showCancelButton: true,
 			buttonsStyling: false,
+			background: 'var(--modal-panel-background)',
+			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Purge',
 			customClass: {
 				confirmButton: 'nm-button is-variant-negative _mgr-6',

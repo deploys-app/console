@@ -20,6 +20,8 @@
 			input: 'text',
 			showCancelButton: true,
 			buttonsStyling: false,
+			background: 'var(--modal-panel-background)',
+			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Delete',
 			customClass: {
 				confirmButton: 'nm-button is-variant-negative _mgr-6',
