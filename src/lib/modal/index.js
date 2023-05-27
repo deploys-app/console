@@ -23,8 +23,8 @@ export async function confirm ({ title, html, yes, callback }) {
 		buttonsStyling: false,
 		confirmButtonText: yes || 'Yes',
 		customClass: {
-			confirmButton: 'button _cl-white -danger _mgr-6',
-			cancelButton: 'button -negative -tertiary',
+			confirmButton: 'nm-button is-variant-negative _mgr-6',
+			cancelButton: 'nm-button is-variant-tertiary',
 			actions: '_mgt-7'
 		}
 	})

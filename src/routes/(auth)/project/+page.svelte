@@ -22,8 +22,8 @@
 			buttonsStyling: false,
 			confirmButtonText: 'Delete',
 			customClass: {
-				confirmButton: 'button _cl-white -danger _mgr-6',
-				cancelButton: 'button -negative -tertiary',
+				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				cancelButton: 'nm-button is-variant-tertiary',
 				actions: '_mgt-7'
 			},
 			preConfirm: (input) => input === project

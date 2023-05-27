@@ -84,8 +84,8 @@
 			buttonsStyling: false,
 			confirmButtonText: 'Purge',
 			customClass: {
-				confirmButton: 'button _cl-white -danger _mgr-6',
-				cancelButton: 'button -negative -tertiary',
+				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				cancelButton: 'nm-button is-variant-tertiary',
 				actions: '_mgt-7'
 			}
 		})
