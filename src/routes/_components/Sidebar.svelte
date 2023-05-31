@@ -117,7 +117,8 @@
 				<strong>CURRENT PROJECT</strong>
 			</small>
 
-			<div class="project-box _cs-pt" on:click={openProjectModal} on:keypress={openProjectModal}>
+			<div class="project-box _cs-pt" role="button" tabindex="0"
+				on:click={openProjectModal} on:keypress={openProjectModal}>
 				<span>
 					{#if project}
 						{projectName}

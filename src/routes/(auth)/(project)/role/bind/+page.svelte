@@ -111,7 +111,7 @@
 					<tr>
 						<td>{it}</td>
 						<td>
-							<div class="icon-button"
+							<div class="icon-button" role="button" tabindex="0"
 								on:click={() => removeRole(it)} on:keypress={() => removeRole(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</div>

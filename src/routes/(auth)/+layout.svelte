@@ -40,7 +40,8 @@
 	</div>
 
 	<div class="sidebar-wrapper _zid-2">
-		<div class="sidebar-backdrop" on:click={hideSidebar} on:keypress={hideSidebar}></div>
+		<div class="sidebar-backdrop" role="button" tabindex="0"
+			on:click={hideSidebar} on:keypress={hideSidebar}></div>
 		<Sidebar {projects} on:openProjectModal={() => projectModal.open()} />
 	</div>
 
