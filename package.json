@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@nomimono/nomimono-css": "^0.4.15",
+    "@sveltejs/adapter-cloudflare": "^2.3.0",
     "@sveltejs/adapter-node": "^1.2.4",
     "@sveltejs/kit": "=1.20.0",
     "clipboard": "^2.0.11",
