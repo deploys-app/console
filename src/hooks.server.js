@@ -1,12 +1,12 @@
-import * as Sentry from '@sentry/sveltekit'
+// import * as Sentry from '@sentry/sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
-import { env } from '$env/dynamic/public'
+// import { env } from '$env/dynamic/public'
 
-if (env.PUBLIC_SENTRY_DSN) {
-	Sentry.init({
-		dsn: env.PUBLIC_SENTRY_DSN
-	})
-}
+// if (env.PUBLIC_SENTRY_DSN) {
+//  Sentry.init({
+//     dsn: env.PUBLIC_SENTRY_DSN
+//  })
+// }
 
 const allowTheme = {
 	dark: true,
@@ -51,9 +51,9 @@ function storeProject ({ event, resolve }) {
 }
 
 export const handle = sequence(
-	Sentry.sentryHandle(),
+	// Sentry.sentryHandle(),
 	theme,
 	handleCookie,
 	storeProject
 )
-export const handleError = Sentry.handleErrorWithSentry()
+// export const handleError = Sentry.handleErrorWithSentry()
