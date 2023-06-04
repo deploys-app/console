@@ -98,10 +98,8 @@
 	}
 
 	.social > a {
-		background-color: hsl(226, 30%, 52%);
-
 		&:hover {
-			background-color: hsl(226, 30%, 46%);
+			background-color: hsl(var(--hsl-base-200));
 		}
 	}
 </style>
