@@ -218,13 +218,10 @@ input[type=number].-no-arrow {
 	font-size: 12px;
 	cursor: pointer;
 
-	box-shadow: var(--raised-z8);
-
 	transition: all var(--timing-faster) ease;
 
 	&:hover {
 		transform: scale(1.1);
-		box-shadow: var(--raised-z13);
 	}
 }
 
