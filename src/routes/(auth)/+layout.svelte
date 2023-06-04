@@ -21,7 +21,7 @@
 
 	onMount(() => {
 		api.setOnUnauth(() => {
-			goto('/auth/signin')
+			location.reload()
 		})
 	})
 
