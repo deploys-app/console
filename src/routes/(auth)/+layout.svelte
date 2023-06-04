@@ -3,7 +3,6 @@
 	import Navbar from '../_components/Navbar.svelte'
 	import Sidebar from '../_components/Sidebar.svelte'
 	import { page } from '$app/stores'
-	import { goto } from '$app/navigation'
 	import api from '$lib/api'
 	import { onMount } from 'svelte'
 	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
