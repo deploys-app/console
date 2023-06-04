@@ -17,6 +17,9 @@ const config = {
 		alias: {
 			$style: './src/style',
 			$types: './src/types'
+		},
+		version: {
+			pollInterval: 60 * 1000 // 1 min
 		}
 	}
 }
