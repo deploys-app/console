@@ -15,27 +15,18 @@ export function init () {
 		colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798bf', '#aaeeee', '#ff0066',
 			'#eeaaee', '#55bf3b', '#df5353', '#7798bf', '#aaeeee'],
 		chart: {
-			backgroundColor: {
-				linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
-				stops: [
-					[0, 'rgba(0, 0, 0, 0.2)'],
-					[1, 'rgba(0, 0, 0, 0.2)']
-				]
-			},
-			style: {
-				fontFamily: '\'Unica One\', sans-serif'
-			},
+			backgroundColor: 'hsl(var(--hsl-base-200))',
 			plotBorderColor: '#606063'
 		},
 		title: {
 			style: {
-				color: '#e0e0e3',
+				color: 'hsl(var(--hsl-content))',
 				fontSize: '20px'
 			}
 		},
 		subtitle: {
 			style: {
-				color: '#e0e0e3',
+				color: 'hsl(var(--hsl-content))',
 				textTransform: 'uppercase'
 			}
 		},
@@ -43,7 +34,7 @@ export function init () {
 			gridLineColor: '#707073',
 			labels: {
 				style: {
-					color: '#e0e0e3'
+					color: 'hsl(var(--hsl-content))'
 				}
 			},
 			lineColor: '#707073',
@@ -60,7 +51,7 @@ export function init () {
 			gridLineColor: '#707073',
 			labels: {
 				style: {
-					color: '#e0e0e3'
+					color: 'hsl(var(--hsl-content))'
 				}
 			},
 			lineColor: '#707073',
@@ -103,15 +94,14 @@ export function init () {
 			}
 		},
 		legend: {
-			backgroundColor: 'rgba(0, 0, 0, 0.3)',
 			itemStyle: {
-				color: '#e0e0e3'
+				color: 'hsl(var(--hsl-content))'
 			},
 			itemHoverStyle: {
-				color: '#fff'
+				color: 'hsl(var(--hsl-content)/0.8)'
 			},
 			itemHiddenStyle: {
-				color: '#606063'
+				color: 'hsl(var(--hsl-content)/0.4)'
 			},
 			title: {
 				style: {
