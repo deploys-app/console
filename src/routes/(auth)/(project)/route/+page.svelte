@@ -50,6 +50,7 @@
 				<th>Route</th>
 				<th>Target</th>
 				<th>Location</th>
+				<th>Config</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
 				<th class="is-collapse is-align-right"></th>
@@ -57,7 +58,7 @@
 			</thead>
 			<tbody>
 			{#if $loading}
-				<LoadingRow span={4} />
+				<LoadingRow span={5} />
 			{:else}
 				{#each routes as it}
 					<tr>
@@ -66,6 +67,11 @@
 						</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>
+						<td>
+							{#if it.config.basicAuth}
+								<i class="fa-solid fa-lock"></i>
+							{/if}
+						</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
@@ -75,7 +81,7 @@
 						</td>
 					</tr>
 				{:else}
-					<NoDataRow span={4} forbidden={!permission.routes} />
+					<NoDataRow span={5} forbidden={!permission.routes} />
 				{/each}
 			{/if}
 			</tbody>

@@ -14,7 +14,15 @@
 		path: '',
 		location: '',
 		targetPrefix: '',
-		targetValue: ''
+		targetValue: '',
+		config: {
+			enableBasicAuth: false,
+			basicAuth: {
+				user: '',
+				password: ''
+			}
+			// TODO: add forwardAuth
+		}
 	}
 
 	$: targetPlaceholder = {
@@ -86,7 +94,13 @@
 				location: form.location,
 				domain,
 				path: form.path,
-				target: `${form.targetPrefix}${form.targetValue}`
+				target: `${form.targetPrefix}${form.targetValue}`,
+				config: {
+					basicAuth: form.config.enableBasicAuth ? {
+						user: form.config.basicAuth.user,
+						password: form.config.basicAuth.password
+					} : null
+				}
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -193,6 +207,35 @@
 					</div>
 				</div>
 			{/if}
+
+			<div class="nm-field _mgt-5">
+				<h6><strong>Advanced Settings</strong></h6>
+			</div>
+
+			<div class="nm-field">
+				<div class="nm-checkbox">
+					<input id="input-enable_basic_auth" type="checkbox" bind:checked={form.config.enableBasicAuth}>
+					<label for="input-enable_basic_auth">Basic Auth</label>
+				</div>
+			</div>
+
+			{#if form.config.enableBasicAuth}
+				<div class="nm-field">
+					<label for="input-basic_auth_user">User</label>
+					<div class="nm-input">
+						<input id="input-basic_auth_user" bind:value={form.config.basicAuth.user} required>
+					</div>
+				</div>
+
+				<div class="nm-field">
+					<label for="input-basic_auth_password">Password</label>
+					<div class="nm-input">
+						<input id="input-basic_auth_password" type="password" bind:value={form.config.basicAuth.password} required>
+					</div>
+				</div>
+			{/if}
+
+			<hr>
 
 			<button class="nm-button _mgr-at" class:is-loading={saving}>Save</button>
 		{/if}

@@ -83,6 +83,10 @@ export interface Route {
 }
 
 export interface RouteConfig {
+	basicAuth?: {
+		user: string
+		password: string
+	}
 	forwardAuth?: {
 		target: string
 		authRequestHeaders: string[]
