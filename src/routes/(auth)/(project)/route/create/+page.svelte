@@ -96,10 +96,12 @@
 				path: form.path,
 				target: `${form.targetPrefix}${form.targetValue}`,
 				config: {
-					basicAuth: form.config.enableBasicAuth ? {
-						user: form.config.basicAuth.user,
-						password: form.config.basicAuth.password
-					} : null
+					basicAuth: form.config.enableBasicAuth
+						? {
+							user: form.config.basicAuth.user,
+							password: form.config.basicAuth.password
+						}
+						: null
 				}
 			}, fetch)
 			if (!resp.ok) {
