@@ -38,7 +38,7 @@
 
 <dialog bind:this={dialog} on:click|self={close} aria-hidden="true">
 	<div class="panel">
-		<div class="close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
+		<div class="close" on:click|self={close} on:keypress={close}>✕</div>
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
@@ -60,7 +60,6 @@
 						</td>
 						<td>
 							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
-								tabindex="0" role="link"
 								class="_tdcrt-udl _cs-pt _cl-primary:hover"
 								style="font-weight: 500">
 								{it.name}
