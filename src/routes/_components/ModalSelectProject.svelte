@@ -6,7 +6,9 @@
 	export let projects
 
 	$: project = $page.url.searchParams.get('project')
-	let isActive = false
+
+	/** @type {HTMLDialogElement} */
+	let dialog
 
 	/**
 	 * @param {string} sid
@@ -26,17 +28,17 @@
 	}
 
 	export function open () {
-		isActive = true
+		dialog.showModal()
 	}
 
 	function close () {
-		isActive = false
+		dialog.close()
 	}
 </script>
 
-<div class="nm-modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
-	<div class="nm-modal-panel">
-		<div class="nm-modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
+<dialog bind:this={dialog} on:click|self={close} aria-hidden="true">
+	<div class="panel">
+		<div class="close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
@@ -71,7 +73,7 @@
 			</table>
 		</div>
 	</div>
-</div>
+</dialog>
 
 <style lang="scss">
 	.nm-table-container {
@@ -84,7 +86,7 @@
 		padding-bottom: 0.5rem;
 	}
 
-	.nm-modal-panel {
+	.panel {
 		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
 		width: 100%;
 		max-width: 48rem;

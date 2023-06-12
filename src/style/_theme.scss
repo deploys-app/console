@@ -127,7 +127,7 @@
 		0 4rem 4rem hsl(var(--bsd-hsl) / 0.15);
   }
 
-[data-theme=dark] {
+[data-theme=dark], ::backdrop {
 	--lo-container-side-padding: 24px;
 	--lo-page-aside-content--aside-width: 18.75rem;
 	--form-element-small-font-size: 0.75rem;
@@ -183,7 +183,7 @@
 	--modal-panel-background: hsl(var(--hsl-base-300));
 }
 
-[data-theme=light] {
+[data-theme=light], ::backdrop {
 	--hue-primary: 333;
 	--hsl-primary: var(--hue-primary) 80% 65%;
 	--hsl-primary-active: var(--hue-primary) 80% 58%;
