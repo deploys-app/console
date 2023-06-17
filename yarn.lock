@@ -235,10 +235,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.42.0":
-  version: 8.42.0
-  resolution: "@eslint/js@npm:8.42.0"
-  checksum: 750558843ac458f7da666122083ee05306fc087ecc1e5b21e7e14e23885775af6c55bcc92283dff1862b7b0d8863ec676c0f18c7faf1219c722fe91a8ece56b6
+"@eslint/js@npm:8.43.0":
+  version: 8.43.0
+  resolution: "@eslint/js@npm:8.43.0"
+  checksum: 580487a09c82ac169744d36e4af77bc4f582c9a37749d1e9481eb93626c8f3991b2390c6e4e69e5642e3b6e870912b839229a0e23594fae348156ea5a8ed7e2e
   languageName: node
   linkType: hard
 
@@ -332,10 +332,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomimono/nomimono-css@npm:^0.4.15":
-  version: 0.4.15
-  resolution: "@nomimono/nomimono-css@npm:0.4.15"
-  checksum: eadef2779a54fc5fa228148e84e21e0e0d70a40c1cb9356d7ac2e79b991e18521a011b95b055a004780e76b25293a9e088856f2356218b9561c0744dd53c8f93
+"@nomimono/nomimono-css@npm:^0.4.16":
+  version: 0.4.16
+  resolution: "@nomimono/nomimono-css@npm:0.4.16"
+  checksum: 7077ff2295ba13c0893bf6a4d2dc374f423c7c08b847b203d43ccc3e8c1c5ab69db37cb17fb8a528526315492c8400e2eb93964728d4dee779a0516a59ae4351
   languageName: node
   linkType: hard
 
@@ -446,17 +446,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/browser@npm:7.54.0":
-  version: 7.54.0
-  resolution: "@sentry/browser@npm:7.54.0"
+"@sentry-internal/tracing@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry-internal/tracing@npm:7.55.2"
   dependencies:
-    "@sentry-internal/tracing": 7.54.0
-    "@sentry/core": 7.54.0
-    "@sentry/replay": 7.54.0
-    "@sentry/types": 7.54.0
-    "@sentry/utils": 7.54.0
+    "@sentry/core": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
     tslib: ^1.9.3
-  checksum: b466c069954b61aefd6b165937c0fc2055ac4dcb80e739b4f600224b008139232948dd1e1a67f4f660fa04b8c0fe29b33574709302ef825945721286b81da52a
+  checksum: 6295a1a63ae45f46e70d8528154b21ea240ab008d4555a39f6bfe91752cfc7c2f1c50912d3a687877bffa7b327b7af1f19f5ecf95d623717d60187310f226c1c
+  languageName: node
+  linkType: hard
+
+"@sentry/browser@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/browser@npm:7.55.2"
+  dependencies:
+    "@sentry-internal/tracing": 7.55.2
+    "@sentry/core": 7.55.2
+    "@sentry/replay": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
+    tslib: ^1.9.3
+  checksum: 0608e538115313c47449aef9e4f5a582114017dc40ecdd4acac2d660e454ffcc85d63eb5226f25206ada039fbb9455500e86ac207a8a9ab484102418fc9a83b8
   languageName: node
   linkType: hard
 
@@ -502,19 +514,46 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/integrations@npm:7.54.0":
-  version: 7.54.0
-  resolution: "@sentry/integrations@npm:7.54.0"
+"@sentry/core@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/core@npm:7.55.2"
   dependencies:
-    "@sentry/types": 7.54.0
-    "@sentry/utils": 7.54.0
-    localforage: ^1.8.1
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
     tslib: ^1.9.3
-  checksum: 4a6c9de543dbee324cf1c7908e481b024943c6a66eafec4fe569aea3fc9be183fe1b4147076e90e704fc12f1ef8b975b0a6e00e3bd782988551d2ed8064eadc9
+  checksum: 3f31d14622725a76322f025ffb09186872e856e3783b99a9fa211cf93b22329011a21f5b4f4dd4bcbc9b15bbfc3a867b18303b7b4da3b282b5a677b9d568f6fe
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:7.54.0, @sentry/node@npm:^7.19.0":
+"@sentry/integrations@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/integrations@npm:7.55.2"
+  dependencies:
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
+    localforage: ^1.8.1
+    tslib: ^1.9.3
+  checksum: ccb315c9a9399400962e3c56182f754aeb4511bffffd2a1c14cb443a9180170dddc1ea91f8e732f17c750c231a16e9e2bc09662d5c9e66239a2a5f76ee280715
+  languageName: node
+  linkType: hard
+
+"@sentry/node@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/node@npm:7.55.2"
+  dependencies:
+    "@sentry-internal/tracing": 7.55.2
+    "@sentry/core": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
+    cookie: ^0.4.1
+    https-proxy-agent: ^5.0.0
+    lru_map: ^0.3.3
+    tslib: ^1.9.3
+  checksum: 723f0b88a02e8f72f59fae931f07e980fad2ae23b6201b14e16d87cc546b75a0153160256fa9143f2c0e100004eb63f23c59305ec0281df0ed68296f1ccf1705
+  languageName: node
+  linkType: hard
+
+"@sentry/node@npm:^7.19.0":
   version: 7.54.0
   resolution: "@sentry/node@npm:7.54.0"
   dependencies:
@@ -530,49 +569,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/replay@npm:7.54.0":
-  version: 7.54.0
-  resolution: "@sentry/replay@npm:7.54.0"
+"@sentry/replay@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/replay@npm:7.55.2"
   dependencies:
-    "@sentry/core": 7.54.0
-    "@sentry/types": 7.54.0
-    "@sentry/utils": 7.54.0
-  checksum: ae6537fbe3a47993d247a92291ea0b70e53ee2289c648fef9ca1aca0c7cd841d2308240b9eb7df6f8e411eb602693e90b4f945f8e985c5f1e8047471cf2c3dfe
+    "@sentry/core": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
+  checksum: 30532baca2a678857f9a451d747b5cfbf57f4803c0fea8e48b912106d223cba650df6a7cc0168c119e70caa4b73cf854e82bf02bc735aac8ea4e062ae25aaac9
   languageName: node
   linkType: hard
 
-"@sentry/svelte@npm:7.54.0":
-  version: 7.54.0
-  resolution: "@sentry/svelte@npm:7.54.0"
+"@sentry/svelte@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/svelte@npm:7.55.2"
   dependencies:
-    "@sentry/browser": 7.54.0
-    "@sentry/types": 7.54.0
-    "@sentry/utils": 7.54.0
+    "@sentry/browser": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
     magic-string: ^0.30.0
     tslib: ^1.9.3
   peerDependencies:
-    svelte: 3.x
-  checksum: 87731e9068523e0b633c5fa22c1c890af26f0604d1c13dadef600059bedab0de7e7e7a8e03a4e04dedfaf84a0fc4162184727df00fa39d47115bbe437eda2d57
+    svelte: 3.x || 4.x
+  checksum: 8fcd6cbd603eaaa4f992994ce9a3bef1377a758bc6f007e697377fe41c17c81babbd33ac82cde7deb1d39024623588dec4ce545a602f6d3e145fdff1599493f6
   languageName: node
   linkType: hard
 
-"@sentry/sveltekit@npm:^7.54.0":
-  version: 7.54.0
-  resolution: "@sentry/sveltekit@npm:7.54.0"
+"@sentry/sveltekit@npm:^7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/sveltekit@npm:7.55.2"
   dependencies:
-    "@sentry-internal/tracing": 7.54.0
-    "@sentry/core": 7.54.0
-    "@sentry/integrations": 7.54.0
-    "@sentry/node": 7.54.0
-    "@sentry/svelte": 7.54.0
-    "@sentry/types": 7.54.0
-    "@sentry/utils": 7.54.0
+    "@sentry-internal/tracing": 7.55.2
+    "@sentry/core": 7.55.2
+    "@sentry/integrations": 7.55.2
+    "@sentry/node": 7.55.2
+    "@sentry/svelte": 7.55.2
+    "@sentry/types": 7.55.2
+    "@sentry/utils": 7.55.2
     "@sentry/vite-plugin": ^0.6.0
     magicast: 0.2.8
     sorcery: 0.11.0
   peerDependencies:
     "@sveltejs/kit": 1.x
-  checksum: fa93ae90de25e96d17726f56958c0ddb13434450691ad3825f353fc56fc1f45b79e50301472bc468b119beaeb20bf24fa770b5e0f52a397d80f2499730f1c91f
+  checksum: 6f40c002f5f193ec0343199f8e7a1fc1a7bd609c9af8c3f9113deda45e52efc7c6a25318bd8adecccd12fa66a94c2bd8ce646fd2459cc3141d54a02b8bbf5cb6
   languageName: node
   linkType: hard
 
@@ -592,6 +631,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sentry/types@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/types@npm:7.55.2"
+  checksum: 37ca4043dd88e05ea104172e7b0aa39e802f71c01ab3bcc31beb5ef25bccfa98fe1305e57cc929d65cdc59f0da6d71e464556a0309379371e5e350f6866cbf3c
+  languageName: node
+  linkType: hard
+
 "@sentry/utils@npm:7.54.0":
   version: 7.54.0
   resolution: "@sentry/utils@npm:7.54.0"
@@ -599,6 +645,16 @@ __metadata:
     "@sentry/types": 7.54.0
     tslib: ^1.9.3
   checksum: 8daadba6b0cbe3dc4c42284dbc14ada730f3dd75a050cb3827ef7e173a9f7e06cdbe52ab1e20941841320c6c4cc3d8c969f0da78650e8426e161707450087717
+  languageName: node
+  linkType: hard
+
+"@sentry/utils@npm:7.55.2":
+  version: 7.55.2
+  resolution: "@sentry/utils@npm:7.55.2"
+  dependencies:
+    "@sentry/types": 7.55.2
+    tslib: ^1.9.3
+  checksum: efcb02ea9d49de7f754f7e9e42a8f5e882aad4d106ba2a3394706d6fc7b7ea74b86d66595da51f026cdde4b6743963ec3b3a7cb2e870354ac1009d7fa9159476
   languageName: node
   linkType: hard
 
@@ -638,9 +694,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.20.2":
-  version: 1.20.2
-  resolution: "@sveltejs/kit@npm:1.20.2"
+"@sveltejs/kit@npm:=1.20.4":
+  version: 1.20.4
+  resolution: "@sveltejs/kit@npm:1.20.4"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^2.4.1
     "@types/cookie": ^0.5.1
@@ -653,14 +709,13 @@ __metadata:
     sade: ^1.8.1
     set-cookie-parser: ^2.6.0
     sirv: ^2.0.2
-    tiny-glob: ^0.2.9
     undici: ~5.22.0
   peerDependencies:
     svelte: ^3.54.0 || ^4.0.0-next.0
     vite: ^4.0.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: 084c62423c7ba480dbba69c9578cced1e27c44cd06b372a3f1f9422790ed975cb036ee2bbb8bad8812767135cdeae04b2bfba425e102b26156ee1c23fddde1d2
+  checksum: 957e19c4afa9c7c9d09dedf7cc1f596fdac06a84db9f406bab618f8b7dabbc906938f63b86a57560ee9cafee63f117d96235ad67e2431fc36e307c60f378fc3d
   languageName: node
   linkType: hard
 
@@ -1094,21 +1149,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "console@workspace:."
   dependencies:
-    "@nomimono/nomimono-css": ^0.4.15
-    "@sentry/sveltekit": ^7.54.0
+    "@nomimono/nomimono-css": ^0.4.16
+    "@sentry/sveltekit": ^7.55.2
     "@sveltejs/adapter-cloudflare": ^2.3.0
     "@sveltejs/adapter-node": ^1.2.4
-    "@sveltejs/kit": =1.20.2
+    "@sveltejs/kit": =1.20.4
     clipboard: ^2.0.11
     dayjs: ^1.11.8
-    eslint: ^8.42.0
+    eslint: ^8.43.0
     eslint-plugin-svelte3: ^4.0.0
     gravatar-url: ^4.0.1
     highcharts: ^11.1.0
     js-cookie: ^3.0.5
     prettier: ^2.8.8
     prettier-plugin-svelte: ^2.10.1
-    sass: ^1.63.3
+    sass: ^1.63.4
     svelte: ^3.59.1
     svelte-check: ^3.4.3
     svelte-preprocess: ^5.0.4
@@ -1386,14 +1441,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.42.0":
-  version: 8.42.0
-  resolution: "eslint@npm:8.42.0"
+"eslint@npm:^8.43.0":
+  version: 8.43.0
+  resolution: "eslint@npm:8.43.0"
   dependencies:
     "@eslint-community/eslint-utils": ^4.2.0
     "@eslint-community/regexpp": ^4.4.0
     "@eslint/eslintrc": ^2.0.3
-    "@eslint/js": 8.42.0
+    "@eslint/js": 8.43.0
     "@humanwhocodes/config-array": ^0.11.10
     "@humanwhocodes/module-importer": ^1.0.1
     "@nodelib/fs.walk": ^1.2.8
@@ -1431,7 +1486,7 @@ __metadata:
     text-table: ^0.2.0
   bin:
     eslint: bin/eslint.js
-  checksum: 07105397b5f2ff4064b983b8971e8c379ec04b1dfcc9d918976b3e00377189000161dac991d82ba14f8759e466091b8c71146f602930ca810c290ee3fcb3faf0
+  checksum: 55654ce00b0d128822b57526e40473d0497c7c6be3886afdc0b41b6b0dfbd34d0eae8159911b18451b4db51a939a0e6d2e117e847ae419086884fc3d4fe23c7c
   languageName: node
   linkType: hard
 
@@ -1732,20 +1787,6 @@ __metadata:
   dependencies:
     type-fest: ^0.20.2
   checksum: ad1ecf914bd051325faad281d02ea2c0b1df5d01bd94d368dcc5513340eac41d14b3c61af325768e3c7f8d44576e72780ec0b6f2d366121f8eec6e03c3a3b97a
-  languageName: node
-  linkType: hard
-
-"globalyzer@npm:0.1.0":
-  version: 0.1.0
-  resolution: "globalyzer@npm:0.1.0"
-  checksum: 419a0f95ba542534fac0842964d31b3dc2936a479b2b1a8a62bad7e8b61054faa9b0a06ad9f2e12593396b9b2621cac93358d9b3071d33723fb1778608d358a1
-  languageName: node
-  linkType: hard
-
-"globrex@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "globrex@npm:0.1.2"
-  checksum: adca162494a176ce9ecf4dd232f7b802956bb1966b37f60c15e49d2e7d961b66c60826366dc2649093cad5a0d69970cfa8875bd1695b5a1a2f33dcd2aa88da3c
   languageName: node
   linkType: hard
 
@@ -2963,16 +3004,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.63.3":
-  version: 1.63.3
-  resolution: "sass@npm:1.63.3"
+"sass@npm:^1.63.4":
+  version: 1.63.4
+  resolution: "sass@npm:1.63.4"
   dependencies:
     chokidar: ">=3.0.0 <4.0.0"
     immutable: ^4.0.0
     source-map-js: ">=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: 41d1d7e875be738a8b5ef92bc722b20fd88f9fc8db61caa17dec37e0a53739cf28dc3b79481b1998c410c82c30247f473c2559e64cec7c4d851e5cea0434ec4e
+  checksum: 12bde5beff85a7018157d90c8b9d5aec8b56832f89fcfeca146f10936eecf97e669d22fd41f812b3407ed259bbb114d69c9ecbfc7ee9b15308211fb910cdf5eb
   languageName: node
   linkType: hard
 
@@ -3289,16 +3330,6 @@ __metadata:
   version: 2.1.0
   resolution: "tiny-emitter@npm:2.1.0"
   checksum: fbcfb5145751a0e3b109507a828eb6d6d4501352ab7bb33eccef46e22e9d9ad3953158870a6966a59e57ab7c3f9cfac7cab8521db4de6a5e757012f4677df2dd
-  languageName: node
-  linkType: hard
-
-"tiny-glob@npm:^0.2.9":
-  version: 0.2.9
-  resolution: "tiny-glob@npm:0.2.9"
-  dependencies:
-    globalyzer: 0.1.0
-    globrex: ^0.1.2
-  checksum: aea5801eb6663ddf77ebb74900b8f8bd9dfcfc9b6a1cc8018cb7421590c00bf446109ff45e4b64a98e6c95ddb1255a337a5d488fb6311930e2a95334151ec9c6
   languageName: node
   linkType: hard
 
