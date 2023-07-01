@@ -66,7 +66,7 @@ function wrapInvalidate (fn) {
  * callback can return a number to override the interval for only the next call
  * @param {() => Promise<number | void>} callback
  * @param {number} interval
- * @returns {Function}
+ * @returns {() => void}
  */
 function intervalInvalidate (callback, interval) {
 	let p

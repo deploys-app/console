@@ -1,5 +1,5 @@
-declare namespace svelte.JSX {
+declare namespace svelteHTML {
 	interface HTMLAttributes<T> {
-		'onsidebar:toggle': () => void
+		'on:sidebar:toggle'?: () => void
 	}
 }
