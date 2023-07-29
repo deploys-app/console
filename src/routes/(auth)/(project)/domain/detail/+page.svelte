@@ -253,9 +253,9 @@
 
 			{#if domain.verification.ssl.dcv.name}
 				<div class="nm-field">
-					<label for={`input-ssl_dcv_name`}>CNAME Name</label>
+					<label for="input-ssl_dcv_name">CNAME Name</label>
 					<div class="nm-input -has-icon-right _mgbt-3">
-						<input id={`input-ssl_dcv_name`} value={domain.verification.ssl.dcv.name} readonly disabled>
+						<input id="input-ssl_dcv_name" value={domain.verification.ssl.dcv.name} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.name}>
 								<i class="fa-light fa-copy"></i>
@@ -263,9 +263,9 @@
 					</div>
 				</div>
 				<div class="nm-field">
-					<label for={`input-ssl_dcv_value`}>CNAME Value</label>
+					<label for="input-ssl_dcv_value">CNAME Value</label>
 					<div class="nm-input -has-icon-right _mgbt-3">
-						<input id={`input-ssl_dcv_value`} value={domain.verification.ssl.dcv.value} readonly disabled>
+						<input id="input-ssl_dcv_value" value={domain.verification.ssl.dcv.value} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.value}>
 								<i class="fa-light fa-copy"></i>
