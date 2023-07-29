@@ -123,6 +123,10 @@ export interface Domain {
 		}
 		ssl: {
 			pending: boolean
+			dcv: {
+				name: string
+				value: string
+			}
 			records: {
 				txtName: string
 				txtValue: string
