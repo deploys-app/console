@@ -40,7 +40,6 @@ export interface ProjectQuota {
 
 export interface ProjectConfig {
 	domainAllowDisableCdn: boolean
-	domainWildcard: boolean
 }
 
 export interface BillingAccount {

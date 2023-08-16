@@ -14,7 +14,7 @@
 		domain: '',
 		location: '',
 		cdn: true,
-		wildcard: false
+		wildcard: true
 	}
 
 	let saving = false
@@ -84,14 +84,12 @@
 			<h6><strong>Advanced Settings</strong></h6>
 		</div>
 
-		{#if projectInfo.config.domainWildcard}
-			<div class="nm-field">
-				<div class="nm-checkbox">
-					<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
-					<label for="input-wildcard">Wildcard</label>
-				</div>
+		<div class="nm-field">
+			<div class="nm-checkbox">
+				<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
+				<label for="input-wildcard">Wildcard</label>
 			</div>
-		{/if}
+		</div>
 		<div class="nm-field">
 			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainAllowDisableCdn}>
