@@ -13,6 +13,8 @@
 	/** @typedef {Object} Series */
 	/** @property {string} prefix */
 	/** @property {Array} lines */
+	/** @property {string?} dashStyle */
+	/** @property {string?} color */
 
 	/** @type {Series[]} */
 	export let series
@@ -54,12 +56,12 @@
 	$: {
 		if (series?.length === 0) clear()
 		series?.forEach((s) => {
-			update(s.prefix, s.lines)
+			update(s.prefix, s.lines, s.dashStyle, s.color)
 		})
 		chart?.redraw()
 	}
 
-	function update (name, lines) {
+	function update (name, lines, dashStyle, color) {
 		if (!browser || !chart) return
 		if (!lines) lines = []
 
@@ -80,7 +82,9 @@
 				marker: {
 					enabled: false
 				},
-				data
+				data,
+				dashStyle,
+				color
 			}, false)
 		})
 	}
