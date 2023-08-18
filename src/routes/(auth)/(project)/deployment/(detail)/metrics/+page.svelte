@@ -45,11 +45,13 @@
 			}
 
 			cpu = [
-				{ prefix: 'Usage', lines: resp.result.cpuUsage ?? [] }
+				{ prefix: 'Usage', lines: resp.result.cpuUsage ?? [] },
+				{ prefix: 'Limit', lines: resp.result.cpuLimit ?? [] }
 			]
 			memory = [
 				{ prefix: 'Usage', lines: resp.result.memoryUsage ?? [] },
-				{ prefix: 'Allocated', lines: resp.result.memory ?? [] }
+				{ prefix: 'Allocated', lines: resp.result.memory ?? [] },
+				{ prefix: 'Limit', lines: resp.result.memoryLimit ?? [] }
 			]
 			if (deployment.type === 'WebService') {
 				request = [
