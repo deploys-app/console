@@ -11,7 +11,7 @@
 	const reloadInterval = 60 * 1000 // 1m
 
 	const filter = {
-		range: $page.url.searchParams.get('range') || '1h'
+		range: $page.url.searchParams.get('range') || '1hagg'
 	}
 
 	let cpu = []
