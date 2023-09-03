@@ -481,35 +481,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry-internal/tracing@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry-internal/tracing@npm:7.64.0"
+"@sentry-internal/tracing@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry-internal/tracing@npm:7.66.0"
   dependencies:
-    "@sentry/core": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry/core": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     tslib: ^2.4.1 || ^1.9.3
-  checksum: 74601ec707867e536e226fd86544024bd1a07d5e8374f8d036a9570920aba4354dd3be185c1c02a6e72bb1ecd4a30b98b0b76f0016d7781864804a6105641029
+  checksum: 8eb427edf613df808b8e1030d0bf021af6a2e5d52930bb9561efe032a7b37c18af5c69b75017d667070bb987981bc2d9a40c7feaa646e23297bfec9a22853cd2
   languageName: node
   linkType: hard
 
-"@sentry/browser@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/browser@npm:7.64.0"
+"@sentry/browser@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/browser@npm:7.66.0"
   dependencies:
-    "@sentry-internal/tracing": 7.64.0
-    "@sentry/core": 7.64.0
-    "@sentry/replay": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry-internal/tracing": 7.66.0
+    "@sentry/core": 7.66.0
+    "@sentry/replay": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     tslib: ^2.4.1 || ^1.9.3
-  checksum: 759b5289fb6b3707027bb14c1458e296fb17d98b5444b64b5e098f4d0939da47fb53ff912c3023d33c8cd952d4343eeaf9d86f7ecc6844ac35a8a28f2b436061
+  checksum: c3530289f31514fcd6ac1009dc7fd3fc28a378d9bd11ed6f9acdc02729119287810ced25bf53eaa64983ab04558ce234d9938f6dc4e42f079da3eebb94939b64
   languageName: node
   linkType: hard
 
-"@sentry/bundler-plugin-core@npm:0.6.0":
-  version: 0.6.0
-  resolution: "@sentry/bundler-plugin-core@npm:0.6.0"
+"@sentry/bundler-plugin-core@npm:0.6.1":
+  version: 0.6.1
+  resolution: "@sentry/bundler-plugin-core@npm:0.6.1"
   dependencies:
     "@sentry/cli": ^2.17.0
     "@sentry/node": ^7.19.0
@@ -519,7 +519,7 @@ __metadata:
     magic-string: 0.27.0
     unplugin: 1.0.1
     webpack-sources: 3.2.3
-  checksum: cad9dd32e9858306058f1543174187d6f65ecdcc572ce19ae34c553303ca7b6c32be64acf7d1ab60d283b232b936fa5fe248c9565a04bb9e1b157bdcdf28d4b5
+  checksum: 9dfeadcbeaf2b9830257102f2722a1a901ea663747db11683f517c1e809e7e9f712676d8709ddc071297269596dfa799a1178378b1b0dd16e235d6c0cacc2262
   languageName: node
   linkType: hard
 
@@ -549,42 +549,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/core@npm:7.64.0"
+"@sentry/core@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/core@npm:7.66.0"
   dependencies:
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     tslib: ^2.4.1 || ^1.9.3
-  checksum: 62834e0c0dbf58a743ac956157c81ebfb8ba35a0b2558a9787e172b081c5fa3d4a80c13c3c56797de8139c7aa324ed4baf54946136ba7d624c17e4f0bbc38c5a
+  checksum: 50f598d45586a643cbf75bade329160a06f2797932836e255b50ada52a531ec02d8c56022daf844cb0ee45437f222102b06a73020e7a17eadfbdb9457f7e9bf2
   languageName: node
   linkType: hard
 
-"@sentry/integrations@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/integrations@npm:7.64.0"
+"@sentry/integrations@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/integrations@npm:7.66.0"
   dependencies:
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     localforage: ^1.8.1
     tslib: ^2.4.1 || ^1.9.3
-  checksum: 0f6a15abb1c2702e428c6d72bd590dff15cc4d51d99e48c42b354c9e789a6f39c593eea1b6cc23da8f6058a2634fc49f9a9fbbff8808babb4c01543bc22598b9
+  checksum: bd54cf4c880facb058aac2888242f927b89270443c437748f88490738b3c2933e982638b65b1a01d745c815020b1e829a8a5442cd3e77c6a46ceff16efbeccd5
   languageName: node
   linkType: hard
 
-"@sentry/node@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/node@npm:7.64.0"
+"@sentry/node@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/node@npm:7.66.0"
   dependencies:
-    "@sentry-internal/tracing": 7.64.0
-    "@sentry/core": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry-internal/tracing": 7.66.0
+    "@sentry/core": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     cookie: ^0.4.1
     https-proxy-agent: ^5.0.0
     lru_map: ^0.3.3
     tslib: ^2.4.1 || ^1.9.3
-  checksum: d16b5dd90ebb4c7202daf49edf41ad6cba21bb8c146d73c16f391e118575c45319a1a03309c7e4b78d0ab621ef9f2bdeb386093daac9373398ca57ce1e9d16dd
+  checksum: 5f3fec1cec663905140671886c5360a9306fe1766c369f4d4220ef9cedaf73431fcb29bd9910fa2fb9e5f08ba50bf6f9f6320d9cf05d43304439fc19da3ea7c8
   languageName: node
   linkType: hard
 
@@ -604,49 +604,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/replay@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/replay@npm:7.64.0"
+"@sentry/replay@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/replay@npm:7.66.0"
   dependencies:
-    "@sentry/core": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
-  checksum: 0e9522bff5ee8a6383660e8da182b0918b01782153f1ac645b2a3c917656705ca19b6eb176b80becb0b527e42ceb12e85baf405f3e4f82ca2c09ffda80fea242
+    "@sentry/core": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
+  checksum: 54b4ea614a4eb79b7a35327249f06612b4bc60209927046736e5ae8b609883e1a295563a5f9377140a21c74e777ae6c81bdb4498f3f920163df9a6fe135241b2
   languageName: node
   linkType: hard
 
-"@sentry/svelte@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/svelte@npm:7.64.0"
+"@sentry/svelte@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/svelte@npm:7.66.0"
   dependencies:
-    "@sentry/browser": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
+    "@sentry/browser": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
     magic-string: ^0.30.0
     tslib: ^2.4.1 || ^1.9.3
   peerDependencies:
     svelte: 3.x || 4.x
-  checksum: 8e7b6b447c280a9326337de2226079d44f67d25d958bc45fc1d94e56cf6f3a5a14d702d5f0bb9f086654843b1eba94c3e73d154745974a3be888ac29e4db4b50
+  checksum: 70bbc6ecc297d4f7230ebf12d5d66ff0910c1622b75d3b1c83e4c5a4774815b49218aaeb593e6f038c6646477ab02093a7028882a081921931ad8263f1c9f6dd
   languageName: node
   linkType: hard
 
-"@sentry/sveltekit@npm:^7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/sveltekit@npm:7.64.0"
+"@sentry/sveltekit@npm:^7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/sveltekit@npm:7.66.0"
   dependencies:
-    "@sentry-internal/tracing": 7.64.0
-    "@sentry/core": 7.64.0
-    "@sentry/integrations": 7.64.0
-    "@sentry/node": 7.64.0
-    "@sentry/svelte": 7.64.0
-    "@sentry/types": 7.64.0
-    "@sentry/utils": 7.64.0
-    "@sentry/vite-plugin": ^0.6.0
+    "@sentry-internal/tracing": 7.66.0
+    "@sentry/core": 7.66.0
+    "@sentry/integrations": 7.66.0
+    "@sentry/node": 7.66.0
+    "@sentry/svelte": 7.66.0
+    "@sentry/types": 7.66.0
+    "@sentry/utils": 7.66.0
+    "@sentry/vite-plugin": ^0.6.1
     magicast: 0.2.8
     sorcery: 0.11.0
   peerDependencies:
     "@sveltejs/kit": 1.x
-  checksum: 00f7edb8f19c93d586564af5b53f1490471c47c0dd45a73408f5cf81ee7f50ccb1f2a2c815a32e13c02b2ffd5dd1b6c47fe98cfa5826ae5a1b67968bc70bed4b
+  checksum: 54f629cb4d737a36d60027509f51e087f02ce6ed4932083cdd34a3599898dd9623f70378dc28b6216ee498241dcf97190a83b1684f2bc7f42503dabe06eae150
   languageName: node
   linkType: hard
 
@@ -666,10 +666,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/types@npm:7.64.0"
-  checksum: 405ff957d9b617466ccf1aedd53c27e604379b1b3c1b1fcf106b2a019247326e9dba20f9d34d61fb89f74e7e0a2f1670c23dfd2cf6a642fdbfdcc81f0fa06e2f
+"@sentry/types@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/types@npm:7.66.0"
+  checksum: 33ae0139e0689979d570524c8ccf55348961cc6ac656140023a2348c7667524581162ac902ed85f2761bfaba095cbe9afbdee2e8e3fa1bf1dbe27b097869a5ea
   languageName: node
   linkType: hard
 
@@ -683,22 +683,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:7.64.0":
-  version: 7.64.0
-  resolution: "@sentry/utils@npm:7.64.0"
+"@sentry/utils@npm:7.66.0":
+  version: 7.66.0
+  resolution: "@sentry/utils@npm:7.66.0"
   dependencies:
-    "@sentry/types": 7.64.0
+    "@sentry/types": 7.66.0
     tslib: ^2.4.1 || ^1.9.3
-  checksum: 049cc2324283080f3f4745720e43c567b04061a85ca7a3fa4abcae4ea4fb9a09f6ebbbb9a47539e8397973512803c777f1d6a017accf3e54322a5e0259854616
+  checksum: b33d89c18cfcac1bf4bf20453f6ebd5229911a3264b32f25d6591cfab303c86da9b06ce46e8f3490f391c7b4efe5ddd153e5dffe8b2316cf605daa789da0c39c
   languageName: node
   linkType: hard
 
-"@sentry/vite-plugin@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "@sentry/vite-plugin@npm:0.6.0"
+"@sentry/vite-plugin@npm:^0.6.1":
+  version: 0.6.1
+  resolution: "@sentry/vite-plugin@npm:0.6.1"
   dependencies:
-    "@sentry/bundler-plugin-core": 0.6.0
-  checksum: ba4136ba86009727571b87df766fe45f03d68c4fc21b3687d1532aab6c503ee3412d92f69eff0cb6c20be9ef29c7b090225d4c9ee716d5de8115ec687bb8d3b0
+    "@sentry/bundler-plugin-core": 0.6.1
+  checksum: a982feee20d1fcf151c4381a012577b860d55cd967b92a74226d6e1b7bd23d4beb23f882e49da4098d4b22e0e231d4b3416545c5ad18a4cea65db267e9d218fb
   languageName: node
   linkType: hard
 
@@ -729,9 +729,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sveltejs/kit@npm:=1.23.0":
-  version: 1.23.0
-  resolution: "@sveltejs/kit@npm:1.23.0"
+"@sveltejs/kit@npm:=1.24.0":
+  version: 1.24.0
+  resolution: "@sveltejs/kit@npm:1.24.0"
   dependencies:
     "@sveltejs/vite-plugin-svelte": ^2.4.1
     "@types/cookie": ^0.5.1
@@ -744,13 +744,14 @@ __metadata:
     sade: ^1.8.1
     set-cookie-parser: ^2.6.0
     sirv: ^2.0.2
+    tiny-glob: ^0.2.9
     undici: ~5.23.0
   peerDependencies:
     svelte: ^3.54.0 || ^4.0.0-next.0
     vite: ^4.0.0
   bin:
     svelte-kit: svelte-kit.js
-  checksum: a4240e7a72922ba88f5ffd2b20b2a0fada9995bff732dcd71a3c3992f2da89446432e3576372277a6fa3d127763fe2ced43d0d17209568508a689ff3069ef1b0
+  checksum: de42b8204006c1a4b10b322a81e856de2132d60fefa77c940dc8816d6ad2dd7802348295075de6a0ceca5e3fb40c01909777ad52d9d617029b0a830987a9f3b7
   languageName: node
   linkType: hard
 
@@ -1225,10 +1226,10 @@ __metadata:
   resolution: "console@workspace:."
   dependencies:
     "@nomimono/nomimono-css": ^0.4.19
-    "@sentry/sveltekit": ^7.64.0
+    "@sentry/sveltekit": ^7.66.0
     "@sveltejs/adapter-cloudflare": ^2.3.3
     "@sveltejs/adapter-node": ^1.3.1
-    "@sveltejs/kit": =1.23.0
+    "@sveltejs/kit": =1.24.0
     clipboard: ^2.0.11
     dayjs: ^1.11.9
     eslint: ^8.48.0
@@ -1236,11 +1237,11 @@ __metadata:
     gravatar-url: ^4.0.1
     highcharts: ^11.1.0
     js-cookie: ^3.0.5
-    prettier: ^3.0.2
+    prettier: ^3.0.3
     prettier-plugin-svelte: ^3.0.3
     sass: ^1.66.1
     svelte: ^4.2.0
-    svelte-check: ^3.5.0
+    svelte-check: ^3.5.1
     svelte-preprocess: ^5.0.4
     sweetalert2: ^11.7.27
     typescript: ~5.2.2
@@ -1904,6 +1905,20 @@ __metadata:
   dependencies:
     type-fest: ^0.20.2
   checksum: ad1ecf914bd051325faad281d02ea2c0b1df5d01bd94d368dcc5513340eac41d14b3c61af325768e3c7f8d44576e72780ec0b6f2d366121f8eec6e03c3a3b97a
+  languageName: node
+  linkType: hard
+
+"globalyzer@npm:0.1.0":
+  version: 0.1.0
+  resolution: "globalyzer@npm:0.1.0"
+  checksum: 419a0f95ba542534fac0842964d31b3dc2936a479b2b1a8a62bad7e8b61054faa9b0a06ad9f2e12593396b9b2621cac93358d9b3071d33723fb1778608d358a1
+  languageName: node
+  linkType: hard
+
+"globrex@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "globrex@npm:0.1.2"
+  checksum: adca162494a176ce9ecf4dd232f7b802956bb1966b37f60c15e49d2e7d961b66c60826366dc2649093cad5a0d69970cfa8875bd1695b5a1a2f33dcd2aa88da3c
   languageName: node
   linkType: hard
 
@@ -2934,12 +2949,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "prettier@npm:3.0.2"
+"prettier@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "prettier@npm:3.0.3"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 118b59ddb6c80abe2315ab6d0f4dd1b253be5cfdb20622fa5b65bb1573dcd362e6dd3dcf2711dd3ebfe64aecf7bdc75de8a69dc2422dcd35bdde7610586b677a
+  checksum: e10b9af02b281f6c617362ebd2571b1d7fc9fb8a3bd17e371754428cda992e5e8d8b7a046e8f7d3e2da1dcd21aa001e2e3c797402ebb6111b5cd19609dd228e0
   languageName: node
   linkType: hard
 
@@ -3381,9 +3396,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"svelte-check@npm:^3.5.0":
-  version: 3.5.0
-  resolution: "svelte-check@npm:3.5.0"
+"svelte-check@npm:^3.5.1":
+  version: 3.5.1
+  resolution: "svelte-check@npm:3.5.1"
   dependencies:
     "@jridgewell/trace-mapping": ^0.3.17
     chokidar: ^3.4.1
@@ -3397,7 +3412,7 @@ __metadata:
     svelte: ^3.55.0 || ^4.0.0-next.0 || ^4.0.0
   bin:
     svelte-check: bin/svelte-check
-  checksum: c62da075d1ca3bcccb6953ca6636e2035e2af29afc8699a6de832982cd446c1c237856cebcb12ce6a7255a10af5d544972c9fb6b57649a6cfbd758ceab3dd622
+  checksum: 96b886299e2d562edc1a9e98541702bbd9e1886568f166c7de3e267e3feca8acfa9b6548601b1c42fffe0ee3ec5c0cf7271e02cba094ab0c556f12ff47ba093e
   languageName: node
   linkType: hard
 
@@ -3509,6 +3524,16 @@ __metadata:
   version: 2.1.0
   resolution: "tiny-emitter@npm:2.1.0"
   checksum: fbcfb5145751a0e3b109507a828eb6d6d4501352ab7bb33eccef46e22e9d9ad3953158870a6966a59e57ab7c3f9cfac7cab8521db4de6a5e757012f4677df2dd
+  languageName: node
+  linkType: hard
+
+"tiny-glob@npm:^0.2.9":
+  version: 0.2.9
+  resolution: "tiny-glob@npm:0.2.9"
+  dependencies:
+    globalyzer: 0.1.0
+    globrex: ^0.1.2
+  checksum: aea5801eb6663ddf77ebb74900b8f8bd9dfcfc9b6a1cc8018cb7421590c00bf446109ff45e4b64a98e6c95ddb1255a337a5d488fb6311930e2a95334151ec9c6
   languageName: node
   linkType: hard
 
