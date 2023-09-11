@@ -1,5 +1,5 @@
-import { redirect, error } from '@sveltejs/kit'
 import api from '$lib/api'
+import { redirect, error } from '@sveltejs/kit'
 
 export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
