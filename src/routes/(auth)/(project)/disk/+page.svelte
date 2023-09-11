@@ -51,7 +51,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="nm-link" href={`/disk/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href={`/disk/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>
