@@ -8,9 +8,7 @@ jobs:
     name: Lint
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    - run: yarn workspaces focus
-    - run: yarn lint
-    - run: yarn check
+    - uses: oven-sh/setup-bun@v1
+    - run: bun install
+    - run: bun run lint
+    - run: bun run check

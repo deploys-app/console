@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM oven/bun:1.0.0
 
 ARG SENTRY_ORG
 ARG SENTRY_PROJECT
@@ -13,19 +13,17 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
-ADD package.json yarn.lock .yarnrc.yml ./
-ADD .yarn .yarn
-RUN yarn workspaces focus
+ADD package.json bun.lockb ./
+RUN bun install
 ADD . .
-RUN yarn build
+RUN bun run build
 RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
 
-FROM node:18-slim
+FROM oven/bun:1.0.0
 
 WORKDIR /workspace
-ADD package.json yarn.lock .yarnrc.yml ./
-ADD .yarn .yarn
-RUN yarn workspaces focus --production
+ADD package.json bun.lockb ./
+RUN bun install --production --ignore-scripts
 
 FROM gcr.io/distroless/nodejs18-debian11
 
