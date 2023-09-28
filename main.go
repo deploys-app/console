@@ -33,7 +33,7 @@ func main() {
 			},
 			Timeout: 30 * time.Second,
 		},
-		Endpoint: config.String("deploys_endpoint"),
+		Endpoint: config.String("api_endpoint"),
 		Auth: func(r *http.Request) {
 			r.Header.Set("Authorization", "Bearer "+kctx.GetToken(r.Context()))
 		},
