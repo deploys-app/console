@@ -1,4 +1,4 @@
 root = true
 
-[*.svelte]
+[*.tmpl]
 indent_style = tab

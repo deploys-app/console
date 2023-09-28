@@ -1,0 +1,31 @@
+{{define "root"}}
+<!DOCTYPE html>
+<html lang="en" data-theme="{{.Page.Theme}}">
+<meta charset="utf-8">
+<title>Console | Deploys.app</title>
+<link rel="icon" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy"
+	  content="
+	  	default-src 'self';
+	  	script-src 'self' 'unsafe-inline' cdn.jsdelivr.net;
+	  	style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdn.moonrhythm.io;
+	  	font-src 'self' cdn.moonrhythm.io;
+	  	img-src 'self' www.gravatar.com;">
+
+<script src="https://cdn.jsdelivr.net/npm/hyperscript.org@0.9.11/dist/_hyperscript.min.js" integrity="sha256-nmPlFi82wR2GIasCUlGn4o60ISZvHLEOK03Lu7kafR4=" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.6/dist/htmx.min.js" integrity="sha256-y7cjwwXPbWMVyJCQmBVSNYhQni4JKln4z8SohYKWidU=" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js" integrity="sha256-nP25Pzivzy0Har7NZtMr/TODzfGWdlTrwmomYF2vQXM=" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/pvdbsmf@1.0.0/dist/pvdbsmf.min.js" integrity="sha256-T13557G2SrIfeStPmC1vlorWv/zhn0F6xb3U93J147Y=" crossorigin="anonymous" defer></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/reset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/atomic.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/layout.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/component.min.css">
+<link rel="stylesheet" href="/-/style.css">
+
+<link rel="stylesheet" href="https://cdn.moonrhythm.io/fontawesome-pro/6.4.2/css/all.min.css">
+{{template "root.style" .}}
+{{template "root.main" .}}
+{{template "root.script" .}}
+{{end}}

@@ -1,0 +1,40 @@
+{{define "main"}}
+	<h6>Emails</h6>
+	<br>
+	<div class="nm-panel is-level-300">
+		<div class="_dp-f _jtfct-spbtw _alit-ct">
+			<div class="lo-grid-span-horizontal _g-4 _mgl-at">
+				Contact us to request access
+			</div>
+		</div>
+
+		<div class="nm-table-container _mgt-6">
+			<table class="nm-table">
+				<thead>
+				<tr>
+					<th>Domain</th>
+					<th>Quota</th>
+					<th>Created at</th>
+				</tr>
+				</thead>
+				<tbody>
+                {{range .List}}
+					<tr>
+						<td>{{.Domain}}</td>
+						<td>-</td>
+						<td data-format="datetime" data-value="{{.CreatedAt | datetime}}">
+							{{.CreatedAt | datetime}}
+						</td>
+					</tr>
+                {{else}}
+                    {{if .Forbidden}}
+						<td colspan="3">You don't have permission to view data</td>
+                    {{else}}
+						<td colspan="3">No data</td>
+                    {{end}}
+                {{end}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{{end}}

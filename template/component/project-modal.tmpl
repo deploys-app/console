@@ -1,0 +1,41 @@
+{{define "project-modal"}}
+	<div id="project-modal" class="nm-modal" aria-hidden="true"
+		 _="on click[target === me] remove .is-active from me">
+		<div class="nm-modal-panel">
+			<div class="nm-modal-close" tabindex="0" role="button"
+				 _="on click or keypress remove .is-active from #project-modal">✕
+			</div>
+			<h4>Projects</h4>
+
+			<div class="nm-table-container _mgt-6">
+				<table class="nm-table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
+					<thead>
+					<tr>
+						<th class="is-collapse"></th>
+						<th>Name</th>
+						<th>ID</th>
+					</tr>
+					</thead>
+					<tbody>
+                    {{range .Projects}}
+						<tr>
+							<td>
+                                {{if eq $.Project .Project}}
+									<i class="fas fa-check _cl-primary _fs-6"></i>
+                                {{end}}
+							</td>
+							<td>
+								<a href="{{gotoProjectLink $.Path .Project}}"
+								   class="_tdcrt-udl _cs-pt _cl-primary:hover" style="font-weight: 500">
+                                    {{.Name}}
+								</a>
+							</td>
+							<td>{{.Project}}</td>
+						</tr>
+                    {{end}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+{{end}}

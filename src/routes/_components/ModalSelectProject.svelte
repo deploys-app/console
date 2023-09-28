@@ -72,21 +72,3 @@
 		</div>
 	</div>
 </div>
-
-<style lang="scss">
-	.nm-table-container {
-		max-height: 405px;
-		overflow: auto;
-	}
-
-	.nm-table td {
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-	}
-
-	.nm-modal-panel {
-		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
-		width: 100%;
-		max-width: 48rem;
-	}
-</style>

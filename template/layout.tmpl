@@ -1,0 +1,112 @@
+{{define "root.main"}}
+	<div id="app-layout" class="app-layout">
+		<div class="navbar-wrapper">
+            {{template "navbar" .Page.Profile}}
+		</div>
+
+		<div class="sidebar-wrapper _zid-2">
+			<div class="sidebar-backdrop" role="button" tabindex="0"
+				 _="on click or keypress remove .is-shown-sidebar from #app-layout"></div>
+            {{template "sidebar" .Page}}
+		</div>
+
+		<div class="content-wrapper">
+            {{template "main" .}}
+		</div>
+	</div>
+
+	{{template "project-modal" .Page}}
+{{end}}
+
+{{define "root.style"}}
+	<style>
+		:root {
+			--width-sidebar:   16rem;
+			--height-navbar:   4rem;
+			--content-sidegap: 2rem;
+		}
+
+		.app-layout {
+			position: relative;
+		}
+
+		.navbar-wrapper,
+		.sidebar-wrapper,
+		.content-wrapper {
+			transition: all var(--timing-normal) ease-in-out;
+		}
+
+		.sidebar-wrapper {
+			position:  fixed;
+			z-index:   1;
+
+			transform: translate3d(0, 0, 0);
+		}
+
+		.navbar-wrapper {
+			position:     fixed;
+			z-index:      1;
+
+			width:        100%;
+
+			padding-left: var(--width-sidebar);
+		}
+
+		.content-wrapper {
+			padding-top:    calc(var(--height-navbar) + var(--content-sidegap));
+			padding-left:   calc(var(--width-sidebar) + var(--content-sidegap));
+			padding-right:  2rem;
+			padding-bottom: 2rem;
+
+		}
+
+		@media screen and (max-width: 1023px) {
+			:root {
+				--content-sidegap: 1rem;
+			}
+
+			.navbar-wrapper {
+				padding-left: 0;
+			}
+
+			.sidebar-wrapper {
+				transform: translate3d(calc(var(--width-sidebar) * -1), 0, 0);
+			}
+
+			.app-layout.is-shown-sidebar .sidebar-wrapper {
+				transform: translate3d(0, 0, 0);
+			}
+
+			.content-wrapper {
+				padding-left:  var(--content-sidegap);
+				padding-right: var(--content-sidegap);
+			}
+
+			.app-layout.is-shown-sidebar .sidebar-backdrop {
+				position: fixed;
+				top:      0;
+				left:     0;
+				width:    100vw;
+				height:   100vh;
+			}
+		}
+	</style>
+    {{block "style" .}}{{end}}
+{{end}}
+
+{{define "root.script"}}
+	<script>
+		const formatPage = () => {
+			document.querySelectorAll('[data-format="datetime"]').forEach((el) => {
+				el.innerText = dayjs(el.dataset.value).format('YYYY-MM-DD HH:mm:ss')
+			})
+		}
+
+		;['DOMContentLoaded', 'htmx:load'].forEach((event) => {
+			window.addEventListener(event, formatPage)
+		})
+
+		// TODO: format htmx before swap
+	</script>
+    {{block "script" .}}{{end}}
+{{end}}

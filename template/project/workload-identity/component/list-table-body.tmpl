@@ -1,0 +1,22 @@
+{{range .List}}
+	<tr>
+		<td>
+            {{component "status-icon" .Status.String}}
+			<a class="nm-link"
+			   href="{{route "workload-identity.detail"
+               (param "project" $.Page.Project)
+               (param "location" .Location)
+               (param "name" .Name)}}">
+                {{.Name}}
+			</a>
+		</td>
+		<td>{{.Location}}</td>
+		<td data-format="datetime" data-value="{{.CreatedAt | datetime}}">{{.CreatedAt | datetime}}</td>
+	</tr>
+{{else}}
+    {{if .Forbidden}}
+		<td colspan="3">You don't have permission to view data</td>
+    {{else}}
+		<td colspan="3">No data</td>
+    {{end}}
+{{end}}

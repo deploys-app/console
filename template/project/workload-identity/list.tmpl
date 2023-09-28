@@ -1,0 +1,31 @@
+{{define "main"}}
+	<h6>Workload Identities</h6>
+	<br>
+	<div class="nm-panel is-level-300">
+		<div class="_dp-f _jtfct-spbtw _alit-ct">
+			<div class="lo-grid-span-horizontal _g-4 _mgl-at">
+				<a class="nm-button" href="{{route "workload-identity.create" (param "project" .Page.Project)}}">
+					Create
+				</a>
+			</div>
+		</div>
+
+		<div class="nm-table-container _mgt-6">
+			<table class="nm-table">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Location</th>
+					<th>Created at</th>
+				</tr>
+				</thead>
+				<tbody hx-get="{{route "workload-identity"
+                (param "project" .Page.Project)
+                (param "component" "list-table-body")}}"
+					   hx-trigger="every 5s">
+                {{component "workload-identity.component.list-table-body" .}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{{end}}

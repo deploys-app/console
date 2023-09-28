@@ -1,0 +1,133 @@
+{{define "navbar"}}
+	<nav class="navbar">
+		<div class="icon-nav-menu _dp-n:md" tabindex="0" role="button"
+			 _="on click or keypress toggle .is-shown-sidebar on #app-layout">
+			<i class="fa-light fa-bars"></i>
+		</div>
+
+		<div class="_dp-f _mgl-at">
+			<form method="post" action="{{route "theme"}}" class="nm-dropdown _mgl-at _mgt-at _mgbt-at">
+				<div class="nm-button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
+					<i class="fa-solid fa-palette"></i>
+					Theme
+				</div>
+				<ul class="nm-menu is-card is-compact">
+					<li>
+						<button name="theme" value="dark" class="_w-100pct _bdw-0 _bgcl-tpr _cl-content _fs-3">Dark
+						</button>
+					</li>
+					<li>
+						<button name="theme" value="light" class="_w-100pct _bdw-0 _bgcl-tpr _cl-content _fs-3">Light
+						</button>
+					</li>
+				</ul>
+			</form>
+
+			<div>
+				<div class="avatar" tabindex="0" role="button"
+					 _="on click or keypress toggle .{'_dp-n'} on #profile-popup">
+					<img src="{{profilePhoto .Email}}" alt="profile" width="36" class="_bdrd-max"
+						 crossorigin="anonymous" draggable="false">
+				</div>
+
+				<div id="profile-popup" class="popup _dp-n">
+					<form id="signout-form" method="post" action="{{route "auth.signout"}}"></form>
+					<ul class="user-menu">
+						<li>
+							<a class="item _dp-b" href="{{route "billing"}}">
+								Billing accounts
+							</a>
+						</li>
+						<li>
+							<button form="signout-form"
+									class="item _dp-b _w-100pct _tal-l _cs-pt">Sign out</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<style>
+		.popup {
+			position:   absolute;
+			z-index:    1;
+			box-shadow: var(--raised-z11);
+			min-width:  256px;
+
+			right:      1rem;
+			margin-top: -.5rem;
+		}
+
+		ul.user-menu {
+			border-radius: 3px;
+			overflow:      hidden;
+
+			background:    white;
+			color:         hsl(var(--hsl-black)/var(--cl-opacity));
+		}
+
+		ul.user-menu > li {
+			/*padding: 0 1rem;*/
+		}
+
+		ul.user-menu > li > .item {
+			padding: .75rem 1.5rem;
+		}
+
+		a.item {
+			color: inherit;
+		}
+
+		ul.user-menu > li:not(:last-child) .item {
+			border-bottom: 1px solid rgb(238, 238, 238);
+		}
+
+		ul.user-menu > li:hover {
+			background-color: hsl(var(--hsl-primary)/0.05);
+			cursor:           pointer;
+		}
+
+		.navbar {
+			display:          flex;
+			width:            100%;
+			height:           var(--height-navbar, 20rem);
+			background-color: hsl(var(--hsl-base-300));
+			box-shadow:       var(--raised-z10);
+			align-items:      center;
+			justify-content:  space-between;
+		}
+
+		.icon-nav-menu {
+			display:         flex;
+			align-items:     center;
+			justify-content: center;
+			height:          calc(var(--height-navbar) - 1rem);
+			width:           calc(var(--height-navbar) - 1rem);
+			margin-left:     .5rem;
+
+			font-size:       1.5rem;
+			border-radius:   50%;
+
+			cursor:          pointer;
+
+		}
+
+		.icon-nav-menu:hover {
+			background: rgba(190, 197, 255, 0.075);
+		}
+
+		.avatar {
+			display:         flex;
+			align-items:     center;
+			justify-content: center;
+			width:           var(--height-navbar);
+			height:          var(--height-navbar);
+			cursor:          pointer;
+		}
+
+		.avatar:hover {
+			background: rgba(190, 197, 255, 0.075);
+		}
+	</style>
+{{end}}

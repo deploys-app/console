@@ -1,0 +1,13 @@
+{{if eq . "pending"}}
+	<i class="_mgh-5 fa-solid fa-spinner-third fa-spin"></i>
+{{else if eq . "success"}}
+	<i class="_mgh-5 fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+{{else if eq . "error"}}
+	<i class="_mgh-5 fa-solid fa-times _cl-negative _cl-opacity-80"></i>
+{{else if eq . "cancelled"}}
+	<i class="_mgh-5 fa-solid fa-ban _cl-negative _cl-opacity-80"></i>
+{{else if eq . "verify"}}
+	<i class="_mgh-5 fa-solid fa-exclamation-triangle _cl-warning"></i>
+{{else}}
+	<i class="_mgh-5 fa-solid fa-minus _cl-light"></i>
+{{end}}
