@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	htmltemplate "html/template"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -25,6 +26,8 @@ func preloadTemplate(tmpl *hime.Template) {
 }
 
 func loadTemplateFunc(tmpl *hime.Template) {
+	reMemory := regexp.MustCompile(`^(\d+)(\w+)$`)
+
 	tmpl.Funcs(htmltemplate.FuncMap{
 		"profilePhoto": func(email string) string {
 			email = strings.TrimSpace(email)
@@ -50,6 +53,16 @@ func loadTemplateFunc(tmpl *hime.Template) {
 		},
 		"static": func(s string) string {
 			return "/-/" + static.GetFilename(s)
+		},
+		"formatMemory": func(s string) string {
+			if s == "0" {
+				return "Shared"
+			}
+			m := reMemory.FindStringSubmatch(s)
+			if len(m) != 3 {
+				return s
+			}
+			return m[1] + " " + m[2] + "B"
 		},
 	})
 }

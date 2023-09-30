@@ -44,8 +44,8 @@
 							</a>
 						</li>
 						<li>
-							<a href="{`/deployment?project=${project}`}" title="Deployments">
-								<div class="menu-item" class:is-active="{menu === 'deployment'}">
+							<a href="{{route "deployment" (param "project" .Project)}}" title="Deployments">
+								<div class="menu-item {{if eq .Menu "deployment"}}is-active{{end}}">
 									<span class="menu-icon">
 										<i class="fa-solid fa-rocket"></i>
 									</span>

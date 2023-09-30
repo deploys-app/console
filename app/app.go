@@ -83,6 +83,7 @@ func Mount(m *httpmux.Mux) {
 	m = m.Middleware(
 		projectMiddleware,
 	)
+	m.Handle("/deployment", methodmux.Get(hime.Handler(getDeployment)))
 	m.Handle("/workload-identity", methodmux.Get(hime.Handler(getWorkloadIdentity)))
 	m.Handle("/email", methodmux.Get(hime.Handler(getEmail)))
 }

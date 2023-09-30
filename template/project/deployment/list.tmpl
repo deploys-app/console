@@ -1,0 +1,67 @@
+{{define "main"}}
+	<h6>Deployments</h6>
+	<br>
+	<div class="nm-panel is-level-300">
+		<div class="_dp-f _jtfct-spbtw _alit-ct">
+			<div class="lo-grid-span-horizontal _g-4 _mgl-at">
+				<a class="nm-button" href="{{route "deployment.deploy" (param "project" .Page.Project)}}">
+					Create
+				</a>
+			</div>
+		</div>
+
+		<div class="nm-table-container _mgt-6">
+			<table class="nm-table">
+				<thead>
+				<tr>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Memory</th>
+					<th>Replicas</th>
+					<th>Location</th>
+					<th>Last deployed</th>
+				</tr>
+				</thead>
+				<tbody>
+                {{range .List}}
+					<tr>
+						<td>
+                            {{component "deployment.component.status-icon" .}}
+							<a class="nm-link"
+							   href="{{route "deployment.metrics"
+                               (param "project" $.Page.Project)
+							   (param "location" .Location)
+							   (param "name" .Name)}}">
+                                {{.Name}}
+							</a>
+						</td>
+						<td>{{.Type.Text}}</td>
+						<td>{{.Resources.Requests.Memory | formatMemory}}</td>
+						<td>
+                            {{if gt .MinReplicas 0}}
+                                {{if eq .MinReplicas .MaxReplicas}}
+                                    {{.MinReplicas}}
+                                {{else}}
+                                    {{.MinReplicas}} - {{.MaxReplicas}}
+                                {{end}}
+                            {{else}}
+								-
+                            {{end}}
+						</td>
+						<td>{{.Location}}</td>
+						<td data-format="datetime" data-value="{{.CreatedAt | datetime}}">{{.CreatedAt | datetime}}</td>
+					</tr>
+                {{else}}
+					<td colspan="6" class="_tal-ct">
+                        {{if .Forbidden}}
+							You don't have permission to view data
+                        {{else}}
+							No data
+                        {{end}}
+					</td>
+                {{end}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{{end}}
