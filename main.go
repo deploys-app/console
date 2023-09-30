@@ -15,6 +15,7 @@ import (
 
 	"github.com/deploys-app/console/app"
 	"github.com/deploys-app/console/kctx"
+	"github.com/deploys-app/console/static"
 )
 
 func main() {
@@ -43,10 +44,7 @@ func main() {
 
 	mux := httpmux.New()
 	app.Mount(mux)
-	// TODO: refactor
-	mux.Handle("/favicon.ico", http.NotFoundHandler())
-	mux.Handle("/favicon.png", http.NotFoundHandler())
-	mux.Handle("/-/", http.StripPrefix("/-", http.FileServer(http.Dir("static"))))
+	static.Mount(mux.Group("/-"))
 
 	srv := parapet.NewBackend()
 	srv.Addr = addr

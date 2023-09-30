@@ -27,11 +27,13 @@
 						</td>
 					</tr>
                 {{else}}
-                    {{if .Forbidden}}
-						<td colspan="3">You don't have permission to view data</td>
-                    {{else}}
-						<td colspan="3">No data</td>
-                    {{end}}
+					<td colspan="3" class="_tal-ct">
+                        {{if .Forbidden}}
+							You don't have permission to view data
+                        {{else}}
+							No data
+                        {{end}}
+					</td>
                 {{end}}
 				</tbody>
 			</table>

@@ -9,6 +9,7 @@ import (
 	"github.com/deploys-app/deploys/api/client"
 	"github.com/moonrhythm/hime"
 	"github.com/moonrhythm/httpmux"
+	"github.com/moonrhythm/parapet"
 
 	"github.com/deploys-app/console/kctx"
 	"github.com/deploys-app/console/template"
@@ -66,6 +67,9 @@ func Mount(m *httpmux.Mux) {
 		m.Handle("/callback", methodmux.Get(hime.Handler(getCallback)))
 	}
 
+	// special case, dashboard or not found
+	m.Handle("/", rootHandler())
+
 	// auth routes
 	m = m.Middleware(
 		tokenMiddleware,
@@ -79,7 +83,6 @@ func Mount(m *httpmux.Mux) {
 	m = m.Middleware(
 		projectMiddleware,
 	)
-	m.Handle("/", methodmux.Get(hime.Handler(getDashboard)))
 	m.Handle("/workload-identity", methodmux.Get(hime.Handler(getWorkloadIdentity)))
 	m.Handle("/email", methodmux.Get(hime.Handler(getEmail)))
 }
@@ -144,6 +147,24 @@ func tokenMiddleware(h http.Handler) http.Handler {
 		ctx = ctx.WithContext(kctx.NewToken(ctx.Context(), token))
 		ctx = ctx.WithContext(kctx.NewEmail(ctx.Context(), me.Email))
 		return ctx.Handle(h)
+	})
+}
+
+func rootHandler() http.Handler {
+	var m parapet.Middlewares
+	m.UseFunc(tokenMiddleware)
+	m.UseFunc(themeMiddleware)
+	m.UseFunc(projectMiddleware)
+	dashboardHandler := m.ServeHandler(hime.Handler(getDashboard))
+
+	return hime.Handler(func(ctx *hime.Context) error {
+		if ctx.URL.Path == "/" {
+			return ctx.Handle(dashboardHandler)
+		}
+
+		// not found
+		http.NotFound(ctx.ResponseWriter(), ctx.Request)
+		return nil
 	})
 }
 

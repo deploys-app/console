@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/moonrhythm/hime"
+
+	"github.com/deploys-app/console/static"
 )
 
 func preloadTemplate(tmpl *hime.Template) {
@@ -45,6 +47,9 @@ func loadTemplateFunc(tmpl *hime.Template) {
 			v.Set("project", project)
 			u.RawQuery = v.Encode()
 			return u.String()
+		},
+		"static": func(s string) string {
+			return "/-/" + static.GetFilename(s)
 		},
 	})
 }

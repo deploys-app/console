@@ -3,7 +3,7 @@
 <html lang="en" data-theme="{{.Page.Theme}}">
 <meta charset="utf-8">
 <title>Console | Deploys.app</title>
-<link rel="icon" href="/favicon.png">
+<link rel="icon" href="{{static "favicon.png"}}">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy"
 	  content="
@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/atomic.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/layout.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@nomimono/nomimono-css@0.4.20/component.min.css">
-<link rel="stylesheet" href="/-/style.css">
+<link rel="stylesheet" href="{{static "style.css"}}">
 
 <link rel="stylesheet" href="https://cdn.moonrhythm.io/fontawesome-pro/6.4.2/css/all.min.css">
 {{template "root.style" .}}
