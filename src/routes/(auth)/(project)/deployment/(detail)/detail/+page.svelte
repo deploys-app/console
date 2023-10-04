@@ -187,6 +187,10 @@
 			<td>{format.memory(deployment.resources.requests.memory)}</td>
 		</tr>
 		<tr>
+			<td>Sidecars</td>
+			<td>{deployment.sidecars?.length || 0}</td>
+		</tr>
+		<tr>
 			<td>Deployed At</td>
 			<td>{format.datetime(deployment.createdAt)}</td>
 		</tr>

@@ -60,7 +60,18 @@
 		/** @type {{ k: string, v: string }[]} */
 		env: [],
 		/** @type {{ k: string, v: string }[]} */
-		mountData: []
+		mountData: [],
+		// /** @type {import('$types').Sidecar[]} */
+		// sidecars: [],
+		sidecar: {
+			type: '',
+			cloudSqlProxy: {
+				instance: '',
+				/** @type {?number} */
+				port: null,
+				credentials: ''
+			}
+		}
 	}
 	if (deployment) {
 		form.location = deployment.location
@@ -85,6 +96,23 @@
 		form.resources = deployment.resources
 		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
+		form.sidecar = (deployment.sidecars || []).length > 0
+			? {
+				type: 'cloudSqlProxy',
+				cloudSqlProxy: {
+					instance: deployment.sidecars[0].cloudSqlProxy?.instance ?? '',
+					port: deployment.sidecars[0].cloudSqlProxy?.port ?? null,
+					credentials: deployment.sidecars[0].cloudSqlProxy?.credentials ?? ''
+				}
+			}
+			: {
+				type: '',
+				cloudSqlProxy: {
+					instance: '',
+					port: null,
+					credentials: ''
+				}
+			}
 	}
 
 	$: selectedLocation = locations.find((x) => x.id === form.location)
@@ -176,6 +204,21 @@
 			.join('\n')
 	}
 
+	function convertSidecar () {
+		if (!form.sidecar.type) {
+			return []
+		}
+		return [
+			{
+				cloudSqlProxy: {
+					instance: form.sidecar.cloudSqlProxy.instance,
+					port: form.sidecar.cloudSqlProxy.port,
+					credentials: form.sidecar.cloudSqlProxy.credentials
+				}
+			}
+		]
+	}
+
 	let saving = false
 
 	async function save () {
@@ -190,7 +233,8 @@
 				...form,
 				protocol: form.type === 'WebService' ? form.protocol : '',
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
-				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {})
+				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
+				sidecars: convertSidecar()
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -644,6 +688,46 @@
 					</tfoot>
 				</table>
 			</div>
+		</div>
+
+		<hr>
+
+		<h6><strong>Sidecar</strong></h6>
+		<div class="_dp-g _g-6">
+			<div class="nm-field">
+				<label for="input-sidecar-type">Type</label>
+				<div class="nm-select">
+					<select id="input-sidecar-type" bind:value={form.sidecar.type}>
+						<option value="">None</option>
+						<option value="cloudSqlProxy">Cloud SQL Proxy</option>
+					</select>
+				</div>
+			</div>
+			{#if form.sidecar.type === 'cloudSqlProxy'}
+				<div class="nm-field">
+					<label for="input-sidecar-instance">Instance</label>
+					<div class="nm-input">
+						<input id="input-sidecar-instance" placeholder="Instance" bind:value={form.sidecar.cloudSqlProxy.instance} required>
+					</div>
+				</div>
+				<div class="nm-field">
+					<label for="input-sidecar-port">Port</label>
+					<div class="nm-input">
+						<input class="-no-arrow" id="input-sidecar-port" placeholder="Port" type="number" bind:value={form.sidecar.cloudSqlProxy.port} required>
+					</div>
+				</div>
+				<div class="nm-field">
+					<label for="input-sidecar-credentials">Credentials</label>
+					<div class="nm-input">
+						<input id="input-sidecar-credentials" placeholder="Credentials" bind:value={form.sidecar.cloudSqlProxy.credentials}>
+					</div>
+				</div>
+			{/if}
+<!--			<button class="nm-button _dp-f _mg-at" type="button"-->
+<!--					on:click={() => { form.sidecars.push({}) }}>-->
+<!--				<i class="fa-solid fa-plus _mgr-5"></i>-->
+<!--				<span>Add Sidecar</span>-->
+<!--			</button>-->
 		</div>
 
 		<hr>

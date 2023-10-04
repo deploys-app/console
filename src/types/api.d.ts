@@ -224,6 +224,14 @@ export interface DeploymentResource {
 	limits: Resource
 }
 
+export interface Sidecar {
+	cloudSqlProxy?: {
+		instance: string
+		port: number
+		credentials: string
+	}
+}
+
 export interface Deployment {
 	project: string
 	location: string
@@ -247,6 +255,7 @@ export interface Deployment {
 	nodePort: number
 	annotations: Annotations
 	resources: DeploymentResource
+	sidecars: Sidecar[]
 	url: string
 	internalUrl: string
 	logUrl: string
