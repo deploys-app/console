@@ -101,14 +101,16 @@
 				type: 'cloudSqlProxy',
 				cloudSqlProxy: {
 					instance: deployment.sidecars[0].cloudSqlProxy?.instance ?? '',
-					port: deployment.sidecars[0].cloudSqlProxy?.port ?? null
+					port: deployment.sidecars[0].cloudSqlProxy?.port ?? null,
+					credentials: deployment.sidecars[0].cloudSqlProxy?.credentials ?? ''
 				}
 			}
 			: {
 				type: '',
 				cloudSqlProxy: {
 					instance: '',
-					port: null
+					port: null,
+					credentials: ''
 				}
 			}
 	}
