@@ -213,7 +213,7 @@
 				cloudSqlProxy: {
 					instance: form.sidecar.cloudSqlProxy.instance,
 					port: form.sidecar.cloudSqlProxy.port,
-					credentials: ''
+					credentials: form.sidecar.cloudSqlProxy.credentials
 				}
 			}
 		]
