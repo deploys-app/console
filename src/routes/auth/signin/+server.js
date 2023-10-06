@@ -1,7 +1,3 @@
-import { env } from '$env/dynamic/public'
-
-const endpoint = env.PUBLIC_API_ENDPOINT
-
 /** @type {Crypto} */
 let webcrypto
 
@@ -52,7 +48,7 @@ export async function GET ({ cookies, url }) {
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: `${endpoint}/auth?${q.toString()}`
+			location: `https://auth.deploys.app/?${q.toString()}`
 		}
 	})
 }
