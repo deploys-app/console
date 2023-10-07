@@ -1,3 +1,5 @@
+import { env } from '$env/dynamic/private'
+
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
 	const state = url.searchParams.get('state') ?? ''
@@ -7,7 +9,29 @@ export async function GET ({ cookies, url }) {
 		return new Response('invalid state', { status: 400 })
 	}
 
-	cookies.set('token', code, {
+	// exchange token
+	const resp = await fetch('https://auth.deploys.app/token', {
+		method: 'POST',
+		body: new URLSearchParams({
+			grant_type: 'authorization_code',
+			code,
+			client_id: env.OAUTH2_CLIENT_ID,
+			client_secret: env.OAUTH2_CLIENT_SECRET
+		}),
+		headers: {
+			'content-type': 'application/x-www-form-urlencoded'
+		}
+	})
+	if (resp.status < 200 || resp.status > 299) {
+		return new Response('invalid code', { status: 400 })
+	}
+	const respBody = await resp.json()
+	const token = respBody.refresh_token
+	if (!token) {
+		return new Response('unknown error', { status: 500 })
+	}
+
+	cookies.set('token', token, {
 		httpOnly: true,
 		maxAge: 60 * 60 * 24 * 7,
 		sameSite: 'lax',
