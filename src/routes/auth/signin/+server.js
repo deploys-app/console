@@ -1,3 +1,5 @@
+import { env } from '$env/dynamic/private'
+
 /** @type {Crypto} */
 let webcrypto
 
@@ -34,7 +36,9 @@ export async function GET ({ cookies, url }) {
 	callback.pathname = '/auth/callback'
 
 	const q = new URLSearchParams()
-	q.set('callback', callback.toString())
+	q.set('response_type', 'code')
+	q.set('client_id', env.OAUTH2_CLIENT_ID)
+	q.set('redirect_uri', callback.toString())
 	q.set('state', state)
 
 	cookies.set('state', state, {
