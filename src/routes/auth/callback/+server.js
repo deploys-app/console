@@ -23,7 +23,7 @@ export async function GET ({ cookies, url }) {
 		}
 	})
 	if (resp.status < 200 || resp.status > 299) {
-		return new Response('invalid code', { status: 400 })
+		return resp
 	}
 	const respBody = await resp.json()
 	const token = respBody.refresh_token
