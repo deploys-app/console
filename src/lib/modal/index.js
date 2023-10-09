@@ -75,7 +75,8 @@ export async function error ({ error, callback }) {
 		background: 'var(--modal-panel-background)',
 		color: 'var(--modal-panel-color)',
 		customClass: {
-			actions: '_mgt-7'
+			actions: '_mgt-7',
+			confirmButton: 'nm-button is-variant-negative'
 		}
 	})
 	callback?.()
@@ -96,6 +97,10 @@ export async function success ({ content }) {
 		text: content,
 		icon: 'success',
 		background: 'var(--modal-panel-background)',
-		color: 'var(--modal-panel-color)'
+		color: 'var(--modal-panel-color)',
+		customClass: {
+			actions: '_mgt-7',
+			confirmButton: 'nm-button is-variant-negative'
+		}
 	})
 }
