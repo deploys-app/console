@@ -106,7 +106,49 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			modal.success({ content: `Purged cache on domain "${domain.domain}" path "${result.value}"` })
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path prefix "${result.value}"` })
+		} finally {
+			purging = false
+		}
+	}
+
+	async function purgeCacheFile () {
+		if (purging) {
+			return
+		}
+
+		const result = await Swal.fire({
+			title: `Purge cache on domain "${domain.domain}"`,
+			text: 'Type path exact',
+			icon: 'warning',
+			input: 'text',
+			showCancelButton: true,
+			buttonsStyling: false,
+			background: 'var(--modal-panel-background)',
+			color: 'var(--modal-panel-color)',
+			confirmButtonText: 'Purge',
+			customClass: {
+				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				cancelButton: 'nm-button is-variant-tertiary',
+				actions: '_mgt-7'
+			}
+		})
+		if (!result.isConfirmed || !result.value) {
+			return
+		}
+
+		purging = true
+		try {
+			const resp = await api.invoke('domain.purgeCache', {
+				project,
+				domain: domain.domain,
+				file: result.value
+			}, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
+				return
+			}
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path exact "${result.value}"` })
 		} finally {
 			purging = false
 		}
@@ -368,6 +410,16 @@
 						</div>
 						<button class="nm-button" class:is-loading={purging} on:click={purgeCachePrefix}>
 							Purge prefix
+						</button>
+					</div>
+					<hr class="_mgv-7">
+					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+						<div class="_f-1 lo-12 _g-3">
+							<div><strong>Purge file</strong></div>
+							<p class="_fs-2 _opct-80">Remove cached resources at exact path</p>
+						</div>
+						<button class="nm-button" class:is-loading={purging} on:click={purgeCacheFile}>
+							Purge file
 						</button>
 					</div>
 				</div>
