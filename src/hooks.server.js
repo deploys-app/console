@@ -8,6 +8,14 @@ import { sequence } from '@sveltejs/kit/hooks'
 //  })
 // }
 
+/** @type {import('@sveltejs/kit').Handle} **/
+async function injectHeaders ({ event, resolve }) {
+	const response = await resolve(event)
+	response.headers.set('strict-transport-security', 'max-age=31536000; includeSubDomains; preload')
+	response.headers.set('x-frame-options', 'DENY')
+	return response
+}
+
 const allowTheme = {
 	dark: true,
 	light: true
@@ -52,6 +60,7 @@ function storeProject ({ event, resolve }) {
 
 export const handle = sequence(
 	// Sentry.sentryHandle(),
+	injectHeaders,
 	theme,
 	handleCookie,
 	storeProject
