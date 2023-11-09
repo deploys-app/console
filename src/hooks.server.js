@@ -8,7 +8,7 @@ import { sequence } from '@sveltejs/kit/hooks'
 //  })
 // }
 
-/** @type {import('@sveltejs/kit').Handle} **/
+/** @type {import('@sveltejs/kit').Handle} */
 async function injectHeaders ({ event, resolve }) {
 	const response = await resolve(event)
 	response.headers.set('strict-transport-security', 'max-age=31536000; includeSubDomains; preload')
