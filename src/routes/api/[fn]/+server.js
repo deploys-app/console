@@ -6,6 +6,20 @@ const endpoint = env.API_ENDPOINT
 export async function POST ({ locals, params, request }) {
 	const token = locals.token
 
+	// fast-path to reject unauthorized requests
+	if (!token) {
+		return new Response(JSON.stringify({
+			ok: false,
+			error: {
+				message: 'api: unauthorized'
+			}
+		}), {
+			headers: {
+				'content-type': 'application/json'
+			}
+		})
+	}
+
 	const resp = await fetch(`${endpoint}/${params.fn}`, {
 		method: 'POST',
 		body: request.body,
