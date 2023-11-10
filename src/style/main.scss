@@ -269,3 +269,56 @@ pre {
 		overflow-y: auto;
 	}
 }
+
+dialog {
+	padding: 0;
+	background: transparent;
+	border: 0;
+	color: inherit;
+
+	&::backdrop {
+		background: var(--modal-background);
+	}
+
+	.panel {
+		position: relative;
+		width: 100%;
+		margin-top: 1rem;
+		max-width: 48rem;
+		padding: 1.5rem;
+		-webkit-transition: all .16s ease-in-out;
+		transition: all .16s ease-in-out;
+		-webkit-transform: translate3d(0, -12px, 0);
+		transform: translate3d(0, -12px, 0);
+		border-radius: 0.75rem;
+		background: var(--modal-panel-background, hsl(var(--hsl-base-100)));
+		-webkit-box-shadow: var(--box-shadow-200);
+		box-shadow: var(--box-shadow-200);
+	}
+
+	.close {
+		font-weight: 600;
+		position: absolute;
+		top: .5rem;
+		right: .5rem;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-align: center;
+		-ms-flex-align: center;
+		align-items: center;
+		-webkit-box-pack: center;
+		-ms-flex-pack: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		cursor: pointer;
+		color: hsl(var(--hsl-content)/0.7);
+		border-radius: 0.5rem;
+		background: hsl(var(--hsl-base-300)/0.5);
+
+		&:hover {
+			background: hsl(var(--hsl-base-300)/0.8);
+		}
+	}
+}
