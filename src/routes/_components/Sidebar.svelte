@@ -106,7 +106,7 @@
 
 <nav class="sidebar _pdt-6 _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
 	<div class="site-logo">
-		<img src="/images/logo.png" alt="Deploys.app" draggable="false">
+		<img src="/images/logo.webp" alt="Deploys.app" draggable="false">
 	</div>
 
 	<div class="_f-1">
