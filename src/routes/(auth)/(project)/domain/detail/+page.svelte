@@ -44,6 +44,10 @@
 
 	let purging = false
 	async function purgeCache () {
+		if (domain.wildcard) {
+			return // not supported
+		}
+
 		if (purging) {
 			return
 		}
@@ -398,7 +402,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="_fs-2 _opct-80">Remove all cached resources</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCache}>
+						<button class="nm-button" class:is-loading={purging} on:click={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
