@@ -74,7 +74,7 @@
 		} catch (err) {
 			// ignore
 		} finally {
-			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 5000)
+			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 10000)
 		}
 	}
 
