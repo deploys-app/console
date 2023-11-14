@@ -1,12 +1,4 @@
-// import * as Sentry from '@sentry/sveltekit'
 import { sequence } from '@sveltejs/kit/hooks'
-// import { env } from '$env/dynamic/public'
-
-// if (env.PUBLIC_SENTRY_DSN) {
-//  Sentry.init({
-//     dsn: env.PUBLIC_SENTRY_DSN
-//  })
-// }
 
 /** @type {import('@sveltejs/kit').Handle} */
 async function injectHeaders ({ event, resolve }) {
@@ -59,10 +51,8 @@ function storeProject ({ event, resolve }) {
 }
 
 export const handle = sequence(
-	// Sentry.sentryHandle(),
 	injectHeaders,
 	theme,
 	handleCookie,
 	storeProject
 )
-// export const handleError = Sentry.handleErrorWithSentry()
