@@ -248,6 +248,16 @@
 							</div>
 						</a>
 					</li>
+					<li>
+						<a href={`/dropbox?project=${project}`} title="Dropbox">
+							<div class="menu-item" class:is-active={menu === 'dropbox'}>
+								<span class="menu-icon">
+									<i class="fa-solid fa-box-open"></i>
+								</span>
+								<span>Dropbox (Alpha)</span>
+							</div>
+						</a>
+					</li>
 				{/if}
 			</ul>
 		</div>
