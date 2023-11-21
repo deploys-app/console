@@ -3,6 +3,7 @@ export async function POST ({ request }) {
 	const resp = await fetch('https://dropbox.deploys.app/', {
 		method: 'POST',
 		body: request.body,
+		// @ts-ignore
 		duplex: 'half',
 		headers: {
 			accept: 'application/json',
