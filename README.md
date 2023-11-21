@@ -9,10 +9,10 @@ Install dependencies with `bun install`.
 Start development server:
 
 ```bash
-bun run dev
+bun -b run dev
 
 # or start the server and open the app in a new browser tab
-bun run dev --open
+bun -b run dev --open
 ```
 
 ## Building
@@ -20,7 +20,7 @@ bun run dev --open
 To create a production version:
 
 ```bash
-bun run build
+bun -b run build
 ```
 
 ## License
