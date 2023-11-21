@@ -2,3 +2,6 @@ root = true
 
 [*.svelte]
 indent_style = tab
+
+[*.js,*.cjs]
+indent_style = tab

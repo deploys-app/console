@@ -30,7 +30,8 @@ module.exports = {
 		camelcase: ['error', {
 			allow: ['^UNSAFE_'],
 			properties: 'never',
-			ignoreGlobals: true
+			ignoreGlobals: true,
+			ignoreImports: true
 		}],
 		'comma-dangle': ['error', {
 			arrays: 'never',
