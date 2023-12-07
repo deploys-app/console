@@ -22,12 +22,12 @@
 		downloadUrl = ''
 		uploading = true
 		try {
-			const resp = await fetch('#', {
+			const resp = await fetch(`/api/dropbox?project=${project}`, {
 				method: 'POST',
 				body: file
 			})
 			const res = await resp.json()
-			downloadUrl = res.downloadUrl ?? ''
+			downloadUrl = res?.result?.downloadUrl ?? ''
 			elFile.value = ''
 		} catch (e) {
 			console.log(e)
