@@ -53,13 +53,13 @@
 				<tr>
 					<td>
 						{tag.tag}
-						<span class="icon copy" data-clipboard-text="registry.deploys.app/{repository.name}:{tag.tag}">
+						<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
 					<td>
 						{format.shortDigest(tag.digest)}
-						<span class="icon copy" data-clipboard-text="registry.deploys.app/{repository.name}@{tag.digest}">
+						<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
