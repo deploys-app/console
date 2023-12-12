@@ -8,6 +8,7 @@
 <h6>Registry (Alpha)</h6>
 <br>
 <div class="nm-panel is-level-300">
+	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
 	<div class="nm-table-container _mgt-6">
 		<table class="nm-table">
 			<thead>
