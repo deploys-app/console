@@ -34,7 +34,7 @@
 	<div class="lo-12 _g-5">
 		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
 			<strong>{repository.name}</strong>
-			<div class="_fs-4 _mgt-3 _wb-ba">registry.deploys.app/{repository.name}</div>
+			<div class="_fs-4 _mgt-3 _wb-ba">registry.deploys.app/{project}/{repository.name}</div>
 			<div class="_fs-4 _mgt-3 _wb-ba">{format.storage(repository.size)}</div>
 		</h3>
 	</div>
