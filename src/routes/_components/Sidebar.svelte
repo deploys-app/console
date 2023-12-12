@@ -258,6 +258,16 @@
 							</div>
 						</a>
 					</li>
+					<li>
+						<a href={`/registry?project=${project}`} title="Dropbox">
+							<div class="menu-item" class:is-active={menu === 'registry'}>
+								<span class="menu-icon">
+									<i class="fa-solid fa-warehouse-full"></i>
+								</span>
+								<span>Registry (Alpha)</span>
+							</div>
+						</a>
+					</li>
 				{/if}
 			</ul>
 		</div>

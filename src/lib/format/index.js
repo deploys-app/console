@@ -27,6 +27,14 @@ export function memory (v) {
 }
 
 /**
+ * @param {number} v
+ * @returns {string}
+ */
+export function storage (v) {
+	return (v / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
+}
+
+/**
  * @param {string} v
  * @returns {string}
  */
@@ -64,4 +72,12 @@ export function deploymentType (t) {
 		TCPService: 'TCP Service',
 		InternalTCPService: 'Internal TCP Service'
 	}[t] || t
+}
+
+/**
+ * @param {string} s
+ * @returns {string}
+ */
+export function shortDigest (s) {
+	return s.replace(/^sha256:/, '').slice(0, 12)
 }
