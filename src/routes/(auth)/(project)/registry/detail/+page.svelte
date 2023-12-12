@@ -63,7 +63,7 @@
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
-					<td>{tag.createdAt}</td>
+					<td>{format.datetime(tag.createdAt)}</td>
 				</tr>
 			{/each}
 			</tbody>
