@@ -10,7 +10,7 @@ export async function load ({ parent, fetch }) {
 	} = await parent()
 
 	const revisions = await api.invoke('deployment.revisions', { project, location, name }, fetch)
-	if (!revisions.ok) throw error(500, revisions.error?.message)
+	if (!revisions.ok) error(500, revisions.error?.message)
 
 	return {
 		deployment,

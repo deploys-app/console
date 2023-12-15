@@ -11,8 +11,8 @@ export async function load ({ url, parent, fetch }) {
 	if (location && name) {
 		deployment = await api.invoke('deployment.get', { project, location, name }, fetch)
 		if (!deployment.ok) {
-			if (deployment.error?.notFound) throw redirect(302, `/deployment?project=${project}`)
-			throw error(500, deployment.error?.message)
+			if (deployment.error?.notFound) redirect(302, `/deployment?project=${project}`)
+			error(500, deployment.error?.message)
 		}
 	}
 	return {

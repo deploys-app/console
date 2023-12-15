@@ -5,7 +5,7 @@ export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 	const roles = await api.invoke('role.list', { project }, fetch)
 	if (!roles.ok && !roles.error?.forbidden) {
-		throw error(500, roles.error?.message)
+		error(500, roles.error?.message)
 	}
 
 	return {

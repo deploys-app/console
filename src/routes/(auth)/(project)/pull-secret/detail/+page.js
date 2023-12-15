@@ -8,10 +8,10 @@ export async function load ({ url, parent, fetch }) {
 
 	const pullSecret = await api.invoke('pullSecret.get', { project, location, name }, fetch)
 	if (!pullSecret.ok) {
-		if (pullSecret.error?.notFound) throw redirect(302, `/pull-secret?project=${project}`)
-		throw error(500, pullSecret.error?.message)
+		if (pullSecret.error?.notFound) redirect(302, `/pull-secret?project=${project}`)
+		error(500, pullSecret.error?.message)
 	}
-	if (!pullSecret.result) throw redirect(302, `/pull-secret?project=${project}`)
+	if (!pullSecret.result) redirect(302, `/pull-secret?project=${project}`)
 
 	return {
 		location,

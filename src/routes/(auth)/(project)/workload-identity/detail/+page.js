@@ -13,9 +13,9 @@ export async function load ({ url, parent, fetch }) {
 
 	if (!locationData.ok || !workloadIdentity.ok) {
 		if (locationData.error?.notFound || workloadIdentity.error?.notFound) {
-			throw redirect(302, `/workload-identity?project=${project}`)
+			redirect(302, `/workload-identity?project=${project}`)
 		}
-		throw error(500, `location: ${locationData.error?.message}, workloadIdentity: ${workloadIdentity.error?.message}`)
+		error(500, `location: ${locationData.error?.message}, workloadIdentity: ${workloadIdentity.error?.message}`)
 	}
 	return {
 		// location: locationData.result,
