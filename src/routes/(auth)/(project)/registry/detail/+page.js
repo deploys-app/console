@@ -15,24 +15,12 @@ export async function load ({ url, parent, fetch }) {
 		error(500, repository.error?.message)
 	}
 
-	const [/* manifests , */tags] = await Promise.all([
-		// api.invoke('registry/getManifests', {
-		// 	project,
-		// 	repository: id
-		// }, fetch),
-		api.invoke('registry/getTags', {
-			project,
-			repository: id
-		}, fetch)
-	])
-	if (/* !manifests.ok || */ !tags.ok) {
-		error(500, /* manifests.error?.message || */ tags.error?.message)
-	}
-
 	return {
 		id,
 		repository: repository.result,
-		// manifests: manifests.result?.items ?? [],
-		tags: tags.result?.items ?? []
+		tags: api.invoke('registry/getTags', {
+			project,
+			repository: id
+		}, fetch)
 	}
 }

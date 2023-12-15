@@ -1,8 +1,10 @@
 <script>
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
+
 	export let data
 
 	$: project = data.project
-	$: repositories = data.repositories
 </script>
 
 <h6>Registry (Alpha)</h6>
@@ -17,16 +19,26 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each repositories as repo}
-					<tr>
-						<td>
-							<a class="nm-link"
-							   href="/registry/detail?project={project}&repository={repo.name}">
-								{repo.name}
-							</a>
-						</td>
-					</tr>
-				{/each}
+				{#await data.repositories}
+					<LoadingRow span={1} />
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as repo}
+							<tr>
+								<td>
+									<a class="nm-link"
+									   href="/registry/detail?project={project}&repository={repo.name}">
+										{repo.name}
+									</a>
+								</td>
+							</tr>
+						{/each}
+					{:else}
+						<ErrorRow span={1} error={res.error} />
+					{/if}
+				{:catch error}
+					<ErrorRow span={1} error={error} />
+				{/await}
 			</tbody>
 		</table>
 	</div>
