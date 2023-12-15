@@ -2,14 +2,13 @@
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
+	import LoadingRow from '$lib/components/LoadingRow.svelte'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: id = data.id
 	$: repository = data.repository
-	// $: manifests = data.manifests
-	$: tags = data.tags
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -49,23 +48,33 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#each tags as tag}
-				<tr>
-					<td>
-						{tag.tag}
-						<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</td>
-					<td>
-						{format.shortDigest(tag.digest)}
-						<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</td>
-					<td>{format.datetime(tag.createdAt)}</td>
-				</tr>
-			{/each}
+				{#await data.tags}
+					<LoadingRow span={3} />
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as tag}
+							<tr>
+								<td>
+									{tag.tag}
+									<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
+										<i class="fa-light fa-copy"></i>
+									</span>
+								</td>
+								<td>
+									{format.shortDigest(tag.digest)}
+									<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
+										<i class="fa-light fa-copy"></i>
+									</span>
+								</td>
+								<td>{format.datetime(tag.createdAt)}</td>
+							</tr>
+						{/each}
+					{:else}
+						<ErrorRow span={3} error={res.error} />
+					{/if}
+				{:catch error}
+					<ErrorRow span={3} error={error} />
+				{/await}
 			</tbody>
 		</table>
 	</div>
