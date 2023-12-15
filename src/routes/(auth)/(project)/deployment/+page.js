@@ -7,7 +7,7 @@ export async function load ({ parent, fetch }) {
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Deployment>>} */
 	const deployments = await api.invoke('deployment.list', { project }, fetch)
 	if (!deployments.ok && !deployments.error?.forbidden) {
-		throw error(500, deployments.error?.message)
+		error(500, deployments.error?.message)
 	}
 
 	return {

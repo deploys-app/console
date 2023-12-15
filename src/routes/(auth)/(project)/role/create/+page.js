@@ -7,17 +7,17 @@ export async function load ({ url, parent, fetch }) {
 
 	/** @type {import('$types').ApiResponse<string[]>} */
 	const permissions = await api.invoke('role.permissions', {}, fetch)
-	if (!permissions.ok) throw error(500, permissions.error?.message)
+	if (!permissions.ok) error(500, permissions.error?.message)
 
 	let role = null
 	if (roleId) {
 		/** @type {import('$types').ApiResponse<import('$types').Role>} */
 		const roleInfo = await api.invoke('role.get', { project, role: roleId }, fetch)
 		if (!roleInfo.ok) {
-			if (roleInfo.error?.notFound) throw redirect(302, `/role?project=${project}`)
-			throw error(500, roleInfo.error?.message)
+			if (roleInfo.error?.notFound) redirect(302, `/role?project=${project}`)
+			error(500, roleInfo.error?.message)
 		}
-		if (!roleInfo.result) throw redirect(302, `/role?project=${project}`)
+		if (!roleInfo.result) redirect(302, `/role?project=${project}`)
 		role = roleInfo.result
 	}
 

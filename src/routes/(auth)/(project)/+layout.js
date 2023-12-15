@@ -19,9 +19,9 @@ export async function load ({ url, data, fetch }) {
 	if (!project && restoreProject) {
 		const q = new URLSearchParams(url.search)
 		q.set('project', restoreProject)
-		throw redirect(302, `?${q.toString()}`)
+		redirect(302, `?${q.toString()}`)
 	}
-	if (!project) throw redirect(302, '/project')
+	if (!project) redirect(302, '/project')
 
 	if (browser && browserCache?.project === project) {
 		return {
@@ -36,16 +36,16 @@ export async function load ({ url, data, fetch }) {
 	if (!projectInfo.ok) {
 		// not allow to access if user don't have permission 'project.get'
 		if (projectInfo.error?.forbidden || projectInfo.error?.notFound) {
-			throw redirect(302, '/project')
+			redirect(302, '/project')
 		}
-		throw error(500, `project: ${projectInfo.error?.message}`)
+		error(500, `project: ${projectInfo.error?.message}`)
 	}
-	if (!projectInfo.result) throw error(302, '/project')
+	if (!projectInfo.result) error(302, '/project')
 
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Location>>} */
 	const locations = await api.invoke('location.list', { project }, fetch)
-	if (!locations.ok) throw error(500, `locations: ${locations.error?.message}`)
-	if (!locations.result) throw error(302, '/project')
+	if (!locations.ok) error(500, `locations: ${locations.error?.message}`)
+	if (!locations.result) error(302, '/project')
 
 	if (browser) {
 		browserCache = {

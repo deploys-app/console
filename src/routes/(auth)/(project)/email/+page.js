@@ -5,7 +5,7 @@ export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 	const emails = await api.invoke('email.list', { project }, fetch)
 	if (!emails.ok && !emails.error?.forbidden) {
-		throw error(500, emails.error?.message)
+		error(500, emails.error?.message)
 	}
 
 	return {

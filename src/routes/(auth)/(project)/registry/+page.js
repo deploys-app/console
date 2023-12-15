@@ -5,7 +5,7 @@ export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 	const repositories = await api.invoke('registry/list', { project }, fetch)
 	if (!repositories.ok && !repositories.error?.forbidden) {
-		throw error(500, repositories.error?.message)
+		error(500, repositories.error?.message)
 	}
 
 	return {

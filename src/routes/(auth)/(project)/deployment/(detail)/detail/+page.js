@@ -11,9 +11,9 @@ export async function load ({ parent, fetch }) {
 	/** @type {import('$types').ApiResponse<import('$types').Location>} */
 	const locationInfo = await api.invoke('location.get', { project, id: location }, fetch)
 	if (!locationInfo.ok) {
-		throw error(500, `location: ${locationInfo.error?.message}`)
+		error(500, `location: ${locationInfo.error?.message}`)
 	}
-	if (!locationInfo.result) throw redirect(302, `/deployment?project=${project}`)
+	if (!locationInfo.result) redirect(302, `/deployment?project=${project}`)
 
 	return {
 		location: locationInfo.result,

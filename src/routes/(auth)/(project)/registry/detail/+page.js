@@ -10,9 +10,9 @@ export async function load ({ url, parent, fetch }) {
 	}, fetch)
 	if (!repository.ok) {
 		if (repository.error?.message === 'repository not found') {
-			throw redirect(302, `/registry?project=${project}`)
+			redirect(302, `/registry?project=${project}`)
 		}
-		throw error(500, repository.error?.message)
+		error(500, repository.error?.message)
 	}
 
 	const [/* manifests , */tags] = await Promise.all([
@@ -26,7 +26,7 @@ export async function load ({ url, parent, fetch }) {
 		}, fetch)
 	])
 	if (/* !manifests.ok || */ !tags.ok) {
-		throw error(500, /* manifests.error?.message || */ tags.error?.message)
+		error(500, /* manifests.error?.message || */ tags.error?.message)
 	}
 
 	return {

@@ -19,7 +19,7 @@ export async function load ({ parent, fetch }) {
 	}
 
 	if (!usage.ok || !price.ok) {
-		throw error(500, `usage: ${usage.error?.message}, price: ${price.error?.message}`)
+		error(500, `usage: ${usage.error?.message}, price: ${price.error?.message}`)
 	}
 
 	return {
