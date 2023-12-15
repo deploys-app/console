@@ -40,12 +40,12 @@ export async function load ({ url, data, fetch }) {
 		}
 		error(500, `project: ${projectInfo.error?.message}`)
 	}
-	if (!projectInfo.result) error(302, '/project')
+	if (!projectInfo.result) redirect(302, '/project')
 
 	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Location>>} */
 	const locations = await api.invoke('location.list', { project }, fetch)
 	if (!locations.ok) error(500, `locations: ${locations.error?.message}`)
-	if (!locations.result) error(302, '/project')
+	if (!locations.result) redirect(302, '/project')
 
 	if (browser) {
 		browserCache = {
