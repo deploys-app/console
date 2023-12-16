@@ -275,4 +275,19 @@ declare namespace Api {
         createdBy: string
         successAt: string
     }
+
+    export interface Repository {
+        name: string
+        createdAt: string
+    }
+
+    export interface RepositoryTag {
+        tag: string
+        digest: string
+        createdAt: string
+    }
+
+    export type RepositoryTagResult =
+        List<RepositoryTag>
+        & { name: string }
 }

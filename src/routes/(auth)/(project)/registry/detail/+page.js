@@ -18,6 +18,7 @@ export async function load ({ url, parent, fetch }) {
 	return {
 		id,
 		repository: repository.result,
+		/** @type {Promise<Api.Response<Api.RepositoryTagResult>>} */
 		tags: api.invoke('registry/getTags', {
 			project,
 			repository: id
