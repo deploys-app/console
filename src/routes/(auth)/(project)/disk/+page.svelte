@@ -4,18 +4,20 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { loading } from '$lib/stores'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: permission = data.permission
-	$: disks = data.disks
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('disk.list')
-		if (!disks.some((x) => x.status === 'pending')) {
+		const res = await data.disks
+		if (!res.ok) {
+			return
+		}
+		if (!res.result.items?.some((x) => x.status === 'pending')) {
 			return 300000
 		}
 	}, 4000))
@@ -26,7 +28,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/disk/create?project=${project}`}>
+			<a class="nm-button" href="/disk/create?project={project}">
                 Create
             </a>
 		</div>
@@ -44,32 +46,38 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={5} />
-			{:else}
-				{#each disks as it}
-					<tr>
-						<td>
-							<StatusIcon status={it.status} />
-							<a class="nm-link" href={`/disk/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
-								{it.name}
-							</a>
-						</td>
-						<td>{it.size} GiB</td>
-						<td>{it.location}</td>
-						<td>{format.datetime(it.createdAt)}</td>
-						<td>
-							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
-								<div class="icon-button">
-									<i class="fa-solid fa-pen"></i>
-								</div>
-							</a>
-						</td>
-					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.disks} />
-				{/each}
-			{/if}
+				{#await data.disks}
+					<LoadingRow span={5} />
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as it (it.name)}
+							<tr>
+								<td>
+									<StatusIcon status={it.status} />
+									<a class="nm-link" href="/disk/metrics?project={project}&location={it.location}&name={it.name}">
+										{it.name}
+									</a>
+								</td>
+								<td>{it.size} GiB</td>
+								<td>{it.location}</td>
+								<td>{format.datetime(it.createdAt)}</td>
+								<td>
+									<a href="/disk/create?project={project}&location={it.location}&name={it.name}">
+										<div class="icon-button">
+											<i class="fa-solid fa-pen"></i>
+										</div>
+									</a>
+								</td>
+							</tr>
+						{:else}
+							<NoDataRow span={5} />
+						{/each}
+					{:else}
+						<ErrorRow span={5} error={res.error} />
+					{/if}
+				{:catch error}
+					<ErrorRow span={5} error={error} />
+				{/await}
 			</tbody>
 		</table>
 	</div>
