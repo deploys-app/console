@@ -276,6 +276,15 @@ declare namespace Api {
         successAt: string
     }
 
+    export type ServiceAccount = {
+        sid: string
+        email: string
+        name: string
+        description: string
+        createdAt: string
+        createdBy: string
+    }
+
     export type Repository = {
         name: string
         createdAt: string
