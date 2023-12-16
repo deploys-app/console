@@ -276,18 +276,6 @@ declare namespace Api {
         successAt: string
     }
 
-    export interface Disk {
-        project: string
-        location: string
-        name: string
-        size: number
-        status: 'pending' | 'success' | 'error'
-        action: 'create' | 'delete'
-        createdAt: string
-        createdBy: string
-        successAt: string
-    }
-
     export interface Repository {
         name: string
         createdAt: string
