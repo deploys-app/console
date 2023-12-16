@@ -1,6 +1,7 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
 
@@ -32,6 +33,8 @@
 									</a>
 								</td>
 							</tr>
+						{:else}
+							<NoDataRow span={1} />
 						{/each}
 					{:else}
 						<ErrorRow span={1} error={res.error} />
