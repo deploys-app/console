@@ -1,16 +1,17 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: permission = data.permission
-	$: routes = data.routes
 
+	/**
+	 * @param {import('$types').Route} route
+	 */
 	function deleteRoute (route) {
 		modal.confirm({
 			title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
@@ -57,33 +58,41 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={5} />
-			{:else}
-				{#each routes as it}
-					<tr>
-						<td>
-							<a class="nm-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
-						</td>
-						<td>{it.target}</td>
-						<td>{it.location}</td>
-						<td>
-							{#if it.config.basicAuth}
-								<i class="fa-solid fa-lock"></i>
-							{/if}
-						</td>
-<!--						<td>{format.datetime(it.createdAt)}</td>-->
-<!--						<td>{it.createdBy}</td>-->
-						<td>
-							<button class="icon-button" on:click={() => deleteRoute(it)}>
-								<i class="fa-solid fa-trash-alt"></i>
-							</button>
-						</td>
-					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.routes} />
-				{/each}
-			{/if}
+				{#await data.routes}
+					<LoadingRow span={5} />
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as it}
+							<tr>
+								<td>
+									<a class="nm-link _tdcrt-udl"
+									   href={`https://${it.domain}${it.path}`}
+									   target="_blank">https://{it.domain}{it.path}</a>
+								</td>
+								<td>{it.target}</td>
+								<td>{it.location}</td>
+								<td>
+									{#if it.config.basicAuth}
+										<i class="fa-solid fa-lock"></i>
+									{/if}
+								</td>
+								<!--						<td>{format.datetime(it.createdAt)}</td>-->
+								<!--						<td>{it.createdBy}</td>-->
+								<td>
+									<button class="icon-button" on:click={() => deleteRoute(it)}>
+										<i class="fa-solid fa-trash-alt"></i>
+									</button>
+								</td>
+							</tr>
+						{:else}
+							<NoDataRow span={5} />
+						{/each}
+					{:else}
+						<ErrorRow span={5} error={res.error} />
+					{/if}
+				{:catch error}
+					<ErrorRow span={5} error={error} />
+				{/await}
 			</tbody>
 		</table>
 	</div>
