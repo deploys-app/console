@@ -16,7 +16,7 @@ declare namespace Api {
         | { ok: true; result: T; error?: never }
         | { ok: false; error: Error; result?: never }
 
-    export interface Profile {
+    export type Profile = {
         email: string
     }
 
@@ -24,16 +24,16 @@ declare namespace Api {
         items: T[]
     }
 
-    export interface ProjectQuota {
+    export type ProjectQuota = {
         deployments: number
         deploymentMaxReplicas: number
     }
 
-    export interface ProjectConfig {
+    export type ProjectConfig = {
         domainAllowDisableCdn: boolean
     }
 
-    export interface Project {
+    export type Project = {
         id: string
         project: string
         name: string
@@ -43,7 +43,7 @@ declare namespace Api {
         createdAt: string
     }
 
-    export interface BillingAccount {
+    export type BillingAccount = {
         id: string
         name: string
         taxId: string
@@ -52,7 +52,7 @@ declare namespace Api {
         active: boolean
     }
 
-    export interface ProjectUsage {
+    export type ProjectUsage = {
         cpuUsage: number
         cpu: number
         memory: number
@@ -61,17 +61,17 @@ declare namespace Api {
         replica: number
     }
 
-    export interface BillingProject {
+    export type BillingProject = {
         price: number
     }
 
-    export interface PodStatus {
+    export type PodStatus = {
         count: number
         ready: number
         failed: number
     }
 
-    export interface RouteConfig {
+    export type RouteConfig = {
         basicAuth?: {
             user: string
             password: string
@@ -83,7 +83,7 @@ declare namespace Api {
         }
     }
 
-    export interface Route {
+    export type Route = {
         location: string
         domain: string
         path: string
@@ -94,7 +94,7 @@ declare namespace Api {
         createdBy: string
     }
 
-    export interface Location {
+    export type Location = {
         id: string
         domainSuffix: string
         endpoint: string
@@ -108,7 +108,7 @@ declare namespace Api {
         createdAt: string
     }
 
-    export interface Domain {
+    export type Domain = {
         project: string
         location: string
         domain: string
@@ -144,13 +144,13 @@ declare namespace Api {
         createdBy: string
     }
 
-    export interface PullSecretSpec {
+    export type PullSecretSpec = {
         server: string
         username: string
         password: string
     }
 
-    export interface PullSecret {
+    export type PullSecret = {
         name: string
         value: string
         spec: PullSecretSpec
@@ -161,7 +161,7 @@ declare namespace Api {
         createdBy: string
     }
 
-    export interface WorkloadIdentity {
+    export type WorkloadIdentity = {
         project: string
         location: string
         name: string
@@ -171,7 +171,7 @@ declare namespace Api {
         createdBy: string
     }
 
-    export interface Disk {
+    export type Disk = {
         project: string
         location: string
         name: string
@@ -183,7 +183,7 @@ declare namespace Api {
         successAt: string
     }
 
-    export interface Role {
+    export type Role = {
         role: string
         name: string
         permissions: string[]
@@ -191,19 +191,19 @@ declare namespace Api {
         createdBy: string
     }
 
-    export interface Env {
+    export type Env = {
         [key: string]: string
     }
 
-    export interface MountData {
+    export type MountData = {
         [key: string]: string
     }
 
-    export interface Annotations {
+    export type Annotations = {
         [key: string]: string
     }
 
-    export interface DeploymentDisk {
+    export type DeploymentDisk = {
         name: string
         mountPath: string
         subPath: string
@@ -218,17 +218,17 @@ declare namespace Api {
         H2C = 'h2c'
     }
 
-    export interface Resource {
+    export type Resource = {
         // cpu: string
         memory: string
     }
 
-    export interface DeploymentResource {
+    export type DeploymentResource = {
         requests: Resource
         limits: Resource
     }
 
-    export interface Sidecar {
+    export type Sidecar = {
         cloudSqlProxy?: {
             instance: string
             port: number
@@ -236,7 +236,7 @@ declare namespace Api {
         }
     }
 
-    export interface Deployment {
+    export type Deployment = {
         project: string
         location: string
         name: string
@@ -276,12 +276,12 @@ declare namespace Api {
         successAt: string
     }
 
-    export interface Repository {
+    export type Repository = {
         name: string
         createdAt: string
     }
 
-    export interface RepositoryTag {
+    export type RepositoryTag = {
         tag: string
         digest: string
         createdAt: string
