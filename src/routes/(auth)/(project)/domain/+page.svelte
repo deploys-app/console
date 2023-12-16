@@ -1,17 +1,14 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: permission = data.permission
-	$: domains = data.domains
-	$: projectInfo = data.projectInfo
 
 	function deleteDomain (domain) {
 		modal.confirm({
@@ -57,42 +54,46 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
+			{#await data.domains}
 				<LoadingRow span={5} />
-			{:else}
-				{#each domains as it}
-					<tr>
-						<td>
-							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
-							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
-						</td>
-						<td>
-							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
-							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
-							{/if}
-						</td>
-						<td>
-							{#if it.cdn}
-								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
-							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
-							{/if}
-						</td>
-						<td>{it.location}</td>
-<!--						<td>{format.datetime(it.createdAt)}</td>-->
-<!--						<td>{it.createdBy}</td>-->
-						<td>
-							<button class="icon-button" on:click={() => deleteDomain(it)}>
-								<i class="fa-solid fa-trash-alt"></i>
-							</button>
-						</td>
-					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.domains} />
-				{/each}
-			{/if}
+			{:then res}
+				{#if res.ok}
+					{#each res.result.items ?? [] as it}
+						<tr>
+							<td>
+								<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
+								<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
+							</td>
+							<td>
+								{#if it.wildcard}
+									<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+								{:else}
+									<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+								{/if}
+							</td>
+							<td>
+								{#if it.cdn}
+									<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+								{:else}
+									<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+								{/if}
+							</td>
+							<td>{it.location}</td>
+	<!--						<td>{format.datetime(it.createdAt)}</td>-->
+	<!--						<td>{it.createdBy}</td>-->
+							<td>
+								<button class="icon-button" on:click={() => deleteDomain(it)}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</td>
+						</tr>
+					{:else}
+						<NoDataRow span={5} />
+					{/each}
+				{/if}
+			{:catch error}
+				<ErrorRow span={5} error={error} />
+			{/await}
 			</tbody>
 		</table>
 	</div>
