@@ -1,3 +1,5 @@
+export type MaybePromise<T> = T | Promise<T>
+
 export interface Error {
 	message: string
 	items?: string[]

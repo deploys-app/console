@@ -11,14 +11,20 @@
 
 	$: project = data.project
 
+	/** @type {import('$types').MaybePromise<import('$types').ApiResponse<import('./+page').DeploymentListResult>>} */
+	let deployments = data.deployments
+
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('deployment.list')
 		const res = await data.deployments
-		if (!res.ok) return
-		if (!res.result.items?.some((x) => x.status === 'pending')) {
-			return 300000
+		if (!res.ok) {
+			return 3000
 		}
-	}, 4000))
+		deployments = res
+		if (res.result.items?.some((x) => x.status === 'pending')) {
+			return 4000
+		}
+	}, 300000))
 </script>
 
 <h6>Deployments</h6>
@@ -47,7 +53,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.deployments}
+				{#await deployments}
 					<LoadingRow span={6} />
 				{:then res}
 					{#if res.ok}
