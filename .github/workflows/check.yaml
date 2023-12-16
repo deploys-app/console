@@ -9,6 +9,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: asdf-vm/actions/install@v2
-    - run: bun install
+    - run: bun install --frozen-lockfile
     - run: bun run lint
     - run: bun run check

@@ -133,7 +133,6 @@
 			return
 		}
 		pullSecrets = resp.result.items ?? []
-		form.pullSecret = form.pullSecret
 	}
 
 	async function fetchWorkloadIdentities () {
@@ -152,7 +151,6 @@
 			return
 		}
 		workloadIdentities = resp.result.items ?? []
-		form.workloadIdentity = form.workloadIdentity
 	}
 
 	async function fetchDisks () {
@@ -171,7 +169,6 @@
 			return
 		}
 		disks = resp.result.items ?? []
-		form.disk.name = form.disk.name
 	}
 
 	async function changeLocation () {
@@ -344,12 +341,14 @@
 			<div class="nm-field">
 				<label for="input-pull_secret">Pull Secret</label>
 				<div class="nm-select">
-					<select id="input-pull_secret" bind:value={form.pullSecret}>
-						<option value="">No Pull Secret</option>
-						{#each pullSecrets as it}
-							<option value={it.name}>{it.name}</option>
-						{/each}
-					</select>
+					{#key pullSecrets}
+						<select id="input-pull_secret" bind:value={form.pullSecret}>
+							<option value="">No Pull Secret</option>
+							{#each pullSecrets as it (it.name)}
+								<option value={it.name}>{it.name}</option>
+							{/each}
+						</select>
+					{/key}
 				</div>
 			</div>
 		{:else}
@@ -367,12 +366,14 @@
 				<div class="nm-field">
 					<label for="input-workload_identity">Workload Identity</label>
 					<div class="nm-select">
-						<select id="input-workload_identity" bind:value={form.workloadIdentity}>
-							<option value="">No Workload Identity</option>
-							{#each workloadIdentities as it}
-								<option value={it.name}>{it.name}</option>
-							{/each}
-						</select>
+						{#key workloadIdentities}
+							<select id="input-workload_identity" bind:value={form.workloadIdentity}>
+								<option value="">No Workload Identity</option>
+								{#each workloadIdentities as it (it.name)}
+									<option value={it.name}>{it.name}</option>
+								{/each}
+							</select>
+						{/key}
 					</div>
 				</div>
 			{:else}
@@ -417,11 +418,11 @@
 		<div class="nm-field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="_pdbt-4">
-				{#each form.command as _, i}
+				{#each form.command as _, i (_)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
+							on:click={() => { form.command = form.command.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
@@ -436,11 +437,11 @@
 		<div class="nm-field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="_pdbt-4">
-				{#each form.args as _, i}
+				{#each form.args as _, i (_)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
+							on:click={() => { form.args = form.args.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
@@ -473,12 +474,14 @@
 					<div class="nm-field">
 						<label for="input-disk_name">Name</label>
 						<div class="nm-select">
-							<select id="input-disk_name" bind:value={form.disk.name}>
-								<option value="">No Disk</option>
-								{#each disks as it}
-									<option value={it.name}>{it.name}</option>
-								{/each}
-							</select>
+							{#key disks}
+								<select id="input-disk_name" bind:value={form.disk.name}>
+									<option value="">No Disk</option>
+									{#each disks as it (it.name)}
+										<option value={it.name}>{it.name}</option>
+									{/each}
+								</select>
+							{/key}
 						</div>
 					</div>
 				{:else}
@@ -607,7 +610,7 @@
 								</td>
 								<td style="padding: 19px 12px;">
 									<button class="icon-button" type="button"
-										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
+										on:click={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -618,7 +621,7 @@
 						<tr>
 							<td colspan="4">
 								<button class="nm-button _dp-f _mg-at" type="button"
-									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
+									on:click={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
 								</button>
@@ -668,7 +671,7 @@
 								</td>
 								<td style="padding: 19px 12px;">
 									<button class="icon-button" type="button"
-										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
+										on:click={() => { form.mountData = form.mountData.filter((_, k) => k !== i) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -679,7 +682,7 @@
 					<tr>
 						<td colspan="4">
 							<button class="nm-button _dp-f _mg-at" type="button"
-								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
+								on:click={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
 							</button>

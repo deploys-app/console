@@ -4,21 +4,27 @@
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { loading } from '$lib/stores'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: permission = data.permission
-	$: deployments = data.deployments
+
+	/** @type {import('$types').MaybePromise<import('$types').ApiResponse<import('./+page').DeploymentListResult>>} */
+	let deployments = data.deployments
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('deployment.list')
-		if (!deployments.some((x) => x.status === 'pending')) {
-			return 300000
+		const res = await data.deployments
+		if (!res.ok) {
+			return 3000
 		}
-	}, 4000))
+		deployments = res
+		if (res.result.items?.some((x) => x.status === 'pending')) {
+			return 4000
+		}
+	}, 300000))
 </script>
 
 <h6>Deployments</h6>
@@ -26,7 +32,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/deployment/deploy?project=${project}`}>
+			<a class="nm-button" href="/deployment/deploy?project={project}">
                 Create
             </a>
 		</div>
@@ -47,39 +53,45 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={6} />
-			{:else}
-				{#each deployments as it}
-					<tr>
-						<td>
-							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
-							<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
-								{it.name}
-							</a>
-						</td>
-						<td>{format.deploymentType(it.type)}</td>
-	<!--					<td>{format.cpu(it.resources.requests.cpu)}</td>-->
-						<td>{format.memory(it.resources.requests.memory)}</td>
-						<td>
-							{#if it.minReplicas > 0}
-								{#if it.minReplicas === it.maxReplicas}
-									{it.minReplicas}
-								{:else}
-									{it.minReplicas} - {it.maxReplicas}
-								{/if}
-							{:else}
-								-
-							{/if}
-						</td>
-						<td>{it.location}</td>
-						<td>{format.datetime(it.createdAt)}</td>
-	<!--					<td>{it.createdBy}</td>-->
-					</tr>
-				{:else}
-					<NoDataRow span={6} forbidden={!permission.deployments} />
-				{/each}
-			{/if}
+				{#await deployments}
+					<LoadingRow span={6} />
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as it}
+							<tr>
+								<td>
+									<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
+									<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+										{it.name}
+									</a>
+								</td>
+								<td>{format.deploymentType(it.type)}</td>
+			<!--					<td>{format.cpu(it.resources.requests.cpu)}</td>-->
+								<td>{format.memory(it.resources.requests.memory)}</td>
+								<td>
+									{#if it.minReplicas > 0}
+										{#if it.minReplicas === it.maxReplicas}
+											{it.minReplicas}
+										{:else}
+											{it.minReplicas} - {it.maxReplicas}
+										{/if}
+									{:else}
+										-
+									{/if}
+								</td>
+								<td>{it.location}</td>
+								<td>{format.datetime(it.createdAt)}</td>
+			<!--					<td>{it.createdBy}</td>-->
+							</tr>
+						{:else}
+							<NoDataRow span={6} />
+						{/each}
+					{:else}
+						<ErrorRow span={6} error={res.error} />
+					{/if}
+				{:catch error}
+					<ErrorRow span={6} error={error} />
+				{/await}
 			</tbody>
 		</table>
 	</div>

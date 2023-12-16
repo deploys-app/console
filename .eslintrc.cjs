@@ -1,13 +1,24 @@
 module.exports = {
 	root: true,
+	parser: '@typescript-eslint/parser',
 	ignorePatterns: ['node_modules', 'build'],
-	extends: ['eslint:recommended'],
-	plugins: ['svelte3'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
+	extends: [
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+		'plugin:svelte/recommended'
+	],
+	plugins: ['@typescript-eslint'],
 	parserOptions: {
 		sourceType: 'module',
-		ecmaVersion: 2020
+		ecmaVersion: 2020,
+		extraFileExtensions: ['.svelte'],
 	},
+	overrides: [
+		{
+			files: ['*.svelte'],
+			parser: 'svelte-eslint-parser'
+		}
+	],
 	env: {
 		browser: true,
 		es2017: true,
@@ -107,7 +118,7 @@ module.exports = {
 			],
 			allowSamePrecedence: true
 		}],
-		'no-mixed-spaces-and-tabs': 'error',
+		'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
 		'no-multi-spaces': 'error',
 		'no-multi-str': 'error',
 		'no-new': 'error',
