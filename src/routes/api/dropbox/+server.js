@@ -19,7 +19,7 @@ export async function POST ({ locals, request, url }) {
 	const resp = await fetch('https://dropbox.deploys.app/', {
 		method: 'POST',
 		body: request.body,
-		// @ts-ignore
+		// @ts-expect-error workaround for missing type
 		duplex: 'half',
 		headers: {
 			accept: 'application/json',

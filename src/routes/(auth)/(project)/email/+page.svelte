@@ -6,7 +6,6 @@
 
 	export let data
 
-	$: project = data.project
 	$: permission = data.permission
 	$: emails = data.emails
 </script>

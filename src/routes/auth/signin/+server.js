@@ -5,10 +5,9 @@ let webcrypto
 
 // workaround for dev
 if (typeof crypto === 'undefined') {
-	// @ts-ignore
 	import('node:crypto')
 		.then((imp) => {
-			// @ts-ignore
+			// @ts-expect-error workaround to use Crypto while dev
 			webcrypto = imp.webcrypto
 		})
 		.catch(() => {

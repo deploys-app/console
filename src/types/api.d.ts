@@ -9,11 +9,9 @@ export interface Error {
 	validate?: string[]
 }
 
-export interface ApiResponse<T> {
-	ok: boolean
-	error?: Error
-	result?: T
-}
+export type ApiResponse<T> =
+	| { ok: true; result: T; error?: never }
+	| { ok: false; error: Error; result?: never }
 
 export interface Profile {
 	email: string
@@ -21,6 +19,15 @@ export interface Profile {
 
 export interface List<T> {
 	items: T[]
+}
+
+export interface ProjectQuota {
+	deployments: number
+	deploymentMaxReplicas: number
+}
+
+export interface ProjectConfig {
+	domainAllowDisableCdn: boolean
 }
 
 export interface Project {
@@ -31,15 +38,6 @@ export interface Project {
 	quota: ProjectQuota
 	config: ProjectConfig
 	createdAt: string
-}
-
-export interface ProjectQuota {
-	deployments: number
-	deploymentMaxReplicas: number
-}
-
-export interface ProjectConfig {
-	domainAllowDisableCdn: boolean
 }
 
 export interface BillingAccount {
@@ -70,17 +68,6 @@ export interface PodStatus {
 	failed: number
 }
 
-export interface Route {
-	location: string
-	domain: string
-	path: string
-	target: string
-	deployment: string
-	config: RouteConfig
-	createdAt: string
-	createdBy: string
-}
-
 export interface RouteConfig {
 	basicAuth?: {
 		user: string
@@ -93,6 +80,17 @@ export interface RouteConfig {
 	}
 }
 
+export interface Route {
+	location: string
+	domain: string
+	path: string
+	target: string
+	deployment: string
+	config: RouteConfig
+	createdAt: string
+	createdBy: string
+}
+
 export interface Location {
 	id: string
 	domainSuffix: string
@@ -102,7 +100,7 @@ export interface Location {
 	memoryAllocatable: string[]
 	features: {
 		workloadIdentity?: boolean
-		disk?: {}
+		disk?: Record<string, never>
 	}
 	createdAt: string
 }
@@ -143,6 +141,12 @@ export interface Domain {
 	createdBy: string
 }
 
+export interface PullSecretSpec {
+	server: string
+	username: string
+	password: string
+}
+
 export interface PullSecret {
 	name: string
 	value: string
@@ -152,12 +156,6 @@ export interface PullSecret {
 	status: 'pending' | 'success' | 'error'
 	createdAt: string
 	createdBy: string
-}
-
-export interface PullSecretSpec {
-	server: string
-	username: string
-	password: string
 }
 
 export interface WorkloadIdentity {
@@ -209,8 +207,11 @@ export interface DeploymentDisk {
 }
 
 export enum DeploymentProtocol {
+	// eslint-disable-next-line no-unused-vars
 	HTTP = 'http',
+	// eslint-disable-next-line no-unused-vars
 	HTTPS = 'https',
+	// eslint-disable-next-line no-unused-vars
 	H2C = 'h2c'
 }
 
