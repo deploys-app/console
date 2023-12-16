@@ -290,6 +290,11 @@ declare namespace Api {
         createdBy: string
     }
 
+    export type EmailDomain = {
+        domain: string
+        createdAt: string
+    }
+
     export type Repository = {
         name: string
         createdAt: string
