@@ -191,6 +191,11 @@ declare namespace Api {
         createdBy: string
     }
 
+    export type RoleUser = {
+        email: string
+        roles: string[]
+    }
+
     export type Env = {
         [key: string]: string
     }

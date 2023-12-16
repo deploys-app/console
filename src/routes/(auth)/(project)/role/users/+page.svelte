@@ -1,15 +1,13 @@
 <script>
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-	$: permission = data.permission
-	$: users = data.users
 
 	function deleteUser (email) {
 		modal.confirm({
@@ -36,7 +34,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/role/bind?project=${project}`}>
+			<a class="nm-button" href="/role/bind?project={project}">
 				Add
 			</a>
 		</div>
@@ -52,32 +50,38 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#if $loading}
+				{#await data.users}
 					<LoadingRow span={3} />
-				{:else}
-					{#each users as it}
-						<tr>
-							<td>{it.email}</td>
-							<td>
-								{#each it.roles as r}
-									{r}<br>
-								{/each}
-							</td>
-							<td>
-								<a href={`/role/bind?project=${project}&email=${it.email}`}>
-									<div class="icon-button">
-										<i class="fa-solid fa-pen"></i>
-									</div>
-								</a>
-								<button class="icon-button" on:click={() => deleteUser(it.email)}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
-							</td>
-						</tr>
+				{:then res}
+					{#if res.ok}
+						{#each res.result.items ?? [] as it}
+							<tr>
+								<td>{it.email}</td>
+								<td>
+									{#each it.roles as r}
+										{r}<br>
+									{/each}
+								</td>
+								<td>
+									<a href="/role/bind?project={project}&email={it.email}">
+										<div class="icon-button">
+											<i class="fa-solid fa-pen"></i>
+										</div>
+									</a>
+									<button class="icon-button" on:click={() => deleteUser(it.email)}>
+										<i class="fa-solid fa-trash-alt"></i>
+									</button>
+								</td>
+							</tr>
+						{:else}
+							<NoDataRow span={3} />
+						{/each}
 					{:else}
-						<NoDataRow span={3} forbidden={!permission.users} />
-					{/each}
-				{/if}
+						<ErrorRow span={3} error={res.error} />
+					{/if}
+				{:catch err}
+					<ErrorRow span={3} error={err} />
+				{/await}
 			</tbody>
 		</table>
 	</div>
