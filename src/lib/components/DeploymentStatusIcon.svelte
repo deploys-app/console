@@ -18,7 +18,7 @@
 		cancelled: 'fa-solid fa-ban _cl-negative _cl-opacity-80'
 	}
 
-	/** @type {import('$types').PodStatus | null} */
+	/** @type {Api.PodStatus | null} */
 	let podStatus
 
 	/** @type {string} */

@@ -1,11 +1,9 @@
 import api from '$lib/api'
 
-/** @typedef {import('$types').List<import('$types').Deployment>} DeploymentListResult */
-
 export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 	return {
-		/** @type {Promise<import('$types').ApiResponse<DeploymentListResult>>} */
+		/** @type {Promise<Api.Response<Api.List<Api.Deployment>>>} */
 		deployments: api.invoke('deployment.list', { project }, fetch)
 	}
 }

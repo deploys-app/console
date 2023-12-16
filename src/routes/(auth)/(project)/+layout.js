@@ -5,8 +5,8 @@ import { browser } from '$app/environment'
 /**
  * @typedef {Object} BrowserCache
  * @property {string} project
- * @property {import('$types').Project} projectInfo
- * @property {import('$types').Location[]} locations
+ * @property {Api.Project} projectInfo
+ * @property {Api.Location[]} locations
  */
 
 /** @type {BrowserCache | null} */
@@ -31,7 +31,7 @@ export async function load ({ url, data, fetch }) {
 		}
 	}
 
-	/** @type {import('$types').ApiResponse<import('$types').Project>} */
+	/** @type {Api.Response<Api.Project>} */
 	const projectInfo = await api.invoke('project.get', { project }, fetch)
 	if (!projectInfo.ok) {
 		// not allow to access if user don't have permission 'project.get'
@@ -42,7 +42,7 @@ export async function load ({ url, data, fetch }) {
 	}
 	if (!projectInfo.result) redirect(302, '/project')
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Location>>} */
+	/** @type {Api.Response<Api.List<Api.Location>>} */
 	const locations = await api.invoke('location.list', { project }, fetch)
 	if (!locations.ok) error(500, `locations: ${locations.error?.message}`)
 	if (!locations.result) redirect(302, '/project')

@@ -10,7 +10,7 @@ let onUnauth
  * @param {string} fn
  * @param {Object} args
  * @param {fetch} fetch
- * @returns {Promise<import('$types').ApiResponse<T>>}
+ * @returns {Promise<Api.Response<T>>}
  */
 async function invoke (fn, args, fetch) {
 	const resp = await fetch(`${endpoint}/${fn}`, {

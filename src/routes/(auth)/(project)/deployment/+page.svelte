@@ -11,7 +11,7 @@
 
 	$: project = data.project
 
-	/** @type {import('$types').MaybePromise<import('$types').ApiResponse<import('./+page').DeploymentListResult>>} */
+	/** @type {MaybePromise<Api.Response<Api.List<Api.Deployment>>>} */
 	let deployments = data.deployments
 
 	onMount(() => api.intervalInvalidate(async () => {

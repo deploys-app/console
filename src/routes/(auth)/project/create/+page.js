@@ -4,7 +4,7 @@ import api from '$lib/api'
 export async function load ({ url, fetch }) {
 	const project = url.searchParams.get('project')
 
-	/** @type {import('$types').ApiResponse<import('$types').Project> | null} */
+	/** @type {Api.Response<Api.Project> | null} */
 	let projectInfo = null
 	if (project) {
 		projectInfo = await api.invoke('project.get', { project }, fetch)
@@ -14,7 +14,7 @@ export async function load ({ url, fetch }) {
 		}
 	}
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').BillingAccount>>} */
+	/** @type {Api.Response<Api.List<Api.BillingAccount>>} */
 	const billingAccounts = await api.invoke('billing.list', {}, fetch)
 	if (!billingAccounts.ok) error(500, billingAccounts.error?.message)
 

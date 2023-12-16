@@ -40,7 +40,7 @@ export async function confirm ({ title, html, yes, callback }) {
 
 /**
  * @typedef {Object} ModalErrorOptions
- * @property {string | import('$types').Error | unknown} [error]
+ * @property {string | Api.Error | unknown} [error]
  * @property {Function} [callback]
  */
 
