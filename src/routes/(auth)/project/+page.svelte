@@ -65,7 +65,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each projects as it}
+				{#each projects as it (it.project)}
 					<tr>
 						<td>
 							<a href={`/?project=${it.project}`} class="nm-link">

@@ -58,7 +58,7 @@
 				<LoadingRow span={5} />
 			{:then res}
 				{#if res.ok}
-					{#each res.result.items ?? [] as it}
+					{#each res.result.items ?? [] as it (`${it.domain}-${it.location}`)}
 						<tr>
 							<td>
 								<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />

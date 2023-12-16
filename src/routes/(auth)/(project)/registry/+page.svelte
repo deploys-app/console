@@ -24,7 +24,7 @@
 					<LoadingRow span={1} />
 				{:then res}
 					{#if res.ok}
-						{#each res.result.items ?? [] as repo}
+						{#each res.result.items ?? [] as repo (repo.name)}
 							<tr>
 								<td>
 									<a class="nm-link"

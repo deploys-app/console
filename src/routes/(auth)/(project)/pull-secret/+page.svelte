@@ -49,7 +49,7 @@
 					<LoadingRow span={4} />
 				{:then res}
 					{#if res.ok}
-						{#each res.result.items ?? [] as it}
+						{#each res.result.items ?? [] as it (`${it.name}-${it.location}`)}
 							<tr>
 								<td>
 									<StatusIcon status={it.status} />

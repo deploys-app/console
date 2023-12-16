@@ -62,7 +62,7 @@
 					<LoadingRow span={5} />
 				{:then res}
 					{#if res.ok}
-						{#each res.result.items ?? [] as it}
+						{#each res.result.items ?? [] as it (`${it.domain}${it.path}-${it.location}`)}
 							<tr>
 								<td>
 									<a class="nm-link _tdcrt-udl"
