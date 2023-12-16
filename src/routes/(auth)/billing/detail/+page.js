@@ -4,7 +4,7 @@ import api from '$lib/api'
 export async function load ({ url, fetch }) {
 	const id = url.searchParams.get('id')
 
-	/** @type {import('$types').ApiResponse<import('$types').BillingAccount>} */
+	/** @type {Api.Response<Api.BillingAccount>} */
 	const billingAccount = await api.invoke('billing.get', { id }, fetch)
 	if (!billingAccount.ok) {
 		if (billingAccount.error?.notFound) redirect(302, '/billing')

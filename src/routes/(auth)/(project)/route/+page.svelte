@@ -10,7 +10,7 @@
 	$: project = data.project
 
 	/**
-	 * @param {import('$types').Route} route
+	 * @param {Api.Route} route
 	 */
 	function deleteRoute (route) {
 		modal.confirm({

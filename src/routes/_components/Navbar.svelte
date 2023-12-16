@@ -3,7 +3,7 @@
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
 
-	/** @type {import('$types').Profile | null} */
+	/** @type {Api.Profile | null} */
 	export let profile = null
 
 	let active = false

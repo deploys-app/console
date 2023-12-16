@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
 
-	/** @type {import('$types').Project[]} */
+	/** @type {Api.Project[]} */
 	export let projects
 
 	$: menu = $page.data.menu || ''

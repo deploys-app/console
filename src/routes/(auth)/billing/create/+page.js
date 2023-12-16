@@ -6,7 +6,7 @@ export async function load ({ url, fetch }) {
 
 	let billingAccount = null
 	if (id) {
-		/** @type {import('$types').ApiResponse<import('$types').BillingAccount>} */
+		/** @type {Api.Response<Api.BillingAccount>} */
 		const res = await api.invoke('billing.get', { id }, fetch)
 		if (!res.ok) {
 			if (res.error?.notFound) redirect(302, '/billing')

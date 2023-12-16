@@ -8,7 +8,7 @@ export async function load ({ parent, fetch }) {
 		deployment
 	} = await parent()
 
-	/** @type {import('$types').ApiResponse<import('$types').Location>} */
+	/** @type {Api.Response<Api.Location>} */
 	const locationInfo = await api.invoke('location.get', { project, id: location }, fetch)
 	if (!locationInfo.ok) {
 		error(500, `location: ${locationInfo.error?.message}`)

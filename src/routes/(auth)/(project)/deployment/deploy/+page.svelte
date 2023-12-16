@@ -21,13 +21,13 @@
 		disks: true
 	}
 
-	/** @type {import('$types').PullSecret[]} */
+	/** @type {Api.PullSecret[]} */
 	let pullSecrets = []
 
-	/** @type {import('$types').WorkloadIdentity[]} */
+	/** @type {Api.WorkloadIdentity[]} */
 	let workloadIdentities = []
 
-	/** @type {import('$types').Disk[]} */
+	/** @type {Api.Disk[]} */
 	let disks = []
 
 	const form = {
@@ -61,7 +61,7 @@
 		env: [],
 		/** @type {{ k: string, v: string }[]} */
 		mountData: [],
-		// /** @type {import('$types').Sidecar[]} */
+		// /** @type {Api.Sidecar[]} */
 		// sidecars: [],
 		sidecar: {
 			type: '',

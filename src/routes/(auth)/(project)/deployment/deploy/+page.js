@@ -6,7 +6,7 @@ export async function load ({ url, parent, fetch }) {
 	const location = url.searchParams.get('location')
 	const name = url.searchParams.get('name')
 
-	/** @type {import('$types').ApiResponse<import('$types').Deployment> | null} */
+	/** @type {Api.Response<Api.Deployment> | null} */
 	let deployment = null
 	if (location && name) {
 		deployment = await api.invoke('deployment.get', { project, location, name }, fetch)

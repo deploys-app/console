@@ -31,7 +31,7 @@
 		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
 	}[form.targetPrefix] || ''
 
-	/** @type {import('$types').Domain[]} */
+	/** @type {Api.Domain[]} */
 	let domains = []
 	let deployments = []
 
@@ -41,7 +41,7 @@
 		domains = []
 		form.domain = ''
 
-		/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Domain>>} */
+		/** @type {Api.Response<Api.List<Api.Domain>>} */
 		const resp = await api.invoke('domain.list', { project, location: form.location }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })

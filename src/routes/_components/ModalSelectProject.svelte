@@ -2,7 +2,7 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 
-	/** @type {import('$types').Project[]} */
+	/** @type {Api.Project[]} */
 	export let projects
 
 	$: project = $page.url.searchParams.get('project')
