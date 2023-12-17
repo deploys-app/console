@@ -1,11 +1,11 @@
 <script>
 	import '$style/main.scss'
-	import Navbar from '../_components/Navbar.svelte'
-	import Sidebar from '../_components/Sidebar.svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import { onMount } from 'svelte'
-	import ModalSelectProject from '../_components/ModalSelectProject.svelte'
+	import Navbar from './Navbar.svelte'
+	import Sidebar from './Sidebar.svelte'
+	import ModalSelectProject from './ModalSelectProject.svelte'
 
 	export let data
 
