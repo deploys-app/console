@@ -57,8 +57,13 @@
 	}
 
 	let fetchPodStatusTimeout
+	let destroyed = false
 
 	async function fetchPodStatus () {
+		if (destroyed) {
+			return
+		}
+
 		if (fetchPodStatusTimeout) {
 			clearTimeout(fetchPodStatusTimeout)
 			fetchPodStatusTimeout = null
@@ -79,6 +84,7 @@
 	}
 
 	onDestroy(() => {
+		destroyed = true
 		fetchPodStatusTimeout && clearTimeout(fetchPodStatusTimeout)
 	})
 </script>
