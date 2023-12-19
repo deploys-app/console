@@ -5,7 +5,7 @@
 	/** @type {Api.Project[]} */
 	export let projects
 
-	$: menu = $page.data.menu || ''
+	$: pageMenu = $page.data.menu || ''
 	$: project = $page.url.searchParams.get('project')
 	$: projectName = projects.find((p) => p.project === project)?.name || project
 
@@ -14,6 +14,87 @@
 	function openProjectModal () {
 		dispatch('openProjectModal')
 	}
+
+	const projectMenuList = [
+		{
+			id: 'dashboard',
+			title: 'Dashboard',
+			icon: 'fa-columns',
+			link: '/'
+		},
+		{
+			id: 'deployment',
+			title: 'Deployments',
+			icon: 'fa-rocket',
+			link: '/deployment'
+		},
+		{
+			id: 'domain',
+			title: 'Domains',
+			icon: 'fa-globe',
+			link: '/domain'
+		},
+		{
+			id: 'route',
+			title: 'Routes',
+			icon: 'fa-router',
+			link: '/route'
+		},
+		{
+			id: 'workload-identity',
+			title: 'Workload Identities',
+			icon: 'fa-network-wired',
+			link: '/workload-identity'
+		},
+		{
+			id: 'disk',
+			title: 'Disks',
+			icon: 'fa-hdd',
+			link: '/disk'
+		},
+		{
+			id: 'pull-secret',
+			title: 'Pull Secrets',
+			icon: 'fa-key',
+			link: '/pull-secret'
+		},
+		{
+			id: 'role',
+			title: 'Roles',
+			icon: 'fa-user-tag',
+			link: '/role'
+		},
+		{
+			id: 'role.users',
+			title: 'Users',
+			icon: 'fa-users',
+			link: '/role/users'
+		},
+		{
+			id: 'service-account',
+			title: 'Service Accounts',
+			icon: 'fa-user-lock',
+			link: '/service-account'
+		},
+		{
+			id: 'email',
+			title: 'Emails',
+			icon: 'fa-envelope',
+			link: '/email'
+		},
+		{
+			id: 'dropbox',
+			title: 'Dropbox (Alpha)',
+			icon: 'fa-box-open',
+			link: '/dropbox'
+		},
+		{
+			id: 'registry',
+			title: 'Registry (Alpha)',
+			icon: 'fa-warehouse-full',
+			link: '/registry'
+		}
+	]
 </script>
 
 <style lang="scss">
@@ -135,139 +216,28 @@
 		</div>
 		<br>
 
+		<div class="_dp-n">
+			<!-- Preload codes -->
+			{#each projectMenuList as menu}
+				<a href="{menu.link}?project={project}" title={menu.title}>{menu.title}</a>
+			{/each}
+		</div>
+
 		<div>
 			<ul class="sidebar-menus">
 				{#if project}
-					<li>
-						<a href={`/?project=${project}`} title="Dashboard">
-							<div class="menu-item" class:is-active={menu === 'dashboard'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-columns"></i>
-								</span>
-								<span>Dashboard</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/deployment?project=${project}`} title="Deployments">
-							<div class="menu-item" class:is-active={menu === 'deployment'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-rocket"></i>
-								</span>
-								<span>Deployments</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/domain?project=${project}`} title="Domains">
-							<div class="menu-item" class:is-active={menu === 'domain'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-globe"></i>
-								</span>
-								<span>Domains</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/route?project=${project}`} title="Routes">
-							<div class="menu-item" class:is-active={menu === 'route'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-router"></i>
-								</span>
-								<span>Routes</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/workload-identity?project=${project}`} title="Workload Identities">
-							<div class="menu-item" class:is-active={menu === 'workload-identity'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-network-wired"></i>
-								</span>
-								<span>Workload Identities</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/disk?project=${project}`} title="Disks">
-							<div class="menu-item" class:is-active={menu === 'disk'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-hdd"></i>
-								</span>
-								<span>Disks</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/pull-secret?project=${project}`} title="Pull Secrets">
-							<div class="menu-item" class:is-active={menu === 'pull-secret'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-key"></i>
-								</span>
-								<span>Pull Secrets</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/role?project=${project}`} title="Roles">
-							<div class="menu-item" class:is-active={menu === 'role'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-user-tag"></i>
-								</span>
-								<span>Roles</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/role/users?project=${project}`} title="Users">
-							<div class="menu-item" class:is-active={menu === 'role.users'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-users"></i>
-								</span>
-								<span>Users</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/service-account?project=${project}`} title="Service Accounts">
-							<div class="menu-item" class:is-active={menu === 'service-account'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-user-lock"></i>
-								</span>
-								<span>Service Accounts</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/email?project=${project}`} title="Emails">
-							<div class="menu-item" class:is-active={menu === 'email'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-envelope"></i>
-								</span>
-								<span>Emails</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/dropbox?project=${project}`} title="Dropbox">
-							<div class="menu-item" class:is-active={menu === 'dropbox'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-box-open"></i>
-								</span>
-								<span>Dropbox (Alpha)</span>
-							</div>
-						</a>
-					</li>
-					<li>
-						<a href={`/registry?project=${project}`} title="Dropbox">
-							<div class="menu-item" class:is-active={menu === 'registry'}>
-								<span class="menu-icon">
-									<i class="fa-solid fa-warehouse-full"></i>
-								</span>
-								<span>Registry (Alpha)</span>
-							</div>
-						</a>
-					</li>
+					{#each projectMenuList as menu}
+						<li>
+							<a href="{menu.link}?project={project}" title={menu.title}>
+								<div class="menu-item" class:is-active={menu.id === pageMenu}>
+									<span class="menu-icon">
+										<i class="fa-solid {menu.icon}"></i>
+									</span>
+									<span>{menu.title}</span>
+								</div>
+							</a>
+						</li>
+					{/each}
 				{/if}
 			</ul>
 		</div>
@@ -279,10 +249,10 @@
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
 			<div class="social _dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
-				<a href="https://github.com/deploys-app" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
+				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-github"></i>
 				</a>
-				<a href="https://discord.gg/5ZttPJsypS" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
 					<i class="fa-brands fa-discord"></i>
 				</a>
 				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
