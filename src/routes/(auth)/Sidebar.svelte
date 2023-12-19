@@ -5,7 +5,7 @@
 	/** @type {Api.Project[]} */
 	export let projects
 
-	$: menu = $page.data.menu || ''
+	$: pageMenu = $page.data.menu || ''
 	$: project = $page.url.searchParams.get('project')
 	$: projectName = projects.find((p) => p.project === project)?.name || project
 
@@ -229,7 +229,7 @@
 					{#each projectMenuList as menu}
 						<li>
 							<a href="{menu.link}?project={project}" title={menu.title}>
-								<div class="menu-item" class:is-active={menu.id === $page.data.menu}>
+								<div class="menu-item" class:is-active={menu.id === pageMenu}>
 									<span class="menu-icon">
 										<i class="fa-solid {menu.icon}"></i>
 									</span>
