@@ -11,9 +11,17 @@
 
 	$: project = data.project
 
+	/** @type {MaybePromise<Api.Response<Api.List<Api.WorkloadIdentity>>>} */
+	let workloadIdentities = data.workloadIdentities
+
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('workloadIdentity.list')
-	}, 5000))
+		const res = await data.workloadIdentities
+		if (res.ok) {
+			return 3000
+		}
+		workloadIdentities = res
+	}, 10000))
 </script>
 
 <h6>Workload Identities</h6>
@@ -37,7 +45,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.workloadIdentities}
+				{#await workloadIdentities}
 					<LoadingRow span={3} />
 				{:then res}
 					{#if res.ok}

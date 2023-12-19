@@ -11,12 +11,16 @@
 
 	$: project = data.project
 
+	/** @type {MaybePromise<Api.Response<Api.List<Api.Disk>>>} */
+	let disks = data.disks
+
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('disk.list')
 		const res = await data.disks
 		if (!res.ok) {
 			return
 		}
+		disks = res
 		if (!res.result.items?.some((x) => x.status === 'pending')) {
 			return 300000
 		}
@@ -46,7 +50,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.disks}
+				{#await disks}
 					<LoadingRow span={5} />
 				{:then res}
 					{#if res.ok}

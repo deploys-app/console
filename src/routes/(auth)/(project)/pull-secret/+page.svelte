@@ -11,12 +11,16 @@
 
 	$: project = data.project
 
+	/** @type {MaybePromise<Api.Response<Api.List<Api.PullSecret>>>} */
+	let pullSecrets = data.pullSecrets
+
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('pullSecret.list')
 		const res = await data.pullSecrets
 		if (!res.ok) {
 			return
 		}
+		pullSecrets = res
 		if (!res.result.items?.some((x) => x.status === 'pending')) {
 			return 300000
 		}
@@ -45,7 +49,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.pullSecrets}
+				{#await pullSecrets}
 					<LoadingRow span={4} />
 				{:then res}
 					{#if res.ok}
