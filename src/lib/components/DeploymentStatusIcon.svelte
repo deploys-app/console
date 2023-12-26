@@ -50,7 +50,7 @@
 		if (!podStatus) {
 			return 'fa-solid fa-spin fa-spinner _cl-light'
 		}
-		if (podStatus.ready === podStatus.count) {
+		if (podStatus.count > 0 && podStatus.ready === podStatus.count) {
 			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
 		}
 		return 'fa-solid fa-exclamation-triangle _cl-warning'
