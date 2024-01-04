@@ -14,6 +14,7 @@
   "devDependencies": {
     "@nomimono/nomimono-css": "^0.4.20",
     "@sveltejs/adapter-cloudflare": "^3.0.1",
+    "@sveltejs/adapter-node": "^2.0.2",
     "@sveltejs/kit": "=2.0.6",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",

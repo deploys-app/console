@@ -1,4 +1,5 @@
-import adapter from '@sveltejs/adapter-cloudflare'
+import adapterCloudflare from '@sveltejs/adapter-cloudflare'
+import adapterNode from '@sveltejs/adapter-node'
 import preprocess from 'svelte-preprocess'
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -7,7 +8,7 @@ const config = {
 		sass: true
 	}),
 	kit: {
-		adapter: adapter(),
+		adapter: process.env.ADAPTER === 'node' ? adapterNode() : adapterCloudflare(),
 		alias: {
 			$style: './src/style',
 			$types: './src/types'
