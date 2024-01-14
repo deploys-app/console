@@ -16,7 +16,7 @@ RUN bun -b run build
 FROM gcr.io/distroless/nodejs20-debian11
 
 ENV NODE_ENV=production
-ENV BODY_SIZE_LIMIT=0
+ENV BODY_SIZE_LIMIT=Infinity
 ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
