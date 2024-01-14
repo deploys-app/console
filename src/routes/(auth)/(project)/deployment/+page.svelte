@@ -60,7 +60,7 @@
 						{#each res.result.items ?? [] as it (`${it.name}-${it.location}`)}
 							<tr>
 								<td>
-									<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
+									<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
 									<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 										{it.name}
 									</a>

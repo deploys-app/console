@@ -63,14 +63,16 @@ export function gsaBinding (project, name, gsa, locationProject) {
 }
 
 /**
- * @param {string} t
+ * @param {Api.DeploymentType} t
  * @returns {string}
  */
 export function deploymentType (t) {
 	return {
 		WebService: 'Web Service',
 		TCPService: 'TCP Service',
-		InternalTCPService: 'Internal TCP Service'
+		InternalTCPService: 'Internal TCP Service',
+		Worker: 'Worker',
+		CronJob: 'Cron Job'
 	}[t] || t
 }
 

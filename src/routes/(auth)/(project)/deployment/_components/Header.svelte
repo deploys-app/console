@@ -57,7 +57,7 @@
 	<div class="_dp-g _g-5 _gatf-r _gatf-cl:lg">
 		<h3 class="_dp-f _fw-w _alit-fst _mgr-7 _mgbt-6 _mgbt-0:lg">
 			<div>
-				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} />
+				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} type={deployment.type} />
 			</div>
 			<div>
 				{deployment.name}

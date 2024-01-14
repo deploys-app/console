@@ -68,6 +68,7 @@ declare namespace Api {
     export type PodStatus = {
         count: number
         ready: number
+        succeeded: number
         failed: number
     }
 
@@ -241,11 +242,29 @@ declare namespace Api {
         }
     }
 
+    export type DeploymentType =
+        'WebService' |
+        'TCPService' |
+        'InternalTCPService' |
+        'Worker' |
+        'CronJob'
+
+    export type DeploymentAction =
+        'deploy' |
+        'delete' |
+        'pause'
+
+    export type DeploymentStatus =
+        'pending' |
+        'success' |
+        'error' |
+        'cancelled'
+
     export type Deployment = {
         project: string
         location: string
         name: string
-        type: string
+        type: DeploymentType
         revision: number
         image: string
         env: Env
@@ -273,8 +292,8 @@ declare namespace Api {
         statusUrl: string
         address: string
         internalAddress: string
-        status: 'pending' | 'success' | 'error'
-        action: 'deploy' | 'delete' | 'pause'
+        status: DeploymentStatus
+        action: DeploymentAction
         allocatedPrice: number
         createdAt: string
         createdBy: string

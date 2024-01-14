@@ -2,14 +2,17 @@
 	import { browser } from '$app/environment'
 	import { onDestroy } from 'svelte'
 
-	/** @type {'deploy' | 'delete' | 'pause'} */
+	/** @type {Api.DeploymentAction} */
 	export let action
 
-	/** @type {'pending' | 'success' | 'error' | 'cancelled'} */
+	/** @type {Api.DeploymentStatus} */
 	export let status
 
 	/** @type {string} */
 	export let url
+
+	/** @type {Api.DeploymentType} */
+	export let type
 
 	const statusIconClass = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
@@ -49,6 +52,9 @@
 
 		if (!podStatus) {
 			return 'fa-solid fa-spin fa-spinner _cl-light'
+		}
+		if (type === 'CronJob' && podStatus.count === podStatus.succeeded + podStatus.ready) {
+			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
 		}
 		if (podStatus.count > 0 && podStatus.ready === podStatus.count) {
 			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
