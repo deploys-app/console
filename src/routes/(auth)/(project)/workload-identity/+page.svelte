@@ -12,7 +12,7 @@
 	$: project = data.project
 
 	/** @type {MaybePromise<Api.Response<Api.List<Api.WorkloadIdentity>>>} */
-	let workloadIdentities = data.workloadIdentities
+	$: workloadIdentities = data.workloadIdentities
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('workloadIdentity.list')

@@ -12,7 +12,7 @@
 	$: project = data.project
 
 	/** @type {MaybePromise<Api.Response<Api.List<Api.PullSecret>>>} */
-	let pullSecrets = data.pullSecrets
+	$: pullSecrets = data.pullSecrets
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('pullSecret.list')

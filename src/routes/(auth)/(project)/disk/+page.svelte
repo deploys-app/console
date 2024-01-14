@@ -12,7 +12,7 @@
 	$: project = data.project
 
 	/** @type {MaybePromise<Api.Response<Api.List<Api.Disk>>>} */
-	let disks = data.disks
+	$: disks = data.disks
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('disk.list')
