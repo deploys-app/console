@@ -183,6 +183,10 @@
 		<!--{{/*				<td>{{.Deployment.Resources.Requests.CPU | textDeploymentCPU}}</td>*/}}-->
 		<!--{{/*			</tr>*/}}-->
 		<tr>
+			<td>CPU limited</td>
+			<td>{format.cpuLimited(deployment.resources.limits.cpu)}</td>
+		</tr>
+		<tr>
 			<td>Memory allocated</td>
 			<td>{format.memory(deployment.resources.requests.memory)}</td>
 		</tr>

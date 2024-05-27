@@ -225,7 +225,7 @@ declare namespace Api {
     }
 
     export type Resource = {
-        // cpu: string
+        cpu: string
         memory: string
     }
 

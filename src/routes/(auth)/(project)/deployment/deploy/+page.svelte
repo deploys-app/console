@@ -55,6 +55,9 @@
 		resources: {
 			requests: {
 				memory: '0'
+			},
+			limits: {
+				cpu: '0'
 			}
 		},
 		/** @type {{ k: string, v: string }[]} */
@@ -550,19 +553,34 @@
 		<hr>
 		<br>
 
-<!--		{{/*        <div class="nm-field">*/}}-->
-<!--		{{/*            <label for="input-cpu">CPU allocated</label>*/}}-->
-<!--		{{/*            <div class="nm-select">*/}}-->
-<!--		{{/*                <select id="input-cpu" name="cpu">*/}}-->
-<!--		{{/*                    {{range .Location.CPUAllocatable}}*/}}-->
-<!--		{{/*                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>*/}}-->
-<!--		{{/*                    {{end}}*/}}-->
-<!--		{{/*                </select>*/}}-->
-<!--		{{/*            </div>*/}}-->
-<!--		{{/*            <small class="helper">*/}}-->
-<!--		{{/*                Number of vCPUs allocated to each container instance.*/}}-->
-<!--		{{/*            </small>*/}}-->
-<!--		{{/*        </div>*/}}-->
+<!--        <div class="nm-field">-->
+<!--            <label for="input-cpu">CPU allocated</label>-->
+<!--            <div class="nm-select">-->
+<!--                <select id="input-cpu" name="cpu">-->
+<!--                    {{range .Location.CPUAllocatable}}-->
+<!--                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>-->
+<!--                    {{end}}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <small class="helper">-->
+<!--                Number of vCPUs allocated to each container instance.-->
+<!--            </small>-->
+<!--        </div>-->
+
+		<div class="nm-field">
+			<label for="input-cpu-limit">CPU limited</label>
+            <div class="nm-select">
+                <select id="input-cpu-limit" name="cpu" bind:value={form.resources.limits.cpu}>
+                    <option value="0">Cluster Default</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <small class="helper">
+                Number of vCPUs limit to each container instance. Autoscale trigger when CPU hit 80% of the limit.
+            </small>
+        </div>
 
 		<div class="nm-field">
 			<label for="input-memory">Memory allocated</label>
