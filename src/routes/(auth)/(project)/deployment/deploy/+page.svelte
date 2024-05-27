@@ -570,7 +570,7 @@
 		<div class="nm-field">
 			<label for="input-cpu-limit">CPU limited</label>
             <div class="nm-select">
-                <select id="input-cpu-limit" name="cpu">
+                <select id="input-cpu-limit" name="cpu" bind:value={form.resources.limits.cpu}>
                     <option value="0">Cluster Default</option>
                     <option value="1">1</option>
                     <option value="2">2</option>
