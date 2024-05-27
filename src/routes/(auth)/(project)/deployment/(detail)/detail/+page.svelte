@@ -7,6 +7,7 @@
 	import api from '$lib/api'
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import { cpuLimited } from '$lib/format'
 
 	export let data
 
@@ -184,7 +185,7 @@
 		<!--{{/*			</tr>*/}}-->
 		<tr>
 			<td>CPU limited</td>
-			<td>{format.cpu(deployment.resources.limits.memory)}</td>
+			<td>{format.cpuLimited(deployment.resources.limits.cpu)}</td>
 		</tr>
 		<tr>
 			<td>Memory allocated</td>

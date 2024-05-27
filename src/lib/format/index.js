@@ -15,6 +15,17 @@ export function cpu (v) {
  * @param {string} v
  * @returns {string}
  */
+export function cpuLimited (v) {
+	if (v === '0' || !v) {
+		return 'Cluster Default'
+	}
+	return `${v} vCPU`
+}
+
+/**
+ * @param {string} v
+ * @returns {string}
+ */
 export function memory (v) {
 	if (v === '0') {
 		return 'Shared'
