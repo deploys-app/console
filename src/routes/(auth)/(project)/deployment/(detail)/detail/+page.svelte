@@ -7,7 +7,6 @@
 	import api from '$lib/api'
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { cpuLimited } from '$lib/format'
 
 	export let data
 
