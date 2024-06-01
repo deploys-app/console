@@ -421,7 +421,7 @@
 		<div class="nm-field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="_pdbt-4">
-				{#each form.command as _, i (_)}
+				{#each form.command as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right" type="button"
@@ -440,7 +440,7 @@
 		<div class="nm-field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="_pdbt-4">
-				{#each form.args as _, i (_)}
+				{#each form.args as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right" type="button"
