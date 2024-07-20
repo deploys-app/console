@@ -24,7 +24,7 @@
 		if (res.result.items?.some((x) => x.status === 'pending')) {
 			return 4000
 		}
-	}, 300000))
+	}, 10000))
 </script>
 
 <h6>Deployments</h6>
