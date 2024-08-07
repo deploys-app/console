@@ -1,10 +1,8 @@
 <script>
-	import { onMount } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
@@ -13,18 +11,6 @@
 
 	/** @type {MaybePromise<Api.Response<Api.List<Api.Deployment>>>} */
 	$: deployments = data.deployments
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('deployment.list')
-		const res = await data.deployments
-		if (!res.ok) {
-			return 3000
-		}
-		deployments = res
-		if (res.result.items?.some((x) => x.status === 'pending')) {
-			return 4000
-		}
-	}, 10000))
 </script>
 
 <h6>Deployments</h6>
