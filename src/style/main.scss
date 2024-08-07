@@ -193,13 +193,13 @@ p {
 }
 
 input[type=number].-no-arrow {
+	-moz-appearance: textfield;
+
 	&::-webkit-outer-spin-button,
 	&::-webkit-inner-spin-button {
 		-webkit-appearance: none;
 		margin: 0;
 	}
-
-	-moz-appearance: textfield;
 }
 
 .icon-button {
