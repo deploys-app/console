@@ -4,6 +4,7 @@ import api from '$lib/api'
 export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
 	const id = url.searchParams.get('repository')
+
 	const repository = await api.invoke('registry/get', {
 		project,
 		repository: id
@@ -15,13 +16,16 @@ export async function load ({ url, parent, fetch }) {
 		error(500, repository.error?.message)
 	}
 
+	/** @type {Api.Response<Api.RepositoryTagResult>} */
+	const res = await api.invoke('registry/getTags', {
+		project,
+		repository: id
+	}, fetch)
+
 	return {
 		id,
 		repository: repository.result,
-		/** @type {Promise<Api.Response<Api.RepositoryTagResult>>} */
-		tags: api.invoke('registry/getTags', {
-			project,
-			repository: id
-		}, fetch)
+		tags: res.result?.items ?? [],
+		error: res.error
 	}
 }

@@ -2,13 +2,15 @@
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
 
 	$: project = data.project
 	$: repository = data.repository
+	$: tags = data.tags
+	$: error = data.error
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -48,33 +50,25 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.tags}
-					<LoadingRow span={3} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as tag}
-							<tr>
-								<td>
-									{tag.tag}
-									<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
-										<i class="fa-light fa-copy"></i>
-									</span>
-								</td>
-								<td>
-									{format.shortDigest(tag.digest)}
-									<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
-										<i class="fa-light fa-copy"></i>
-									</span>
-								</td>
-								<td>{format.datetime(tag.createdAt)}</td>
-							</tr>
-						{/each}
-					{:else}
-						<ErrorRow span={3} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={3} {error} />
-				{/await}
+				{#each tags as tag}
+					<tr>
+						<td>
+							{tag.tag}
+							<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</td>
+						<td>
+							{format.shortDigest(tag.digest)}
+							<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</td>
+						<td>{format.datetime(tag.createdAt)}</td>
+					</tr>
+				{/each}
+				<NoDataRow span={3} list={tags} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

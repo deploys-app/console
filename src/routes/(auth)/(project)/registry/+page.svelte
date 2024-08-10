@@ -1,11 +1,12 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	export let data
 
 	$: project = data.project
+	$: repositories = data.repositories
+	$: error = data.error
 </script>
 
 <h6>Registry (Alpha)</h6>
@@ -20,28 +21,18 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#await data.repositories}
-					<LoadingRow span={1} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as repo (repo.name)}
-							<tr>
-								<td>
-									<a class="nm-link"
-									   href="/registry/detail?project={project}&repository={repo.name}">
-										{repo.name}
-									</a>
-								</td>
-							</tr>
-						{:else}
-							<NoDataRow span={1} />
-						{/each}
-					{:else}
-						<ErrorRow span={1} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={1} {error} />
-				{/await}
+				{#each repositories as repo (repo.name)}
+					<tr>
+						<td>
+							<a class="nm-link"
+							   href="/registry/detail?project={project}&repository={repo.name}">
+								{repo.name}
+							</a>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={1} list={repositories} />
+				<ErrorRow span={1} {error} />
 			</tbody>
 		</table>
 	</div>
