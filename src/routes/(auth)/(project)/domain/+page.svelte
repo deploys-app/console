@@ -1,5 +1,4 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
@@ -9,6 +8,8 @@
 	export let data
 
 	$: project = data.project
+	$: domains = data.domains
+	$: error = data.error
 
 	function deleteDomain (domain) {
 		modal.confirm({
@@ -54,46 +55,38 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#await data.domains}
-				<LoadingRow span={5} />
-			{:then res}
-				{#if res.ok}
-					{#each res.result.items ?? [] as it (`${it.domain}-${it.location}`)}
-						<tr>
-							<td>
-								<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
-								<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
-							</td>
-							<td>
-								{#if it.wildcard}
-									<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
-								{:else}
-									<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
-								{/if}
-							</td>
-							<td>
-								{#if it.cdn}
-									<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
-								{:else}
-									<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
-								{/if}
-							</td>
-							<td>{it.location}</td>
-	<!--						<td>{format.datetime(it.createdAt)}</td>-->
-	<!--						<td>{it.createdBy}</td>-->
-							<td>
-								<button class="icon-button" on:click={() => deleteDomain(it)}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
-							</td>
-						</tr>
-					{:else}
-						<NoDataRow span={5} />
-					{/each}
-				{/if}
-			{:catch error}
-				<ErrorRow span={5} error={error} />
-			{/await}
+				{#each domains as it (`${it.domain}-${it.location}`)}
+					<tr>
+						<td>
+							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
+							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
+						</td>
+						<td>
+							{#if it.wildcard}
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+							{:else}
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+							{/if}
+						</td>
+						<td>
+							{#if it.cdn}
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+							{:else}
+								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+							{/if}
+						</td>
+						<td>{it.location}</td>
+<!--						<td>{format.datetime(it.createdAt)}</td>-->
+<!--						<td>{it.createdBy}</td>-->
+						<td>
+							<button class="icon-button" on:click={() => deleteDomain(it)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={5} list={domains} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

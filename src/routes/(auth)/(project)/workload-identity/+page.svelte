@@ -1,27 +1,14 @@
 <script>
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { onMount } from 'svelte'
-	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
 
 	$: project = data.project
-
-	/** @type {MaybePromise<Api.Response<Api.List<Api.WorkloadIdentity>>>} */
 	$: workloadIdentities = data.workloadIdentities
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('workloadIdentity.list')
-		const res = await data.workloadIdentities
-		if (res.ok) {
-			return 3000
-		}
-		workloadIdentities = res
-	}, 10000))
+	$: error = data.error
 </script>
 
 <h6>Workload Identities</h6>
@@ -45,30 +32,20 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await workloadIdentities}
-					<LoadingRow span={3} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as it}
-							<tr>
-								<td>
-									<StatusIcon status={it.status} />
-									<a class="nm-link" href="/workload-identity/detail?project={project}&location={it.location}&name={it.name}">
-										{it.name}
-									</a>
-								</td>
-								<td>{it.location}</td>
-								<td>{format.datetime(it.createdAt)}</td>
-							</tr>
-						{:else}
-							<NoDataRow span={3} />
-						{/each}
-					{:else}
-						<ErrorRow span={3} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={3} error={error} />
-				{/await}
+				{#each workloadIdentities as it}
+					<tr>
+						<td>
+							<StatusIcon status={it.status} />
+							<a class="nm-link" href="/workload-identity/detail?project={project}&location={it.location}&name={it.name}">
+								{it.name}
+							</a>
+						</td>
+						<td>{it.location}</td>
+						<td>{format.datetime(it.createdAt)}</td>
+					</tr>
+				{/each}
+				<NoDataRow span={3} list={workloadIdentities} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

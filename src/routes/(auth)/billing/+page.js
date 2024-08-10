@@ -1,8 +1,10 @@
 import api from '$lib/api'
 
 export async function load ({ fetch }) {
+	/** @type {Api.Response<Api.List<Api.BillingAccount>>} */
+	const res = await api.invoke('billing.list', {}, fetch)
 	return {
-		/** @type {Promise<Api.Response<Api.List<Api.BillingAccount>>>} */
-		billingAccounts: api.invoke('billing.list', {}, fetch)
+		billingAccounts: res.result?.items ?? [],
+		error: res.error
 	}
 }

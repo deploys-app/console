@@ -1,5 +1,4 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -8,6 +7,8 @@
 	export let data
 
 	$: project = data.project
+	$: routes = data.routes
+	$: error = data.error
 
 	/**
 	 * @param {Api.Route} route
@@ -58,41 +59,31 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.routes}
-					<LoadingRow span={5} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as it (`${it.domain}${it.path}-${it.location}`)}
-							<tr>
-								<td>
-									<a class="nm-link _tdcrt-udl"
-									   href={`https://${it.domain}${it.path}`}
-									   target="_blank">https://{it.domain}{it.path}</a>
-								</td>
-								<td>{it.target}</td>
-								<td>{it.location}</td>
-								<td>
-									{#if it.config.basicAuth}
-										<i class="fa-solid fa-lock"></i>
-									{/if}
-								</td>
-								<!--						<td>{format.datetime(it.createdAt)}</td>-->
-								<!--						<td>{it.createdBy}</td>-->
-								<td>
-									<button class="icon-button" on:click={() => deleteRoute(it)}>
-										<i class="fa-solid fa-trash-alt"></i>
-									</button>
-								</td>
-							</tr>
-						{:else}
-							<NoDataRow span={5} />
-						{/each}
-					{:else}
-						<ErrorRow span={5} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={5} error={error} />
-				{/await}
+				{#each routes as it (`${it.domain}${it.path}-${it.location}`)}
+					<tr>
+						<td>
+							<a class="nm-link _tdcrt-udl"
+							   href={`https://${it.domain}${it.path}`}
+							   target="_blank">https://{it.domain}{it.path}</a>
+						</td>
+						<td>{it.target}</td>
+						<td>{it.location}</td>
+						<td>
+							{#if it.config.basicAuth}
+								<i class="fa-solid fa-lock"></i>
+							{/if}
+						</td>
+<!--						<td>{format.datetime(it.createdAt)}</td>-->
+<!--						<td>{it.createdBy}</td>-->
+						<td>
+							<button class="icon-button" on:click={() => deleteRoute(it)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={5} list={routes} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

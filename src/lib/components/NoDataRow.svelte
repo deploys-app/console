@@ -1,12 +1,11 @@
 <script>
 	export let span = 1
-	export let forbidden = false
+	/** @type {?Array} */
+	export let list
 </script>
 
-<td colspan={span} class="_tal-ct">
-	{#if forbidden}
-		You don't have permission to view data
-	{:else}
+{#if !list?.length}
+	<td colspan={span} class="_tal-ct">
 		No data
-	{/if}
-</td>
+	</td>
+{/if}

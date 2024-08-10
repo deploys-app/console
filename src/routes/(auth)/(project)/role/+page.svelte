@@ -1,5 +1,4 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
@@ -7,7 +6,12 @@
 	export let data
 
 	$: project = data.project
+	$: roles = data.roles
+	$: error = data.error
 
+	/**
+	 * @param {string} sid
+	 */
 	function roleCanUpdate (sid) {
 		return sid !== 'owner'
 	}
@@ -36,43 +40,33 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#await data.roles}
-					<LoadingRow span={5} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as it}
-							<tr>
-								<td>
-									{#if roleCanUpdate(it.role)}
-										<a href="/role/create?project={project}&role={it.role}" class="nm-link">
-											<strong>{it.role}</strong>
-										</a>
-									{:else}
-										<strong>{it.role}</strong>
-									{/if}
-								</td>
-								<td>{it.name}</td>
-								<td>{format.datetime(it.createdAt)}</td>
-								<td>{it.createdBy}</td>
-								<td>
-									{#if roleCanUpdate(it.role)}
-										<a href="/role/create?project={project}&role={it.role}">
-											<div class="icon-button">
-												<i class="fa-solid fa-pen"></i>
-											</div>
-										</a>
-									{/if}
-								</td>
-							</tr>
-						{:else}
-							<NoDataRow span={5} />
-						{/each}
-					{:else}
-						<ErrorRow span={5} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={5} error={error} />
-				{/await}
+				{#each roles as it (it.role)}
+					<tr>
+						<td>
+							{#if roleCanUpdate(it.role)}
+								<a href="/role/create?project={project}&role={it.role}" class="nm-link">
+									<strong>{it.role}</strong>
+								</a>
+							{:else}
+								<strong>{it.role}</strong>
+							{/if}
+						</td>
+						<td>{it.name}</td>
+						<td>{format.datetime(it.createdAt)}</td>
+						<td>{it.createdBy}</td>
+						<td>
+							{#if roleCanUpdate(it.role)}
+								<a href="/role/create?project={project}&role={it.role}">
+									<div class="icon-button">
+										<i class="fa-solid fa-pen"></i>
+									</div>
+								</a>
+							{/if}
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={5} list={roles} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

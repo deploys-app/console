@@ -40,7 +40,7 @@
 						<ErrorRow span={1} error={res.error} />
 					{/if}
 				{:catch error}
-					<ErrorRow span={1} error={error} />
+					<ErrorRow span={1} {error} />
 				{/await}
 			</tbody>
 		</table>

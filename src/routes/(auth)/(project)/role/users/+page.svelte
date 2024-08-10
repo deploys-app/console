@@ -1,5 +1,4 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -8,7 +7,12 @@
 	export let data
 
 	$: project = data.project
+	$: users = data.users
+	$: error = data.error
 
+	/**
+	 * @param {string} email
+	 */
 	function deleteUser (email) {
 		modal.confirm({
 			title: `Delete user ${email} from project ${project} ?`,
@@ -50,38 +54,28 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#await data.users}
-					<LoadingRow span={3} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as it}
-							<tr>
-								<td>{it.email}</td>
-								<td>
-									{#each it.roles as r}
-										{r}<br>
-									{/each}
-								</td>
-								<td>
-									<a href="/role/bind?project={project}&email={it.email}">
-										<div class="icon-button">
-											<i class="fa-solid fa-pen"></i>
-										</div>
-									</a>
-									<button class="icon-button" on:click={() => deleteUser(it.email)}>
-										<i class="fa-solid fa-trash-alt"></i>
-									</button>
-								</td>
-							</tr>
-						{:else}
-							<NoDataRow span={3} />
-						{/each}
-					{:else}
-						<ErrorRow span={3} error={res.error} />
-					{/if}
-				{:catch err}
-					<ErrorRow span={3} error={err} />
-				{/await}
+				{#each users as it (it.email)}
+					<tr>
+						<td>{it.email}</td>
+						<td>
+							{#each it.roles as r}
+								{r}<br>
+							{/each}
+						</td>
+						<td>
+							<a href="/role/bind?project={project}&email={it.email}">
+								<div class="icon-button">
+									<i class="fa-solid fa-pen"></i>
+								</div>
+							</a>
+							<button class="icon-button" on:click={() => deleteUser(it.email)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={3} list={users} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

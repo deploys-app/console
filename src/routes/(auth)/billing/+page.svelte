@@ -1,9 +1,11 @@
 <script>
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
 	export let data
+
+	$: billingAccounts = data.billingAccounts
+	$: error = data.error
 </script>
 
 <h6>Billing</h6>
@@ -27,33 +29,23 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#await data.billingAccounts}
-					<LoadingRow span={3} />
-				{:then res}
-					{#if res.ok}
-						{#each res.result.items ?? [] as it (it.id)}
-							<tr>
-								<td>
-									<a class="nm-link" href="/billing/detail?id={it.id}">{it.name}</a>
-								</td>
-								<td>{it.id}</td>
-								<td class="is-align-center">
-									{#if it.active}
-										<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
-									{:else}
-										<i class="fa-solid fa-times _cl-negative _cl-opacity-80"></i>
-									{/if}
-								</td>
-							</tr>
-						{:else}
-							<NoDataRow span={3} />
-						{/each}
-					{:else}
-						<ErrorRow span={3} error={res.error} />
-					{/if}
-				{:catch error}
-					<ErrorRow span={3} error={error} />
-				{/await}
+				{#each billingAccounts as it (it.id)}
+					<tr>
+						<td>
+							<a class="nm-link" href="/billing/detail?id={it.id}">{it.name}</a>
+						</td>
+						<td>{it.id}</td>
+						<td class="is-align-center">
+							{#if it.active}
+								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+							{:else}
+								<i class="fa-solid fa-times _cl-negative _cl-opacity-80"></i>
+							{/if}
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={3} list={billingAccounts} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>
