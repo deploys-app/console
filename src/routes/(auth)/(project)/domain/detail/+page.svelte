@@ -185,6 +185,7 @@
 					project,
 					location: domain.location,
 					domain: domain.domain,
+					wildcard: domain.wildcard,
 					cdn: true
 				}, fetch)
 				if (!resp.ok) {
