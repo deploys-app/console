@@ -13,8 +13,8 @@
 	const form = {
 		domain: '',
 		location: '',
-		cdn: true,
-		wildcard: true
+		cdn: false,
+		wildcard: false
 	}
 
 	let saving = false
