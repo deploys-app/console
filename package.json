@@ -13,8 +13,8 @@
   },
   "devDependencies": {
     "@nomimono/nomimono-css": "^0.4.25",
-    "@sveltejs/adapter-cloudflare": "^4.8.0",
-    "@sveltejs/adapter-node": "^5.2.10",
+    "@sveltejs/adapter-cloudflare": "^4.9.0",
+    "@sveltejs/adapter-node": "^5.2.11",
     "@sveltejs/kit": "=2.11.1",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
