@@ -1,16 +1,24 @@
 <script>
-	export let span = 1
-	export let error
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} [span]
+	 * @property {any} error
+	 */
+
+	/** @type {Props} */
+	let { span = 1, error } = $props()
 </script>
 
 {#if error}
-	<td colspan={span} class="_tal-ct">
-		{#if error.forbidden}
-			You don't have permission to view data
-		{:else if error.message}
-			{error.message}
-		{:else}
-			{error}
-		{/if}
-	</td>
+	<tr>
+		<td colspan={span} class="_tal-ct">
+			{#if error.forbidden}
+				You don't have permission to view data
+			{:else if error.message}
+				{error.message}
+			{:else}
+				{error}
+			{/if}
+		</td>
+	</tr>
 {/if}

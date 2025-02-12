@@ -1,19 +1,18 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
 
-	/** @type {Api.Project[]} */
-	export let projects
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Project[]} projects
+	 * @property {() => {}} openProjectModal
+	 */
 
-	$: pageMenu = $page.data.menu || ''
-	$: project = $page.url.searchParams.get('project')
-	$: projectName = projects.find((p) => p.project === project)?.name || project
+	/** @type {Props} */
+	let { projects, openProjectModal } = $props()
 
-	const dispatch = createEventDispatcher()
-
-	function openProjectModal () {
-		dispatch('openProjectModal')
-	}
+	let pageMenu = $derived($page.data.menu || '')
+	let project = $derived($page.url.searchParams.get('project'))
+	let projectName = $derived(projects.find((p) => p.project === project)?.name || project)
 
 	const projectMenuList = [
 		{
@@ -197,7 +196,7 @@
 			</small>
 
 			<div class="project-box _cs-pt" role="button" tabindex="0"
-				on:click={openProjectModal} on:keypress={openProjectModal}>
+				onclick={openProjectModal} onkeypress={openProjectModal}>
 				<span>
 					{#if project}
 						{projectName}

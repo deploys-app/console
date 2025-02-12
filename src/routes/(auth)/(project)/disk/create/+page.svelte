@@ -3,7 +3,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 	const {
 		locations,
 		location,
@@ -11,16 +11,22 @@
 		disk
 	} = data
 
-	$: project = data.project
+	let project = $derived(data.project)
 
-	const form = {
+	const form = $state({
 		location: location || '',
 		name: name || '',
 		size: disk?.size || 1
-	}
+	})
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -78,7 +84,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-name">Disk name</label>
 			<div class="nm-input">

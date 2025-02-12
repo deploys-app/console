@@ -2,22 +2,11 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 
-	$: projectInfo = data.projectInfo
-	$: usage = data.usage
-	$: price = data.price
 
 	const unitGiB = 1024 * 1024 * 1024
 
-	$: billing = {
-		price: formatNumber(price.price),
-		cpu: formatNumber(usage.cpuUsage),
-		memory: formatNumber(usage.memory / unitGiB),
-		egress: formatNumber(usage.egress / unitGiB),
-		disk: formatNumber(usage.disk / unitGiB),
-		replica: formatNumber(usage.replica)
-	}
 
 	onMount(() => {
 		const interval = setInterval(() => {
@@ -32,6 +21,17 @@
 		if (Number.isNaN(v)) return '?'
 		return v?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '?'
 	}
+	let projectInfo = $derived(data.projectInfo)
+	let usage = $derived(data.usage)
+	let price = $derived(data.price)
+	let billing = $derived({
+		price: formatNumber(price.price),
+		cpu: formatNumber(usage.cpuUsage),
+		memory: formatNumber(usage.memory / unitGiB),
+		egress: formatNumber(usage.egress / unitGiB),
+		disk: formatNumber(usage.disk / unitGiB),
+		replica: formatNumber(usage.replica)
+	})
 </script>
 
 <h6>Dashboard</h6>

@@ -7,10 +7,10 @@
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 
-	export let data
+	let { data } = $props()
 
-	$: project = data.project
-	$: domain = data.domain
+	let project = $derived(data.project)
+	let domain = $derived(data.domain)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -42,7 +42,7 @@
 		setTimeout(f, 3000)
 	}
 
-	let purging = false
+	let purging = $state(false)
 	async function purgeCache () {
 		if (domain.wildcard) {
 			return // not supported
@@ -403,7 +403,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="_fs-2 _opct-80">Remove all cached resources</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCache} disabled={domain.wildcard}>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
@@ -413,7 +413,7 @@
 							<div><strong>Purge prefix</strong></div>
 							<p class="_fs-2 _opct-80">Remove cached resources at prefix path</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCachePrefix}>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCachePrefix}>
 							Purge prefix
 						</button>
 					</div>
@@ -423,7 +423,7 @@
 							<div><strong>Purge file</strong></div>
 							<p class="_fs-2 _opct-80">Remove cached resources at exact path</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCacheFile}>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCacheFile}>
 							Purge file
 						</button>
 					</div>
@@ -435,13 +435,13 @@
 	{#if !domain.cdn}
 		<hr>
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="nm-button" on:click={upgradeCdn}>Add CDN (DDoS Protection)</button>
+			<button class="nm-button" onclick={upgradeCdn}>Add CDN (DDoS Protection)</button>
 		</div>
 	{/if}
 
 	<hr>
 	<div class="_dp-f _g-6">
-		<button class="nm-button" type="button" on:click={deleteItem}>
+		<button class="nm-button" type="button" onclick={deleteItem}>
 			Delete
 		</button>
 	</div>

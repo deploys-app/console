@@ -4,19 +4,19 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 	const {
 		role,
 		permissions
 	} = data
 
-	$: project = data.project
+	let project = $derived(data.project)
 
-	const form = {
+	const form = $state({
 		role: role?.role ?? '',
 		name: role?.name ?? '',
 		permissions: role?.permissions ?? []
-	}
+	})
 
 	function deleteItem () {
 		if (!role) return
@@ -57,8 +57,14 @@
 		form.permissions = form.permissions.filter((x) => x !== permission)
 	}
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -113,7 +119,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-role">Role ID</label>
 			<div class="nm-input">
@@ -137,7 +143,7 @@
 
 			<div class="nm-field _dp-f _mgbt-5">
 				<div class="nm-select">
-					<select on:change={selectPermissionChanged}>
+					<select onchange={selectPermissionChanged}>
 						<option value="" disabled selected>---Select Permission---</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it}
 							<option value={it}>{it}</option>
@@ -160,7 +166,7 @@
 								<td>{it}</td>
 								<td>
 									<div class="icon-button" role="button" tabindex="0"
-										on:click={() => removePermission(it)} on:keypress={() => removePermission(it)}>
+										onclick={() => removePermission(it)} onkeypress={() => removePermission(it)}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</div>
 								</td>
@@ -180,7 +186,7 @@
 				{#if role}Update{:else}Create{/if}
 			</button>
 			{#if role}
-				<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
+				<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
 			{/if}
 			</div>
 	</form>

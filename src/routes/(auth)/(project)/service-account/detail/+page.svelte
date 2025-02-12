@@ -4,11 +4,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 
-	$: project = data.project
-	$: id = data.id
-	$: serviceAccount = data.serviceAccount
+	let project = $derived(data.project)
+	let id = $derived(data.id)
+	let serviceAccount = $derived(data.serviceAccount)
 
 	function deleteItem () {
 		modal.confirm({
@@ -25,7 +25,7 @@
 		})
 	}
 
-	let loadingCreateKey = false
+	let loadingCreateKey = $state(false)
 
 	async function createKey () {
 		if (loadingCreateKey) {
@@ -122,14 +122,14 @@
 			{#each (serviceAccount.keys ?? []) as key}
 				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
-					<button class="icon -is-right" on:click={() => deleteKey(key.secret)} type="button">
+					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>
 			{/each}
 
 			<div class="_dp-g _g-6 _w-100pct">
-				<button class="nm-button _mgh-at" class:loading={loadingCreateKey} on:click={createKey} disabled={loadingCreateKey} type="button">
+				<button class="nm-button _mgh-at" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
 					<i class="fa-solid fa-plus _mgr-5"></i>
 					Create key
 				</button>
@@ -139,7 +139,7 @@
 		<hr>
 
 		<div class="_dp-f">
-			<button class="nm-button" type="button" on:click={deleteItem}>
+			<button class="nm-button" type="button" onclick={deleteItem}>
 				Delete
 			</button>
 		</div>

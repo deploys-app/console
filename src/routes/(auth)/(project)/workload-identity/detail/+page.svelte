@@ -6,11 +6,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 
-	$: workloadIdentity = data.workloadIdentity
-	$: project = data.project
-	$: projectInfo = data.projectInfo
+	let workloadIdentity = $derived(data.workloadIdentity)
+	let project = $derived(data.project)
+	let projectInfo = $derived(data.projectInfo)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -95,7 +95,7 @@
 		<hr>
 
 		<div class="_dp-f _g-6">
-			<button class="nm-button" on:click={deleteItem}>Delete</button>
+			<button class="nm-button" onclick={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>

@@ -2,11 +2,16 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 
-	/** @type {Api.Project[]} */
-	export let projects
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Project[]} projects
+	 */
 
-	$: project = $page.url.searchParams.get('project')
-	let isActive = false
+	/** @type {Props} */
+	let { projects } = $props()
+
+	let project = $derived($page.url.searchParams.get('project'))
+	let isActive = $state(false)
 
 	/**
 	 * @param {string} sid
@@ -34,9 +39,9 @@
 	}
 </script>
 
-<div class="nm-modal" on:click|self={close} class:is-active={isActive} aria-hidden="true">
+<div class="nm-modal" onclick={close} class:is-active={isActive} aria-hidden="true">
 	<div class="nm-modal-panel">
-		<div class="nm-modal-close" on:click|self={close} on:keypress={close} tabindex="0" role="button">✕</div>
+		<div class="nm-modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
@@ -57,7 +62,7 @@
 							{/if}
 						</td>
 						<td>
-							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
+							<div onclick={() => setProject(it.project)} onkeypress={() => setProject(it.project)}
 								tabindex="0" role="link"
 								class="_tdcrt-udl _cs-pt _cl-primary:hover"
 								style="font-weight: 500">

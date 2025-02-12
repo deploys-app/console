@@ -5,12 +5,12 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	let { data } = $props()
 
-	$: project = data.project
-	$: repository = data.repository
-	$: tags = data.tags
-	$: error = data.error
+	let project = $derived(data.project)
+	let repository = $derived(data.repository)
+	let tags = $derived(data.tags)
+	let error = $derived(data.error)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

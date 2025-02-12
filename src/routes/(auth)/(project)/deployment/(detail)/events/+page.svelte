@@ -3,11 +3,11 @@
 	import * as format from '$lib/format'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	let { data } = $props()
 
-	$: deployment = data.deployment
+	let deployment = $derived(data.deployment)
 
-	let events = []
+	let events = $state([])
 
 	onMount(() => {
 		reloadEvents()

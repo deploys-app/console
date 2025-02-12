@@ -3,11 +3,11 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	let { data } = $props()
 
-	$: project = data.project
-	$: roles = data.roles
-	$: error = data.error
+	let project = $derived(data.project)
+	let roles = $derived(data.roles)
+	let error = $derived(data.error)
 
 	/**
 	 * @param {string} sid

@@ -3,20 +3,25 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 	const {
 		id,
 		serviceAccount
 	} = data
 
-	$: project = data.project
+	let project = $derived(data.project)
 
-	let sid = serviceAccount?.sid
-	let name = serviceAccount?.name
-	let desc = serviceAccount?.description
-	let saving = false
+	let sid = $state(serviceAccount?.sid)
+	let name = $state(serviceAccount?.name)
+	let desc = $state(serviceAccount?.description)
+	let saving = $state(false)
 
-	async function save () {
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -77,7 +82,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		{#if id}
 			<div class="nm-field">
 				<label for="input-email">Email</label>

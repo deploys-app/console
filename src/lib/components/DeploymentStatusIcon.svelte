@@ -2,17 +2,21 @@
 	import { browser } from '$app/environment'
 	import { onDestroy } from 'svelte'
 
-	/** @type {Api.DeploymentAction} */
-	export let action
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.DeploymentAction} action
+	 * @property {Api.DeploymentStatus} status
+	 * @property {string} url
+	 * @property {Api.DeploymentType} type
+	 */
 
-	/** @type {Api.DeploymentStatus} */
-	export let status
-
-	/** @type {string} */
-	export let url
-
-	/** @type {Api.DeploymentType} */
-	export let type
+	/** @type {Props} */
+	let {
+		action,
+		status,
+		url,
+		type
+	} = $props()
 
 	const statusIconClass = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
@@ -22,21 +26,10 @@
 	}
 
 	/** @type {Api.PodStatus | null} */
-	let podStatus
+	let podStatus = $state(null)
 
 	/** @type {string} */
-	let iconClass
-
-	$: {
-		status
-		url
-		action
-		browser && fetchPodStatus()
-	}
-	$: {
-		podStatus
-		iconClass = getIconClass()
-	}
+	let iconClass = $state('')
 
 	/**
 	 * @returns {string}
@@ -92,6 +85,16 @@
 	onDestroy(() => {
 		destroyed = true
 		fetchPodStatusTimeout && clearTimeout(fetchPodStatusTimeout)
+	})
+	$effect(() => {
+		status
+		url
+		action
+		browser && fetchPodStatus()
+	})
+	$effect(() => {
+		podStatus
+		iconClass = getIconClass()
 	})
 </script>
 

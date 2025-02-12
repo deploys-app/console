@@ -4,20 +4,20 @@
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 
-	export let data
+	let { data } = $props()
 
-	$: deployment = data.deployment
+	let deployment = $derived(data.deployment)
 
 	const reloadInterval = 60 * 1000 // 1m
 
-	const filter = {
+	const filter = $state({
 		range: $page.url.searchParams.get('range') || '1hagg'
-	}
+	})
 
-	let cpu = []
-	let memory = []
-	let request = []
-	let egress = []
+	let cpu = $state([])
+	let memory = $state([])
+	let request = $state([])
+	let egress = $state([])
 
 	let reloadTimeout
 
@@ -80,7 +80,7 @@
 
 <div class="_dp-g _g-6 _jtfct-fst">
 	<div class="nm-select">
-		<select bind:value={filter.range} on:change={() => fetchMetrics(true)}>
+		<select bind:value={filter.range} onchange={() => fetchMetrics(true)}>
 			<option value="1h">1 Hour</option>
 			<option value="6h">6 Hours</option>
 			<option value="12h">12 Hours</option>

@@ -2,7 +2,7 @@
 	import Cookie from 'js-cookie'
 	import { onMount } from 'svelte'
 
-	export let data
+	let { data, children } = $props()
 
 	const project = data.project
 
@@ -11,4 +11,4 @@
 	})
 </script>
 
-<slot />
+{@render children?.()}

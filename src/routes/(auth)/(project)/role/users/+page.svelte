@@ -4,11 +4,11 @@
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	let { data } = $props()
 
-	$: project = data.project
-	$: users = data.users
-	$: error = data.error
+	let project = $derived(data.project)
+	let users = $derived(data.users)
+	let error = $derived(data.error)
 
 	/**
 	 * @param {string} email
@@ -68,7 +68,7 @@
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
-							<button class="icon-button" on:click={() => deleteUser(it.email)}>
+							<button class="icon-button" onclick={() => deleteUser(it.email)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

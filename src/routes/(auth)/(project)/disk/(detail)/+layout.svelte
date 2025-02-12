@@ -4,10 +4,10 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { page } from '$app/stores'
 
-	export let data
+	let { data, children } = $props()
 
-	$: project = data.project
-	$: disk = data.disk
+	let project = $derived(data.project)
+	let disk = $derived(data.disk)
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('disk.get')
@@ -51,5 +51,5 @@
 		</a>
 	</div>
 
-	<slot />
+	{@render children?.()}
 </div>

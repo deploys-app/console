@@ -6,16 +6,16 @@
 	import * as hc from '$lib/hc'
 	import api from '$lib/api'
 
-	export let data
+	let { data } = $props()
 
 	const { billingAccount } = data
 
-	const filter = {
+	const filter = $state({
 		range: $page.url.searchParams.get('range') || 'this_month',
 		projectSids: []
-	}
+	})
 
-	let report
+	let report = $state()
 
 	async function fetchReport () {
 		const resp = await api.invoke('billing.report', {
@@ -32,7 +32,8 @@
 		initChart()
 	}
 
-	let chartEl = null
+	/** @type {HTMLElement} */
+	let chartEl
 	let chart = null
 
 	function initChart () {
@@ -121,7 +122,7 @@
 	<div class="lo-grid-span-horizontal _g-5">
 		<div class="lo-grid-span-horizontal _g-4">
 			<div class="nm-select">
-				<select bind:value={filter.range} on:change={fetchReport}>
+				<select bind:value={filter.range} onchange={fetchReport}>
 					<option value="this_month">This month</option>
 					<option value="prev_month">Prev month</option>
 					<option value="3_months">3 months</option>
@@ -136,7 +137,7 @@
 		<div class="_dp-f _fw-w">
 			{#each (report?.projectList ?? []) as it}
 				<div class="nm-checkbox _mgbt-4 _mgr-5">
-					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} on:change={fetchReport}>
+					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} onchange={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>
 			{/each}

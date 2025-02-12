@@ -4,23 +4,27 @@
 	import * as hc from '$lib/hc'
 	import { browser } from '$app/environment'
 
-	/** @type {string} */
-	export let title
-
-	/** @type {string} */
-	export let unit
-
 	/** @typedef {Object} Series */
 	/** @property {string} prefix */
 	/** @property {Array} lines */
 	/** @property {string?} dashStyle */
 	/** @property {string?} color */
 
-	/** @type {Series[]} */
-	export let series
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} title
+	 * @property {string} unit
+	 * @property {Series[]} series
+	 * @property {'line' | 'spline'} [type]
+	 */
 
-	/** @type {'line' | 'spline'} */
-	export let type = 'line'
+	/** @type {Props} */
+	let {
+		title,
+		unit,
+		series,
+		type = 'line'
+	} = $props()
 
 	/** @type {HTMLDivElement} */
 	let el
@@ -53,13 +57,6 @@
 		}
 	})
 
-	$: {
-		if (series?.length === 0) clear()
-		series?.forEach((s) => {
-			update(s.prefix, s.lines, s.dashStyle, s.color)
-		})
-		chart?.redraw()
-	}
 
 	function update (name, lines, dashStyle, color) {
 		if (!browser || !chart) return
@@ -108,6 +105,14 @@
 		}
 		return v
 	}
+
+	$effect(() => {
+		if (series?.length === 0) clear()
+		series?.forEach((s) => {
+			update(s.prefix, s.lines, s.dashStyle, s.color)
+		})
+		chart?.redraw()
+	})
 </script>
 
 <div bind:this={el}></div>

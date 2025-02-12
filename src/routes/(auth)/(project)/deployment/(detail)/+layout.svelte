@@ -3,10 +3,10 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
-	export let data
+	let { data, children } = $props()
 
-	$: project = data.project
-	$: deployment = data.deployment
+	let project = $derived(data.project)
+	let deployment = $derived(data.deployment)
 
 	let lastReload = Date.now()
 
@@ -31,7 +31,7 @@
 <br>
 
 <div class="nm-panel is-level-300 _dp-g _g-7">
-	<Header {deployment} on:invalidate={() => api.invalidate('deployment.get')} />
+	<Header {deployment} invalidate={() => api.invalidate('deployment.get')} />
 
-	<slot />
+	{@render children?.()}
 </div>

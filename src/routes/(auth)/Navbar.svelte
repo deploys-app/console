@@ -3,10 +3,16 @@
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
 
-	/** @type {Api.Profile | null} */
-	export let profile = null
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Profile | null} [profile]
+	 * @property {() => {}} toggleSidebar
+	 */
 
-	let active = false
+	/** @type {Props} */
+	let { profile = null, toggleSidebar } = $props()
+
+	let active = $state(false)
 
 	/** @type {HTMLFormElement} */
 	let signOut
@@ -19,12 +25,13 @@
 		active = false
 	}
 
-	export function toggle () {
-		active = !active
-	}
+	/**
+	 * @param {Event} e
+	 */
+	export function toggle (e) {
+		e.stopPropagation()
 
-	function toggleSidebar () {
-		window.dispatchEvent(new Event('sidebar:toggle'))
+		active = !active
 	}
 
 	function doSignOut () {
@@ -38,7 +45,7 @@
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu _dp-n:md" on:click={toggleSidebar} on:keypress={toggleSidebar} tabindex="0" role="button">
+	<div class="icon-nav-menu _dp-n:md" onclick={toggleSidebar} onkeypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
@@ -49,13 +56,13 @@
 				Theme
 			</div>
 			<ul class="nm-menu is-card is-compact">
-				<li><div on:click={() => setTheme('dark')} on:keypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
-				<li><div on:click={() => setTheme('light')} on:keypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
+				<li><div onclick={() => setTheme('dark')} onkeypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
+				<li><div onclick={() => setTheme('light')} onkeypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
 			</ul>
 		</div>
 
 		<div>
-			<div class="avatar" on:click|stopPropagation={toggle} on:keypress={toggle} tabindex="0" role="button">
+			<div class="avatar" onclick={toggle} onkeypress={toggle} tabindex="0" role="button">
 				<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous" draggable="false">
 			</div>
 
@@ -63,12 +70,12 @@
 				<div class="popup" transition:scale={{ duration: 160 }}>
 					<ul class="user-menu">
 						<li>
-							<a class="item _dp-b" href="/billing" on:click={close}>
+							<a class="item _dp-b" href="/billing" onclick={close}>
 								Billing accounts
 							</a>
 						</li>
 						<li>
-							<div class="item" on:click={doSignOut} on:keypress={doSignOut} tabindex="0" role="button">
+							<div class="item" onclick={doSignOut} onkeypress={doSignOut} tabindex="0" role="button">
 								Signout
 							</div>
 							<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
