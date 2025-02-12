@@ -7,10 +7,10 @@
 	import Sidebar from './Sidebar.svelte'
 	import ModalSelectProject from './ModalSelectProject.svelte'
 
-	let { data, children } = $props()
+	const { data, children } = $props()
 
-	let profile = $derived(data.profile)
-	let projects = $derived(data.projects ?? [])
+	const profile = $derived(data.profile)
+	const projects = $derived(data.projects ?? [])
 
 	let showSidebar = $state(false)
 	$effect(() => {

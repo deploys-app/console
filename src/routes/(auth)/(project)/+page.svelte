@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
 
 	const unitGiB = 1024 * 1024 * 1024
@@ -21,10 +21,10 @@
 		if (Number.isNaN(v)) return '?'
 		return v?.toLocaleString(undefined, { maximumFractionDigits: 2 }) ?? '?'
 	}
-	let projectInfo = $derived(data.projectInfo)
-	let usage = $derived(data.usage)
-	let price = $derived(data.price)
-	let billing = $derived({
+	const projectInfo = $derived(data.projectInfo)
+	const usage = $derived(data.usage)
+	const price = $derived(data.price)
+	const billing = $derived({
 		price: formatNumber(price.price),
 		cpu: formatNumber(usage.cpuUsage),
 		memory: formatNumber(usage.memory / unitGiB),

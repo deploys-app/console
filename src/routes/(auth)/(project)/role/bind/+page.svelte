@@ -4,14 +4,14 @@
 	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 	const {
 		roles,
 		email,
 		selected
 	} = data
 
-	let project = $derived(data.project)
+	const project = $derived(data.project)
 
 	const form = $state({
 		email,

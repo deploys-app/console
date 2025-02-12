@@ -6,7 +6,7 @@
 	 */
 
 	/** @type {Props} */
-	let { span = 1, error } = $props()
+	const { span = 1, error } = $props()
 </script>
 
 {#if error}

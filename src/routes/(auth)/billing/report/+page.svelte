@@ -6,7 +6,7 @@
 	import * as hc from '$lib/hc'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
 	const { billingAccount } = data
 

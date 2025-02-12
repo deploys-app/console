@@ -4,9 +4,9 @@
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let deployment = $derived(data.deployment)
+	const deployment = $derived(data.deployment)
 
 	const reloadInterval = 60 * 1000 // 1m
 

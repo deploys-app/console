@@ -11,12 +11,12 @@
 	 */
 
 	/** @type {Props} */
-	let { deployment, invalidate } = $props()
+	const { deployment, invalidate } = $props()
 
-	let project = $derived($page.data.project)
+	const project = $derived($page.data.project)
 
-	let canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
-	let canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
+	const canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
+	const canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
 
 	function pause () {
 		modal.confirm({

@@ -4,13 +4,13 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 	const {
 		role,
 		permissions
 	} = data
 
-	let project = $derived(data.project)
+	const project = $derived(data.project)
 
 	const form = $state({
 		role: role?.role ?? '',

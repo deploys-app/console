@@ -5,12 +5,12 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let location = $derived(data.location)
-	let name = $derived(data.name)
-	let pullSecret = $derived(data.pullSecret)
+	const project = $derived(data.project)
+	const location = $derived(data.location)
+	const name = $derived(data.name)
+	const pullSecret = $derived(data.pullSecret)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

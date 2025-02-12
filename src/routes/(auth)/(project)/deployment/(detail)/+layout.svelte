@@ -3,10 +3,10 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 
-	let { data, children } = $props()
+	const { data, children } = $props()
 
-	let project = $derived(data.project)
-	let deployment = $derived(data.deployment)
+	const project = $derived(data.project)
+	const deployment = $derived(data.deployment)
 
 	let lastReload = Date.now()
 

@@ -4,9 +4,9 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
+	const project = $derived(data.project)
 	const locations = data.locations
 
 	const form = $state({

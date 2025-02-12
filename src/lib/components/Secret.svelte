@@ -6,7 +6,7 @@
 	 */
 
 	/** @type {Props} */
-	let { value } = $props()
+	const { value } = $props()
 
 	let isHidden = $state(true)
 

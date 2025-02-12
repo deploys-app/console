@@ -3,9 +3,9 @@
 	import * as format from '$lib/format'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let deployment = $derived(data.deployment)
+	const deployment = $derived(data.deployment)
 
 	let events = $state([])
 

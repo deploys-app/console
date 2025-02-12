@@ -6,7 +6,7 @@
 	 */
 
 	/** @type {Props} */
-	let { span = 1, list = [] } = $props()
+	const { span = 1, list = [] } = $props()
 </script>
 
 {#if !list?.length}

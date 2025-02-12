@@ -3,9 +3,9 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let billingAccount = $derived(data.billingAccount)
+	const billingAccount = $derived(data.billingAccount)
 
 	function deleteItem () {
 		modal.confirm({

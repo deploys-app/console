@@ -2,7 +2,7 @@
 	import Cookie from 'js-cookie'
 	import { onMount } from 'svelte'
 
-	let { data, children } = $props()
+	const { data, children } = $props()
 
 	const project = data.project
 

@@ -4,11 +4,11 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let disks = $derived(data.disks)
-	let error = $derived(data.error)
+	const project = $derived(data.project)
+	const disks = $derived(data.disks)
+	const error = $derived(data.error)
 </script>
 
 <h6>Disks</h6>
@@ -46,7 +46,7 @@
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
-							<a href="/disk/create?project={project}&location={it.location}&name={it.name}">
+							<a href="/disk/create?project={project}&location={it.location}&name={it.name}" aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>

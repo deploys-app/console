@@ -8,9 +8,9 @@
 	 */
 
 	/** @type {Props} */
-	let { projects } = $props()
+	const { projects } = $props()
 
-	let project = $derived($page.url.searchParams.get('project'))
+	const project = $derived($page.url.searchParams.get('project'))
 	let isActive = $state(false)
 
 	/**

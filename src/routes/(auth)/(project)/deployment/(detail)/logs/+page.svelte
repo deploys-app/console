@@ -1,9 +1,9 @@
 <script>
 	import { onMount } from 'svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let deployment = $derived(data.deployment)
+	const deployment = $derived(data.deployment)
 
 	let buffer = ''
 	let text = $state('')

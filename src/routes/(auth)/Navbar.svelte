@@ -10,12 +10,12 @@
 	 */
 
 	/** @type {Props} */
-	let { profile = null, toggleSidebar } = $props()
+	const { profile = null, toggleSidebar } = $props()
 
 	let active = $state(false)
 
-	/** @type {HTMLFormElement} */
-	let signOut
+	/** @type {?HTMLFormElement} */
+	let signOut = $state(null)
 
 	export function open () {
 		active = true
@@ -35,7 +35,7 @@
 	}
 
 	function doSignOut () {
-		signOut.submit()
+		signOut?.submit()
 	}
 
 	function setTheme (value) {

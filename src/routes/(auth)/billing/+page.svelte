@@ -2,10 +2,10 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let billingAccounts = $derived(data.billingAccounts)
-	let error = $derived(data.error)
+	const billingAccounts = $derived(data.billingAccounts)
+	const error = $derived(data.error)
 </script>
 
 <h6>Billing</h6>

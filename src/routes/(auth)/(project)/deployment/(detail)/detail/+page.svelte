@@ -8,13 +8,13 @@
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let deployment = $derived(data.deployment)
-	let location = $derived(data.location)
+	const deployment = $derived(data.deployment)
+	const location = $derived(data.location)
 
-	let hasExternalTCPAddress = $derived(['TCPService'].includes(deployment.type))
-	let hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
+	const hasExternalTCPAddress = $derived(['TCPService'].includes(deployment.type))
+	const hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -213,7 +213,7 @@
 
 <div class="_dp-f _fw-w _alit-ct _mgv-8">
 	<div class="_mgl-at:lg _mgbt-5 _mgbt-0:lg">
-		<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
+		<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
 	</div>
 </div>
 

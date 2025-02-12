@@ -5,7 +5,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
 	let locations = $state(data.locations)
 	let quota = $state(data.projectInfo.quota)
@@ -14,7 +14,7 @@
 		locations = data.locations
 	})
 
-	let project = $derived(data.project)
+	const project = $derived(data.project)
 
 	$effect(() => {
 		quota = data.projectInfo.quota
@@ -125,7 +125,7 @@
 			}
 	}
 
-	let selectedLocation = $derived(locations.find((x) => x.id === form.location))
+	const selectedLocation = $derived(locations.find((x) => x.id === form.location))
 
 	async function fetchPullSecrets () {
 		if (!selectedLocation) {
@@ -436,7 +436,7 @@
 				{#each form.command as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
-						<button class="icon-button icon -is-right" type="button"
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove"
 							onclick={() => { form.command = form.command.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
@@ -455,14 +455,15 @@
 				{#each form.args as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
-						<button class="icon-button icon -is-right" type="button"
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove an argument"
 							onclick={() => { form.args = form.args.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" onclick={() => { form.args = [...form.args, ''] }}>
+			<button class="nm-button _mg-at" type="button"
+					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
@@ -639,7 +640,7 @@
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
+									<button class="icon-button" type="button" aria-label="Remove an environment variable"
 										onclick={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
@@ -700,7 +701,7 @@
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
+									<button class="icon-button" type="button" aria-label="Remove a mount data"
 										onclick={() => { form.mountData = form.mountData.filter((_, k) => k !== i) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
@@ -757,7 +758,7 @@
 				</div>
 			{/if}
 <!--			<button class="nm-button _dp-f _mg-at" type="button"-->
-<!--					on:click={() => { form.sidecars.push({}) }}>-->
+<!--					onclick={() => { form.sidecars.push({}) }}>-->
 <!--				<i class="fa-solid fa-plus _mgr-5"></i>-->
 <!--				<span>Add Sidecar</span>-->
 <!--			</button>-->

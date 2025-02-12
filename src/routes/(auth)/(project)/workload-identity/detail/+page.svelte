@@ -6,11 +6,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let workloadIdentity = $derived(data.workloadIdentity)
-	let project = $derived(data.project)
-	let projectInfo = $derived(data.projectInfo)
+	const workloadIdentity = $derived(data.workloadIdentity)
+	const project = $derived(data.project)
+	const projectInfo = $derived(data.projectInfo)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

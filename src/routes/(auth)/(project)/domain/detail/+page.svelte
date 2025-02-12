@@ -7,10 +7,10 @@
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let domain = $derived(data.domain)
+	const project = $derived(data.project)
+	const domain = $derived(data.domain)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')

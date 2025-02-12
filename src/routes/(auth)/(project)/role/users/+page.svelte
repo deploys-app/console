@@ -4,11 +4,11 @@
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let users = $derived(data.users)
-	let error = $derived(data.error)
+	const project = $derived(data.project)
+	const users = $derived(data.users)
+	const error = $derived(data.error)
 
 	/**
 	 * @param {string} email
@@ -63,12 +63,12 @@
 							{/each}
 						</td>
 						<td>
-							<a href="/role/bind?project={project}&email={it.email}">
+							<a href="/role/bind?project={project}&email={it.email}" aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
-							<button class="icon-button" onclick={() => deleteUser(it.email)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteUser(it.email)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

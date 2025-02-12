@@ -8,7 +8,7 @@
 	 */
 
 	/** @type {Props} */
-	let { children } = $props()
+	const { children } = $props()
 
 	if (browser) {
 		beforeNavigate(({ willUnload, to }) => {

@@ -5,7 +5,7 @@
 	 */
 
 	/** @type {Props} */
-	let { span = 1 } = $props()
+	const { span = 1 } = $props()
 </script>
 
 <td colspan={span} class="_tal-ct">

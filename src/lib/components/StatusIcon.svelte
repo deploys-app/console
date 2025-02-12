@@ -6,7 +6,7 @@
 	 */
 
 	/** @type {Props} */
-	let { status } = $props()
+	const { status } = $props()
 
 	const iconClassByStatus = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
@@ -16,7 +16,7 @@
 		verify: 'fa-solid fa-exclamation-triangle _cl-warning'
 	}
 
-	let iconClass = $derived(iconClassByStatus[status] || 'fa-solid fa-minus _cl-light')
+	const iconClass = $derived(iconClassByStatus[status] || 'fa-solid fa-minus _cl-light')
 </script>
 
 <i class={`${iconClass} _mgh-5`}></i>

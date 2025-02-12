@@ -1,7 +1,7 @@
 <script>
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
+	const project = $derived(data.project)
 
 	/** @type {HTMLInputElement} */
 	let elFile

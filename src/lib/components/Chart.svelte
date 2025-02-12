@@ -19,7 +19,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
+	const {
 		title,
 		unit,
 		series,

@@ -4,12 +4,12 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let location = $derived(data.location)
-	let name = $derived(data.name)
-	let disk = $derived(data.disk)
+	const project = $derived(data.project)
+	const location = $derived(data.location)
+	const name = $derived(data.name)
+	const disk = $derived(data.disk)
 
 	function deleteItem () {
 		modal.confirm({

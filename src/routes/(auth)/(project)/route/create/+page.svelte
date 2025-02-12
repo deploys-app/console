@@ -3,10 +3,10 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let locations = $derived(data.locations)
+	const project = $derived(data.project)
+	const locations = $derived(data.locations)
 
 	const form = $state({
 		domain: '',
@@ -25,7 +25,7 @@
 		}
 	})
 
-	let targetPlaceholder = $derived({
+	const targetPlaceholder = $derived({
 		'redirect://': 'https://example.com',
 		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
 		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
@@ -35,7 +35,7 @@
 	let domains = $state([])
 	let deployments = $state([])
 
-	let selectedDomain = $derived(domains.find((x) => x.domain === form.domain))
+	const selectedDomain = $derived(domains.find((x) => x.domain === form.domain))
 
 	async function fetchDomains () {
 		domains = []

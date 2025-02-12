@@ -4,10 +4,10 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { page } from '$app/stores'
 
-	let { data, children } = $props()
+	const { data, children } = $props()
 
-	let project = $derived(data.project)
-	let disk = $derived(data.disk)
+	const project = $derived(data.project)
+	const disk = $derived(data.disk)
 
 	onMount(() => api.intervalInvalidate(async () => {
 		await api.invalidate('disk.get')

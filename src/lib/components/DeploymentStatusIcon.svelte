@@ -11,7 +11,7 @@
 	 */
 
 	/** @type {Props} */
-	let {
+	const {
 		action,
 		status,
 		url,

@@ -3,7 +3,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
 	const billingAccount = data.billingAccount
 

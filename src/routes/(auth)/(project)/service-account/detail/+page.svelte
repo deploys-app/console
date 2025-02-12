@@ -4,11 +4,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let id = $derived(data.id)
-	let serviceAccount = $derived(data.serviceAccount)
+	const project = $derived(data.project)
+	const id = $derived(data.id)
+	const serviceAccount = $derived(data.serviceAccount)
 
 	function deleteItem () {
 		modal.confirm({
@@ -122,7 +122,7 @@
 			{#each (serviceAccount.keys ?? []) as key}
 				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
-					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button">
+					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button" aria-label="Remove">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>

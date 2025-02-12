@@ -5,11 +5,11 @@
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	let { data } = $props()
+	const { data } = $props()
 
-	let project = $derived(data.project)
-	let domains = $derived(data.domains)
-	let error = $derived(data.error)
+	const project = $derived(data.project)
+	const domains = $derived(data.domains)
+	const error = $derived(data.error)
 
 	function deleteDomain (domain) {
 		modal.confirm({
@@ -79,7 +79,7 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" onclick={() => deleteDomain(it)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
