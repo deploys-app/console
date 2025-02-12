@@ -4,11 +4,11 @@
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: routes = data.routes
-	$: error = data.error
+	const project = $derived(data.project)
+	const routes = $derived(data.routes)
+	const error = $derived(data.error)
 
 	/**
 	 * @param {Api.Route} route
@@ -76,7 +76,7 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" on:click={() => deleteRoute(it)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteRoute(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

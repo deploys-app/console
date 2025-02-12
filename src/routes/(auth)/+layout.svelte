@@ -7,16 +7,19 @@
 	import Sidebar from './Sidebar.svelte'
 	import ModalSelectProject from './ModalSelectProject.svelte'
 
-	export let data
+	const { data, children } = $props()
 
-	$: profile = data.profile
-	$: projects = data.projects ?? []
+	const profile = $derived(data.profile)
+	const projects = $derived(data.projects ?? [])
 
-	let showSidebar = false
-	$: $page, showSidebar = false
+	let showSidebar = $state(false)
+	$effect(() => {
+		$page
+		showSidebar = false
+	})
 
-	/** @type {ModalSelectProject} */
-	let projectModal
+	/** @type {?ModalSelectProject} */
+	let projectModal = $state(null)
 
 	onMount(() => {
 		api.setOnUnauth(() => {
@@ -29,23 +32,20 @@
 	}
 </script>
 
-<svelte:window
-	on:sidebar:toggle={() => showSidebar = !showSidebar} />
-
 <div class="app-layout"
 	class:is-shown-sidebar={showSidebar}>
 	<div class="navbar-wrapper">
-		<Navbar {profile} />
+		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} />
 	</div>
 
 	<div class="sidebar-wrapper _zid-2">
 		<div class="sidebar-backdrop" role="button" tabindex="0"
-			on:click={hideSidebar} on:keypress={hideSidebar}></div>
-		<Sidebar {projects} on:openProjectModal={() => projectModal.open()} />
+			onclick={hideSidebar} onkeypress={hideSidebar}></div>
+		<Sidebar {projects} openProjectModal={() => projectModal?.open} />
 	</div>
 
 	<div class="content-wrapper">
-		<slot />
+		{@render children?.()}
 	</div>
 </div>
 

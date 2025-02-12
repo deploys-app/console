@@ -3,19 +3,25 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
 	const project = data.project
 	const billingAccounts = data.billingAccounts
 
-	const form = {
+	const form = $state({
 		sid: project?.project || '',
 		name: project?.name || '',
 		billingAccount: project?.billingAccount || ''
-	}
+	})
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -71,7 +77,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-project">ID</label>
 			<div class="nm-input">

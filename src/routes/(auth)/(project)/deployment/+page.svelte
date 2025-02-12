@@ -4,11 +4,11 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: deployments = data.deployments
-	$: error = data.error
+	const project = $derived(data.project)
+	const deployments = $derived(data.deployments)
+	const error = $derived(data.error)
 </script>
 
 <h6>Deployments</h6>

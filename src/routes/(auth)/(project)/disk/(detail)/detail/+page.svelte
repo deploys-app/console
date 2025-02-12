@@ -4,12 +4,12 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: location = data.location
-	$: name = data.name
-	$: disk = data.disk
+	const project = $derived(data.project)
+	const location = $derived(data.location)
+	const name = $derived(data.name)
+	const disk = $derived(data.disk)
 
 	function deleteItem () {
 		modal.confirm({
@@ -65,7 +65,7 @@
 <div class="_dp-f _g-6">
 	<a class="nm-button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 
-	<button class="nm-button" type="button" on:click={deleteItem}>
+	<button class="nm-button" type="button" onclick={deleteItem}>
 		Delete
 	</button>
 </div>

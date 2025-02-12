@@ -3,11 +3,11 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: roles = data.roles
-	$: error = data.error
+	const project = $derived(data.project)
+	const roles = $derived(data.roles)
+	const error = $derived(data.error)
 
 	/**
 	 * @param {string} sid
@@ -56,7 +56,7 @@
 						<td>{it.createdBy}</td>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href="/role/create?project={project}&role={it.role}">
+								<a href="/role/create?project={project}&role={it.role}" aria-label="Edit">
 									<div class="icon-button">
 										<i class="fa-solid fa-pen"></i>
 									</div>

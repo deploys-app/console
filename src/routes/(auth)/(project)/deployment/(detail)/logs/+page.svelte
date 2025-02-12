@@ -1,12 +1,12 @@
 <script>
 	import { onMount } from 'svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: deployment = data.deployment
+	const deployment = $derived(data.deployment)
 
 	let buffer = ''
-	let text = ''
+	let text = $state('')
 
 	onMount(() => {
 		const source = new EventSource(deployment.logUrl)

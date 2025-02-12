@@ -3,11 +3,11 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: serviceAccounts = data.serviceAccounts
-	$: error = data.error
+	const project = $derived(data.project)
+	const serviceAccounts = $derived(data.serviceAccounts)
+	const error = $derived(data.error)
 </script>
 
 <h6>Service Accounts</h6>
@@ -42,7 +42,7 @@
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
-							<a href="/service-account/create?project={project}&id={it.sid}">
+							<a href="/service-account/create?project={project}&id={it.sid}" aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>

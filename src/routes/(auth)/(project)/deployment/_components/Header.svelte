@@ -1,18 +1,22 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
 
-	export let deployment
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Deployment} deployment
+	 * @property {() => void} invalidate
+	 */
 
-	$: project = $page.data.project
+	/** @type {Props} */
+	const { deployment, invalidate } = $props()
 
-	$: canPause = deployment.status === 'success' && deployment.action === 'deploy'
-	$: canResume = deployment.status === 'success' && deployment.action === 'pause'
+	const project = $derived($page.data.project)
 
-	const dispatch = createEventDispatcher()
+	const canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
+	const canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
 
 	function pause () {
 		modal.confirm({
@@ -28,7 +32,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				dispatch('invalidate')
+				invalidate?.()
 			}
 		})
 	}
@@ -47,7 +51,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				dispatch('invalidate')
+				invalidate?.()
 			}
 		})
 	}
@@ -71,14 +75,14 @@
 			</a>
 			{#if canPause}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" on:click={pause}>
+					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" on:click={resume}>
+					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>

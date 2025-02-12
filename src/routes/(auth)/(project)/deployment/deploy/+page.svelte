@@ -5,32 +5,39 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	let locations = data.locations
-	let quota = data.projectInfo.quota
+	let locations = $state(data.locations)
+	let quota = $state(data.projectInfo.quota)
 
-	$: locations = data.locations
-	$: project = data.project
-	$: quota = data.projectInfo.quota
+	$effect(() => {
+		locations = data.locations
+	})
+
+	const project = $derived(data.project)
+
+	$effect(() => {
+		quota = data.projectInfo.quota
+	})
+
 	const deployment = data.deployment
 
-	const permission = {
+	const permission = $state({
 		pullSecrets: true,
 		workloadIdentities: true,
 		disks: true
-	}
+	})
 
 	/** @type {Api.PullSecret[]} */
-	let pullSecrets = []
+	let pullSecrets = $state([])
 
 	/** @type {Api.WorkloadIdentity[]} */
-	let workloadIdentities = []
+	let workloadIdentities = $state([])
 
 	/** @type {Api.Disk[]} */
-	let disks = []
+	let disks = $state([])
 
-	const form = {
+	const form = $state({
 		location: deployment?.location || '',
 		name: '',
 		type: 'WebService',
@@ -75,7 +82,7 @@
 				credentials: ''
 			}
 		}
-	}
+	})
 	if (deployment) {
 		form.location = deployment.location
 		form.name = deployment.name
@@ -118,7 +125,7 @@
 			}
 	}
 
-	$: selectedLocation = locations.find((x) => x.id === form.location)
+	const selectedLocation = $derived(locations.find((x) => x.id === form.location))
 
 	async function fetchPullSecrets () {
 		if (!selectedLocation) {
@@ -188,8 +195,8 @@
 		fetchDisks()
 	}
 
-	let showEnvText = false
-	let envText = ''
+	let showEnvText = $state(false)
+	let envText = $state('')
 
 	function parseEnvText () {
 		form.env = envText
@@ -219,9 +226,14 @@
 		]
 	}
 
-	let saving = false
+	let saving = $state(false)
 
-	async function save () {
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -280,7 +292,7 @@
 	</div>
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		{#if deployment}
 			<div class="nm-field">
 				<label for="input-location-readonly">Location</label>
@@ -292,7 +304,7 @@
 			<div class="nm-field">
 				<label for="input-location">Location</label>
 				<div class="nm-select">
-					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
+					<select id="input-location" bind:value={form.location} onchange={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
 						{#each locations as it}
 							<option value={it.id}>
@@ -424,14 +436,14 @@
 				{#each form.command as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
-						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.command = form.command.filter((_, k) => k !== i) }}>
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove"
+							onclick={() => { form.command = form.command.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
+			<button class="nm-button _mg-at" type="button" onclick={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Command</span>
 			</button>
@@ -443,14 +455,15 @@
 				{#each form.args as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
-						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.args = form.args.filter((_, k) => k !== i) }}>
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove an argument"
+							onclick={() => { form.args = form.args.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
+			<button class="nm-button _mg-at" type="button"
+					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
@@ -617,18 +630,18 @@
 							<tr>
 								<td>
 									<div class="nm-input">
-										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
+										<input bind:value={it.k} placeholder="Variable name" onchange={parseEnvValue}>
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
 								<td class="_pdl-5">
 									<div class="nm-input">
-										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
+										<input bind:value={it.v} placeholder="Value" onchange={parseEnvValue}>
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
-										on:click={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
+									<button class="icon-button" type="button" aria-label="Remove an environment variable"
+										onclick={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -639,7 +652,7 @@
 						<tr>
 							<td colspan="4">
 								<button class="nm-button _dp-f _mg-at" type="button"
-									on:click={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
+									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
 								</button>
@@ -649,12 +662,12 @@
 				</table>
 			</div>
 
-			<button class="nm-button _dp-f _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
+			<button class="nm-button _dp-f _mg-at" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
 				<div class="nm-textarea _mgt-5">
-					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
+					<textarea rows="20" bind:value={envText} onchange={parseEnvText}></textarea>
 				</div>
 			{/if}
 		</div>
@@ -688,8 +701,8 @@
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
-										on:click={() => { form.mountData = form.mountData.filter((_, k) => k !== i) }}>
+									<button class="icon-button" type="button" aria-label="Remove a mount data"
+										onclick={() => { form.mountData = form.mountData.filter((_, k) => k !== i) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -700,7 +713,7 @@
 					<tr>
 						<td colspan="4">
 							<button class="nm-button _dp-f _mg-at" type="button"
-								on:click={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
+								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
 							</button>
@@ -745,7 +758,7 @@
 				</div>
 			{/if}
 <!--			<button class="nm-button _dp-f _mg-at" type="button"-->
-<!--					on:click={() => { form.sidecars.push({}) }}>-->
+<!--					onclick={() => { form.sidecars.push({}) }}>-->
 <!--				<i class="fa-solid fa-plus _mgr-5"></i>-->
 <!--				<span>Add Sidecar</span>-->
 <!--			</button>-->

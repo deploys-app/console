@@ -4,9 +4,9 @@
 	import Swal from 'sweetalert2'
 	import * as modal from '$lib/modal'
 
-	export let data
+	const { data } = $props()
 
-	$: projects = data.projects
+	const projects = $derived(data.projects)
 
 	/**
 	 * @param {string} project
@@ -75,12 +75,12 @@
 						<td>{it.project}</td>
 						<td>{it.id}</td>
 						<td>
-							<a href={`/project/create?project=${it.project}`}>
+							<a href={`/project/create?project=${it.project}`} aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
-							<button class="icon-button" on:click={() => deleteItem(it.project)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteItem(it.project)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>

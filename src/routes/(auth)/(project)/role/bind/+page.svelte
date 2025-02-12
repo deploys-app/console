@@ -4,19 +4,19 @@
 	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	const { data } = $props()
 	const {
 		roles,
 		email,
 		selected
 	} = data
 
-	$: project = data.project
+	const project = $derived(data.project)
 
-	const form = {
+	const form = $state({
 		email,
 		roles: selected
-	}
+	})
 
 	function addRole (role) {
 		if (!role || form.roles.includes(role)) {
@@ -35,9 +35,14 @@
 		e.target.value = ''
 	}
 
-	let saving = false
+	let saving = $state(false)
 
-	async function save () {
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -79,7 +84,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<div class="nm-input">
 				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
@@ -87,7 +92,7 @@
 		</div>
 		<div class="nm-field">
 			<div class="nm-select">
-				<select on:change={selectRoleChanged}>
+				<select onchange={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
 					{#each roles as it}
 						{#if !form.roles.includes(it.role)}
@@ -112,7 +117,7 @@
 						<td>{it}</td>
 						<td>
 							<div class="icon-button" role="button" tabindex="0"
-								on:click={() => removeRole(it)} on:keypress={() => removeRole(it)}>
+								onclick={() => removeRole(it)} onkeypress={() => removeRole(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</div>
 						</td>

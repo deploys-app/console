@@ -3,10 +3,10 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: domains = data.domains
-	$: error = data.error
+	const domains = $derived(data.domains)
+	const error = $derived(data.error)
 </script>
 
 <h6>Emails</h6>

@@ -1,10 +1,18 @@
 <script>
-	export let span = 1
-	export let list = []
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} [span]
+	 * @property {any} [list]
+	 */
+
+	/** @type {Props} */
+	const { span = 1, list = [] } = $props()
 </script>
 
 {#if !list?.length}
-	<td colspan={span} class="_tal-ct">
-		No data
-	</td>
+	<tr>
+		<td colspan={span} class="_tal-ct">
+			No data
+		</td>
+	</tr>
 {/if}

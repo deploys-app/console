@@ -2,11 +2,11 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: repositories = data.repositories
-	$: error = data.error
+	const project = $derived(data.project)
+	const repositories = $derived(data.repositories)
+	const error = $derived(data.error)
 </script>
 
 <h6>Registry (Alpha)</h6>

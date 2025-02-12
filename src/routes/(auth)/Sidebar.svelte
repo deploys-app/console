@@ -1,19 +1,18 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import { page } from '$app/stores'
 
-	/** @type {Api.Project[]} */
-	export let projects
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Project[]} projects
+	 * @property {() => void} openProjectModal
+	 */
 
-	$: pageMenu = $page.data.menu || ''
-	$: project = $page.url.searchParams.get('project')
-	$: projectName = projects.find((p) => p.project === project)?.name || project
+	/** @type {Props} */
+	const { projects, openProjectModal } = $props()
 
-	const dispatch = createEventDispatcher()
-
-	function openProjectModal () {
-		dispatch('openProjectModal')
-	}
+	const pageMenu = $derived($page.data.menu || '')
+	const project = $derived($page.url.searchParams.get('project'))
+	const projectName = $derived(projects.find((p) => p.project === project)?.name || project)
 
 	const projectMenuList = [
 		{
@@ -197,7 +196,7 @@
 			</small>
 
 			<div class="project-box _cs-pt" role="button" tabindex="0"
-				on:click={openProjectModal} on:keypress={openProjectModal}>
+				onclick={openProjectModal} onkeypress={openProjectModal}>
 				<span>
 					{#if project}
 						{projectName}
@@ -249,13 +248,13 @@
 		</div>
 		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
 			<div class="social _dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
-				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
+				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Goto Github">
 					<i class="fa-brands fa-github"></i>
 				</a>
-				<a href="https://discord.gg/5ZttPJsypS" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Goto Discord">
 					<i class="fa-brands fa-discord"></i>
 				</a>
-				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8">
+				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Email">
 					<i class="fa-solid fa-envelope"></i>
 				</a>
 			</div>

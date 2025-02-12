@@ -4,7 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 	const {
 		deployment,
 		revisions
@@ -52,7 +52,7 @@
 				<td>{it.createdBy}</td>
 				<td>
 					{#if index > 0}
-						<button class="nm-button is-size-small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
+						<button class="nm-button is-size-small" type="button" onclick={() => rollback(it.revision)}>Rollback</button>
 					{/if}
 				</td>
 			</tr>

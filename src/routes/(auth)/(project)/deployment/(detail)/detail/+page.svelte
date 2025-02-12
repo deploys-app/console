@@ -8,13 +8,13 @@
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: deployment = data.deployment
-	$: location = data.location
+	const deployment = $derived(data.deployment)
+	const location = $derived(data.location)
 
-	$: hasExternalTCPAddress = ['TCPService'].includes(deployment.type)
-	$: hasInternalTCPAddress = ['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type)
+	const hasExternalTCPAddress = $derived(['TCPService'].includes(deployment.type))
+	const hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -46,172 +46,174 @@
 <h6><strong>Deployment details</strong></h6>
 <div class="nm-table-container">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
-		{#if deployment.type === 'WebService'}
-			{#if !deployment.internal}
+		<tbody>
+			{#if deployment.type === 'WebService'}
+				{#if !deployment.internal}
+					<tr>
+						<td>URL</td>
+						<td>
+							<a class="nm-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
+								{`https://${deployment.url}`}
+							</a>
+							<span class="icon copy" data-clipboard-text={`https://${deployment.url}`}>
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</td>
+					</tr>
+				{/if}
 				<tr>
-					<td>URL</td>
+					<td>Internal URL</td>
 					<td>
-						<a class="nm-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
-							{`https://${deployment.url}`}
-						</a>
-						<span class="icon copy" data-clipboard-text={`https://${deployment.url}`}>
+						http://{deployment.internalUrl}
+						<span class="icon copy" data-clipboard-text={`http://${deployment.internalUrl}`}>
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</td>
+				</tr>
+			{/if}
+			{#if hasExternalTCPAddress}
+				<tr>
+					<td>Address</td>
+					<td>{deployment.address}:{deployment.nodePort}</td>
+				</tr>
+			{/if}
+			{#if hasInternalTCPAddress}
+				<tr>
+					<td>Internal Address</td>
+					<td>
+						{deployment.internalAddress}:{deployment.port}
+						<span class="icon copy" data-clipboard-text={`${deployment.internalAddress}:${deployment.port}`}>
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
 				</tr>
 			{/if}
 			<tr>
-				<td>Internal URL</td>
+				<td>Type</td>
 				<td>
-					http://{deployment.internalUrl}
-					<span class="icon copy" data-clipboard-text={`http://${deployment.internalUrl}`}>
+					{format.deploymentType(deployment.type)}
+					{#if deployment.internal}
+						(Internal)
+					{/if}
+				</td>
+			</tr>
+			<tr>
+				<td>Location</td>
+				<td>
+					{deployment.location}
+					<span class="icon copy" data-clipboard-text={`${deployment.location}`}>
 						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
 			</tr>
-		{/if}
-		{#if hasExternalTCPAddress}
 			<tr>
-				<td>Address</td>
-				<td>{deployment.address}:{deployment.nodePort}</td>
-			</tr>
-		{/if}
-		{#if hasInternalTCPAddress}
-			<tr>
-				<td>Internal Address</td>
+				<td>Image</td>
 				<td>
-					{deployment.internalAddress}:{deployment.port}
-					<span class="icon copy" data-clipboard-text={`${deployment.internalAddress}:${deployment.port}`}>
+					{deployment.image}
+					<span class="icon copy" data-clipboard-text={`${deployment.image}`}>
 						<i class="fa-light fa-copy"></i>
 					</span>
 				</td>
 			</tr>
-		{/if}
-		<tr>
-			<td>Type</td>
-			<td>
-				{format.deploymentType(deployment.type)}
-				{#if deployment.internal}
-					(Internal)
-				{/if}
-			</td>
-		</tr>
-		<tr>
-			<td>Location</td>
-			<td>
-				{deployment.location}
-				<span class="icon copy" data-clipboard-text={`${deployment.location}`}>
-					<i class="fa-light fa-copy"></i>
-				</span>
-			</td>
-		</tr>
-		<tr>
-			<td>Image</td>
-			<td>
-				{deployment.image}
-				<span class="icon copy" data-clipboard-text={`${deployment.image}`}>
-					<i class="fa-light fa-copy"></i>
-				</span>
-			</td>
-		</tr>
-		{#if deployment.type === 'WebService'}
+			{#if deployment.type === 'WebService'}
+				<tr>
+					<td>Port</td>
+					<td>{deployment.port}{deployment.protocol ? `:${deployment.protocol}` : ''}</td>
+				</tr>
+			{:else if deployment.type === 'TCPService'}
+				<tr>
+					<td>Port</td>
+					<td>{deployment.port}:{deployment.nodePort}</td>
+				</tr>
+			{/if}
+			{#if location.features.disk}
+				<tr>
+					<td>Disk</td>
+					<td>
+						{#if deployment.disk}
+							{deployment.disk.name}
+							(mount: {deployment.disk.mountPath || '-'}, sub: {deployment.disk.subPath || '-'})
+						{:else}
+							-
+						{/if}
+					</td>
+				</tr>
+			{/if}
+			{#if deployment.minReplicas > 0}
 			<tr>
-				<td>Port</td>
-				<td>{deployment.port}{deployment.protocol ? `:${deployment.protocol}` : ''}</td>
-			</tr>
-		{:else if deployment.type === 'TCPService'}
-			<tr>
-				<td>Port</td>
-				<td>{deployment.port}:{deployment.nodePort}</td>
-			</tr>
-		{/if}
-		{#if location.features.disk}
-			<tr>
-				<td>Disk</td>
+				<td>Replicas</td>
 				<td>
-					{#if deployment.disk}
-						{deployment.disk.name}
-						(mount: {deployment.disk.mountPath || '-'}, sub: {deployment.disk.subPath || '-'})
+					{#if deployment.minReplicas > 0}
+						{#if deployment.minReplicas === deployment.maxReplicas}
+							{deployment.minReplicas}
+						{:else}
+							{deployment.minReplicas} - {deployment.maxReplicas}
+						{/if}
 					{:else}
 						-
 					{/if}
 				</td>
 			</tr>
-		{/if}
-		{#if deployment.minReplicas > 0}
-		<tr>
-			<td>Replicas</td>
-			<td>
-				{#if deployment.minReplicas > 0}
-					{#if deployment.minReplicas === deployment.maxReplicas}
-						{deployment.minReplicas}
-					{:else}
-						{deployment.minReplicas} - {deployment.maxReplicas}
-					{/if}
-				{:else}
-					-
-				{/if}
-			</td>
-		</tr>
-		{/if}
-		{#if deployment.type === 'CronJob'}
+			{/if}
+			{#if deployment.type === 'CronJob'}
+				<tr>
+					<td>Schedule</td>
+					<td>{deployment.schedule}</td>
+				</tr>
+			{/if}
 			<tr>
-				<td>Schedule</td>
-				<td>{deployment.schedule}</td>
+				<td>Command</td>
+				<td>{deployment.command.join(' ') || '-'}</td>
 			</tr>
-		{/if}
-		<tr>
-			<td>Command</td>
-			<td>{deployment.command.join(' ') || '-'}</td>
-		</tr>
-		<tr>
-			<td>Args</td>
-			<td>{deployment.args.join(' ') || '-'}</td>
-		</tr>
-		<tr>
-			<td>Pull Secret</td>
-			<td>{deployment.pullSecret || '-'}</td>
-		</tr>
-		{#if location.features.workloadIdentity}
 			<tr>
-				<td>Workload Identity</td>
-				<td>{deployment.workloadIdentity || '-'}</td>
+				<td>Args</td>
+				<td>{deployment.args.join(' ') || '-'}</td>
 			</tr>
-		{/if}
-		<!--{{/*			<tr>*/}}-->
-		<!--{{/*				<td>CPU allocated</td>*/}}-->
-		<!--{{/*				<td>{{.Deployment.Resources.Requests.CPU | textDeploymentCPU}}</td>*/}}-->
-		<!--{{/*			</tr>*/}}-->
-		<tr>
-			<td>CPU limited</td>
-			<td>{format.cpuLimited(deployment.resources.limits.cpu)}</td>
-		</tr>
-		<tr>
-			<td>Memory allocated</td>
-			<td>{format.memory(deployment.resources.requests.memory)}</td>
-		</tr>
-		<tr>
-			<td>Sidecars</td>
-			<td>{deployment.sidecars?.length || 0}</td>
-		</tr>
-		<tr>
-			<td>Deployed At</td>
-			<td>{format.datetime(deployment.createdAt)}</td>
-		</tr>
-		<tr>
-			<td>Deployed By</td>
-			<td>{deployment.createdBy}</td>
-		</tr>
-		<tr>
-			<td>Allocated Price</td>
-			<td>{deployment.allocatedPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })} THB/month/replica</td>
-		</tr>
+			<tr>
+				<td>Pull Secret</td>
+				<td>{deployment.pullSecret || '-'}</td>
+			</tr>
+			{#if location.features.workloadIdentity}
+				<tr>
+					<td>Workload Identity</td>
+					<td>{deployment.workloadIdentity || '-'}</td>
+				</tr>
+			{/if}
+			<!--{{/*			<tr>*/}}-->
+			<!--{{/*				<td>CPU allocated</td>*/}}-->
+			<!--{{/*				<td>{{.Deployment.Resources.Requests.CPU | textDeploymentCPU}}</td>*/}}-->
+			<!--{{/*			</tr>*/}}-->
+			<tr>
+				<td>CPU limited</td>
+				<td>{format.cpuLimited(deployment.resources.limits.cpu)}</td>
+			</tr>
+			<tr>
+				<td>Memory allocated</td>
+				<td>{format.memory(deployment.resources.requests.memory)}</td>
+			</tr>
+			<tr>
+				<td>Sidecars</td>
+				<td>{deployment.sidecars?.length || 0}</td>
+			</tr>
+			<tr>
+				<td>Deployed At</td>
+				<td>{format.datetime(deployment.createdAt)}</td>
+			</tr>
+			<tr>
+				<td>Deployed By</td>
+				<td>{deployment.createdBy}</td>
+			</tr>
+			<tr>
+				<td>Allocated Price</td>
+				<td>{deployment.allocatedPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })} THB/month/replica</td>
+			</tr>
+		</tbody>
 	</table>
 </div>
 
 <div class="_dp-f _fw-w _alit-ct _mgv-8">
 	<div class="_mgl-at:lg _mgbt-5 _mgbt-0:lg">
-		<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
+		<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
 	</div>
 </div>
 

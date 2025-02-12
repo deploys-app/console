@@ -1,15 +1,20 @@
 <script>
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
+	const project = $derived(data.project)
 
 	/** @type {HTMLInputElement} */
 	let elFile
 
-	let downloadUrl = ''
-	let uploading = false
+	let downloadUrl = $state('')
+	let uploading = $state(false)
 
-	async function upload () {
+	/**
+	 * @param {Event} e
+	 */
+	async function upload (e) {
+		e.preventDefault()
+
 		if (uploading) {
 			return
 		}
@@ -40,7 +45,7 @@
 <h6>Dropbox (Alpha)</h6>
 <br>
 <div class="nm-panel is-level-300">
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={upload}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={upload}>
 		<div class="nm-field">
 			<input class="nm-field" type="file" name="file" bind:this={elFile}>
 		</div>
