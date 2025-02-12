@@ -54,7 +54,7 @@
 
 	async function fetchDeployments () {
 		deployments = []
-		form.target = ''
+		form.targetValue = ''
 
 		const resp = await api.invoke('deployment.list', { project }, fetch)
 		if (!resp.ok) {

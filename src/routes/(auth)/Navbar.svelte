@@ -6,7 +6,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {Api.Profile | null} [profile]
-	 * @property {() => {}} toggleSidebar
+	 * @property {() => void} toggleSidebar
 	 */
 
 	/** @type {Props} */

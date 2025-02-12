@@ -24,7 +24,7 @@
     "eslint-plugin-svelte": "^2.46.1",
     "global": "^4.4.0",
     "gravatar-url": "^4.0.1",
-    "highcharts": "^12.1.2",
+    "highcharts": "=11.4.8",
     "js-cookie": "^3.0.5",
     "sass": "^1.84.0",
     "svelte": "^5.19.10",

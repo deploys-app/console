@@ -4,7 +4,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {Api.Project[]} projects
-	 * @property {() => {}} openProjectModal
+	 * @property {() => void} openProjectModal
 	 */
 
 	/** @type {Props} */

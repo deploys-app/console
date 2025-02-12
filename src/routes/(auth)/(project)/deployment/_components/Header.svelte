@@ -7,7 +7,7 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {Api.Deployment} deployment
-	 * @property {() => {}} invalidate
+	 * @property {() => void} invalidate
 	 */
 
 	/** @type {Props} */
