@@ -8,3 +8,6 @@ build:
 		--local dockerfile=. \
 		--local context=. \
 		--output type=image,name=$(REGISTRY):$(TAG),push=true
+
+deploy: build
+	deploys deployment set image console -project=deploys-app -image=$(REGISTRY):$(TAG)

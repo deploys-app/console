@@ -6,7 +6,7 @@ RUN asdf install
 
 ENV ADAPTER=node
 
-ADD package.json bun.lockb ./
+ADD package.json bun.lock ./
 ADD svelte.config.js ./
 RUN bun install --frozen-lockfile
 ADD . .
