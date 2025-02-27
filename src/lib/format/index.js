@@ -57,6 +57,17 @@ export function datetime (v) {
 }
 
 /**
+ * @param {string} v
+ * @returns {number}
+ */
+export function unixDatetime (v) {
+	if (!v) {
+		return 0
+	}
+	return dayjs(v).unix()
+}
+
+/**
  * @param {string} project
  * @param {string} name
  * @param {string} gsa
