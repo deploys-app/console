@@ -42,6 +42,10 @@ select:-webkit-autofill:focus {
 	transition: background-color 5000s ease-in-out 0s;
 }
 
+textarea {
+	resize: none;
+}
+
 .nm-panel {
 	padding: 1.75rem 1.5rem;
 
@@ -267,5 +271,117 @@ pre {
 		min-height: 800px;
 		max-height: 800px;
 		overflow-y: auto;
+	}
+}
+
+.transition-3 {
+	transition-duration: .3s;
+}
+
+._tsf-rt-90 {
+	transform: rotate(-90deg);
+}
+
+._w-fct {
+	width: fit-content !important;
+}
+
+.line-numbers {
+	&.language-js {
+		background-color: hsl(var(--hsl-base-100) / 1);
+		border-radius: 0.25em;
+		
+		.token {
+			&.string-property {
+				&.property {
+					color: hsl(var(--hsl-primary));
+				}
+			}
+			
+			&.operator {
+				color: hsl(var(--hsl-content));
+				background: transparent !important;
+			}
+			
+			&.number {
+				color: hsl(var(--hsl-accent));
+			}
+			
+			&.string {
+				color: hsl(var(--hsl-positive));
+			}
+		}
+	}
+	
+	code[class*=language-] {
+		max-width: 40vw;
+		margin: 0;
+		text-shadow: none !important;
+	}
+}
+
+.normal {
+	&.language-js {
+		background-color: hsl(var(--hsl-base-100) / 1);
+		border-radius: 0.25em;
+		
+		.token {
+			&.string-property {
+				&.property {
+					color: hsl(var(--hsl-primary));
+					background-color: hsl(var(--hsl-base-300) / 1);
+					padding: 2px;
+					border-radius: 4px;
+				}
+			}
+			
+			&.operator {
+				color: hsl(var(--hsl-content));
+				background: transparent !important;
+			}
+			
+			&.number {
+				color: hsl(var(--hsl-accent));
+			}
+			
+			&.string {
+				color: hsl(var(--hsl-positive));
+			}
+		}
+	}
+	
+	code[class*=language-] {
+		max-width: 70vw;
+		text-overflow: ellipsis !important;
+		overflow: hidden;
+		text-shadow: none !important;
+		
+		@media (min-width: 48rem) {
+			max-width: 40vw;
+		}
+	}
+}
+
+pre[class*=language-] {
+	padding: 0.8em !important;
+
+	&.line-numbers {
+		margin: 0;
+		padding-left: 3.5em !important;
+		text-shadow: none !important;
+	}
+
+	&.normal {
+		margin: 0;
+		overflow: hidden !important;
+	}
+}
+
+._opct-75-hover {
+	opacity: 1;
+	transition-duration: .3s;
+	
+	&:hover {
+		opacity: 0.75;
 	}
 }

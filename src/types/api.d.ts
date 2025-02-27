@@ -16,6 +16,14 @@ declare namespace Api {
         | { ok: true; result: T; error?: never }
         | { ok: false; error: Error; result?: never }
 
+    export type ResponseLog<T> = {
+        message?: string
+        hits?: never
+        num_hits?: number
+        elapsed_time_micros?: number
+    }
+
+
     export type Profile = {
         email: string
     }
