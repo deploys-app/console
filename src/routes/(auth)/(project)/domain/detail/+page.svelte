@@ -178,8 +178,8 @@
 
 	function upgradeCdn () {
 		modal.confirm({
-			html: `Add CDN to "${domain.domain}" ?<br><br>This action can not roll back.`,
-			yes: 'Upgrade to Hostname',
+			html: `Add CDN to "${domain.domain}" ?`,
+			yes: 'Upgrade',
 			callback: async () => {
 				const resp = await api.invoke('domain.create', {
 					project,
@@ -187,6 +187,28 @@
 					domain: domain.domain,
 					wildcard: domain.wildcard,
 					cdn: true
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				await api.invalidate('domain.get')
+				handleReload()
+			}
+		})
+	}
+
+	function downgradeCdn () {
+		modal.confirm({
+			html: `Remove CDN from "${domain.domain}" ?`,
+			yes: 'Downgrade',
+			callback: async () => {
+				const resp = await api.invoke('domain.create', {
+					project,
+					location: domain.location,
+					domain: domain.domain,
+					wildcard: domain.wildcard,
+					cdn: false
 				}, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
@@ -432,8 +454,12 @@
 		{/if}
 	</div>
 
-	{#if !domain.cdn}
-		<hr>
+	<hr>
+	{#if domain.cdn}
+		<div class="_dp-f _alit-ct _fw-w">
+			<button class="nm-button" onclick={downgradeCdn}>Remove CDN (DDoS Protection)</button>
+		</div>
+	{:else}
 		<div class="_dp-f _alit-ct _fw-w">
 			<button class="nm-button" onclick={upgradeCdn}>Add CDN (DDoS Protection)</button>
 		</div>
