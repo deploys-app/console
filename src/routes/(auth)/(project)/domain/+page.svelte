@@ -58,7 +58,7 @@
 				{#each domains as it (`${it.domain}-${it.location}`)}
 					<tr>
 						<td>
-							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
+							<StatusIcon status={it.cdn && it.verification.ssl.pending ? 'verify' : it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
 						</td>
 						<td>
