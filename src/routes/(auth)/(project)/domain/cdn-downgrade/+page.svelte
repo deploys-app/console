@@ -2,8 +2,8 @@
 	import { onMount } from 'svelte'
 	import ClipboardJS from 'clipboard'
 	import { goto } from '$app/navigation'
-	import * as modal from '$lib/modal/index.js'
-	import api from '$lib/api/index.js'
+	import * as modal from '$lib/modal'
+	import api from '$lib/api'
 
 	const { data } = $props()
 
