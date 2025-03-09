@@ -197,28 +197,6 @@
 			}
 		})
 	}
-
-	function downgradeCdn () {
-		modal.confirm({
-			html: `Remove CDN from "${domain.domain}" ?`,
-			yes: 'Downgrade',
-			callback: async () => {
-				const resp = await api.invoke('domain.create', {
-					project,
-					location: domain.location,
-					domain: domain.domain,
-					wildcard: domain.wildcard,
-					cdn: false
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				await api.invalidate('domain.get')
-				handleReload()
-			}
-		})
-	}
 </script>
 
 <div class="nm-breadcrumb">
@@ -457,7 +435,7 @@
 	<hr>
 	{#if domain.cdn}
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="nm-button" onclick={downgradeCdn}>Remove CDN (DDoS Protection)</button>
+			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN (DDoS Protection)</a>
 		</div>
 	{:else}
 		<div class="_dp-f _alit-ct _fw-w">
