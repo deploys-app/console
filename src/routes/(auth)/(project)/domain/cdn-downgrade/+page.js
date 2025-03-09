@@ -14,7 +14,7 @@ export async function load ({ url, parent, fetch }) {
 	if (!domain.result) redirect(302, `/domain?project=${project}`)
 	if (!domain.result.cdn) redirect(302, `/domain/detail?project=${project}&domain=${domainName}`)
 
-	/** @type {Api.Response<Api.Location> */
+	/** @type {Api.Response<Api.Location>} */
 	const location = await api.invoke('location.get', { id: domain.result.location }, fetch)
 	if (!location.ok) {
 		error(500, location.error?.message)
