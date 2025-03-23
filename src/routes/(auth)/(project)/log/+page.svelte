@@ -29,11 +29,13 @@
 	let endpoint = $state(data.endpoint)
 	let indexId = $state(data.indexId)
 
-	let timeFilter = $state(null)
+	/** @type {import('svelte').SvelteComponent | undefined} */
+	let timeFilter = $state(undefined)
+
 	const show = $state({
 		query: true,
 		fields: true,
-		result: [],
+		result: /** @type {string[]} */ ([]),
 		customFilter: false,
 		input: true
 	})
@@ -48,7 +50,7 @@
 	let perPageValue = $state(20)
 
 	let result = $state({
-		list: [],
+		list: /** @type {{ timestamp: string }[]} */ ([]),
 		total: 0,
 		elapsedTime: ''
 	})
@@ -216,7 +218,7 @@
 							transition:slide={{ duration: 200, easing: sineInOut, axis: 'y' }}
 							class="_w-100pct _h-16 _pst-f _bt-0 _l-0 _zid-2 _bgcl-tpr _dp-f _jtfct-fe"
 						>
-							<span class="_pdr-6 _pdl-6 _bgcl-base-200 _tal-r _cl-primary _fs-1 _fs-2:sm"><i class="_mgr-4 fa-solid fa-timer"></i>{ format.datetime(filter.startDate * 1000) } to { format.datetime(filter.endDate * 1000) }</span>
+							<span class="_pdr-6 _pdl-6 _bgcl-base-200 _tal-r _cl-primary _fs-1 _fs-2:sm"><i class="_mgr-4 fa-solid fa-timer"></i>{ format.datetime(String(Number(filter.startDate) * 1000)) } to { format.datetime(String(Number(filter.endDate) * 1000)) }</span>
 						</div>
 					{/if}
 					<div class="_dp-f _fdrt-r _jtfct-spbtw _alit-fst _alit-ct:sm">

@@ -8,8 +8,8 @@
 	let { filter = $bindable(), show = $bindable(), perPageValue, getLog } = $props()
 	let showCustom = $state(false)
 	const form = $state({
-		startDate: null,
-		endDate: null
+		startDate: '',
+		endDate: ''
 	})
 	const durationList = {
 		PT15MIN: {
@@ -129,7 +129,7 @@
 	{#if filter.duration.length}
 		{ durationList[filter.duration].label || '-' }
 	{:else if filter.startDate && filter.endDate}
-		{ format.datetime(filter.startDate * 1000) } to <br class="_dp-f _dp-n:sm">{ format.datetime(filter.endDate * 1000) }
+		{ format.datetime(String(Number(filter.startDate) * 1000)) } to <br class="_dp-f _dp-n:sm">{ format.datetime(String(Number(filter.endDate) * 1000)) }
 	{:else}
 		No date range
 	{/if}
