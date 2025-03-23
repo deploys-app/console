@@ -88,7 +88,9 @@
 		padding-left: calc(var(--width-sidebar) + var(--content-sidegap));
 		padding-right: 2rem;
 		padding-bottom: 2rem;
-
+		min-height: 100dvh;
+		display: flex;
+		flex-direction: column;
 	}
 
 	@media screen and (max-width: 1023px) {
