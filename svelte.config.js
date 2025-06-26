@@ -11,7 +11,8 @@ const config = {
 		adapter: process.env.ADAPTER === 'node' ? adapterNode() : adapterCloudflare(),
 		alias: {
 			$style: './src/style',
-			$types: './src/types'
+			$types: './src/types',
+			'monaco-editor': 'monaco-editor/esm/vs/editor/editor.main.js'
 		},
 		version: {
 			pollInterval: 60 * 1000 // 1 min

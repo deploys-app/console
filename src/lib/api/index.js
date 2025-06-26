@@ -49,6 +49,27 @@ async function invoke (fn, args, fetch) {
 }
 
 /**
+ * @template T
+ * @param {string} indexId
+ * @param {string} fn
+ * @param {Object} args
+ * @param {fetch} fetch
+ * @returns {Promise<Api.ResponseLog<T>>}
+ */
+async function invokeLog (indexId, fn, args, fetch) {
+	const url = `${indexId}${fn ? ('/' + fn) : ''}${args ? ('?' + args) : ''}`
+	const resp = await fetch(`${endpoint}/log/${encodeURIComponent(url)}`, {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json'
+		}
+	})
+
+	const body = await resp.json()
+	return body
+}
+
+/**
  * @param {Function} callback
  */
 function setOnUnauth (callback) {
@@ -90,6 +111,7 @@ function intervalInvalidate (callback, interval) {
 
 export default {
 	invoke,
+	invokeLog,
 	setOnUnauth,
 	invalidate: wrapInvalidate,
 	intervalInvalidate
