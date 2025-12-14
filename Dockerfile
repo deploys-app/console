@@ -13,7 +13,7 @@ ADD . .
 RUN bun -b run build
 #RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
 
-FROM gcr.io/distroless/nodejs22-debian11
+FROM gcr.io/distroless/nodejs24-debian13
 
 ENV NODE_ENV=production
 ENV BODY_SIZE_LIMIT=Infinity
