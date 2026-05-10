@@ -13,13 +13,12 @@ ADD . .
 RUN bun -b run build
 #RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
 
-FROM gcr.io/distroless/nodejs24-debian13
+FROM oven/bun:1.3.4-distroless
 
 ENV NODE_ENV=production
 ENV BODY_SIZE_LIMIT=Infinity
 ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
-ADD package.json ./
 COPY --from=0 /workspace/build .
 CMD ["index.js"]
