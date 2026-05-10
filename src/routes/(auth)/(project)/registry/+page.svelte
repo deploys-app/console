@@ -31,11 +31,11 @@
 <div class="nm-panel is-level-300">
 	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
 	<div class="nm-table-container _mgt-6">
-		<table class="nm-table">
+		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Repository</th>
-					<th></th>
+					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -47,10 +47,9 @@
 								{repo.name}
 							</a>
 						</td>
-						<td class="_ta-r">
-							<button class="nm-button is-variant-negative is-size-sm" type="button"
-								onclick={() => deleteRepository(repo.name)}>
-								Delete
+						<td>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
+								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>
