@@ -85,7 +85,7 @@
 						<td>{format.datetime(tag.createdAt)}</td>
 						<td>
 							<button class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
-								<i class="fa-solid fa-tag-slash"></i>
+								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>
