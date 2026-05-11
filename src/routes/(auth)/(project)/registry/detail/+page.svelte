@@ -4,6 +4,8 @@
 	import ClipboardJS from 'clipboard'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import * as modal from '$lib/modal'
+	import api from '$lib/api'
 
 	const { data } = $props()
 
@@ -18,6 +20,21 @@
 			copyList.destroy()
 		}
 	})
+
+	function untagTag (tag) {
+		modal.confirm({
+			title: `Untag "${tag}" ?`,
+			yes: 'Untag',
+			callback: async () => {
+				const resp = await api.invoke('registry/untag', { project, repository: data.id, tag }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				await api.invalidate('registry/getTags')
+			}
+		})
+	}
 </script>
 
 <div class="nm-breadcrumb">
@@ -47,6 +64,7 @@
 				<th>Tag</th>
 				<th>Digest</th>
 				<th>Created At</th>
+				<th class="is-collapse"></th>
 			</tr>
 			</thead>
 			<tbody>
@@ -65,10 +83,15 @@
 							</span>
 						</td>
 						<td>{format.datetime(tag.createdAt)}</td>
+						<td>
+							<button class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={3} list={tags} />
-				<ErrorRow span={3} {error} />
+				<NoDataRow span={4} list={tags} />
+				<ErrorRow span={4} {error} />
 			</tbody>
 		</table>
 	</div>

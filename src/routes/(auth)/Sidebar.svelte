@@ -89,7 +89,7 @@
 		},
 		{
 			id: 'registry',
-			title: 'Registry (Alpha)',
+			title: 'Registry',
 			icon: 'fa-warehouse-full',
 			link: '/registry'
 		}

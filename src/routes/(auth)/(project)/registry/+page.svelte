@@ -1,6 +1,7 @@
 <script>
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
@@ -9,6 +10,7 @@
 	const project = $derived(data.project)
 	const repositories = $derived(data.repositories)
 	const error = $derived(data.error)
+	const storage = $derived(data.storage)
 
 	function deleteRepository (name) {
 		modal.confirm({
@@ -26,10 +28,13 @@
 	}
 </script>
 
-<h6>Registry (Alpha)</h6>
+<h6>Registry</h6>
 <br>
 <div class="nm-panel is-level-300">
 	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
+	{#if storage !== null}
+		<p class="_mgt-4">Total Storage: <strong>{format.storage(storage.size)}</strong></p>
+	{/if}
 	<div class="nm-table-container _mgt-6">
 		<table class="nm-table is-variant-compact">
 			<thead>
