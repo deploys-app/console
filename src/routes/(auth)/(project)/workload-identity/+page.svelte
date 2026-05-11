@@ -32,7 +32,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#each workloadIdentities as it}
+				{#each workloadIdentities as it (`${it.location}-${it.name}`)}
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />

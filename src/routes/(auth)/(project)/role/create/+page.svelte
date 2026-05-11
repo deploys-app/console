@@ -145,7 +145,7 @@
 				<div class="nm-select">
 					<select onchange={selectPermissionChanged}>
 						<option value="" disabled selected>---Select Permission---</option>
-						{#each permissions.filter((x) => !form.permissions.includes(x)) as it}
+						{#each permissions.filter((x) => !form.permissions.includes(x)) as it (it)}
 							<option value={it}>{it}</option>
 						{/each}
 					</select>
@@ -161,7 +161,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.permissions as it}
+						{#each form.permissions as it (it)}
 							<tr>
 								<td>{it}</td>
 								<td>

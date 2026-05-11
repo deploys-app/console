@@ -144,7 +144,7 @@
 			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} onchange={fetchLocationData} required>
 					<option value="" selected disabled>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						<option value={it.id}>{it.id}</option>
 					{/each}
 				</select>
@@ -157,7 +157,7 @@
 				<div class="nm-select">
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
-						{#each domains as it}
+						{#each domains as it (it.domain)}
 							<option value={it.domain}>{#if it.wildcard}*.{/if}{it.domain}</option>
 						{/each}
 					</select>
@@ -201,7 +201,7 @@
 					<div class="nm-select">
 						<select id="input-target_deployment" bind:value={form.targetValue} required>
 							<option value="" selected disabled>Select Deployment</option>
-							{#each deployments as it}
+							{#each deployments as it (it)}
 								<option value={it}>{it}</option>
 							{/each}
 						</select>

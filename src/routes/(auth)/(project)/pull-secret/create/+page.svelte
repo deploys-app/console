@@ -89,7 +89,7 @@
 			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" disabled selected>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						<option value={it.id}>{it.id}</option>
 					{/each}
 				</select>

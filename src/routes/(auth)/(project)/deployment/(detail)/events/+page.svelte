@@ -41,7 +41,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each events as it}
+		{#each events as it, i (i)}
 			<tr class:row-error={it.type !== 'Normal'}>
 				<td>{format.datetime(it.lastSeen)}</td>
 				<td>{it.type}</td>

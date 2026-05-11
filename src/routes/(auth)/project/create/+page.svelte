@@ -97,7 +97,7 @@
 			<div class="nm-select">
 				<select id="input-billing_account" bind:value={form.billingAccount} required>
 					<option value="" selected disabled>Select Billing Account</option>
-					{#each billingAccounts as it}
+					{#each billingAccounts as it (it.id)}
 						<option value={it.id}>{it.name} ({it.id})</option>
 					{/each}
 				</select>

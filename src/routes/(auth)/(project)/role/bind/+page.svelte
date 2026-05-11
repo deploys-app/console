@@ -94,7 +94,7 @@
 			<div class="nm-select">
 				<select onchange={selectRoleChanged}>
 					<option value="" disabled selected>---Select Role---</option>
-					{#each roles as it}
+					{#each roles as it (it.role)}
 						{#if !form.roles.includes(it.role)}
 							<option value={it.role}>{it.name} ({it.role})</option>
 						{/if}
@@ -112,7 +112,7 @@
 				</tr>
 				</thead>
 				<tbody>
-				{#each form.roles as it}
+				{#each form.roles as it (it)}
 					<tr>
 						<td>{it}</td>
 						<td>

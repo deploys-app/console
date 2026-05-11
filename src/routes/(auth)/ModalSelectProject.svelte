@@ -1,6 +1,7 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import { SvelteURLSearchParams } from 'svelte/reactivity'
 
 	/**
 	 * @typedef {Object} Props
@@ -19,7 +20,7 @@
 	function setProject (sid) {
 		close()
 
-		const q = new URLSearchParams($page.url.search)
+		const q = new SvelteURLSearchParams($page.url.search)
 		q.set('project', sid)
 
 		if (project) {
@@ -54,7 +55,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each projects as it}
+					{#each projects as it (it.project)}
 					<tr>
 						<td>
 							{#if project === it.project}

@@ -68,7 +68,7 @@
 			</tr>
 			</thead>
 			<tbody>
-				{#each tags as tag}
+				{#each tags as tag (tag.tag)}
 					<tr>
 						<td>
 							{tag.tag}

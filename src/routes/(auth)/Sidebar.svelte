@@ -217,7 +217,7 @@
 
 		<div class="_dp-n">
 			<!-- Preload codes -->
-			{#each projectMenuList as menu}
+			{#each projectMenuList as menu (menu.id)}
 				<a href="{menu.link}?project={project}" title={menu.title}>{menu.title}</a>
 			{/each}
 		</div>
@@ -225,7 +225,7 @@
 		<div>
 			<ul class="sidebar-menus">
 				{#if project}
-					{#each projectMenuList as menu}
+					{#each projectMenuList as menu (menu.id)}
 						<li>
 							<a href="{menu.link}?project={project}" title={menu.title}>
 								<div class="menu-item" class:is-active={menu.id === pageMenu}>

@@ -268,7 +268,7 @@
 			<hr>
 			<p><strong>Domain Verification</strong></p>
 			{#if (domain.verification.ownership.errors ?? []).length > 0}
-				{#each domain.verification.ownership.errors as e}
+				{#each domain.verification.ownership.errors as e, i (i)}
 					<p class="_cl-negative _cl-opacity-80">{e}</p>
 				{/each}
 			{/if}
@@ -320,7 +320,7 @@
 					</div>
 				</div>
 			{:else}
-				{#each domain.verification.ssl.records as it, index}
+				{#each domain.verification.ssl.records as it, index (index)}
 					<div class="nm-field">
 						<label for={`input-ssl_name_${index}`}>TXT Name</label>
 						<div class="nm-input -has-icon-right _mgbt-3">
@@ -350,7 +350,7 @@
 			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-ip">A Record</label>
-					{#each domain.dnsConfig.ipv4 as ip}
+					{#each domain.dnsConfig.ipv4 as ip, i (i)}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
@@ -364,7 +364,7 @@
 			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-ipv6">AAAA Record</label>
-					{#each domain.dnsConfig.ipv6 as ip}
+					{#each domain.dnsConfig.ipv6 as ip, i (i)}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
@@ -378,7 +378,7 @@
 			{#if (domain.dnsConfig.cname ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-cname">CNAME Record</label>
-					{#each domain.dnsConfig.cname as cname}
+					{#each domain.dnsConfig.cname as cname, i (i)}
 						<div class="nm-input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
 							<span class="icon -is-right copy"

@@ -101,7 +101,7 @@
 				<div class="nm-select">
 					<select id="input-location" bind:value={form.location} required>
 						<option value="">Select Location</option>
-						{#each locations as it}
+						{#each locations as it (it.id)}
 							{#if it.features.disk}
 								<option value={it.id}>
 									{it.id}

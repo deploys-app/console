@@ -75,7 +75,7 @@
 			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						{#if it.features.workloadIdentity}
 							<option value={it.id}>{it.id}</option>
 						{/if}

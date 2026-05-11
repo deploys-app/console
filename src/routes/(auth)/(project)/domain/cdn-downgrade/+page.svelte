@@ -86,7 +86,7 @@
 		{#if location.endpoint}
 			<div class="nm-field">
 				<label for="input-ip">A Record</label>
-				{#each [location.endpoint] as ip}
+				{#each [location.endpoint] as ip, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-3">
 						<input id="input-ip" value={ip} readonly disabled>
 						<span class="icon -is-right copy"
@@ -114,7 +114,7 @@
 		{#if location.cname}
 			<div class="nm-field">
 				<label for="input-cname">CNAME Record</label>
-				{#each [location.cname] as cname}
+				{#each [location.cname] as cname, i (i)}
 					<div class="nm-input -has-icon-right">
 						<input id="input-cname" value={cname} readonly disabled>
 						<span class="icon -is-right copy"
