@@ -269,3 +269,31 @@ pre {
 		overflow-y: auto;
 	}
 }
+
+[data-theme=light] {
+	.nm-panel.is-level-300,
+	.nm-panel.is-level-400 {
+		border: 1px solid hsl(var(--hsl-line));
+		box-shadow:
+			0 1px 2px hsl(220 20% 20% / 0.04),
+			0 2px 6px hsl(220 20% 20% / 0.04);
+	}
+
+	.nm-input,
+	.nm-input > input,
+	.nm-input > select,
+	.nm-textarea,
+	.nm-textarea > textarea {
+		border-color: hsl(var(--hsl-line));
+	}
+
+	*::placeholder,
+	*::-moz-placeholder,
+	*::-webkit-input-placeholder {
+		color: hsl(var(--hsl-content) / 0.45);
+	}
+
+	.icon:hover {
+		color: hsl(var(--hsl-content));
+	}
+}
