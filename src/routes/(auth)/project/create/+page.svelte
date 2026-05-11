@@ -1,18 +1,19 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	const { data } = $props()
 
-	const project = data.project
-	const billingAccounts = data.billingAccounts
+	const project = $derived(data.project)
+	const billingAccounts = $derived(data.billingAccounts)
 
-	const form = $state({
+	const form = $state(untrack(() => ({
 		sid: project?.project || '',
 		name: project?.name || '',
 		billingAccount: project?.billingAccount || ''
-	})
+	})))
 
 	let saving = $state(false)
 

@@ -1,15 +1,14 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	const { data } = $props()
-	const {
-		locations,
-		location,
-		name,
-		disk
-	} = data
+	const locations = $derived(data.locations)
+	const location = untrack(() => data.location)
+	const name = untrack(() => data.name)
+	const disk = untrack(() => data.disk)
 
 	const project = $derived(data.project)
 

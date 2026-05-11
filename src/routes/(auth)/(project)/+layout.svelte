@@ -4,7 +4,7 @@
 
 	const { data, children } = $props()
 
-	const project = data.project
+	const project = $derived(data.project)
 
 	onMount(() => {
 		Cookie.set('project', project, { expires: 7 })

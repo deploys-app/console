@@ -1,22 +1,21 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	const { data } = $props()
-	const {
-		roles,
-		email,
-		selected
-	} = data
+	const roles = $derived(data.roles)
+	const email = $derived(data.email)
+	const selected = $derived(data.selected)
 
 	const project = $derived(data.project)
 
-	const form = $state({
+	const form = $state(untrack(() => ({
 		email,
 		roles: selected
-	})
+	})))
 
 	function addRole (role) {
 		if (!role || form.roles.includes(role)) {

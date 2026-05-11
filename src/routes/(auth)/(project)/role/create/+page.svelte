@@ -1,22 +1,21 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	const { data } = $props()
-	const {
-		role,
-		permissions
-	} = data
+	const role = $derived(data.role)
+	const permissions = $derived(data.permissions)
 
 	const project = $derived(data.project)
 
-	const form = $state({
+	const form = $state(untrack(() => ({
 		role: role?.role ?? '',
 		name: role?.name ?? '',
 		permissions: role?.permissions ?? []
-	})
+	})))
 
 	function deleteItem () {
 		if (!role) return

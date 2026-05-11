@@ -5,7 +5,7 @@
 
 	const { data } = $props()
 
-	const locations = data.locations
+	const locations = $derived(data.locations)
 
 	const project = $derived(data.project)
 

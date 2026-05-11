@@ -1,19 +1,18 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
 	const { data } = $props()
-	const {
-		id,
-		serviceAccount
-	} = data
+	const id = $derived(data.id)
+	const serviceAccount = $derived(data.serviceAccount)
 
 	const project = $derived(data.project)
 
-	let sid = $state(serviceAccount?.sid)
-	let name = $state(serviceAccount?.name)
-	let desc = $state(serviceAccount?.description)
+	let sid = $state(untrack(() => serviceAccount?.sid))
+	let name = $state(untrack(() => serviceAccount?.name))
+	let desc = $state(untrack(() => serviceAccount?.description))
 	let saving = $state(false)
 
 	/**

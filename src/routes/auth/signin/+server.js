@@ -1,21 +1,6 @@
 import { env } from '$env/dynamic/private'
 
-/** @type {Crypto} */
-let webcrypto
-
-// workaround for dev
-if (typeof crypto === 'undefined') {
-	import('node:crypto')
-		.then((imp) => {
-			// @ts-expect-error workaround to use Crypto while dev
-			webcrypto = imp.webcrypto
-		})
-		.catch(() => {
-			// don't throw error on compile time
-		})
-} else {
-	webcrypto = crypto
-}
+const webcrypto = crypto
 
 /**
  * randomState generates a random string for OAuth2 state

@@ -8,7 +8,7 @@
 
 	const { data } = $props()
 
-	const { billingAccount } = data
+	const billingAccount = $derived(data.billingAccount)
 
 	const filter = $state({
 		range: $page.url.searchParams.get('range') || 'this_month',

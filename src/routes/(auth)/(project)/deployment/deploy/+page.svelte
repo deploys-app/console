@@ -1,6 +1,6 @@
 <script>
 	import * as format from '$lib/format'
-	import { onMount, tick } from 'svelte'
+	import { onMount, tick, untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -12,7 +12,7 @@
 
 	const project = $derived(data.project)
 
-	const deployment = data.deployment
+	const deployment = untrack(() => data.deployment)
 
 	const permission = $state({
 		pullSecrets: true,
