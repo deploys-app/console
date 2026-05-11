@@ -12,11 +12,13 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@nomimono/nomimono-css": "^0.6.0",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "=2.59.1",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@types/node": "^25.6.2",
     "@typescript-eslint/eslint-plugin": "^8.59.2",
     "@typescript-eslint/parser": "^8.59.2",
     "clipboard": "^2.0.11",
