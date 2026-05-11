@@ -119,7 +119,7 @@
 
 		<h6><strong>Keys</strong></h6>
 		<div class="_dp-g _g-6 _w-100pct">
-			{#each (serviceAccount.keys ?? []) as key (key.secret)}
+			{#each (serviceAccount.keys ?? []) as key, i (i)}
 				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
 					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button" aria-label="Remove">
