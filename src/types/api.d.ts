@@ -316,7 +316,13 @@ declare namespace Api {
 
     export type Repository = {
         name: string
+        size: number
         createdAt: string
+    }
+
+    export type ProjectStorage = {
+        size: number
+        updatedAt?: string
     }
 
     export type RepositoryTag = {
