@@ -19,6 +19,7 @@ export default [
 	},
 	{
 		rules: {
+			'svelte/no-navigation-without-resolve': 'off',
 			indent: ['error', 'tab'],
 			'no-var': 'warn',
 			'object-shorthand': ['warn', 'properties'],

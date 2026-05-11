@@ -44,7 +44,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each revisions as it, index}
+		{#each revisions as it, index (it.revision)}
 			<tr>
 				<td>{it.revision}</td>
 				<td>{it.image}</td>

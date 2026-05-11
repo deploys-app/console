@@ -135,7 +135,7 @@
 
 	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-8">
 		<div class="_dp-f _fw-w">
-			{#each (report?.projectList ?? []) as it}
+			{#each (report?.projectList ?? []) as it (it.sid)}
 				<div class="nm-checkbox _mgbt-4 _mgr-5">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} onchange={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
@@ -160,7 +160,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each (report?.list ?? []) as it}
+				{#each (report?.list ?? []) as it, i (i)}
 					<tr>
 						<td>{it.projectSid}</td>
 						<td>{it.name}</td>

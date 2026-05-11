@@ -227,7 +227,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each Object.entries(deployment.env || {}) as [k, v]}
+		{#each Object.entries(deployment.env || {}) as [k, v] (k)}
 			<tr>
 				<td>{k}</td>
 				<td>
@@ -251,7 +251,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each Object.entries(deployment.mountData || {}) as [k, v]}
+		{#each Object.entries(deployment.mountData || {}) as [k, v] (k)}
 			<tr>
 				<td>{k}</td>
 				<td class="_wsp-p">{v}</td>

@@ -58,7 +58,7 @@
 					<tr>
 						<td>{it.email}</td>
 						<td>
-							{#each it.roles as r}
+							{#each it.roles as r (r)}
 								{r}<br>
 							{/each}
 						</td>

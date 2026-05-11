@@ -7,18 +7,10 @@
 
 	const { data } = $props()
 
-	let locations = $state(data.locations)
-	let quota = $state(data.projectInfo.quota)
-
-	$effect(() => {
-		locations = data.locations
-	})
+	const locations = $derived(data.locations)
+	const quota = $derived(data.projectInfo.quota)
 
 	const project = $derived(data.project)
-
-	$effect(() => {
-		quota = data.projectInfo.quota
-	})
 
 	const deployment = data.deployment
 
@@ -306,7 +298,7 @@
 				<div class="nm-select">
 					<select id="input-location" bind:value={form.location} onchange={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
-						{#each locations as it}
+						{#each locations as it (it.id)}
 							<option value={it.id}>
 								{it.id}
 							</option>
@@ -599,7 +591,7 @@
 			<label for="input-memory">Memory allocated</label>
 			<div class="nm-select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
-					{#each selectedLocation.memoryAllocatable as it}
+					{#each selectedLocation.memoryAllocatable as it, i (i)}
 						<option value={it}>{format.memory(it)}</option>
 					{/each}
 				</select>
@@ -626,7 +618,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.env as it, i}
+						{#each form.env as it, i (i)}
 							<tr>
 								<td>
 									<div class="nm-input">
@@ -687,7 +679,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.mountData as it, i}
+						{#each form.mountData as it, i (i)}
 							<tr>
 								<td>
 									<div class="nm-input">
