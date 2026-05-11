@@ -21,21 +21,21 @@
     "@typescript-eslint/parser": "^8.59.2",
     "clipboard": "^2.0.11",
     "dayjs": "^1.11.20",
-    "eslint": "^9.39.2",
-    "eslint-plugin-svelte": "^3.13.1",
+    "eslint": "^10.3.0",
+    "eslint-plugin-svelte": "^3.17.1",
     "global": "^4.4.0",
     "gravatar-url": "^4.0.1",
     "highcharts": "=11.4.8",
     "js-cookie": "^3.0.5",
-    "sass": "^1.96.0",
+    "sass": "^1.99.0",
     "svelte": "^5.55.5",
     "svelte-check": "^4.4.8",
     "svelte-eslint-parser": "^1.6.1",
     "sweetalert2": "^11.26.24",
-    "typescript": "~5.9.3",
+    "typescript": "~6.0.3",
     "valid-url": "^1.0.9",
-    "vite": "^8.0.5",
-    "wrangler": "^4.59.1"
+    "vite": "^8.0.12",
+    "wrangler": "^4.90.0"
   },
   "type": "module"
 }
