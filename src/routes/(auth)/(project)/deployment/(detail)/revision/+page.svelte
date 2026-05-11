@@ -5,10 +5,8 @@
 	import api from '$lib/api'
 
 	const { data } = $props()
-	const {
-		deployment,
-		revisions
-	} = data
+	const deployment = $derived(data.deployment)
+	const revisions = $derived(data.revisions)
 
 	function rollback (toRevision) {
 		modal.confirm({

@@ -4,11 +4,9 @@
 	import api from '$lib/api'
 
 	const { data } = $props()
-	const {
-		project,
-		locations,
-		projectInfo
-	} = data
+	const project = $derived(data.project)
+	const locations = $derived(data.locations)
+	const projectInfo = $derived(data.projectInfo)
 
 	const form = $state({
 		domain: '',

@@ -7,7 +7,7 @@
 	const { data } = $props()
 
 	const project = $derived(data.project)
-	const locations = data.locations
+	const locations = $derived(data.locations)
 
 	const form = $state({
 		name: '',
