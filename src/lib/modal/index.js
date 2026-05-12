@@ -15,7 +15,7 @@ import 'sweetalert2/dist/sweetalert2.min.css'
  */
 export async function confirm ({ title, html, yes, callback }) {
 	const result = await Swal.fire({
-		title: 'Are you sure?' ,
+		title: 'Are you sure?',
 		text: title,
 		html,
 		icon: 'warning',
