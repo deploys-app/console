@@ -9,7 +9,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${billingAccount.name}" ?`,
+			title: `Delete "${billingAccount.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('billing.delete', { id: billingAccount.id }, fetch)

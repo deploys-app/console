@@ -21,7 +21,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${pullSecret.name}" ?`,
+			title: `Delete "${pullSecret.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('pullSecret.delete', { project, location, name }, fetch)

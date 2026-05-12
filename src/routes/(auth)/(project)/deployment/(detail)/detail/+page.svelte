@@ -25,7 +25,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${deployment.name}" ?`,
+			title: `Delete "${deployment.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('deployment.delete', {
@@ -43,7 +43,7 @@
 	}
 </script>
 
-<h6><strong>Deployment details</strong></h6>
+<h6><strong>Deployment Details</strong></h6>
 <div class="nm-table-container">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<tbody>
@@ -227,7 +227,7 @@
 	</div>
 </div>
 
-<h6><strong>Environment variables</strong></h6>
+<h6><strong>Environment Variables</strong></h6>
 <div class="nm-table-container">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>

@@ -13,7 +13,7 @@
 
 	function deleteDomain (domain) {
 		modal.confirm({
-			title: `Delete domain "${domain.domain}" ?`,
+			title: `Delete domain "${domain.domain}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('domain.delete', {

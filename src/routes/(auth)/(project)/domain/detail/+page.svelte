@@ -53,7 +53,7 @@
 		}
 
 		await modal.confirm({
-			title: `Purge cache on domain "${domain.domain}" ?`,
+			title: `Purge cache on domain "${domain.domain}"?`,
 			yes: 'Purge',
 			callback: async () => {
 				purging = true
@@ -160,7 +160,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete domain "${domain.domain}" ?`,
+			title: `Delete domain "${domain.domain}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('domain.delete', {
@@ -178,7 +178,7 @@
 
 	function upgradeCdn () {
 		modal.confirm({
-			html: `Add CDN to "${domain.domain}" ?`,
+			html: `Add CDN to "${domain.domain}"?`,
 			yes: 'Upgrade',
 			callback: async () => {
 				const resp = await api.invoke('domain.create', {

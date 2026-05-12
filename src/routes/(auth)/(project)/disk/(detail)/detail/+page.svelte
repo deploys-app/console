@@ -13,7 +13,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${name}" ?`,
+			title: `Delete "${name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('disk.delete', { project, location, name }, fetch)

@@ -21,7 +21,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${workloadIdentity.name}" ?`,
+			title: `Delete "${workloadIdentity.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('workloadIdentity.delete', {

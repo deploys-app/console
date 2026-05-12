@@ -49,7 +49,7 @@
 
 	function deleteKey (secret) {
 		modal.confirm({
-			title: 'Confirm delete key ?',
+			title: 'Confirm delete key?',
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('serviceAccount.deleteKey', { project, id, secret }, fetch)

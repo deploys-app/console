@@ -21,7 +21,7 @@
 		if (!role) return
 
 		modal.confirm({
-			title: `Delete ${role.role} and its users ?`,
+			title: `Delete ${role.role} and its users?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('role.delete', { project, role: role.role }, fetch)
@@ -143,7 +143,7 @@
 			<div class="nm-field _dp-f _mgbt-5">
 				<div class="nm-select">
 					<select onchange={selectPermissionChanged}>
-						<option value="" disabled selected>---Select Permission---</option>
+						<option value="" disabled selected>Select Permission</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it (it)}
 							<option value={it}>{it}</option>
 						{/each}

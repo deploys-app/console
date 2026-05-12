@@ -124,7 +124,7 @@
 			<div class="nm-select">
 				<select bind:value={filter.range} onchange={fetchReport}>
 					<option value="this_month">This month</option>
-					<option value="prev_month">Prev month</option>
+					<option value="prev_month">Previous month</option>
 					<option value="3_months">3 months</option>
 					<option value="6_months">6 months</option>
 					<option value="year">1 year</option>

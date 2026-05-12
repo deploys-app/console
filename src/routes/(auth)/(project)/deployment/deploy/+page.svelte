@@ -295,9 +295,9 @@
 <div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _jtfit-st _g-5">
 		{#if deployment}
-			<h5><strong>Deploy new revision</strong></h5>
+			<h5><strong>Deploy New Revision</strong></h5>
 		{:else}
-			<h5><strong>Deploy new deployment</strong></h5>
+			<h5><strong>Deploy New Deployment</strong></h5>
 		{/if}
 	</div>
 	<hr>
@@ -632,7 +632,7 @@
                 </select>
             </div>
             <small class="helper">
-                Number of vCPUs limit to each container instance. Autoscale trigger when CPU hit 80% of the limit.
+                Number of vCPUs limited to each container instance. Autoscaling triggers when CPU usage reaches 80% of the limit.
             </small>
         </div>
 

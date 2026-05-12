@@ -20,7 +20,7 @@
 
 	function pause () {
 		modal.confirm({
-			title: `Pause ${deployment.name} in ${deployment.location} ?`,
+			title: `Pause ${deployment.name} in ${deployment.location}?`,
 			yes: 'Pause',
 			callback: async () => {
 				const resp = await api.invoke('deployment.pause', {
@@ -39,7 +39,7 @@
 
 	function resume () {
 		modal.confirm({
-			title: `Resume ${deployment.name} in ${deployment.location} ?`,
+			title: `Resume ${deployment.name} in ${deployment.location}?`,
 			yes: 'Resume',
 			callback: async () => {
 				const resp = await api.invoke('deployment.resume', {

@@ -15,7 +15,7 @@
 	 */
 	function deleteRoute (route) {
 		modal.confirm({
-			title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
+			title: `Delete route ${route.domain}${route.path} in ${route.location}?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('route.delete', {

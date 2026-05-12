@@ -23,7 +23,7 @@
 
 	function untagTag (tag) {
 		modal.confirm({
-			title: `Untag "${tag}" ?`,
+			title: `Untag "${tag}"?`,
 			yes: 'Untag',
 			callback: async () => {
 				const resp = await api.invoke('registry/untag', { project, repository: data.id, tag }, fetch)
