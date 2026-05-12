@@ -14,7 +14,7 @@
 	 */
 	async function deleteItem (project) {
 		const result = await Swal.fire({
-			title: 'Are you sure ?',
+			title: 'Are you sure?',
 			text: `Type "${project}" to confirm!`,
 			icon: 'warning',
 			input: 'text',

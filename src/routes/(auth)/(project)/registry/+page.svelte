@@ -14,7 +14,7 @@
 
 	function deleteRepository (name) {
 		modal.confirm({
-			title: `Delete "${name}" ?`,
+			title: `Delete "${name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('registry/delete', { project, repository: name }, fetch)

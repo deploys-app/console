@@ -15,7 +15,7 @@
 	 */
 	function deleteUser (email) {
 		modal.confirm({
-			title: `Delete user ${email} from project ${project} ?`,
+			title: `Delete user ${email} from project ${project}?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('role.bind', {

@@ -76,7 +76,7 @@
 						</li>
 						<li>
 							<div class="item" onclick={doSignOut} onkeypress={doSignOut} tabindex="0" role="button">
-								Signout
+								Sign Out
 							</div>
 							<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
 								<button>Sign Out</button>
