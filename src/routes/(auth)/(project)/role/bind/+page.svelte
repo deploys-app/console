@@ -86,8 +86,15 @@
 	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<div class="nm-input">
-				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
+				<input type="text" placeholder="Email / allUsers / allAuthenticatedUsers"
+					bind:value={form.email} readonly={!!email} required
+					list="email-suggestions"
+					pattern="^(allUsers|allAuthenticatedUsers|[^@\s]+@[^@\s]+\.[^@\s]+)$">
 			</div>
+			<datalist id="email-suggestions">
+				<option value="allUsers"></option>
+				<option value="allAuthenticatedUsers"></option>
+			</datalist>
 		</div>
 		<div class="nm-field">
 			<div class="nm-select">
