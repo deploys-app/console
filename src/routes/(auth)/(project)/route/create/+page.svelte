@@ -65,6 +65,7 @@
 		deployments = list
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.type === 'WebService')
+			.filter((x) => x.ttl === 0)
 			.map((x) => x.name)
 	}
 
