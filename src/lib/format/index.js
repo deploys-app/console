@@ -94,3 +94,34 @@ export function deploymentType (t) {
 export function shortDigest (s) {
 	return s.replace(/^sha256:/, '').slice(0, 12)
 }
+
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+export function duration (seconds) {
+	if (!seconds || seconds <= 0) {
+		return ''
+	}
+	const d = Math.floor(seconds / 86400)
+	const h = Math.floor((seconds % 86400) / 3600)
+	const m = Math.floor((seconds % 3600) / 60)
+	const s = Math.floor(seconds % 60)
+	const parts = []
+	if (d) parts.push(`${d}d`)
+	if (h) parts.push(`${h}h`)
+	if (m) parts.push(`${m}m`)
+	if (s && !d && !h) parts.push(`${s}s`)
+	return parts.join(' ') || '0s'
+}
+
+/**
+ * @param {number} ttlSeconds
+ * @returns {string}
+ */
+export function ttlExpireAt (ttlSeconds) {
+	if (!ttlSeconds || ttlSeconds <= 0) {
+		return ''
+	}
+	return dayjs().add(ttlSeconds, 'second').format('YYYY-MM-DD HH:mm:ss')
+}

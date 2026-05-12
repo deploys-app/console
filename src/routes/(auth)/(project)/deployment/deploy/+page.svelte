@@ -73,7 +73,10 @@
 				port: null,
 				credentials: ''
 			}
-		}
+		},
+		ttlValue: 0,
+		// unit in seconds; '0' means no auto-delete
+		ttlUnit: '0'
 	})
 	if (deployment) {
 		form.location = deployment.location
@@ -115,6 +118,18 @@
 					credentials: ''
 				}
 			}
+		if (deployment.ttl > 0) {
+			if (deployment.ttl % 86400 === 0) {
+				form.ttlUnit = '86400'
+				form.ttlValue = deployment.ttl / 86400
+			} else if (deployment.ttl % 3600 === 0) {
+				form.ttlUnit = '3600'
+				form.ttlValue = deployment.ttl / 3600
+			} else {
+				form.ttlUnit = '60'
+				form.ttlValue = Math.max(1, Math.round(deployment.ttl / 60))
+			}
+		}
 	}
 
 	const selectedLocation = $derived(locations.find((x) => x.id === form.location))
@@ -232,13 +247,16 @@
 
 		saving = true
 		try {
+			const unit = parseInt(form.ttlUnit) || 0
+			const ttlSeconds = unit > 0 ? Math.max(0, Math.floor(Number(form.ttlValue) || 0)) * unit : 0
 			const resp = await api.invoke('deployment.deploy', {
 				project,
 				...form,
 				protocol: form.type === 'WebService' ? form.protocol : '',
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
 				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
-				sidecars: convertSidecar()
+				sidecars: convertSidecar(),
+				ttl: ttlSeconds
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -518,6 +536,37 @@
 				{/if}
 			</div>
 		{/if}
+
+		<br>
+		<hr>
+		<br>
+
+		<h6><strong>Auto-delete (TTL)</strong></h6>
+		<div class="lo-6 _g-6">
+			<div class="nm-field">
+				<label for="input-ttl_unit">Unit</label>
+				<div class="nm-select">
+					<select id="input-ttl_unit" bind:value={form.ttlUnit}>
+						<option value="0">No auto-delete</option>
+						<option value="60">Minutes</option>
+						<option value="3600">Hours</option>
+						<option value="86400">Days</option>
+					</select>
+				</div>
+			</div>
+
+			{#if form.ttlUnit !== '0'}
+				<div class="nm-field">
+					<label for="input-ttl_value">Duration</label>
+					<div class="nm-input">
+						<input id="input-ttl_value" type="number" min="1" bind:value={form.ttlValue}>
+					</div>
+				</div>
+			{/if}
+		</div>
+		<small class="helper">
+			Deployment will be automatically deleted after this duration. Routes cannot be set on auto-delete deployments.
+		</small>
 
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
