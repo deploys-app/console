@@ -1,19 +1,21 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: users = data.users
+	const project = $derived(data.project)
+	const users = $derived(data.users)
+	const error = $derived(data.error)
 
+	/**
+	 * @param {string} email
+	 */
 	function deleteUser (email) {
 		modal.confirm({
-			title: `Delete user ${email} from project ${project} ?`,
+			title: `Delete user ${email} from project ${project}?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('role.bind', {
@@ -36,7 +38,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/role/bind?project=${project}`}>
+			<a class="nm-button" href="/role/bind?project={project}">
 				Add
 			</a>
 		</div>
@@ -52,32 +54,28 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#if $loading}
-					<LoadingRow span={3} />
-				{:else}
-					{#each users as it}
-						<tr>
-							<td>{it.email}</td>
-							<td>
-								{#each it.roles as r}
-									{r}<br>
-								{/each}
-							</td>
-							<td>
-								<a href={`/role/bind?project=${project}&email=${it.email}`}>
-									<div class="icon-button">
-										<i class="fa-solid fa-pen"></i>
-									</div>
-								</a>
-								<button class="icon-button" on:click={() => deleteUser(it.email)}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
-							</td>
-						</tr>
-					{:else}
-						<NoDataRow span={3} forbidden={!permission.users} />
-					{/each}
-				{/if}
+				{#each users as it (it.email)}
+					<tr>
+						<td>{it.email}</td>
+						<td>
+							{#each it.roles as r (r)}
+								{r}<br>
+							{/each}
+						</td>
+						<td>
+							<a href="/role/bind?project={project}&email={it.email}" aria-label="Edit">
+								<div class="icon-button">
+									<i class="fa-solid fa-pen"></i>
+								</div>
+							</a>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteUser(it.email)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={3} list={users} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

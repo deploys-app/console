@@ -3,12 +3,12 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: locations = data.locations
+	const project = $derived(data.project)
+	const locations = $derived(data.locations)
 
-	const form = {
+	const form = $state({
 		domain: '',
 		subdomain: '',
 		path: '',
@@ -23,25 +23,25 @@
 			}
 			// TODO: add forwardAuth
 		}
-	}
+	})
 
-	$: targetPlaceholder = {
+	const targetPlaceholder = $derived({
 		'redirect://': 'https://example.com',
 		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
 		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
-	}[form.targetPrefix] || ''
+	}[form.targetPrefix] || '')
 
-	/** @type {import('$types').Domain[]} */
-	let domains = []
-	let deployments = []
+	/** @type {Api.Domain[]} */
+	let domains = $state([])
+	let deployments = $state([])
 
-	$: selectedDomain = domains.find((x) => x.domain === form.domain)
+	const selectedDomain = $derived(domains.find((x) => x.domain === form.domain))
 
 	async function fetchDomains () {
 		domains = []
 		form.domain = ''
 
-		/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Domain>>} */
+		/** @type {Api.Response<Api.List<Api.Domain>>} */
 		const resp = await api.invoke('domain.list', { project, location: form.location }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
@@ -54,7 +54,7 @@
 
 	async function fetchDeployments () {
 		deployments = []
-		form.target = ''
+		form.targetValue = ''
 
 		const resp = await api.invoke('deployment.list', { project }, fetch)
 		if (!resp.ok) {
@@ -73,8 +73,14 @@
 		fetchDeployments()
 	}
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -132,13 +138,13 @@
 		</div>
 	</div>
 	<hr>
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-location">Location</label>
 			<div class="nm-select">
-				<select id="input-location" bind:value={form.location} on:change={fetchLocationData} required>
+				<select id="input-location" bind:value={form.location} onchange={fetchLocationData} required>
 					<option value="" selected disabled>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						<option value={it.id}>{it.id}</option>
 					{/each}
 				</select>
@@ -151,7 +157,7 @@
 				<div class="nm-select">
 					<select id="input-domain" bind:value={form.domain} required>
 						<option value="" selected disabled>Select Domain</option>
-						{#each domains as it}
+						{#each domains as it (it.domain)}
 							<option value={it.domain}>{#if it.wildcard}*.{/if}{it.domain}</option>
 						{/each}
 					</select>
@@ -178,7 +184,7 @@
 			<div class="nm-field">
 				<label for="input-target_prefix">Type</label>
 				<div class="nm-select">
-					<select id="input-target_prefix" bind:value={form.targetPrefix} on:change={() => form.targetValue = ''} required>
+					<select id="input-target_prefix" bind:value={form.targetPrefix} onchange={() => form.targetValue = ''} required>
 						<option value="" selected disabled>Select Type</option>
 						<option value="deployment://">Deployment</option>
 						<option value="redirect://">Redirect</option>
@@ -195,7 +201,7 @@
 					<div class="nm-select">
 						<select id="input-target_deployment" bind:value={form.targetValue} required>
 							<option value="" selected disabled>Select Deployment</option>
-							{#each deployments as it}
+							{#each deployments as it (it)}
 								<option value={it}>{it}</option>
 							{/each}
 						</select>

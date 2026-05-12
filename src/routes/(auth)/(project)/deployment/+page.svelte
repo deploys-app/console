@@ -1,24 +1,14 @@
 <script>
-	import { onMount } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { loading } from '$lib/stores'
-	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: deployments = data.deployments
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('deployment.list')
-		if (!deployments.some((x) => x.status === 'pending')) {
-			return 300000
-		}
-	}, 4000))
+	const project = $derived(data.project)
+	const deployments = $derived(data.deployments)
+	const error = $derived(data.error)
 </script>
 
 <h6>Deployments</h6>
@@ -26,7 +16,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/deployment/deploy?project=${project}`}>
+			<a class="nm-button" href="/deployment/deploy?project={project}">
                 Create
             </a>
 		</div>
@@ -47,19 +37,20 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={6} />
-			{:else}
-				{#each deployments as it}
+				{#each deployments as it (`${it.name}-${it.location}`)}
 					<tr>
 						<td>
-							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} />
+							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
+							{#if it.ttl > 0}
+								<i class="fa-regular fa-clock _mgr-5 _cl-warning"
+									title={`Auto-delete at ${format.ttlExpireAt(it.ttl)} (in ${format.duration(it.ttl)})`}></i>
+							{/if}
 							<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>
 						<td>{format.deploymentType(it.type)}</td>
-	<!--					<td>{format.cpu(it.resources.requests.cpu)}</td>-->
+<!--						<td>{format.cpu(it.resources.requests.cpu)}</td>-->
 						<td>{format.memory(it.resources.requests.memory)}</td>
 						<td>
 							{#if it.minReplicas > 0}
@@ -74,12 +65,11 @@
 						</td>
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
-	<!--					<td>{it.createdBy}</td>-->
+<!--						<td>{it.createdBy}</td>-->
 					</tr>
-				{:else}
-					<NoDataRow span={6} forbidden={!permission.deployments} />
 				{/each}
-			{/if}
+				<NoDataRow span={6} list={deployments} />
+				<ErrorRow span={6} {error} />
 			</tbody>
 		</table>
 	</div>

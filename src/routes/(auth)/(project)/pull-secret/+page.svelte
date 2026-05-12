@@ -1,24 +1,14 @@
 <script>
-	import { onMount } from 'svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import * as format from '$lib/format'
-	import { loading } from '$lib/stores'
-	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: pullSecrets = data.pullSecrets
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('pullSecret.list')
-		if (!pullSecrets.some((x) => x.status === 'pending')) {
-			return 300000
-		}
-	}, 4000))
+	const project = $derived(data.project)
+	const pullSecrets = $derived(data.pullSecrets)
+	const error = $derived(data.error)
 </script>
 
 <h6>Pull Secrets</h6>
@@ -26,7 +16,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/pull-secret/create?project=${project}`}>
+			<a class="nm-button" href="/pull-secret/create?project={project}">
                 Create
             </a>
 		</div>
@@ -43,14 +33,11 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={4} />
-			{:else}
-				{#each pullSecrets as it}
+				{#each pullSecrets as it (`${it.name}-${it.location}`)}
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="nm-link" href={`/pull-secret/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href="/pull-secret/detail?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>
@@ -58,10 +45,9 @@
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>{it.createdBy}</td>
 					</tr>
-				{:else}
-					<NoDataRow span={4} forbidden={!permission.pullSecrets} />
 				{/each}
-			{/if}
+				<NoDataRow span={4} list={pullSecrets} />
+				<ErrorRow span={4} {error} />
 			</tbody>
 		</table>
 	</div>

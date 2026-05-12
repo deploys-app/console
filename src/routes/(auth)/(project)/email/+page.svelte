@@ -1,14 +1,12 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as format from '$lib/format'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: emails = data.emails
+	const domains = $derived(data.domains)
+	const error = $derived(data.error)
 </script>
 
 <h6>Emails</h6>
@@ -30,19 +28,15 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={3} />
-			{:else}
-				{#each emails as it}
+				{#each domains as it (it.domain)}
 					<tr>
 						<td>{it.domain}</td>
 						<td>-</td>
 						<td>{format.datetime(it.createdAt)}</td>
 					</tr>
-				{:else}
-					<NoDataRow span={3} forbidden={!permission.emails} />
 				{/each}
-			{/if}
+				<NoDataRow span={3} list={domains} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

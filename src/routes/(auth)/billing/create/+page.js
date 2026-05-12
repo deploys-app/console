@@ -6,13 +6,13 @@ export async function load ({ url, fetch }) {
 
 	let billingAccount = null
 	if (id) {
-		/** @type {import('$types').ApiResponse<import('$types').BillingAccount>} */
+		/** @type {Api.Response<Api.BillingAccount>} */
 		const res = await api.invoke('billing.get', { id }, fetch)
 		if (!res.ok) {
-			if (res.error?.notFound) throw redirect(302, '/billing')
-			throw error(500, res.error?.message)
+			if (res.error?.notFound) redirect(302, '/billing')
+			error(500, res.error?.message)
 		}
-		if (!res.result) throw redirect(302, '/billing')
+		if (!res.result) redirect(302, '/billing')
 
 		billingAccount = res.result
 	}

@@ -184,21 +184,21 @@
 }
 
 [data-theme=light], ::backdrop {
-	--hue-primary: 333;
-	--hsl-primary: var(--hue-primary) 80% 65%;
-	--hsl-primary-active: var(--hue-primary) 80% 58%;
-	--hsl-primary-content: var(--hue-primary) 80% 98%;
+	--hue-primary: 336;
+	--hsl-primary: var(--hue-primary) 62% 48%;
+	--hsl-primary-active: var(--hue-primary) 62% 42%;
+	--hsl-primary-content: var(--hue-primary) 70% 98%;
 	--hue-accent: 267;
-	--hsl-accent: var(--hue-accent) 93% 65%;
-	--hsl-accent-active: var(--hue-accent) 93% 60%;
+	--hsl-accent: var(--hue-accent) 70% 55%;
+	--hsl-accent-active: var(--hue-accent) 70% 48%;
 	--hsl-accent-content: var(--hue-accent) 93% 98%;
-	--hue-base: 222;
-	--hsl-base-100: var(--hue-base) 30% 100%;
-	--hsl-base-200: var(--hue-base) 30% 97%;
-	--hsl-base-300: var(--hue-base) 30% 92%;
-	--hsl-base-400: var(--hue-base) 30% 87%;
-	--hsl-line: 222 30% 90%;
-	--hsl-content: 215 15% 25%;
+	--hue-base: 220;
+	--hsl-base-100: var(--hue-base) 20% 100%;
+	--hsl-base-200: var(--hue-base) 20% 96%;
+	--hsl-base-300: 0 0% 100%;
+	--hsl-base-400: var(--hue-base) 16% 93%;
+	--hsl-line: 220 14% 88%;
+	--hsl-content: 220 18% 20%;
 	--hsl-content-inv: 0 0% 85%;
 	--hsl-positive: 168 72% 35%;
 	--hsl-positive-content: 168 80% 95%;

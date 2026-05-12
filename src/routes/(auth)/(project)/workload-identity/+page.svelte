@@ -1,21 +1,14 @@
 <script>
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as format from '$lib/format'
-	import { onMount } from 'svelte'
-	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: workloadIdentities = data.workloadIdentities
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('workloadIdentity.list')
-	}, 5000))
+	const project = $derived(data.project)
+	const workloadIdentities = $derived(data.workloadIdentities)
+	const error = $derived(data.error)
 </script>
 
 <h6>Workload Identities</h6>
@@ -23,7 +16,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/workload-identity/create?project=${project}`}>
+			<a class="nm-button" href="/workload-identity/create?project={project}">
                 Create
             </a>
 		</div>
@@ -39,24 +32,20 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={3} />
-			{:else}
-				{#each workloadIdentities as it}
+				{#each workloadIdentities as it (`${it.location}-${it.name}`)}
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="nm-link" href={`/workload-identity/detail?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href="/workload-identity/detail?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 					</tr>
-				{:else}
-					<NoDataRow span={3} forbidden={!permission.workloadIdentities} />
 				{/each}
-			{/if}
+				<NoDataRow span={3} list={workloadIdentities} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

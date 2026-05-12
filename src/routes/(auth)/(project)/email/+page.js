@@ -1,17 +1,12 @@
-import { error } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
 	const { project } = await parent()
-	const emails = await api.invoke('email.list', { project }, fetch)
-	if (!emails.ok && !emails.error?.forbidden) {
-		throw error(500, emails.error?.message)
-	}
 
+	/** @type {Api.Response<Api.List<Api.EmailDomain>>} */
+	const res = await api.invoke('email.list', { project }, fetch)
 	return {
-		permission: {
-			emails: !emails.error?.forbidden
-		},
-		emails: emails.result?.items ?? []
+		domains: res.result?.items ?? [],
+		error: res.error
 	}
 }

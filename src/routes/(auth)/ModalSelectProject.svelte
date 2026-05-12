@@ -1,14 +1,20 @@
 <script>
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
+	import { SvelteURLSearchParams } from 'svelte/reactivity'
 
-	/** @type {import('$types').Project[]} */
-	export let projects
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Project[]} projects
+	 */
 
-	$: project = $page.url.searchParams.get('project')
+	/** @type {Props} */
+	const { projects } = $props()
 
-	/** @type {HTMLDialogElement} */
-	let dialog
+	const project = $derived($page.url.searchParams.get('project'))
+
+	/** @type {HTMLDialogElement | null} */
+	let dialog = $state(null)
 
 	/**
 	 * @param {string} sid
@@ -16,7 +22,7 @@
 	function setProject (sid) {
 		close()
 
-		const q = new URLSearchParams($page.url.search)
+		const q = new SvelteURLSearchParams($page.url.search)
 		q.set('project', sid)
 
 		if (project) {
@@ -28,17 +34,17 @@
 	}
 
 	export function open () {
-		dialog.showModal()
+		dialog?.showModal()
 	}
 
 	function close () {
-		dialog.close()
+		dialog?.close()
 	}
 </script>
 
-<dialog bind:this={dialog} on:click|self={close} aria-hidden="true">
+<dialog bind:this={dialog} onclick={close} aria-hidden="true">
 	<div class="panel">
-		<div class="close" on:click|self={close} on:keypress={close}>✕</div>
+		<div class="close" onclick={close} onkeypress={close} role="button" tabindex="0">✕</div>
 		<h4>Projects</h4>
 
 		<div class="nm-table-container _mgt-6">
@@ -51,7 +57,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each projects as it}
+					{#each projects as it (it.project)}
 					<tr>
 						<td>
 							{#if project === it.project}
@@ -59,7 +65,8 @@
 							{/if}
 						</td>
 						<td>
-							<div on:click={() => setProject(it.project)} on:keypress={() => setProject(it.project)}
+							<div onclick={() => setProject(it.project)} onkeypress={() => setProject(it.project)}
+								tabindex="0" role="link"
 								class="_tdcrt-udl _cs-pt _cl-primary:hover"
 								style="font-weight: 500">
 								{it.name}

@@ -1,19 +1,12 @@
-import adapterNode from '@sveltejs/adapter-node'
 import adapterCloudflare from '@sveltejs/adapter-cloudflare'
-import preprocess from 'svelte-preprocess'
-
-function adapter () {
-	if (process.env.CF_PAGES) return adapterCloudflare()
-	return adapterNode()
-}
+import adapterNode from '@sveltejs/adapter-node'
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	preprocess: preprocess({
-		sass: true
-	}),
+	preprocess: [vitePreprocess()],
 	kit: {
-		adapter: adapter(),
+		adapter: process.env.ADAPTER === 'node' ? adapterNode() : adapterCloudflare(),
 		alias: {
 			$style: './src/style',
 			$types: './src/types'

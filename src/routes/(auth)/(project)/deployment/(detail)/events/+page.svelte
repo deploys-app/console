@@ -3,11 +3,11 @@
 	import * as format from '$lib/format'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: deployment = data.deployment
+	const deployment = $derived(data.deployment)
 
-	let events = []
+	let events = $state([])
 
 	onMount(() => {
 		reloadEvents()
@@ -41,7 +41,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each events as it}
+		{#each events as it, i (i)}
 			<tr class:row-error={it.type !== 'Normal'}>
 				<td>{format.datetime(it.lastSeen)}</td>
 				<td>{it.type}</td>

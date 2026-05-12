@@ -10,7 +10,7 @@ let onUnauth
  * @param {string} fn
  * @param {Object} args
  * @param {fetch} fetch
- * @returns {Promise<import('$types').ApiResponse<T>>}
+ * @returns {Promise<Api.Response<T>>}
  */
 async function invoke (fn, args, fetch) {
 	const resp = await fetch(`${endpoint}/${fn}`, {
@@ -28,6 +28,9 @@ async function invoke (fn, args, fetch) {
 		case 'api: unauthorized':
 			body.error.unauth = true
 			onUnauth?.()
+			break
+		case 'api: forbidden':
+			body.error.forbidden = true
 			break
 		case 'iam: forbidden':
 			body.error.forbidden = true

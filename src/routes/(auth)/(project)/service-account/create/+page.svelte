@@ -1,22 +1,26 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
-	const {
-		id,
-		serviceAccount
-	} = data
+	const { data } = $props()
+	const id = $derived(data.id)
+	const serviceAccount = $derived(data.serviceAccount)
 
-	$: project = data.project
+	const project = $derived(data.project)
 
-	let sid = serviceAccount?.sid
-	let name = serviceAccount?.name
-	let desc = serviceAccount?.description
-	let saving = false
+	let sid = $state(untrack(() => serviceAccount?.sid))
+	let name = $state(untrack(() => serviceAccount?.name))
+	let desc = $state(untrack(() => serviceAccount?.description))
+	let saving = $state(false)
 
-	async function save () {
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -77,7 +81,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		{#if id}
 			<div class="nm-field">
 				<label for="input-email">Email</label>

@@ -1,19 +1,12 @@
-import { error } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').Deployment>>} */
-	const deployments = await api.invoke('deployment.list', { project }, fetch)
-	if (!deployments.ok && !deployments.error?.forbidden) {
-		throw error(500, deployments.error?.message)
-	}
-
+	/** @type {Api.Response<Api.List<Api.Deployment>>} */
+	const res = await api.invoke('deployment.list', { project }, fetch)
 	return {
-		permission: {
-			deployments: !deployments.error?.forbidden
-		},
-		deployments: deployments.result?.items ?? []
+		deployments: res.result?.items ?? [],
+		error: res.error
 	}
 }

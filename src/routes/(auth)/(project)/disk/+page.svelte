@@ -1,24 +1,14 @@
 <script>
-	import { onMount } from 'svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
-	import { loading } from '$lib/stores'
-	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: disks = data.disks
-
-	onMount(() => api.intervalInvalidate(async () => {
-		await api.invalidate('disk.list')
-		if (!disks.some((x) => x.status === 'pending')) {
-			return 300000
-		}
-	}, 4000))
+	const project = $derived(data.project)
+	const disks = $derived(data.disks)
+	const error = $derived(data.error)
 </script>
 
 <h6>Disks</h6>
@@ -26,7 +16,7 @@
 <div class="nm-panel is-level-300">
 	<div class="_dp-f _jtfct-spbtw _alit-ct">
 		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href={`/disk/create?project=${project}`}>
+			<a class="nm-button" href="/disk/create?project={project}">
                 Create
             </a>
 		</div>
@@ -44,14 +34,11 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={5} />
-			{:else}
-				{#each disks as it}
+				{#each disks as it (`${it.name}-${it.location}`)}
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="nm-link" href={`/disk/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="nm-link" href="/disk/metrics?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>
@@ -59,17 +46,16 @@
 						<td>{it.location}</td>
 						<td>{format.datetime(it.createdAt)}</td>
 						<td>
-							<a href={`/disk/create?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a href="/disk/create?project={project}&location={it.location}&name={it.name}" aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
 							</a>
 						</td>
 					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.disks} />
 				{/each}
-			{/if}
+				<NoDataRow span={5} list={disks} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

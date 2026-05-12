@@ -1,18 +1,12 @@
-import { error } from '@sveltejs/kit'
 import api from '$lib/api'
 
 export async function load ({ parent, fetch }) {
 	const { project } = await parent()
 
-	const disks = await api.invoke('disk.list', { project }, fetch)
-	if (!disks.ok && !disks.error?.forbidden) {
-		throw error(500, disks.error?.message)
-	}
-
+	/** @type {Api.Response<Api.List<Api.Disk>>} */
+	const res = await api.invoke('disk.list', { project }, fetch)
 	return {
-		permission: {
-			disks: !disks.error?.forbidden
-		},
-		disks: disks.result?.items ?? []
+		disks: res.result?.items ?? [],
+		error: res.error
 	}
 }

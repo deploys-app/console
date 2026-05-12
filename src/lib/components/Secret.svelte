@@ -1,8 +1,14 @@
 <script>
-	/** @type {string} */
-	export let value
 
-	let isHidden = true
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} value
+	 */
+
+	/** @type {Props} */
+	const { value } = $props()
+
+	let isHidden = $state(true)
 
 	function toggle () {
 		isHidden = !isHidden
@@ -10,7 +16,7 @@
 </script>
 
 <span>
-	<div on:click={toggle} on:keypress={toggle} tabindex="0" role="link">
+	<div onclick={toggle} onkeypress={toggle} tabindex="0" role="link">
 		{#if isHidden}
 			<i class="fa-solid fa-eye"></i>
 		{:else}

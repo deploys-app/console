@@ -7,10 +7,10 @@
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: domain = data.domain
+	const project = $derived(data.project)
+	const domain = $derived(data.domain)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -42,14 +42,18 @@
 		setTimeout(f, 3000)
 	}
 
-	let purging = false
+	let purging = $state(false)
 	async function purgeCache () {
+		if (domain.wildcard) {
+			return // not supported
+		}
+
 		if (purging) {
 			return
 		}
 
 		await modal.confirm({
-			title: `Purge cache on domain "${domain.domain}" ?`,
+			title: `Purge cache on domain "${domain.domain}"?`,
 			yes: 'Purge',
 			callback: async () => {
 				purging = true
@@ -106,7 +110,49 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			modal.success({ content: `Purged cache on domain "${domain.domain}" path "${result.value}"` })
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path prefix "${result.value}"` })
+		} finally {
+			purging = false
+		}
+	}
+
+	async function purgeCacheFile () {
+		if (purging) {
+			return
+		}
+
+		const result = await Swal.fire({
+			title: `Purge cache on domain "${domain.domain}"`,
+			text: 'Type path exact',
+			icon: 'warning',
+			input: 'text',
+			showCancelButton: true,
+			buttonsStyling: false,
+			background: 'var(--modal-panel-background)',
+			color: 'var(--modal-panel-color)',
+			confirmButtonText: 'Purge',
+			customClass: {
+				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				cancelButton: 'nm-button is-variant-tertiary',
+				actions: '_mgt-7'
+			}
+		})
+		if (!result.isConfirmed || !result.value) {
+			return
+		}
+
+		purging = true
+		try {
+			const resp = await api.invoke('domain.purgeCache', {
+				project,
+				domain: domain.domain,
+				file: result.value
+			}, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
+				return
+			}
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path exact "${result.value}"` })
 		} finally {
 			purging = false
 		}
@@ -114,7 +160,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete domain "${domain.domain}" ?`,
+			title: `Delete domain "${domain.domain}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('domain.delete', {
@@ -132,13 +178,14 @@
 
 	function upgradeCdn () {
 		modal.confirm({
-			html: `Add CDN to "${domain.domain}" ?<br><br>This action can not roll back.`,
-			yes: 'Upgrade to Hostname',
+			html: `Add CDN to "${domain.domain}"?`,
+			yes: 'Upgrade',
 			callback: async () => {
 				const resp = await api.invoke('domain.create', {
 					project,
 					location: domain.location,
 					domain: domain.domain,
+					wildcard: domain.wildcard,
 					cdn: true
 				}, fetch)
 				if (!resp.ok) {
@@ -221,7 +268,7 @@
 			<hr>
 			<p><strong>Domain Verification</strong></p>
 			{#if (domain.verification.ownership.errors ?? []).length > 0}
-				{#each domain.verification.ownership.errors as e}
+				{#each domain.verification.ownership.errors as e, i (i)}
 					<p class="_cl-negative _cl-opacity-80">{e}</p>
 				{/each}
 			{/if}
@@ -273,7 +320,7 @@
 					</div>
 				</div>
 			{:else}
-				{#each domain.verification.ssl.records as it, index}
+				{#each domain.verification.ssl.records as it, index (index)}
 					<div class="nm-field">
 						<label for={`input-ssl_name_${index}`}>TXT Name</label>
 						<div class="nm-input -has-icon-right _mgbt-3">
@@ -303,7 +350,7 @@
 			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-ip">A Record</label>
-					{#each domain.dnsConfig.ipv4 as ip}
+					{#each domain.dnsConfig.ipv4 as ip, i (i)}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
@@ -317,7 +364,7 @@
 			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-ipv6">AAAA Record</label>
-					{#each domain.dnsConfig.ipv6 as ip}
+					{#each domain.dnsConfig.ipv6 as ip, i (i)}
 						<div class="nm-input -has-icon-right _mgbt-3">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
@@ -331,7 +378,7 @@
 			{#if (domain.dnsConfig.cname ?? []).length > 0}
 				<div class="nm-field">
 					<label for="input-cname">CNAME Record</label>
-					{#each domain.dnsConfig.cname as cname}
+					{#each domain.dnsConfig.cname as cname, i (i)}
 						<div class="nm-input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
 							<span class="icon -is-right copy"
@@ -356,7 +403,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="_fs-2 _opct-80">Remove all cached resources</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCache}>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
@@ -366,8 +413,18 @@
 							<div><strong>Purge prefix</strong></div>
 							<p class="_fs-2 _opct-80">Remove cached resources at prefix path</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} on:click={purgeCachePrefix}>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCachePrefix}>
 							Purge prefix
+						</button>
+					</div>
+					<hr class="_mgv-7">
+					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
+						<div class="_f-1 lo-12 _g-3">
+							<div><strong>Purge file</strong></div>
+							<p class="_fs-2 _opct-80">Remove cached resources at exact path</p>
+						</div>
+						<button class="nm-button" class:is-loading={purging} onclick={purgeCacheFile}>
+							Purge file
 						</button>
 					</div>
 				</div>
@@ -375,16 +432,20 @@
 		{/if}
 	</div>
 
-	{#if !domain.cdn}
-		<hr>
+	<hr>
+	{#if domain.cdn}
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="nm-button" on:click={upgradeCdn}>Add CDN (DDoS Protection)</button>
+			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN (DDoS Protection)</a>
+		</div>
+	{:else}
+		<div class="_dp-f _alit-ct _fw-w">
+			<button class="nm-button" onclick={upgradeCdn}>Add CDN (DDoS Protection)</button>
 		</div>
 	{/if}
 
 	<hr>
 	<div class="_dp-f _g-6">
-		<button class="nm-button" type="button" on:click={deleteItem}>
+		<button class="nm-button" type="button" onclick={deleteItem}>
 			Delete
 		</button>
 	</div>

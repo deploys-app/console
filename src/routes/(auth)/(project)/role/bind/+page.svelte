@@ -1,22 +1,21 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	export let data
-	const {
-		roles,
-		email,
-		selected
-	} = data
+	const { data } = $props()
+	const roles = $derived(data.roles)
+	const email = $derived(data.email)
+	const selected = $derived(data.selected)
 
-	$: project = data.project
+	const project = $derived(data.project)
 
-	const form = {
+	const form = $state(untrack(() => ({
 		email,
 		roles: selected
-	}
+	})))
 
 	function addRole (role) {
 		if (!role || form.roles.includes(role)) {
@@ -35,9 +34,14 @@
 		e.target.value = ''
 	}
 
-	let saving = false
+	let saving = $state(false)
 
-	async function save () {
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -79,7 +83,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<div class="nm-input">
 				<input type="email" placeholder="Email" bind:value={form.email} readonly={!!email} required>
@@ -87,9 +91,9 @@
 		</div>
 		<div class="nm-field">
 			<div class="nm-select">
-				<select on:change={selectRoleChanged}>
-					<option value="" disabled selected>---Select Role---</option>
-					{#each roles as it}
+				<select onchange={selectRoleChanged}>
+					<option value="" disabled selected>Select Role</option>
+					{#each roles as it (it.role)}
 						{#if !form.roles.includes(it.role)}
 							<option value={it.role}>{it.name} ({it.role})</option>
 						{/if}
@@ -107,12 +111,12 @@
 				</tr>
 				</thead>
 				<tbody>
-				{#each form.roles as it}
+				{#each form.roles as it (it)}
 					<tr>
 						<td>{it}</td>
 						<td>
 							<div class="icon-button" role="button" tabindex="0"
-								on:click={() => removeRole(it)} on:keypress={() => removeRole(it)}>
+								onclick={() => removeRole(it)} onkeypress={() => removeRole(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</div>
 						</td>

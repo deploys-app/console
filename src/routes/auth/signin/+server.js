@@ -1,24 +1,6 @@
-import { env } from '$env/dynamic/public'
+import { env } from '$env/dynamic/private'
 
-const endpoint = env.PUBLIC_API_ENDPOINT
-
-/** @type {Crypto} */
-let webcrypto
-
-// workaround for dev
-if (typeof crypto === 'undefined') {
-	// @ts-ignore
-	import('node:crypto')
-		.then((imp) => {
-			// @ts-ignore
-			webcrypto = imp.webcrypto
-		})
-		.catch(() => {
-			// don't throw error on compile time
-		})
-} else {
-	webcrypto = crypto
-}
+const webcrypto = crypto
 
 /**
  * randomState generates a random string for OAuth2 state
@@ -38,7 +20,9 @@ export async function GET ({ cookies, url }) {
 	callback.pathname = '/auth/callback'
 
 	const q = new URLSearchParams()
-	q.set('callback', callback.toString())
+	q.set('response_type', 'code')
+	q.set('client_id', env.OAUTH2_CLIENT_ID)
+	q.set('redirect_uri', callback.toString())
 	q.set('state', state)
 
 	cookies.set('state', state, {
@@ -52,7 +36,7 @@ export async function GET ({ cookies, url }) {
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: `${endpoint}/auth?${q.toString()}`
+			location: `https://auth.deploys.app/?${q.toString()}`
 		}
 	})
 }

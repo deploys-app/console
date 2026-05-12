@@ -4,19 +4,19 @@ import api from '$lib/api'
 export async function load ({ url, fetch }) {
 	const project = url.searchParams.get('project')
 
-	/** @type {import('$types').ApiResponse<import('$types').Project> | null} */
+	/** @type {Api.Response<Api.Project> | null} */
 	let projectInfo = null
 	if (project) {
 		projectInfo = await api.invoke('project.get', { project }, fetch)
 		if (!projectInfo.ok) {
-			if (projectInfo.error?.notFound) throw redirect(302, '/project')
-			throw error(500, projectInfo.error?.message)
+			if (projectInfo.error?.notFound) redirect(302, '/project')
+			error(500, projectInfo.error?.message)
 		}
 	}
 
-	/** @type {import('$types').ApiResponse<import('$types').List<import('$types').BillingAccount>>} */
+	/** @type {Api.Response<Api.List<Api.BillingAccount>>} */
 	const billingAccounts = await api.invoke('billing.list', {}, fetch)
-	if (!billingAccounts.ok) throw error(500, billingAccounts.error?.message)
+	if (!billingAccounts.ok) error(500, billingAccounts.error?.message)
 
 	return {
 		project: projectInfo?.result,

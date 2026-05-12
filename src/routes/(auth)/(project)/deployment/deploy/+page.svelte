@@ -1,36 +1,35 @@
 <script>
 	import * as format from '$lib/format'
-	import { onMount, tick } from 'svelte'
+	import { onMount, tick, untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	let locations = data.locations
-	let quota = data.projectInfo.quota
+	const locations = $derived(data.locations)
+	const quota = $derived(data.projectInfo.quota)
 
-	$: locations = data.locations
-	$: project = data.project
-	$: quota = data.projectInfo.quota
-	const deployment = data.deployment
+	const project = $derived(data.project)
 
-	const permission = {
+	const deployment = untrack(() => data.deployment)
+
+	const permission = $state({
 		pullSecrets: true,
 		workloadIdentities: true,
 		disks: true
-	}
+	})
 
-	/** @type {import('$types').PullSecret[]} */
-	let pullSecrets = []
+	/** @type {Api.PullSecret[]} */
+	let pullSecrets = $state([])
 
-	/** @type {import('$types').WorkloadIdentity[]} */
-	let workloadIdentities = []
+	/** @type {Api.WorkloadIdentity[]} */
+	let workloadIdentities = $state([])
 
-	/** @type {import('$types').Disk[]} */
-	let disks = []
+	/** @type {Api.Disk[]} */
+	let disks = $state([])
 
-	const form = {
+	const form = $state({
 		location: deployment?.location || '',
 		name: '',
 		type: 'WebService',
@@ -55,13 +54,30 @@
 		resources: {
 			requests: {
 				memory: '0'
+			},
+			limits: {
+				cpu: '0'
 			}
 		},
 		/** @type {{ k: string, v: string }[]} */
 		env: [],
 		/** @type {{ k: string, v: string }[]} */
-		mountData: []
-	}
+		mountData: [],
+		// /** @type {Api.Sidecar[]} */
+		// sidecars: [],
+		sidecar: {
+			type: '',
+			cloudSqlProxy: {
+				instance: '',
+				/** @type {?number} */
+				port: null,
+				credentials: ''
+			}
+		},
+		ttlValue: 0,
+		// unit in seconds; '0' means no auto-delete
+		ttlUnit: '0'
+	})
 	if (deployment) {
 		form.location = deployment.location
 		form.name = deployment.name
@@ -85,9 +101,38 @@
 		form.resources = deployment.resources
 		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
+		form.sidecar = (deployment.sidecars || []).length > 0
+			? {
+				type: 'cloudSqlProxy',
+				cloudSqlProxy: {
+					instance: deployment.sidecars[0].cloudSqlProxy?.instance ?? '',
+					port: deployment.sidecars[0].cloudSqlProxy?.port ?? null,
+					credentials: deployment.sidecars[0].cloudSqlProxy?.credentials ?? ''
+				}
+			}
+			: {
+				type: '',
+				cloudSqlProxy: {
+					instance: '',
+					port: null,
+					credentials: ''
+				}
+			}
+		if (deployment.ttl > 0) {
+			if (deployment.ttl % 86400 === 0) {
+				form.ttlUnit = '86400'
+				form.ttlValue = deployment.ttl / 86400
+			} else if (deployment.ttl % 3600 === 0) {
+				form.ttlUnit = '3600'
+				form.ttlValue = deployment.ttl / 3600
+			} else {
+				form.ttlUnit = '60'
+				form.ttlValue = Math.max(1, Math.round(deployment.ttl / 60))
+			}
+		}
 	}
 
-	$: selectedLocation = locations.find((x) => x.id === form.location)
+	const selectedLocation = $derived(locations.find((x) => x.id === form.location))
 
 	async function fetchPullSecrets () {
 		if (!selectedLocation) {
@@ -105,7 +150,6 @@
 			return
 		}
 		pullSecrets = resp.result.items ?? []
-		form.pullSecret = form.pullSecret
 	}
 
 	async function fetchWorkloadIdentities () {
@@ -124,7 +168,6 @@
 			return
 		}
 		workloadIdentities = resp.result.items ?? []
-		form.workloadIdentity = form.workloadIdentity
 	}
 
 	async function fetchDisks () {
@@ -143,7 +186,6 @@
 			return
 		}
 		disks = resp.result.items ?? []
-		form.disk.name = form.disk.name
 	}
 
 	async function changeLocation () {
@@ -160,8 +202,8 @@
 		fetchDisks()
 	}
 
-	let showEnvText = false
-	let envText = ''
+	let showEnvText = $state(false)
+	let envText = $state('')
 
 	function parseEnvText () {
 		form.env = envText
@@ -176,21 +218,45 @@
 			.join('\n')
 	}
 
-	let saving = false
+	function convertSidecar () {
+		if (!form.sidecar.type) {
+			return []
+		}
+		return [
+			{
+				cloudSqlProxy: {
+					instance: form.sidecar.cloudSqlProxy.instance,
+					port: form.sidecar.cloudSqlProxy.port,
+					credentials: form.sidecar.cloudSqlProxy.credentials
+				}
+			}
+		]
+	}
 
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
 
 		saving = true
 		try {
+			const unit = parseInt(form.ttlUnit) || 0
+			const ttlSeconds = unit > 0 ? Math.max(0, Math.floor(Number(form.ttlValue) || 0)) * unit : 0
 			const resp = await api.invoke('deployment.deploy', {
 				project,
 				...form,
 				protocol: form.type === 'WebService' ? form.protocol : '',
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
-				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {})
+				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
+				sidecars: convertSidecar(),
+				ttl: ttlSeconds
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -229,14 +295,14 @@
 <div class="nm-panel is-level-300 _dp-g _g-7">
 	<div class="lo-12 _jtfit-st _g-5">
 		{#if deployment}
-			<h5><strong>Deploy new revision</strong></h5>
+			<h5><strong>Deploy New Revision</strong></h5>
 		{:else}
-			<h5><strong>Deploy new deployment</strong></h5>
+			<h5><strong>Deploy New Deployment</strong></h5>
 		{/if}
 	</div>
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		{#if deployment}
 			<div class="nm-field">
 				<label for="input-location-readonly">Location</label>
@@ -248,9 +314,9 @@
 			<div class="nm-field">
 				<label for="input-location">Location</label>
 				<div class="nm-select">
-					<select id="input-location" bind:value={form.location} on:change={changeLocation} required>
+					<select id="input-location" bind:value={form.location} onchange={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
-						{#each locations as it}
+						{#each locations as it (it.id)}
 							<option value={it.id}>
 								{it.id}
 							</option>
@@ -300,12 +366,14 @@
 			<div class="nm-field">
 				<label for="input-pull_secret">Pull Secret</label>
 				<div class="nm-select">
-					<select id="input-pull_secret" bind:value={form.pullSecret}>
-						<option value="">No Pull Secret</option>
-						{#each pullSecrets as it}
-							<option value={it.name}>{it.name}</option>
-						{/each}
-					</select>
+					{#key pullSecrets}
+						<select id="input-pull_secret" bind:value={form.pullSecret}>
+							<option value="">No Pull Secret</option>
+							{#each pullSecrets as it (it.name)}
+								<option value={it.name}>{it.name}</option>
+							{/each}
+						</select>
+					{/key}
 				</div>
 			</div>
 		{:else}
@@ -323,12 +391,14 @@
 				<div class="nm-field">
 					<label for="input-workload_identity">Workload Identity</label>
 					<div class="nm-select">
-						<select id="input-workload_identity" bind:value={form.workloadIdentity}>
-							<option value="">No Workload Identity</option>
-							{#each workloadIdentities as it}
-								<option value={it.name}>{it.name}</option>
-							{/each}
-						</select>
+						{#key workloadIdentities}
+							<select id="input-workload_identity" bind:value={form.workloadIdentity}>
+								<option value="">No Workload Identity</option>
+								{#each workloadIdentities as it (it.name)}
+									<option value={it.name}>{it.name}</option>
+								{/each}
+							</select>
+						{/key}
 					</div>
 				</div>
 			{:else}
@@ -373,17 +443,17 @@
 		<div class="nm-field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="_pdbt-4">
-				{#each form.command as _, i}
+				{#each form.command as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.command[i]}>
-						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.command.splice(i, 1); form.command = form.command }}>
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove"
+							onclick={() => { form.command = form.command.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" on:click={() => { form.command = [...form.command, ''] }}>
+			<button class="nm-button _mg-at" type="button" onclick={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Command</span>
 			</button>
@@ -392,17 +462,18 @@
 		<div class="nm-field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="_pdbt-4">
-				{#each form.args as _, i}
+				{#each form.args as _, i (i)}
 					<div class="nm-input -has-icon-right _mgbt-4">
 						<input bind:value={form.args[i]}>
-						<button class="icon-button icon -is-right" type="button"
-							on:click={() => { form.args.splice(i, 1); form.args = form.args }}>
+						<button class="icon-button icon -is-right" type="button" aria-label="Remove an argument"
+							onclick={() => { form.args = form.args.filter((_, k) => k !== i) }}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" on:click={() => { form.args = [...form.args, ''] }}>
+			<button class="nm-button _mg-at" type="button"
+					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus _mgr-5"></i>
 				<span>Add Arg</span>
 			</button>
@@ -429,12 +500,14 @@
 					<div class="nm-field">
 						<label for="input-disk_name">Name</label>
 						<div class="nm-select">
-							<select id="input-disk_name" bind:value={form.disk.name}>
-								<option value="">No Disk</option>
-								{#each disks as it}
-									<option value={it.name}>{it.name}</option>
-								{/each}
-							</select>
+							{#key disks}
+								<select id="input-disk_name" bind:value={form.disk.name}>
+									<option value="">No Disk</option>
+									{#each disks as it (it.name)}
+										<option value={it.name}>{it.name}</option>
+									{/each}
+								</select>
+							{/key}
 						</div>
 					</div>
 				{:else}
@@ -463,6 +536,37 @@
 				{/if}
 			</div>
 		{/if}
+
+		<br>
+		<hr>
+		<br>
+
+		<h6><strong>Auto-delete (TTL)</strong></h6>
+		<div class="lo-6 _g-6">
+			<div class="nm-field">
+				<label for="input-ttl_unit">Unit</label>
+				<div class="nm-select">
+					<select id="input-ttl_unit" bind:value={form.ttlUnit}>
+						<option value="0">No auto-delete</option>
+						<option value="60">Minutes</option>
+						<option value="3600">Hours</option>
+						<option value="86400">Days</option>
+					</select>
+				</div>
+			</div>
+
+			{#if form.ttlUnit !== '0'}
+				<div class="nm-field">
+					<label for="input-ttl_value">Duration</label>
+					<div class="nm-input">
+						<input id="input-ttl_value" type="number" min="1" bind:value={form.ttlValue}>
+					</div>
+				</div>
+			{/if}
+		</div>
+		<small class="helper">
+			Deployment will be automatically deleted after this duration. Routes cannot be set on auto-delete deployments.
+		</small>
 
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
@@ -503,25 +607,40 @@
 		<hr>
 		<br>
 
-<!--		{{/*        <div class="nm-field">*/}}-->
-<!--		{{/*            <label for="input-cpu">CPU allocated</label>*/}}-->
-<!--		{{/*            <div class="nm-select">*/}}-->
-<!--		{{/*                <select id="input-cpu" name="cpu">*/}}-->
-<!--		{{/*                    {{range .Location.CPUAllocatable}}*/}}-->
-<!--		{{/*                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>*/}}-->
-<!--		{{/*                    {{end}}*/}}-->
-<!--		{{/*                </select>*/}}-->
-<!--		{{/*            </div>*/}}-->
-<!--		{{/*            <small class="helper">*/}}-->
-<!--		{{/*                Number of vCPUs allocated to each container instance.*/}}-->
-<!--		{{/*            </small>*/}}-->
-<!--		{{/*        </div>*/}}-->
+<!--        <div class="nm-field">-->
+<!--            <label for="input-cpu">CPU allocated</label>-->
+<!--            <div class="nm-select">-->
+<!--                <select id="input-cpu" name="cpu">-->
+<!--                    {{range .Location.CPUAllocatable}}-->
+<!--                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>-->
+<!--                    {{end}}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <small class="helper">-->
+<!--                Number of vCPUs allocated to each container instance.-->
+<!--            </small>-->
+<!--        </div>-->
+
+		<div class="nm-field">
+			<label for="input-cpu-limit">CPU limited</label>
+            <div class="nm-select">
+                <select id="input-cpu-limit" name="cpu" bind:value={form.resources.limits.cpu}>
+                    <option value="0">Cluster Default</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="4">4</option>
+                </select>
+            </div>
+            <small class="helper">
+                Number of vCPUs limited to each container instance. Autoscaling triggers when CPU usage reaches 80% of the limit.
+            </small>
+        </div>
 
 		<div class="nm-field">
 			<label for="input-memory">Memory allocated</label>
 			<div class="nm-select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
-					{#each selectedLocation.memoryAllocatable as it}
+					{#each selectedLocation.memoryAllocatable as it, i (i)}
 						<option value={it}>{format.memory(it)}</option>
 					{/each}
 				</select>
@@ -548,22 +667,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.env as it, i}
+						{#each form.env as it, i (i)}
 							<tr>
 								<td>
 									<div class="nm-input">
-										<input bind:value={it.k} placeholder="Variable name" on:change={parseEnvValue}>
+										<input bind:value={it.k} placeholder="Variable name" onchange={parseEnvValue}>
 									</div>
 								</td>
 								<td class="_pd-0 _pdl-5">:</td>
 								<td class="_pdl-5">
 									<div class="nm-input">
-										<input bind:value={it.v} placeholder="Value" on:change={parseEnvValue}>
+										<input bind:value={it.v} placeholder="Value" onchange={parseEnvValue}>
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
-										on:click={() => { form.env.splice(i, 1); form.env = form.env; parseEnvValue() }}>
+									<button class="icon-button" type="button" aria-label="Remove an environment variable"
+										onclick={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -574,7 +693,7 @@
 						<tr>
 							<td colspan="4">
 								<button class="nm-button _dp-f _mg-at" type="button"
-									on:click={() => { form.env.push({ k: '', v: '' }); form.env = form.env; parseEnvValue() }}>
+									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus _mgr-5"></i>
 									<span>Add Variable</span>
 								</button>
@@ -584,12 +703,12 @@
 				</table>
 			</div>
 
-			<button class="nm-button _dp-f _mg-at" type="button" on:click={() => showEnvText = !showEnvText}>
+			<button class="nm-button _dp-f _mg-at" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
 				<div class="nm-textarea _mgt-5">
-					<textarea rows="20" bind:value={envText} on:change={parseEnvText}></textarea>
+					<textarea rows="20" bind:value={envText} onchange={parseEnvText}></textarea>
 				</div>
 			{/if}
 		</div>
@@ -609,7 +728,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.mountData as it, i}
+						{#each form.mountData as it, i (i)}
 							<tr>
 								<td>
 									<div class="nm-input">
@@ -623,8 +742,8 @@
 									</div>
 								</td>
 								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button"
-										on:click={() => { form.mountData.splice(i, 1); form.mountData = form.mountData }}>
+									<button class="icon-button" type="button" aria-label="Remove a mount data"
+										onclick={() => { form.mountData = form.mountData.filter((_, k) => k !== i) }}>
 										<i class="fa-solid fa-trash-alt"></i>
 									</button>
 								</td>
@@ -635,7 +754,7 @@
 					<tr>
 						<td colspan="4">
 							<button class="nm-button _dp-f _mg-at" type="button"
-								on:click={() => { form.mountData.push({ k: '', v: '' }); form.mountData = form.mountData }}>
+								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus _mgr-5"></i>
 								<span>Add Data</span>
 							</button>
@@ -644,6 +763,46 @@
 					</tfoot>
 				</table>
 			</div>
+		</div>
+
+		<hr>
+
+		<h6><strong>Sidecar</strong></h6>
+		<div class="_dp-g _g-6">
+			<div class="nm-field">
+				<label for="input-sidecar-type">Type</label>
+				<div class="nm-select">
+					<select id="input-sidecar-type" bind:value={form.sidecar.type}>
+						<option value="">None</option>
+						<option value="cloudSqlProxy">Cloud SQL Proxy</option>
+					</select>
+				</div>
+			</div>
+			{#if form.sidecar.type === 'cloudSqlProxy'}
+				<div class="nm-field">
+					<label for="input-sidecar-instance">Instance</label>
+					<div class="nm-input">
+						<input id="input-sidecar-instance" placeholder="Instance" bind:value={form.sidecar.cloudSqlProxy.instance} required>
+					</div>
+				</div>
+				<div class="nm-field">
+					<label for="input-sidecar-port">Port</label>
+					<div class="nm-input">
+						<input class="-no-arrow" id="input-sidecar-port" placeholder="Port" type="number" bind:value={form.sidecar.cloudSqlProxy.port} required>
+					</div>
+				</div>
+				<div class="nm-field">
+					<label for="input-sidecar-credentials">Credentials</label>
+					<div class="nm-input">
+						<input id="input-sidecar-credentials" placeholder="Credentials" bind:value={form.sidecar.cloudSqlProxy.credentials}>
+					</div>
+				</div>
+			{/if}
+<!--			<button class="nm-button _dp-f _mg-at" type="button"-->
+<!--					onclick={() => { form.sidecars.push({}) }}>-->
+<!--				<i class="fa-solid fa-plus _mgr-5"></i>-->
+<!--				<span>Add Sidecar</span>-->
+<!--			</button>-->
 		</div>
 
 		<hr>

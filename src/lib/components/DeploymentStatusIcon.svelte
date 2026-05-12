@@ -2,14 +2,21 @@
 	import { browser } from '$app/environment'
 	import { onDestroy } from 'svelte'
 
-	/** @type {'deploy' | 'delete' | 'pause'} */
-	export let action
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.DeploymentAction} action
+	 * @property {Api.DeploymentStatus} status
+	 * @property {string} url
+	 * @property {Api.DeploymentType} type
+	 */
 
-	/** @type {'pending' | 'success' | 'error' | 'cancelled'} */
-	export let status
-
-	/** @type {string} */
-	export let url
+	/** @type {Props} */
+	const {
+		action,
+		status,
+		url,
+		type
+	} = $props()
 
 	const statusIconClass = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
@@ -18,22 +25,11 @@
 		cancelled: 'fa-solid fa-ban _cl-negative _cl-opacity-80'
 	}
 
-	/** @type {import('$types').PodStatus | null} */
-	let podStatus
+	/** @type {Api.PodStatus | null} */
+	let podStatus = $state(null)
 
 	/** @type {string} */
-	let iconClass
-
-	$: {
-		status
-		url
-		action
-		browser && fetchPodStatus()
-	}
-	$: {
-		podStatus
-		iconClass = getIconClass()
-	}
+	let iconClass = $state('')
 
 	/**
 	 * @returns {string}
@@ -50,15 +46,23 @@
 		if (!podStatus) {
 			return 'fa-solid fa-spin fa-spinner _cl-light'
 		}
-		if (podStatus.ready === podStatus.count) {
+		if (type === 'CronJob' && podStatus.count === podStatus.succeeded + podStatus.ready) {
+			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
+		}
+		if (podStatus.count > 0 && podStatus.ready === podStatus.count) {
 			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
 		}
 		return 'fa-solid fa-exclamation-triangle _cl-warning'
 	}
 
 	let fetchPodStatusTimeout
+	let destroyed = false
 
 	async function fetchPodStatus () {
+		if (destroyed) {
+			return
+		}
+
 		if (fetchPodStatusTimeout) {
 			clearTimeout(fetchPodStatusTimeout)
 			fetchPodStatusTimeout = null
@@ -72,14 +76,25 @@
 			}
 			podStatus = await response.json()
 		} catch (err) {
-			// ignore
+			console.error(err)
 		} finally {
-			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 5000)
+			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 10000)
 		}
 	}
 
 	onDestroy(() => {
+		destroyed = true
 		fetchPodStatusTimeout && clearTimeout(fetchPodStatusTimeout)
+	})
+	$effect(() => {
+		status
+		url
+		action
+		browser && fetchPodStatus()
+	})
+	$effect(() => {
+		podStatus
+		iconClass = getIconClass()
 	})
 </script>
 

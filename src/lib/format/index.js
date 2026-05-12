@@ -15,6 +15,17 @@ export function cpu (v) {
  * @param {string} v
  * @returns {string}
  */
+export function cpuLimited (v) {
+	if (v === '0' || !v) {
+		return 'Cluster Default'
+	}
+	return `${v} vCPU`
+}
+
+/**
+ * @param {string} v
+ * @returns {string}
+ */
 export function memory (v) {
 	if (v === '0') {
 		return 'Shared'
@@ -24,6 +35,14 @@ export function memory (v) {
 		return v
 	}
 	return `${m[1]} ${m[2]}B`
+}
+
+/**
+ * @param {number} v
+ * @returns {string}
+ */
+export function storage (v) {
+	return (v / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
 }
 
 /**
@@ -55,13 +74,54 @@ export function gsaBinding (project, name, gsa, locationProject) {
 }
 
 /**
- * @param {string} t
+ * @param {Api.DeploymentType} t
  * @returns {string}
  */
 export function deploymentType (t) {
 	return {
 		WebService: 'Web Service',
 		TCPService: 'TCP Service',
-		InternalTCPService: 'Internal TCP Service'
+		InternalTCPService: 'Internal TCP Service',
+		Worker: 'Worker',
+		CronJob: 'Cron Job'
 	}[t] || t
+}
+
+/**
+ * @param {string} s
+ * @returns {string}
+ */
+export function shortDigest (s) {
+	return s.replace(/^sha256:/, '').slice(0, 12)
+}
+
+/**
+ * @param {number} seconds
+ * @returns {string}
+ */
+export function duration (seconds) {
+	if (!seconds || seconds <= 0) {
+		return ''
+	}
+	const d = Math.floor(seconds / 86400)
+	const h = Math.floor((seconds % 86400) / 3600)
+	const m = Math.floor((seconds % 3600) / 60)
+	const s = Math.floor(seconds % 60)
+	const parts = []
+	if (d) parts.push(`${d}d`)
+	if (h) parts.push(`${h}h`)
+	if (m) parts.push(`${m}m`)
+	if (s && !d && !h) parts.push(`${s}s`)
+	return parts.join(' ') || '0s'
+}
+
+/**
+ * @param {number} ttlSeconds
+ * @returns {string}
+ */
+export function ttlExpireAt (ttlSeconds) {
+	if (!ttlSeconds || ttlSeconds <= 0) {
+		return ''
+	}
+	return dayjs().add(ttlSeconds, 'second').format('YYYY-MM-DD HH:mm:ss')
 }

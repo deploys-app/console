@@ -1,21 +1,19 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: domains = data.domains
-	$: projectInfo = data.projectInfo
+	const project = $derived(data.project)
+	const domains = $derived(data.domains)
+	const error = $derived(data.error)
 
 	function deleteDomain (domain) {
 		modal.confirm({
-			title: `Delete domain "${domain.domain}" ?`,
+			title: `Delete domain "${domain.domain}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('domain.delete', {
@@ -57,13 +55,10 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={5} />
-			{:else}
-				{#each domains as it}
+				{#each domains as it (`${it.domain}-${it.location}`)}
 					<tr>
 						<td>
-							<StatusIcon status={it.verification.ssl.pending ? 'verify' : it.status} />
+							<StatusIcon status={it.cdn && it.verification.ssl.pending ? 'verify' : it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
 						</td>
 						<td>
@@ -84,15 +79,14 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" on:click={() => deleteDomain(it)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.domains} />
 				{/each}
-			{/if}
+				<NoDataRow span={5} list={domains} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

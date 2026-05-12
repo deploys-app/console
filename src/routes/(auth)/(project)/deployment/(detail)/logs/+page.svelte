@@ -1,12 +1,12 @@
 <script>
 	import { onMount } from 'svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: deployment = data.deployment
+	const deployment = $derived(data.deployment)
 
 	let buffer = ''
-	let text = ''
+	let text = $state('')
 
 	onMount(() => {
 		const source = new EventSource(deployment.logUrl)
@@ -17,7 +17,9 @@
 			try {
 				const d = JSON.parse(ev.data)
 				buffer = `${d.pod} ${d.timestamp} ${d.log}\n` + buffer
-			} catch (err) {}
+			} catch (err) {
+				console.error(err)
+			}
 		})
 		const interval = setInterval(() => {
 			if (text !== buffer) {

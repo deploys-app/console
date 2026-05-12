@@ -6,11 +6,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: workloadIdentity = data.workloadIdentity
-	$: project = data.project
-	$: projectInfo = data.projectInfo
+	const workloadIdentity = $derived(data.workloadIdentity)
+	const project = $derived(data.project)
+	const projectInfo = $derived(data.projectInfo)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -21,7 +21,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${workloadIdentity.name}" ?`,
+			title: `Delete "${workloadIdentity.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('workloadIdentity.delete', {
@@ -95,7 +95,7 @@
 		<hr>
 
 		<div class="_dp-f _g-6">
-			<button class="nm-button" on:click={deleteItem}>Delete</button>
+			<button class="nm-button" onclick={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>

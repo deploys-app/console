@@ -1,38 +1,24 @@
-FROM oven/bun:1.0.0
-
-ARG SENTRY_ORG
-ARG SENTRY_PROJECT
-ARG SENTRY_AUTH_TOKEN
-
-ENV SENTRY_ORG=$SENTRY_ORG
-ENV SENTRY_PROJECT=$SENTRY_PROJECT
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-
-RUN apt-get update && apt-get install -y \
-  ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
+FROM registry.moonrhythm.io/builder
 
 WORKDIR /workspace
-ADD package.json bun.lockb ./
-RUN bun install
+ADD .tool-versions ./
+RUN asdf install
+
+ENV ADAPTER=node
+
+ADD package.json bun.lock ./
+ADD svelte.config.js ./
+RUN bun install --frozen-lockfile
 ADD . .
-RUN bun run build
-RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
+RUN bun -b run build
+#RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
 
-FROM oven/bun:1.0.0
-
-WORKDIR /workspace
-ADD package.json bun.lockb ./
-RUN bun install --production --ignore-scripts
-
-FROM gcr.io/distroless/nodejs18-debian11
+FROM oven/bun:1.3.13-distroless
 
 ENV NODE_ENV=production
-ENV BODY_SIZE_LIMIT=0
+ENV BODY_SIZE_LIMIT=Infinity
 ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
-ADD package.json ./
 COPY --from=0 /workspace/build .
-COPY --from=1 /workspace/node_modules ./node_modules
 CMD ["index.js"]

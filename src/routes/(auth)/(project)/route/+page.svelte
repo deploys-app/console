@@ -1,19 +1,21 @@
 <script>
-	import LoadingRow from '$lib/components/LoadingRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
-	import { loading } from '$lib/stores'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: permission = data.permission
-	$: routes = data.routes
+	const project = $derived(data.project)
+	const routes = $derived(data.routes)
+	const error = $derived(data.error)
 
+	/**
+	 * @param {Api.Route} route
+	 */
 	function deleteRoute (route) {
 		modal.confirm({
-			title: `Delete route ${route.domain}${route.path} in ${route.location} ?`,
+			title: `Delete route ${route.domain}${route.path} in ${route.location}?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('route.delete', {
@@ -57,13 +59,12 @@
 			</tr>
 			</thead>
 			<tbody>
-			{#if $loading}
-				<LoadingRow span={5} />
-			{:else}
-				{#each routes as it}
+				{#each routes as it (`${it.domain}${it.path}-${it.location}`)}
 					<tr>
 						<td>
-							<a class="nm-link _tdcrt-udl" href={`https://${it.domain}${it.path}`} target="_blank">https://{it.domain}{it.path}</a>
+							<a class="nm-link _tdcrt-udl"
+							   href={`https://${it.domain}${it.path}`}
+							   target="_blank">https://{it.domain}{it.path}</a>
 						</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>
@@ -75,15 +76,14 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" on:click={() => deleteRoute(it)}>
+							<button class="icon-button" aria-label="Remove" onclick={() => deleteRoute(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</button>
 						</td>
 					</tr>
-				{:else}
-					<NoDataRow span={5} forbidden={!permission.routes} />
 				{/each}
-			{/if}
+				<NoDataRow span={5} list={routes} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

@@ -1,30 +1,36 @@
-# Console
+# deploys.app Console
 
-Web console for manage resources on deploys.app.
+Web console for managing resources on deploys.app.
 
 ## Developing
 
 Install dependencies with `bun install`.
 
-Start development server:
+Start the development server:
 
 ```bash
-bun run dev
+bun dev
 
 # or start the server and open the app in a new browser tab
-bun run dev --open
+bun dev --open
 ```
 
 ## Building
 
-To create a production version:
+To create a production build:
 
 ```bash
-bun run build
+bun build
+```
+
+Preview the production build:
+
+```bash
+bun preview
 ```
 
 ## License
 
 MIT
 
-This project uses font-awesome pro, you need font-awesome pro license to editing source code.
+This project uses Font Awesome Pro. A Font Awesome Pro license is required to edit the source code.

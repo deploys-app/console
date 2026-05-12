@@ -3,20 +3,26 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	const locations = data.locations
+	const locations = $derived(data.locations)
 
-	$: project = data.project
+	const project = $derived(data.project)
 
-	const form = {
+	const form = $state({
 		name: '',
 		location: '',
 		gsa: ''
-	}
+	})
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -57,7 +63,7 @@
 		</div>
 	</div>
 	<hr>
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-name">Name</label>
 			<div class="nm-input">
@@ -69,7 +75,7 @@
 			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						{#if it.features.workloadIdentity}
 							<option value={it.id}>{it.id}</option>
 						{/if}

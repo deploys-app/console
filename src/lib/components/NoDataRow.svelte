@@ -1,12 +1,18 @@
 <script>
-	export let span = 1
-	export let forbidden = false
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} [span]
+	 * @property {any} [list]
+	 */
+
+	/** @type {Props} */
+	const { span = 1, list = [] } = $props()
 </script>
 
-<td colspan={span} class="_tal-ct">
-	{#if forbidden}
-		You don't have permission to view data
-	{:else}
-		No data
-	{/if}
-</td>
+{#if !list?.length}
+	<tr>
+		<td colspan={span} class="_tal-ct">
+			No data
+		</td>
+	</tr>
+{/if}

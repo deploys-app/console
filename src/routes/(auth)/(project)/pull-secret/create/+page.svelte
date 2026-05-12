@@ -4,21 +4,27 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	const locations = data.locations
+	const project = $derived(data.project)
+	const locations = $derived(data.locations)
 
-	const form = {
+	const form = $state({
 		name: '',
 		location: '',
 		server: 'https://index.docker.io/v2/',
 		username: '',
 		password: ''
-	}
+	})
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -71,7 +77,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-name">Name</label>
 			<div class="nm-input">
@@ -83,7 +89,7 @@
 			<div class="nm-select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" disabled selected>Select Location</option>
-					{#each locations as it}
+					{#each locations as it (it.id)}
 						<option value={it.id}>{it.id}</option>
 					{/each}
 				</select>

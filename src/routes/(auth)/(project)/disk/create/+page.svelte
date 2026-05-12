@@ -1,26 +1,31 @@
 <script>
+	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
-	const {
-		locations,
-		location,
-		name,
-		disk
-	} = data
+	const { data } = $props()
+	const locations = $derived(data.locations)
+	const location = untrack(() => data.location)
+	const name = untrack(() => data.name)
+	const disk = untrack(() => data.disk)
 
-	$: project = data.project
+	const project = $derived(data.project)
 
-	const form = {
+	const form = $state({
 		location: location || '',
 		name: name || '',
 		size: disk?.size || 1
-	}
+	})
 
-	let saving = false
-	async function save () {
+	let saving = $state(false)
+
+	/**
+	 * @param {Event} e
+	 */
+	async function save (e) {
+		e.preventDefault()
+
 		if (saving) {
 			return
 		}
@@ -78,7 +83,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct _mxw-512px" on:submit|preventDefault={save}>
+	<form class="_dp-g _g-6 _w-100pct _mxw-512px" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-name">Disk name</label>
 			<div class="nm-input">
@@ -95,7 +100,7 @@
 				<div class="nm-select">
 					<select id="input-location" bind:value={form.location} required>
 						<option value="">Select Location</option>
-						{#each locations as it}
+						{#each locations as it (it.id)}
 							{#if it.features.disk}
 								<option value={it.id}>
 									{it.id}

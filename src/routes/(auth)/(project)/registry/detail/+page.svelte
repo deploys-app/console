@@ -1,0 +1,98 @@
+<script>
+	import * as format from '$lib/format'
+	import { onMount } from 'svelte'
+	import ClipboardJS from 'clipboard'
+	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import * as modal from '$lib/modal'
+	import api from '$lib/api'
+
+	const { data } = $props()
+
+	const project = $derived(data.project)
+	const repository = $derived(data.repository)
+	const tags = $derived(data.tags)
+	const error = $derived(data.error)
+
+	onMount(() => {
+		const copyList = new ClipboardJS('.copy')
+		return () => {
+			copyList.destroy()
+		}
+	})
+
+	function untagTag (tag) {
+		modal.confirm({
+			title: `Untag "${tag}"?`,
+			yes: 'Untag',
+			callback: async () => {
+				const resp = await api.invoke('registry/untag', { project, repository: data.id, tag }, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				await api.invalidate('registry/getTags')
+			}
+		})
+	}
+</script>
+
+<div class="nm-breadcrumb">
+	<div class="nm-breadcrumb-item">
+		<a href={`/registry?project=${project}`} class="nm-link"><h6>Registry</h6></a>
+	</div>
+	<div class="nm-breadcrumb-item">
+		<h6>{repository.name}</h6>
+	</div>
+</div>
+
+<br>
+
+<div class="nm-panel is-level-300 _dp-g _g-7">
+	<div class="lo-12 _g-5">
+		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
+			<strong>{repository.name}</strong>
+			<div class="_fs-4 _mgt-3 _wb-ba">registry.deploys.app/{project}/{repository.name}</div>
+			<div class="_fs-4 _mgt-3 _wb-ba">{format.storage(repository.size)}</div>
+		</h3>
+	</div>
+
+	<div class="nm-table-container _mgt-6">
+		<table class="nm-table">
+			<thead>
+			<tr>
+				<th>Tag</th>
+				<th>Digest</th>
+				<th>Created At</th>
+				<th class="is-collapse"></th>
+			</tr>
+			</thead>
+			<tbody>
+				{#each tags as tag (tag.tag)}
+					<tr>
+						<td>
+							{tag.tag}
+							<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}:{tag.tag}">
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</td>
+						<td>
+							{format.shortDigest(tag.digest)}
+							<span class="icon copy" data-clipboard-text="registry.deploys.app/{project}/{repository.name}@{tag.digest}">
+								<i class="fa-light fa-copy"></i>
+							</span>
+						</td>
+						<td>{format.datetime(tag.createdAt)}</td>
+						<td>
+							<button class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
+								<i class="fa-solid fa-trash-alt"></i>
+							</button>
+						</td>
+					</tr>
+				{/each}
+				<NoDataRow span={4} list={tags} />
+				<ErrorRow span={4} {error} />
+			</tbody>
+		</table>
+	</div>
+</div>

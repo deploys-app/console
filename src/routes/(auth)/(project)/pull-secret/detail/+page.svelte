@@ -5,12 +5,12 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: project = data.project
-	$: location = data.location
-	$: name = data.name
-	$: pullSecret = data.pullSecret
+	const project = $derived(data.project)
+	const location = $derived(data.location)
+	const name = $derived(data.name)
+	const pullSecret = $derived(data.pullSecret)
 
 	onMount(() => {
 		const copyList = new ClipboardJS('.copy')
@@ -21,7 +21,7 @@
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${pullSecret.name}" ?`,
+			title: `Delete "${pullSecret.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('pullSecret.delete', { project, location, name }, fetch)
@@ -99,7 +99,7 @@
 		<hr>
 
 		<div class="_dp-f _g-6">
-			<button class="nm-button" type="button" on:click={deleteItem}>Delete</button>
+			<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>

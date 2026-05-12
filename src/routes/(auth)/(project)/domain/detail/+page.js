@@ -5,13 +5,13 @@ export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
 	const domainName = url.searchParams.get('domain')
 
-	/** @type {import('$types').ApiResponse<import('$types').Domain>} */
+	/** @type {Api.Response<Api.Domain>} */
 	const domain = await api.invoke('domain.get', { project, domain: domainName }, fetch)
 	if (!domain.ok) {
-		if (domain.error?.notFound) throw redirect(302, `/domain?project=${project}`)
-		throw error(500, domain.error?.message)
+		if (domain.error?.notFound) redirect(302, `/domain?project=${project}`)
+		error(500, domain.error?.message)
 	}
-	if (!domain.result) throw redirect(302, `/domain?project=${project}`)
+	if (!domain.result) redirect(302, `/domain?project=${project}`)
 
 	return {
 		domain: domain.result

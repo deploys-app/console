@@ -15,7 +15,7 @@ import 'sweetalert2/dist/sweetalert2.min.css'
  */
 export async function confirm ({ title, html, yes, callback }) {
 	const result = await Swal.fire({
-		title: 'Are you sure ?',
+		title: 'Are you sure?',
 		text: title,
 		html,
 		icon: 'warning',
@@ -40,7 +40,7 @@ export async function confirm ({ title, html, yes, callback }) {
 
 /**
  * @typedef {Object} ModalErrorOptions
- * @property {string | import('$types').Error | unknown} [error]
+ * @property {string | Api.Error | unknown} [error]
  * @property {Function} [callback]
  */
 
@@ -75,7 +75,8 @@ export async function error ({ error, callback }) {
 		background: 'var(--modal-panel-background)',
 		color: 'var(--modal-panel-color)',
 		customClass: {
-			actions: '_mgt-7'
+			actions: '_mgt-7',
+			confirmButton: 'nm-button is-variant-negative'
 		}
 	})
 	callback?.()
@@ -96,6 +97,10 @@ export async function success ({ content }) {
 		text: content,
 		icon: 'success',
 		background: 'var(--modal-panel-background)',
-		color: 'var(--modal-panel-color)'
+		color: 'var(--modal-panel-color)',
+		customClass: {
+			actions: '_mgt-7',
+			confirmButton: 'nm-button is-variant-negative'
+		}
 	})
 }

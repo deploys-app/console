@@ -1,22 +1,26 @@
 <script>
-	import { createEventDispatcher } from 'svelte'
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
 
-	export let deployment
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Deployment} deployment
+	 * @property {() => void} invalidate
+	 */
 
-	$: project = $page.data.project
+	/** @type {Props} */
+	const { deployment, invalidate } = $props()
 
-	$: canPause = deployment.status === 'success' && deployment.action === 'deploy'
-	$: canResume = deployment.status === 'success' && deployment.action === 'pause'
+	const project = $derived($page.data.project)
 
-	const dispatch = createEventDispatcher()
+	const canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
+	const canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
 
 	function pause () {
 		modal.confirm({
-			title: `Pause ${deployment.name} in ${deployment.location} ?`,
+			title: `Pause ${deployment.name} in ${deployment.location}?`,
 			yes: 'Pause',
 			callback: async () => {
 				const resp = await api.invoke('deployment.pause', {
@@ -28,14 +32,14 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				dispatch('invalidate')
+				invalidate?.()
 			}
 		})
 	}
 
 	function resume () {
 		modal.confirm({
-			title: `Resume ${deployment.name} in ${deployment.location} ?`,
+			title: `Resume ${deployment.name} in ${deployment.location}?`,
 			yes: 'Resume',
 			callback: async () => {
 				const resp = await api.invoke('deployment.resume', {
@@ -47,7 +51,7 @@
 					modal.error({ error: resp.error })
 					return
 				}
-				dispatch('invalidate')
+				invalidate?.()
 			}
 		})
 	}
@@ -57,7 +61,7 @@
 	<div class="_dp-g _g-5 _gatf-r _gatf-cl:lg">
 		<h3 class="_dp-f _fw-w _alit-fst _mgr-7 _mgbt-6 _mgbt-0:lg">
 			<div>
-				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} />
+				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} type={deployment.type} />
 			</div>
 			<div>
 				{deployment.name}
@@ -71,14 +75,14 @@
 			</a>
 			{#if canPause}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" on:click={pause}>
+					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" on:click={resume}>
+					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>

@@ -3,13 +3,13 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
+	const { data } = $props()
 
-	$: billingAccount = data.billingAccount
+	const billingAccount = $derived(data.billingAccount)
 
 	function deleteItem () {
 		modal.confirm({
-			title: `Delete "${billingAccount.name}" ?`,
+			title: `Delete "${billingAccount.name}"?`,
 			yes: 'Delete',
 			callback: async () => {
 				const resp = await api.invoke('billing.delete', { id: billingAccount.id }, fetch)
@@ -68,7 +68,7 @@
 		<div class="_dp-f _g-6">
 			<a class="nm-button" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
 			<a class="nm-button" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
-			<button class="nm-button" type="button" on:click={deleteItem}>Delete account</button>
+			<button class="nm-button" type="button" onclick={deleteItem}>Delete account</button>
 		</div>
 	</div>
 </div>

@@ -4,11 +4,9 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	export let data
-	const {
-		deployment,
-		revisions
-	} = data
+	const { data } = $props()
+	const deployment = $derived(data.deployment)
+	const revisions = $derived(data.revisions)
 
 	function rollback (toRevision) {
 		modal.confirm({
@@ -44,7 +42,7 @@
 		</tr>
 		</thead>
 		<tbody>
-		{#each revisions as it, index}
+		{#each revisions as it, index (it.revision)}
 			<tr>
 				<td>{it.revision}</td>
 				<td>{it.image}</td>
@@ -52,7 +50,7 @@
 				<td>{it.createdBy}</td>
 				<td>
 					{#if index > 0}
-						<button class="nm-button is-size-small" type="button" on:click={() => rollback(it.revision)}>Rollback</button>
+						<button class="nm-button is-size-small" type="button" onclick={() => rollback(it.revision)}>Rollback</button>
 					{/if}
 				</td>
 			</tr>
