@@ -298,6 +298,7 @@ declare namespace Api {
         createdAt: string
         createdBy: string
         successAt: string
+        ttl: number
     }
 
     export type ServiceAccount = {

@@ -195,6 +195,16 @@
 				<td>Sidecars</td>
 				<td>{deployment.sidecars?.length || 0}</td>
 			</tr>
+			{#if deployment.ttl > 0}
+				<tr>
+					<td>Auto-delete</td>
+					<td>
+						<i class="fa-regular fa-clock _mgr-5 _cl-warning"></i>
+						{format.ttlExpireAt(deployment.ttl)}
+						<span class="_cl-light _mgl-3">(in {format.duration(deployment.ttl)})</span>
+					</td>
+				</tr>
+			{/if}
 			<tr>
 				<td>Deployed At</td>
 				<td>{format.datetime(deployment.createdAt)}</td>
