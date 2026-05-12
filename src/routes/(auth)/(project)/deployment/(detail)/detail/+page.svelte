@@ -195,7 +195,15 @@
 				<td>Sidecars</td>
 				<td>{deployment.sidecars?.length || 0}</td>
 			</tr>
-			{#if deployment.ttl > 0}
+			{#if deployment.ttl === -1}
+				<tr>
+					<td>Auto-delete</td>
+					<td>
+						<i class="fa-regular fa-clock _mgr-5 _cl-danger"></i>
+						Expired — pending deletion
+					</td>
+				</tr>
+			{:else if deployment.ttl > 0}
 				<tr>
 					<td>Auto-delete</td>
 					<td>

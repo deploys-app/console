@@ -41,7 +41,9 @@
 					<tr>
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
-							{#if it.ttl > 0}
+							{#if it.ttl === -1}
+								<i class="fa-regular fa-clock _mgr-5 _cl-danger" title="Expired — pending deletion"></i>
+							{:else if it.ttl > 0}
 								<i class="fa-regular fa-clock _mgr-5 _cl-warning"
 									title={`Auto-delete at ${format.ttlExpireAt(it.ttl)} (in ${format.duration(it.ttl)})`}></i>
 							{/if}
