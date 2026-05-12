@@ -199,7 +199,7 @@
 				<tr>
 					<td>Auto-delete</td>
 					<td>
-						<i class="fa-regular fa-clock _mgr-5 _cl-danger"></i>
+						<i class="fa-regular fa-clock _mgr-5 _cl-negative"></i>
 						Expired — pending deletion
 					</td>
 				</tr>
