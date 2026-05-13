@@ -335,4 +335,13 @@ declare namespace Api {
     export type RepositoryTagResult =
         List<RepositoryTag>
         & { name: string }
+
+    export type RepositoryManifest = {
+        digest: string
+        createdAt: string
+    }
+
+    export type RepositoryManifestResult =
+        List<RepositoryManifest>
+        & { name: string }
 }
