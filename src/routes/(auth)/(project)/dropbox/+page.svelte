@@ -1,63 +1,423 @@
 <script>
+	import ClipboardJS from 'clipboard'
+	import { onMount } from 'svelte'
+
 	const { data } = $props()
 
 	const project = $derived(data.project)
 
 	/** @type {HTMLInputElement} */
 	let elFile
-
-	let downloadUrl = $state('')
 	let uploading = $state(false)
+	let dragOver = $state(false)
+	let error = $state('')
+	let justCopied = $state('')
+
+	/** @type {File | null} */
+	let selectedFile = $state(null)
+
+	/** @type {Array<{ name: string, size: number, url: string, uploadedAt: Date }>} */
+	let uploads = $state([])
+
+	onMount(() => {
+		const clip = new ClipboardJS('.copy-url')
+		clip.on('success', (e) => {
+			justCopied = String(e.text)
+			setTimeout(() => {
+				if (justCopied === e.text) justCopied = ''
+			}, 1500)
+			e.clearSelection()
+		})
+		return () => clip?.destroy()
+	})
+
+	/**
+	 * @param {number} bytes
+	 * @returns {string}
+	 */
+	function formatSize (bytes) {
+		if (bytes < 1024) return `${bytes} B`
+		if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
+		if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`
+		return `${(bytes / 1024 ** 3).toFixed(2)} GB`
+	}
+
+	/**
+	 * @param {Date} d
+	 */
+	function formatTime (d) {
+		return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+	}
+
+	function onFileChange () {
+		selectedFile = elFile.files?.[0] ?? null
+		error = ''
+	}
+
+	/**
+	 * @param {DragEvent} e
+	 */
+	function onDrop (e) {
+		e.preventDefault()
+		dragOver = false
+		const file = e.dataTransfer?.files?.[0]
+		if (!file) return
+		const dt = new DataTransfer()
+		dt.items.add(file)
+		elFile.files = dt.files
+		selectedFile = file
+		error = ''
+	}
+
+	/**
+	 * @param {DragEvent} e
+	 */
+	function onDragOver (e) {
+		e.preventDefault()
+		dragOver = true
+	}
+
+	function onDragLeave () {
+		dragOver = false
+	}
+
+	function clearFile () {
+		if (!elFile) return
+		elFile.value = ''
+		selectedFile = null
+		error = ''
+	}
 
 	/**
 	 * @param {Event} e
 	 */
 	async function upload (e) {
 		e.preventDefault()
+		if (uploading || !selectedFile) return
 
-		if (uploading) {
-			return
-		}
-		if (!elFile.files?.length) {
-			return
-		}
-
-		const file = elFile.files[0]
-
-		downloadUrl = ''
+		const file = selectedFile
 		uploading = true
+		error = ''
 		try {
 			const resp = await fetch(`/api/dropbox?project=${project}`, {
 				method: 'POST',
 				body: file
 			})
 			const res = await resp.json()
-			downloadUrl = res?.result?.downloadUrl ?? ''
-			elFile.value = ''
-		} catch (e) {
-			console.log(e)
+			if (!resp.ok || !res?.ok) {
+				error = res?.error?.message ?? `upload failed (${resp.status})`
+				return
+			}
+			const url = res?.result?.downloadUrl ?? ''
+			if (url) {
+				uploads = [
+					{ name: file.name, size: file.size, url, uploadedAt: new Date() },
+					...uploads
+				]
+			}
+			clearFile()
+		} catch (err) {
+			error = err instanceof Error ? err.message : String(err)
 		} finally {
 			uploading = false
 		}
 	}
 </script>
 
-<h6>Dropbox (Alpha)</h6>
+<style lang="scss">
+	.drop-zone {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+
+		padding: 2.5rem 1rem;
+
+		border: 2px dashed hsl(var(--hsl-base-400) / 0.6);
+		border-radius: 8px;
+		background-color: hsl(var(--hsl-base-400) / 0.08);
+
+		text-align: center;
+		color: hsl(var(--hsl-content) / 0.75);
+
+		cursor: pointer;
+		transition: all var(--timing-normal) ease;
+
+		&:hover, &.is-drag-over {
+			border-color: hsl(var(--hsl-primary));
+			background-color: hsl(var(--hsl-primary) / 0.06);
+			color: hsl(var(--hsl-content));
+		}
+
+		.drop-icon {
+			font-size: 2rem;
+			color: hsl(var(--hsl-content) / 0.6);
+		}
+	}
+
+	.hidden-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.selected-file {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+
+		padding: 0.75rem 1rem;
+
+		background-color: hsl(var(--hsl-base-400) / 0.12);
+		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
+		border-radius: 6px;
+
+		.file-icon {
+			font-size: 1.25rem;
+			color: hsl(var(--hsl-content) / 0.7);
+		}
+
+		.file-meta {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.file-name {
+			font-weight: 600;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.file-size {
+			font-size: var(--fs-1);
+			color: hsl(var(--hsl-content) / 0.6);
+		}
+
+		.file-clear {
+			background: none;
+			border: none;
+			padding: 0.25rem 0.5rem;
+			color: hsl(var(--hsl-content) / 0.6);
+			cursor: pointer;
+
+			&:hover {
+				color: hsl(var(--hsl-content));
+			}
+		}
+	}
+
+	.error-banner {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		padding: 0.75rem 1rem;
+		border-radius: 6px;
+
+		background-color: hsl(var(--hsl-danger) / 0.1);
+		color: hsl(var(--hsl-danger));
+		border: 1px solid hsl(var(--hsl-danger) / 0.3);
+
+		font-size: var(--fs-2);
+	}
+
+	.uploads {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.upload-item {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		gap: 0.75rem;
+		align-items: center;
+
+		padding: 0.75rem 1rem;
+
+		background-color: hsl(var(--hsl-base-400) / 0.08);
+		border: 1px solid hsl(var(--hsl-base-400) / 0.25);
+		border-radius: 6px;
+
+		.upload-icon {
+			color: hsl(var(--hsl-success));
+			font-size: 1.1rem;
+		}
+
+		.upload-info {
+			min-width: 0;
+
+			.upload-name {
+				font-weight: 600;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.upload-url {
+				font-family: var(--ff-mono, monospace);
+				font-size: var(--fs-1);
+				color: hsl(var(--hsl-content) / 0.7);
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.upload-sub {
+				font-size: var(--fs-1);
+				color: hsl(var(--hsl-content) / 0.55);
+			}
+		}
+
+		.upload-actions {
+			display: flex;
+			gap: 0.25rem;
+
+			.icon-button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+
+				width: 2rem;
+				height: 2rem;
+
+				background: none;
+				border: 1px solid hsl(var(--hsl-base-400) / 0.4);
+				border-radius: 4px;
+
+				color: hsl(var(--hsl-content) / 0.75);
+
+				cursor: pointer;
+				transition: all var(--timing-fast) ease;
+
+				&:hover {
+					background-color: hsl(var(--hsl-base-400) / 0.15);
+					color: hsl(var(--hsl-content));
+					border-color: hsl(var(--hsl-base-400) / 0.7);
+				}
+
+				&.is-copied {
+					color: hsl(var(--hsl-success));
+					border-color: hsl(var(--hsl-success) / 0.5);
+				}
+			}
+		}
+	}
+</style>
+
+<h6>Dropbox</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={upload}>
-		<div class="nm-field">
-			<input class="nm-field" type="file" name="file" bind:this={elFile}>
-		</div>
-		<div class="_dp-f _g-6">
-			<button class="nm-button" class:is-loading={uploading} type="submit">Upload</button>
+<div class="nm-panel is-level-300 _dp-g _g-6">
+	<div>
+		<p class="_mgbt-2">Upload a file and get a shareable download URL.</p>
+		<small class="_co-content/.6">
+			Files are scoped to this project. Drag a file into the drop zone or click to browse.
+		</small>
+	</div>
+
+	<form class="_dp-g _g-5 _w-100pct" onsubmit={upload}>
+		<label
+			class="drop-zone"
+			class:is-drag-over={dragOver}
+			ondragover={onDragOver}
+			ondragleave={onDragLeave}
+			ondrop={onDrop}>
+			<span class="drop-icon">
+				<i class="fa-solid fa-cloud-arrow-up"></i>
+			</span>
+			<div>
+				<strong>Drop a file here</strong> or click to browse
+			</div>
+			<input
+				class="hidden-input"
+				type="file"
+				name="file"
+				bind:this={elFile}
+				onchange={onFileChange}>
+		</label>
+
+		{#if selectedFile}
+			<div class="selected-file">
+				<span class="file-icon">
+					<i class="fa-solid fa-file"></i>
+				</span>
+				<div class="file-meta">
+					<div class="file-name">{selectedFile.name}</div>
+					<div class="file-size">{formatSize(selectedFile.size)}</div>
+				</div>
+				<button class="file-clear" type="button" onclick={clearFile} disabled={uploading} aria-label="Remove file">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+			</div>
+		{/if}
+
+		{#if error}
+			<div class="error-banner">
+				<i class="fa-solid fa-circle-exclamation"></i>
+				<span>{error}</span>
+			</div>
+		{/if}
+
+		<div class="_dp-f _g-6 _jtfct-fe">
+			<button
+				class="nm-button"
+				class:is-loading={uploading}
+				type="submit"
+				disabled={!selectedFile || uploading}>
+				<i class="fa-solid fa-upload _mgr-3"></i>
+				Upload
+			</button>
 		</div>
 	</form>
 
-	{#if downloadUrl}
-		<div class="_mgt-8">
-			Download URL
-			<pre>{downloadUrl}</pre>
+	{#if uploads.length > 0}
+		<hr>
+		<div>
+			<div class="_dp-f _jtfct-spbtw _alit-ct _mgbt-5">
+				<strong>Recent uploads</strong>
+				<small class="_co-content/.6">cleared on page reload</small>
+			</div>
+
+			<div class="uploads">
+				{#each uploads as it (it.url)}
+					<div class="upload-item">
+						<span class="upload-icon">
+							<i class="fa-solid fa-circle-check"></i>
+						</span>
+						<div class="upload-info">
+							<div class="upload-name">{it.name}</div>
+							<div class="upload-url" title={it.url}>{it.url}</div>
+							<div class="upload-sub">{formatSize(it.size)} · {formatTime(it.uploadedAt)}</div>
+						</div>
+						<div class="upload-actions">
+							<button
+								class="icon-button copy-url"
+								class:is-copied={justCopied === it.url}
+								type="button"
+								data-clipboard-text={it.url}
+								aria-label="Copy URL">
+								{#if justCopied === it.url}
+									<i class="fa-solid fa-check"></i>
+								{:else}
+									<i class="fa-light fa-copy"></i>
+								{/if}
+							</button>
+							<a
+								class="icon-button"
+								href={it.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								aria-label="Open URL">
+								<i class="fa-solid fa-arrow-up-right-from-square"></i>
+							</a>
+						</div>
+					</div>
+				{/each}
+			</div>
 		</div>
 	{/if}
 </div>

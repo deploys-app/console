@@ -83,7 +83,7 @@
 		},
 		{
 			id: 'dropbox',
-			title: 'Dropbox (Alpha)',
+			title: 'Dropbox',
 			icon: 'fa-box-open',
 			link: '/dropbox'
 		},
