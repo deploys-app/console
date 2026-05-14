@@ -1,0 +1,24 @@
+name: Deploy
+on:
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+    branches: [main]
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+    - uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+    - uses: google-github-actions/get-gke-credentials@v2
+      with:
+        project_id: ${{ vars.GKE_PROJECT }}
+        cluster_name: ${{ vars.GKE_CLUSTER }}
+        location: ${{ vars.GKE_LOCATION }}
+    - name: Deploy
+      env:
+        IMAGE: asia-southeast1-docker.pkg.dev/deploys-app/internal/console:${{ github.event.workflow_run.head_sha }}
+      run: kubectl set image -n deployer deployment/console app=$IMAGE
