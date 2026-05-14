@@ -12,12 +12,14 @@ test.describe('pull secrets', () => {
 
 		await page.goto('/pull-secret?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Pull Secrets' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'gcr' })).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Pull Secrets' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'gcr' })).toBeVisible()
 	})
 
 	test('empty state when no pull secrets', async ({ page }) => {
 		await page.goto('/pull-secret?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

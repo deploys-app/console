@@ -29,13 +29,15 @@ export default defineConfig({
 			command: 'node tests/mock-server.js',
 			port: MOCK_PORT,
 			reuseExistingServer: !process.env.CI,
+			timeout: 30_000,
 			stdout: 'pipe',
 			stderr: 'pipe'
 		},
 		{
-			command: `bun run dev --port ${PORT} --strictPort`,
+			command: `bun run dev --port ${PORT} --strictPort --host 127.0.0.1`,
 			port: PORT,
 			reuseExistingServer: !process.env.CI,
+			timeout: 180_000,
 			stdout: 'pipe',
 			stderr: 'pipe',
 			env: {

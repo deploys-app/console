@@ -12,13 +12,15 @@ test.describe('roles', () => {
 
 		await page.goto('/role?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Roles' })).toBeVisible()
-		await expect(page.getByText('developer')).toBeVisible()
-		await expect(page.getByText('Developer')).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Roles' })).toBeVisible()
+		await expect(main.getByText('developer')).toBeVisible()
+		await expect(main.getByText('Developer')).toBeVisible()
 	})
 
 	test('empty state when no roles', async ({ page }) => {
 		await page.goto('/role?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

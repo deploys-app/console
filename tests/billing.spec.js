@@ -17,14 +17,16 @@ test.describe('billing accounts', () => {
 
 		await page.goto('/billing')
 
-		await expect(page.getByRole('heading', { name: 'Billing' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'Personal' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'Company' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'Create account' })).toHaveAttribute('href', '/billing/create')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Billing' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Personal' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Company' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Create account' })).toHaveAttribute('href', '/billing/create')
 	})
 
 	test('empty state when no billing accounts', async ({ page }) => {
 		await page.goto('/billing')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

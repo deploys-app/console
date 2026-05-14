@@ -17,10 +17,11 @@ test.describe('domains', () => {
 
 		await page.goto('/domain?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Domains' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'example.com', exact: true })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'foo.example.com', exact: true })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'Create' })).toHaveAttribute(
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Domains' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'example.com', exact: true })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'foo.example.com', exact: true })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Create' })).toHaveAttribute(
 			'href',
 			'/domain/create?project=test-project'
 		)
@@ -28,6 +29,7 @@ test.describe('domains', () => {
 
 	test('empty state when no domains', async ({ page }) => {
 		await page.goto('/domain?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

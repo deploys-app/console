@@ -12,12 +12,14 @@ test.describe('workload identities', () => {
 
 		await page.goto('/workload-identity?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Workload Identities' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'gsa-binding' })).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Workload Identities' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'gsa-binding' })).toBeVisible()
 	})
 
 	test('empty state when no workload identities', async ({ page }) => {
 		await page.goto('/workload-identity?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

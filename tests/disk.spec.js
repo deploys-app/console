@@ -17,15 +17,17 @@ test.describe('disks', () => {
 
 		await page.goto('/disk?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Disks' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'data' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'cache' })).toBeVisible()
-		await expect(page.getByText('10 GiB')).toBeVisible()
-		await expect(page.getByText('5 GiB')).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Disks' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'data' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'cache' })).toBeVisible()
+		await expect(main.getByText('10 GiB')).toBeVisible()
+		await expect(main.getByText('5 GiB')).toBeVisible()
 	})
 
 	test('empty state when no disks', async ({ page }) => {
 		await page.goto('/disk?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

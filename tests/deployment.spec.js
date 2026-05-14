@@ -17,10 +17,11 @@ test.describe('deployments', () => {
 
 		await page.goto('/deployment?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Deployments' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'web' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'api' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'Create' })).toHaveAttribute(
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Deployments' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'web' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'api' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Create' })).toHaveAttribute(
 			'href',
 			'/deployment/deploy?project=test-project'
 		)
@@ -28,7 +29,8 @@ test.describe('deployments', () => {
 
 	test('shows empty state when there are no deployments', async ({ page }) => {
 		await page.goto('/deployment?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 
 	test('shows error row when the deployment.list API fails', async ({ page }) => {
@@ -39,6 +41,7 @@ test.describe('deployments', () => {
 			}
 		})
 		await page.goto('/deployment?project=test-project')
-		await expect(page.getByText(/api: internal error/)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('api: internal error')).toBeVisible()
 	})
 })

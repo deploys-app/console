@@ -17,14 +17,16 @@ test.describe('routes', () => {
 
 		await page.goto('/route?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Routes' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'https://example.com/' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'https://api.example.com/v1' })).toBeVisible()
-		await expect(page.locator('table tbody tr')).toHaveCount(2)
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Routes' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'https://example.com/' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'https://api.example.com/v1' })).toBeVisible()
+		await expect(main.locator('table tbody tr')).toHaveCount(2)
 	})
 
 	test('empty state when no routes', async ({ page }) => {
 		await page.goto('/route?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

@@ -12,12 +12,14 @@ test.describe('email domains', () => {
 
 		await page.goto('/email?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Emails' })).toBeVisible()
-		await expect(page.getByText('mail.example.com')).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Emails' })).toBeVisible()
+		await expect(main.getByText('mail.example.com')).toBeVisible()
 	})
 
 	test('empty state when no email domains', async ({ page }) => {
 		await page.goto('/email?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })

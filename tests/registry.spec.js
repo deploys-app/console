@@ -16,13 +16,15 @@ test.describe('registry', () => {
 
 		await page.goto('/registry?project=test-project')
 
-		await expect(page.getByRole('heading', { name: 'Registry' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'web' })).toBeVisible()
-		await expect(page.getByRole('link', { name: 'api' })).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Registry' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'web' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'api' })).toBeVisible()
 	})
 
 	test('empty state when no repositories', async ({ page }) => {
 		await page.goto('/registry?project=test-project')
-		await expect(page.getByText(/no data/i)).toBeVisible()
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No data')).toBeVisible()
 	})
 })
