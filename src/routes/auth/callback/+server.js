@@ -1,5 +1,7 @@
 import { env } from '$env/dynamic/private'
 
+const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
+
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
 	const state = url.searchParams.get('state') ?? ''
@@ -10,7 +12,7 @@ export async function GET ({ cookies, url }) {
 	}
 
 	// exchange token
-	const resp = await fetch('https://auth.deploys.app/token', {
+	const resp = await fetch(`${authEndpoint}/token`, {
 		method: 'POST',
 		body: new URLSearchParams({
 			grant_type: 'authorization_code',

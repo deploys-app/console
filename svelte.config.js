@@ -6,7 +6,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 const config = {
 	preprocess: [vitePreprocess()],
 	kit: {
-		adapter: process.env.ADAPTER === 'node' ? adapterNode() : adapterCloudflare(),
+		adapter: process.env.ADAPTER === 'cloudflare' ? adapterCloudflare() : adapterNode(),
 		alias: {
 			$style: './src/style',
 			$types: './src/types'

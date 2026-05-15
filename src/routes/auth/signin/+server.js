@@ -1,5 +1,7 @@
 import { env } from '$env/dynamic/private'
 
+const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
+
 const webcrypto = crypto
 
 /**
@@ -36,7 +38,7 @@ export async function GET ({ cookies, url }) {
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: `https://auth.deploys.app/?${q.toString()}`
+			location: `${authEndpoint}/?${q.toString()}`
 		}
 	})
 }

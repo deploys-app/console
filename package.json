@@ -14,6 +14,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@nomimono/nomimono-css": "^0.6.0",
+    "@playwright/test": "^1.60.0",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "=2.59.1",
