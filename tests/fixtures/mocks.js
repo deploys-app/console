@@ -107,14 +107,6 @@ export function defaultMocks () {
 		'/email.list': {
 			ok: true,
 			result: { items: [] }
-		},
-		'/registry/list': {
-			ok: true,
-			result: { items: [] }
-		},
-		'/registry/getProjectStorage': {
-			ok: true,
-			result: { size: 0 }
 		}
 	}
 }
@@ -253,8 +245,3 @@ export const sampleBillingAccount = {
 	active: true
 }
 
-export const sampleRepository = {
-	name: 'web',
-	size: 12345678,
-	createdAt: now
-}

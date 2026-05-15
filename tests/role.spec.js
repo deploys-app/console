@@ -14,8 +14,8 @@ test.describe('roles', () => {
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('heading', { name: 'Roles' })).toBeVisible()
-		await expect(main.getByText('developer')).toBeVisible()
-		await expect(main.getByText('Developer')).toBeVisible()
+		await expect(main.getByRole('link', { name: 'developer' })).toBeVisible()
+		await expect(main.getByRole('cell', { name: 'Developer', exact: true })).toBeVisible()
 	})
 
 	test('empty state when no roles', async ({ page }) => {
