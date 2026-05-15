@@ -7,6 +7,8 @@ jobs:
     runs-on: self-hosted
     name: Playwright
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_USE_BUILD: 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -14,6 +16,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Build app (adapter-node)
+        run: bun run build
 
       - name: Cache Playwright browsers
         id: playwright-cache
