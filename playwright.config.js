@@ -8,7 +8,7 @@ const MOCK_PORT = Number(process.env.MOCK_PORT || 9999)
 const useBuild = !!process.env.PLAYWRIGHT_USE_BUILD
 
 const devCommand = `bun run dev --port ${PORT} --strictPort --host 127.0.0.1`
-const buildCommand = 'node build'
+const buildCommand = 'bun ./build'
 
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 export default defineConfig({
@@ -33,7 +33,7 @@ export default defineConfig({
 	],
 	webServer: [
 		{
-			command: 'node tests/mock-server.js',
+			command: 'bun tests/mock-server.js',
 			port: MOCK_PORT,
 			reuseExistingServer: !process.env.CI,
 			timeout: 30_000,
