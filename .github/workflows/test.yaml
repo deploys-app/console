@@ -30,7 +30,7 @@ jobs:
             playwright-${{ runner.os }}-
 
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bun --bun x playwright install --with-deps chromium
 
       - name: Run Playwright tests
         run: bun run test
