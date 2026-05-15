@@ -31,7 +31,7 @@ src/routes/
   auth/                        # sign-in / callback / sign-out (unauthenticated)
   (auth)/                      # layout group — redirects to /auth/signin if no token
     (project)/                 # layout group — requires ?project= param
-      deployment/ disk/ domain/ dropbox/ email/
+      audit-log/ deployment/ disk/ domain/ dropbox/ email/
       pull-secret/ registry/ role/ route/
       service-account/ workload-identity/
     billing/

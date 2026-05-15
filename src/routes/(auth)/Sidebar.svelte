@@ -92,6 +92,12 @@
 			title: 'Registry',
 			icon: 'fa-warehouse-full',
 			link: '/registry'
+		},
+		{
+			id: 'audit-log',
+			title: 'Audit Logs',
+			icon: 'fa-clipboard-list',
+			link: '/audit-log'
 		}
 	]
 </script>
