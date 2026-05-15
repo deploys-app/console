@@ -783,7 +783,7 @@
 		<div class="_dp-g _g-6">
 			{#each form.sidecars as sidecar, i (i)}
 				<div class="nm-panel is-level-200 _dp-g _g-5">
-					<div class="_dp-f _jtfit-sb _atit-c">
+					<div class="_dp-f _jtfct-spbtw _alit-ct">
 						<strong>Sidecar #{i + 1}</strong>
 						<button class="icon-button" type="button" aria-label="Remove sidecar"
 							onclick={() => removeSidecar(i)}>
