@@ -29,6 +29,25 @@ Preview the production build:
 bun preview
 ```
 
+## Testing
+
+End-to-end tests run with [Playwright](https://playwright.dev) against a mocked API server (see `tests/mock-server.js`).
+
+First-time setup — install the Playwright browsers (only needed once per machine, or after upgrading `@playwright/test`):
+
+```bash
+bunx playwright install
+```
+
+Then run the tests:
+
+```bash
+bun test                          # run the full suite headless
+bunx playwright test --ui         # open the interactive test runner
+bunx playwright test auth.spec.js # run a single spec
+bunx playwright show-report       # open the last HTML report
+```
+
 ## License
 
 MIT
