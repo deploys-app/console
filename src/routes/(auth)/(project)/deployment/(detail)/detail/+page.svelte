@@ -191,10 +191,27 @@
 				<td>Memory allocated</td>
 				<td>{format.memory(deployment.resources.requests.memory)}</td>
 			</tr>
-			<tr>
-				<td>Sidecars</td>
-				<td>{deployment.sidecars?.length || 0}</td>
-			</tr>
+			{#if deployment.sidecars?.length}
+				<tr>
+					<td>Sidecars</td>
+					<td>
+						<ul class="_mg-0 _pdl-6">
+							{#each deployment.sidecars as s, i (i)}
+								{#if s.cloudSqlProxy}
+									<li>
+										<strong>Cloud SQL Proxy</strong>
+										&nbsp;—&nbsp;
+										<span>{s.cloudSqlProxy.instance}</span>
+										{#if s.cloudSqlProxy.port}
+											<span class="_cl-light">:{s.cloudSqlProxy.port}</span>
+										{/if}
+									</li>
+								{/if}
+							{/each}
+						</ul>
+					</td>
+				</tr>
+			{/if}
 			{#if deployment.ttl === -1}
 				<tr>
 					<td>Auto-delete</td>
