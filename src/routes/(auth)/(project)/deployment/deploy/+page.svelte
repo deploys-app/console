@@ -63,17 +63,8 @@
 		env: [],
 		/** @type {{ k: string, v: string }[]} */
 		mountData: [],
-		// /** @type {Api.Sidecar[]} */
-		// sidecars: [],
-		sidecar: {
-			type: '',
-			cloudSqlProxy: {
-				instance: '',
-				/** @type {?number} */
-				port: null,
-				credentials: ''
-			}
-		},
+		/** @type {Api.SidecarForm[]} */
+		sidecars: [],
 		ttlValue: 0,
 		// unit in seconds; '0' means no auto-delete
 		ttlUnit: '0'
@@ -101,23 +92,22 @@
 		form.resources = deployment.resources
 		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
-		form.sidecar = (deployment.sidecars || []).length > 0
-			? {
-				type: 'cloudSqlProxy',
-				cloudSqlProxy: {
-					instance: deployment.sidecars[0].cloudSqlProxy?.instance ?? '',
-					port: deployment.sidecars[0].cloudSqlProxy?.port ?? null,
-					credentials: deployment.sidecars[0].cloudSqlProxy?.credentials ?? ''
+		form.sidecars = (deployment.sidecars || []).map((s) => {
+			if (s.cloudSqlProxy) {
+				return {
+					type: 'cloudSqlProxy',
+					cloudSqlProxy: {
+						instance: s.cloudSqlProxy.instance ?? '',
+						port: s.cloudSqlProxy.port ?? null,
+						credentials: s.cloudSqlProxy.credentials ?? ''
+					}
 				}
 			}
-			: {
+			return {
 				type: '',
-				cloudSqlProxy: {
-					instance: '',
-					port: null,
-					credentials: ''
-				}
+				cloudSqlProxy: { instance: '', port: null, credentials: '' }
 			}
+		})
 		if (deployment.ttl > 0) {
 			if (deployment.ttl % 86400 === 0) {
 				form.ttlUnit = '86400'
@@ -218,19 +208,41 @@
 			.join('\n')
 	}
 
-	function convertSidecar () {
-		if (!form.sidecar.type) {
-			return []
-		}
-		return [
-			{
-				cloudSqlProxy: {
-					instance: form.sidecar.cloudSqlProxy.instance,
-					port: form.sidecar.cloudSqlProxy.port,
-					credentials: form.sidecar.cloudSqlProxy.credentials
+	function convertSidecars () {
+		return form.sidecars
+			.filter((s) => s.type)
+			.map((s) => {
+				if (s.type === 'cloudSqlProxy') {
+					return {
+						cloudSqlProxy: {
+							instance: s.cloudSqlProxy.instance,
+							port: s.cloudSqlProxy.port,
+							credentials: s.cloudSqlProxy.credentials
+						}
+					}
 				}
+				return {}
+			})
+	}
+
+	const sidecarMax = 2
+
+	function addSidecar () {
+		if (form.sidecars.length >= sidecarMax) {
+			return
+		}
+		form.sidecars = [
+			...form.sidecars,
+			{
+				type: 'cloudSqlProxy',
+				cloudSqlProxy: { instance: '', port: null, credentials: '' }
 			}
 		]
+	}
+
+	/** @param {number} i */
+	function removeSidecar (i) {
+		form.sidecars = form.sidecars.filter((_, k) => k !== i)
 	}
 
 	let saving = $state(false)
@@ -255,7 +267,7 @@
 				protocol: form.type === 'WebService' ? form.protocol : '',
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
 				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
-				sidecars: convertSidecar(),
+				sidecars: convertSidecars(),
 				ttl: ttlSeconds
 			}, fetch)
 			if (!resp.ok) {
@@ -767,42 +779,54 @@
 
 		<hr>
 
-		<h6><strong>Sidecar</strong></h6>
+		<h6><strong>Sidecars</strong></h6>
 		<div class="_dp-g _g-6">
-			<div class="nm-field">
-				<label for="input-sidecar-type">Type</label>
-				<div class="nm-select">
-					<select id="input-sidecar-type" bind:value={form.sidecar.type}>
-						<option value="">None</option>
-						<option value="cloudSqlProxy">Cloud SQL Proxy</option>
-					</select>
-				</div>
-			</div>
-			{#if form.sidecar.type === 'cloudSqlProxy'}
-				<div class="nm-field">
-					<label for="input-sidecar-instance">Instance</label>
-					<div class="nm-input">
-						<input id="input-sidecar-instance" placeholder="Instance" bind:value={form.sidecar.cloudSqlProxy.instance} required>
+			{#each form.sidecars as sidecar, i (i)}
+				<div class="nm-panel is-level-200 _dp-g _g-5">
+					<div class="_dp-f _jtfit-sb _atit-c">
+						<strong>Sidecar #{i + 1}</strong>
+						<button class="icon-button" type="button" aria-label="Remove sidecar"
+							onclick={() => removeSidecar(i)}>
+							<i class="fa-solid fa-trash-alt"></i>
+						</button>
 					</div>
-				</div>
-				<div class="nm-field">
-					<label for="input-sidecar-port">Port</label>
-					<div class="nm-input">
-						<input class="-no-arrow" id="input-sidecar-port" placeholder="Port" type="number" bind:value={form.sidecar.cloudSqlProxy.port} required>
+					<div class="nm-field">
+						<label for="input-sidecar-type-{i}">Type</label>
+						<div class="nm-select">
+							<select id="input-sidecar-type-{i}" bind:value={sidecar.type}>
+								<option value="" disabled>Select Type</option>
+								<option value="cloudSqlProxy">Cloud SQL Proxy</option>
+							</select>
+						</div>
 					</div>
+					{#if sidecar.type === 'cloudSqlProxy'}
+						<div class="nm-field">
+							<label for="input-sidecar-instance-{i}">Instance</label>
+							<div class="nm-input">
+								<input id="input-sidecar-instance-{i}" placeholder="project:region:instance" bind:value={sidecar.cloudSqlProxy.instance} required>
+							</div>
+						</div>
+						<div class="nm-field">
+							<label for="input-sidecar-port-{i}">Port</label>
+							<div class="nm-input">
+								<input class="-no-arrow" id="input-sidecar-port-{i}" placeholder="3300" type="number" bind:value={sidecar.cloudSqlProxy.port}>
+							</div>
+						</div>
+						<div class="nm-field">
+							<label for="input-sidecar-credentials-{i}">Credentials</label>
+							<div class="nm-input">
+								<input id="input-sidecar-credentials-{i}" placeholder="Credentials JSON" bind:value={sidecar.cloudSqlProxy.credentials}>
+							</div>
+						</div>
+					{/if}
 				</div>
-				<div class="nm-field">
-					<label for="input-sidecar-credentials">Credentials</label>
-					<div class="nm-input">
-						<input id="input-sidecar-credentials" placeholder="Credentials" bind:value={form.sidecar.cloudSqlProxy.credentials}>
-					</div>
-				</div>
+			{/each}
+			{#if form.sidecars.length < sidecarMax}
+				<button class="nm-button _dp-f _mg-at" type="button" onclick={addSidecar}>
+					<i class="fa-solid fa-plus _mgr-5"></i>
+					<span>Add Sidecar</span>
+				</button>
 			{/if}
-<!--			<button class="nm-button _dp-f _mg-at" type="button"-->
-<!--					onclick={() => { form.sidecars.push({}) }}>-->
-<!--				<i class="fa-solid fa-plus _mgr-5"></i>-->
-<!--				<span>Add Sidecar</span>-->
-<!--			</button>-->
 		</div>
 
 		<hr>

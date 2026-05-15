@@ -162,6 +162,14 @@ export const sampleDeployment = {
 	ttl: 0
 }
 
+export const sampleCloudSqlProxySidecar = {
+	cloudSqlProxy: {
+		instance: 'my-project:us-central1:my-db',
+		port: 3306,
+		credentials: ''
+	}
+}
+
 export const sampleDomain = {
 	project: 'test-project',
 	location: 'gke',

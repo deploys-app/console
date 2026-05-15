@@ -234,10 +234,28 @@ declare namespace Api {
         limits: Resource
     }
 
+    export type CloudSqlProxySidecar = {
+        instance: string
+        port: number
+        credentials: string
+    }
+
     export type Sidecar = {
-        cloudSqlProxy?: {
+        cloudSqlProxy?: CloudSqlProxySidecar
+    }
+
+    export type SidecarType = '' | 'cloudSqlProxy'
+
+    /**
+     * Editable form shape for a sidecar. Carries a discriminator plus a
+     * config slot per variant so the form can switch between types without
+     * losing partial input.
+     */
+    export type SidecarForm = {
+        type: SidecarType
+        cloudSqlProxy: {
             instance: string
-            port: number
+            port: number | null
             credentials: string
         }
     }
