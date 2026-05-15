@@ -18,6 +18,7 @@ jobs:
         project_id: ${{ vars.GKE_PROJECT }}
         cluster_name: ${{ vars.GKE_CLUSTER }}
         location: ${{ vars.GKE_LOCATION }}
+    - uses: azure/setup-kubectl@v4
     - name: Deploy
       env:
         IMAGE: asia-southeast1-docker.pkg.dev/deploys-app/internal/console:${{ github.event.workflow_run.head_sha }}
