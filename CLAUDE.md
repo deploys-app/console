@@ -67,6 +67,12 @@ OAuth2 against `auth.deploys.app`. Token stored in httpOnly cookies. `src/hooks.
 
 Uses the **nomimono-css** design system (classes like `nm-panel`, `nm-button`, `nm-field`). SCSS files live in `src/style/`, imported via the `$style` alias. Theme (dark/light) is stored in a cookie and applied via `data-theme` attribute.
 
+**Before doing any CSS work**, read both:
+- The project styles in `src/style/` (`main.scss`, `_theme.scss`) to see project-level tokens, overrides, and conventions.
+- The nomimono-css atomic classes in `node_modules/@nomimono/nomimono-css/atomic.css` (also `reset.css`, `layout.css`, `component.css`) to prefer existing utility/component classes over writing new CSS.
+
+Reach for nomimono atomic/component classes first; only add custom SCSS when no existing class fits.
+
 ### Modals
 
 Centralized in `src/lib/modal/index.js` — wraps SweetAlert2. Use this for confirmations and form dialogs rather than inline alert/confirm.
