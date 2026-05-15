@@ -1,3 +1,6 @@
+import { env } from '$env/dynamic/private'
+
+const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 const landing = 'https://www.deploys.app/'
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
@@ -12,7 +15,7 @@ export async function POST ({ locals }) {
 		return new Response(undefined, {
 			status: 302,
 			headers: {
-				location: `https://auth.deploys.app/revoke?${q.toString()}`
+				location: `${authEndpoint}/revoke?${q.toString()}`
 			}
 		})
 	}

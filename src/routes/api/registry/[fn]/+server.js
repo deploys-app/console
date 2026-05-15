@@ -1,4 +1,6 @@
-const endpoint = 'https://registry.deploys.app/api'
+import { env } from '$env/dynamic/private'
+
+const endpoint = env.REGISTRY_ENDPOINT || 'https://registry.deploys.app/api'
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST ({ locals, params, request }) {
