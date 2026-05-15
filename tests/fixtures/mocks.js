@@ -107,6 +107,14 @@ export function defaultMocks () {
 		'/email.list': {
 			ok: true,
 			result: { items: [] }
+		},
+		'/__registry/list': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/__registry/getProjectStorage': {
+			ok: true,
+			result: { size: 0 }
 		}
 	}
 }
@@ -243,5 +251,11 @@ export const sampleBillingAccount = {
 	taxName: '',
 	taxAddress: '',
 	active: true
+}
+
+export const sampleRepository = {
+	name: 'web',
+	size: 12345678,
+	createdAt: now
 }
 
