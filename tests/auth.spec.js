@@ -16,7 +16,13 @@ unauthedTest.describe('unauthenticated access', () => {
 	unauthedTest('/auth/signin redirects to the OAuth provider', async ({ page }) => {
 		const resp = await page.request.get('/auth/signin', { maxRedirects: 0 })
 		expect(resp.status()).toBe(302)
-		expect(resp.headers().location || '').toMatch(/^https:\/\/auth\.deploys\.app\//)
+		// AUTH_ENDPOINT defaults to https://auth.deploys.app but tests
+		// override it to the mock; assert on the OAuth params instead.
+		const location = resp.headers().location || ''
+		expect(location).toMatch(/response_type=code/)
+		expect(location).toMatch(/client_id=test-client/)
+		expect(location).toMatch(/redirect_uri=/)
+		expect(location).toMatch(/state=[0-9a-f]+/)
 	})
 })
 
