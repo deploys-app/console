@@ -74,3 +74,9 @@ Centralized in `src/lib/modal/index.js` — wraps SweetAlert2. Use this for conf
 ### Language note
 
 The codebase uses **JavaScript with JSDoc** type annotations (not TypeScript `.ts` files), checked via `svelte-check` against `jsconfig.json`. Keep new files in `.js`/`.svelte` with JSDoc types.
+
+## Dependencies
+
+### highcharts — pinned to 11.4.8
+
+Our Highcharts license covers **version 11 only**. Do not upgrade to 12+; using a major version outside the licensed range would put us out of compliance. The version is pinned with `=11.4.8` in `package.json`, and `ncu` runs should exclude it (`ncu --reject highcharts`).
