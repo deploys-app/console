@@ -18,8 +18,6 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build app (adapter-node)
-        env:
-          ADAPTER: node
         run: bun run build
 
       - name: Cache Playwright browsers
