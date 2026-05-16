@@ -58,6 +58,12 @@
 			link: '/pull-secret'
 		},
 		{
+			id: 'env-group',
+			title: 'Env Groups',
+			icon: 'fa-cog',
+			link: '/env-group'
+		},
+		{
 			id: 'role',
 			title: 'Roles',
 			icon: 'fa-user-tag',

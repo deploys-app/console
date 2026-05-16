@@ -108,6 +108,10 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
+		'/envGroup.list': {
+			ok: true,
+			result: { items: [] }
+		},
 		'/__registry/list': {
 			ok: true,
 			result: { items: [] }
@@ -247,6 +251,17 @@ export const sampleWorkloadIdentity = {
 	name: 'gsa-binding',
 	gsa: '[email protected]',
 	status: 'success',
+	createdAt: now,
+	createdBy: '[email protected]'
+}
+
+export const sampleEnvGroup = {
+	project: 'test-project',
+	name: 'shared-config',
+	env: {
+		LOG_LEVEL: 'info',
+		FEATURE_FLAG: 'true'
+	},
 	createdAt: now,
 	createdBy: '[email protected]'
 }

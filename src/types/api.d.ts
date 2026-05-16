@@ -201,6 +201,14 @@ declare namespace Api {
         [key: string]: string
     }
 
+    export type EnvGroup = {
+        project: string
+        name: string
+        env: Env
+        createdAt: string
+        createdBy: string
+    }
+
     export type MountData = {
         [key: string]: string
     }
