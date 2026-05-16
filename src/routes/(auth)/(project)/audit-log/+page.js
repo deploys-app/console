@@ -1,7 +1,5 @@
 import api from '$lib/api'
 
-const ALLOWED_LIMITS = [25, 50, 100]
-
 /**
  * @param {string | null} v
  * @returns {string | undefined}
@@ -19,8 +17,9 @@ function toRFC3339 (v) {
  */
 function parseLimit (v) {
 	const n = Number(v)
-	if (ALLOWED_LIMITS.includes(n)) return n
-	return 50
+	if (!Number.isInteger(n) || n < 1) return 50
+	if (n > 100) return 100
+	return n
 }
 
 export async function load ({ url, parent, fetch }) {

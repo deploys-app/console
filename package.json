@@ -42,6 +42,6 @@
   },
   "type": "module",
   "dependencies": {
-    "date-picker-svelte": "^2.17.0"
+    "@svelte-plugins/datepicker": "^1.0.11"
   }
 }

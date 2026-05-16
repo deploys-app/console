@@ -2,7 +2,8 @@
 	import { untrack } from 'svelte'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { goto } from '$app/navigation'
-	import { DateInput } from 'date-picker-svelte'
+	import { DatePicker } from '@svelte-plugins/datepicker'
+	import dayjs from 'dayjs'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import * as format from '$lib/format'
@@ -21,7 +22,7 @@
 		{ value: 'role', label: 'Role' },
 		{ value: 'serviceAccount', label: 'Service Account' }
 	]
-	const LIMIT_OPTIONS = [25, 50, 100]
+	const LIMIT_OPTIONS = [10, 25, 50, 100]
 
 	/**
 	 * @param {string} v
@@ -37,12 +38,30 @@
 		resourceType: data.filters.resourceType,
 		actor: data.filters.actor,
 		outcome: data.filters.outcome,
-		after: parseDate(data.filters.after),
-		before: parseDate(data.filters.before),
+		startDate: parseDate(data.filters.after),
+		endDate: parseDate(data.filters.before),
 		limit: data.filters.limit
 	})))
 
+	let isDatePickerOpen = $state(false)
 	let applying = $state(false)
+
+	const dateRangeLabel = $derived.by(() => {
+		const s = form.startDate ? dayjs(form.startDate).format('YYYY-MM-DD') : ''
+		const e = form.endDate ? dayjs(form.endDate).format('YYYY-MM-DD') : ''
+		if (!s && !e) return ''
+		return `${s || '…'}  →  ${e || '…'}`
+	})
+
+	function toggleDatePicker () {
+		isDatePickerOpen = !isDatePickerOpen
+	}
+
+	function clearDateRange (e) {
+		e.stopPropagation()
+		form.startDate = null
+		form.endDate = null
+	}
 
 	/**
 	 * @param {Event} e
@@ -57,8 +76,8 @@
 			if (form.resourceType) q.set('resourceType', form.resourceType)
 			if (form.actor) q.set('actor', form.actor)
 			if (form.outcome) q.set('outcome', form.outcome)
-			if (form.after) q.set('after', form.after.toISOString())
-			if (form.before) q.set('before', form.before.toISOString())
+			if (form.startDate) q.set('after', new Date(form.startDate).toISOString())
+			if (form.endDate) q.set('before', new Date(form.endDate).toISOString())
 			if (form.limit && form.limit !== 50) q.set('limit', String(form.limit))
 			await goto(`/audit-log?${q.toString()}`, { keepFocus: true })
 		} finally {
@@ -73,8 +92,8 @@
 			form.resourceType = ''
 			form.actor = ''
 			form.outcome = ''
-			form.after = null
-			form.before = null
+			form.startDate = null
+			form.endDate = null
 			form.limit = 50
 			await goto(`/audit-log?project=${project}`, { keepFocus: true })
 		} finally {
@@ -104,6 +123,82 @@
 		justify-content: flex-end;
 		gap: 0.5rem;
 		margin-top: 1rem;
+	}
+
+	.date-range-trigger {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		width: 100%;
+		min-height: var(--form-element-height, 2.25rem);
+		padding: 0 0.625rem;
+		border: 1px solid hsl(var(--hsl-content)/0.15);
+		border-radius: var(--form-element-border-radius, 0.25rem);
+		background: transparent;
+		color: hsl(var(--hsl-content));
+		font: inherit;
+		text-align: left;
+		cursor: pointer;
+		transition: border-color 0.16s ease-in-out, box-shadow 0.16s ease-in-out;
+
+		&:hover {
+			border-color: hsl(var(--hsl-content)/0.25);
+		}
+
+		&:focus-visible {
+			outline: none;
+			border-color: hsl(var(--hsl-primary));
+			box-shadow: 0 0 0 0.175rem hsl(var(--hsl-primary)/0.3);
+		}
+
+		.placeholder {
+			color: hsl(var(--hsl-content)/0.5);
+		}
+
+		.value {
+			flex: 1;
+		}
+
+		.icon-clear {
+			display: inline-flex;
+			padding: 0.2rem;
+			border-radius: 4px;
+			color: hsl(var(--hsl-content)/0.6);
+			background: transparent;
+			border: 0;
+			cursor: pointer;
+
+			&:hover {
+				color: hsl(var(--hsl-content));
+				background: hsl(var(--hsl-content)/0.08);
+			}
+		}
+
+		.icon-cal {
+			color: hsl(var(--hsl-content)/0.5);
+		}
+	}
+
+	:global(.datepicker[data-picker-theme='audit-log-dp']) {
+		--datepicker-container-background: hsl(var(--hsl-base-200));
+		--datepicker-container-border: 1px solid hsl(var(--hsl-content)/0.15);
+		--datepicker-color: hsl(var(--hsl-content));
+		--datepicker-border-color: hsl(var(--hsl-content)/0.15);
+		--datepicker-state-active: hsl(var(--hsl-primary));
+		--datepicker-state-hover: hsl(var(--hsl-content)/0.08);
+		--datepicker-calendar-header-color: hsl(var(--hsl-content));
+		--datepicker-calendar-dow-color: hsl(var(--hsl-content)/0.7);
+		--datepicker-calendar-day-color: hsl(var(--hsl-content));
+		--datepicker-calendar-day-color-disabled: hsl(var(--hsl-content)/0.3);
+		--datepicker-calendar-range-selected-background: hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-selected-color: hsl(var(--hsl-content));
+		--datepicker-calendar-header-month-nav-color: hsl(var(--hsl-content));
+		--datepicker-calendar-header-month-nav-background-hover: hsl(var(--hsl-content)/0.08);
+		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-presets-background: hsl(var(--hsl-base-300));
+		--datepicker-calendar-presets-button-color: hsl(var(--hsl-content));
+		--datepicker-calendar-presets-button-background: transparent;
+		--datepicker-calendar-presets-button-background-hover: hsl(var(--hsl-content)/0.08);
 	}
 
 	.outcome-badge {
@@ -157,44 +252,6 @@
 		color: hsl(var(--hsl-content)/0.7);
 		vertical-align: middle;
 	}
-
-	.date-field :global(.date-time-field) {
-		width: 100%;
-	}
-
-	.date-field :global(.date-time-field input) {
-		width: 100%;
-		min-height: var(--form-element-height, 2.25rem);
-		padding: 0 0.625rem;
-		border: 1px solid hsl(var(--hsl-content)/0.15);
-		border-radius: var(--form-element-border-radius, 0.25rem);
-		background: transparent;
-		color: hsl(var(--hsl-content));
-		font: inherit;
-		transition: border-color 0.16s ease-in-out, box-shadow 0.16s ease-in-out;
-
-		&:hover {
-			border-color: hsl(var(--hsl-content)/0.25);
-		}
-
-		&:focus {
-			outline: none;
-			border-color: hsl(var(--hsl-primary));
-			box-shadow: 0 0 0 0.175rem hsl(var(--hsl-primary)/0.3);
-		}
-	}
-
-	.date-field :global(.date-time-picker) {
-		background: hsl(var(--hsl-base-200));
-		color: hsl(var(--hsl-content));
-		border: 1px solid hsl(var(--hsl-content)/0.15);
-		--date-picker-background: hsl(var(--hsl-base-200));
-		--date-picker-foreground: hsl(var(--hsl-content));
-		--date-picker-highlight-border: hsl(var(--hsl-primary));
-		--date-picker-highlight-shadow: hsl(var(--hsl-primary)/0.3);
-		--date-picker-selected-color: hsl(var(--hsl-primary-content));
-		--date-picker-selected-background: hsl(var(--hsl-primary));
-	}
 </style>
 
 <h6>Audit Logs</h6>
@@ -230,15 +287,34 @@
 					</select>
 				</div>
 			</div>
-			<div class="nm-field date-field">
-				<label class="nm-label" for="filter-after">After</label>
-				<DateInput id="filter-after" bind:value={form.after}
-					format="yyyy-MM-dd HH:mm" placeholder="From" closeOnSelection={true} />
-			</div>
-			<div class="nm-field date-field">
-				<label class="nm-label" for="filter-before">Before</label>
-				<DateInput id="filter-before" bind:value={form.before}
-					format="yyyy-MM-dd HH:mm" placeholder="To" closeOnSelection={true} />
+			<div class="nm-field">
+				<span class="nm-label">Date range</span>
+				<DatePicker
+					theme="audit-log-dp"
+					bind:isOpen={isDatePickerOpen}
+					bind:startDate={form.startDate}
+					bind:endDate={form.endDate}
+					isRange
+					isMultipane
+					showPresets
+					align="left"
+					includeFont={false}
+				>
+					<button type="button" class="date-range-trigger" onclick={toggleDatePicker}>
+						<i class="fa-regular fa-calendar icon-cal"></i>
+						{#if dateRangeLabel}
+							<span class="value">{dateRangeLabel}</span>
+							<span class="icon-clear" role="button" tabindex="-1"
+								aria-label="Clear date range"
+								onclick={clearDateRange}
+								onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && clearDateRange(e)}>
+								<i class="fa-solid fa-xmark"></i>
+							</span>
+						{:else}
+							<span class="placeholder value">Any time</span>
+						{/if}
+					</button>
+				</DatePicker>
 			</div>
 			<div class="nm-field">
 				<label class="nm-label" for="filter-limit">Limit</label>
