@@ -201,6 +201,14 @@ declare namespace Api {
         [key: string]: string
     }
 
+    export type EnvGroup = {
+        project: string
+        name: string
+        env: Env
+        createdAt: string
+        createdBy: string
+    }
+
     export type MountData = {
         [key: string]: string
     }
@@ -286,6 +294,7 @@ declare namespace Api {
         revision: number
         image: string
         env: Env
+        envGroups: string[]
         command: string[]
         args: string[]
         workloadIdentity: string

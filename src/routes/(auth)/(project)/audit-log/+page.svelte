@@ -18,6 +18,7 @@
 		{ value: 'deployment', label: 'Deployment' },
 		{ value: 'disk', label: 'Disk' },
 		{ value: 'domain', label: 'Domain' },
+		{ value: 'envGroup', label: 'Env Group' },
 		{ value: 'pullSecret', label: 'Pull Secret' },
 		{ value: 'role', label: 'Role' },
 		{ value: 'serviceAccount', label: 'Service Account' }

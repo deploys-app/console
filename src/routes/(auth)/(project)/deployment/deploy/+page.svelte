@@ -17,7 +17,8 @@
 	const permission = $state({
 		pullSecrets: true,
 		workloadIdentities: true,
-		disks: true
+		disks: true,
+		envGroups: true
 	})
 
 	/** @type {Api.PullSecret[]} */
@@ -28,6 +29,9 @@
 
 	/** @type {Api.Disk[]} */
 	let disks = $state([])
+
+	/** @type {Api.EnvGroup[]} */
+	let envGroups = $state([])
 
 	const form = $state({
 		location: deployment?.location || '',
@@ -61,6 +65,8 @@
 		},
 		/** @type {{ k: string, v: string }[]} */
 		env: [],
+		/** @type {string[]} */
+		envGroups: [],
 		/** @type {{ k: string, v: string }[]} */
 		mountData: [],
 		/** @type {Api.SidecarForm[]} */
@@ -91,6 +97,7 @@
 		form.maxReplicas = deployment.maxReplicas
 		form.resources = deployment.resources
 		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
+		form.envGroups = [...(deployment.envGroups || [])]
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
 		form.sidecars = (deployment.sidecars || []).map((s) => {
 			if (s.cloudSqlProxy) {
@@ -178,6 +185,19 @@
 		disks = resp.result.items ?? []
 	}
 
+	async function fetchEnvGroups () {
+		const resp = await api.invoke('envGroup.list', { project }, fetch)
+		if (!resp.ok) {
+			if (resp.error?.forbidden) {
+				permission.envGroups = false
+				return
+			}
+			modal.error({ error: resp.error })
+			return
+		}
+		envGroups = resp.result.items ?? []
+	}
+
 	async function changeLocation () {
 		pullSecrets = []
 		workloadIdentities = []
@@ -206,6 +226,34 @@
 		envText = form.env
 			.map(({ k, v }) => `${k}=${v}`)
 			.join('\n')
+	}
+
+	let envGroupInput = $state('')
+
+	/**
+	 * @param {string} name
+	 */
+	function addEnvGroup (name) {
+		const n = name.trim()
+		if (!n || form.envGroups.includes(n)) return
+		form.envGroups = [...form.envGroups, n]
+	}
+
+	function selectEnvGroupChanged (e) {
+		addEnvGroup(e.target.value)
+		e.target.value = ''
+	}
+
+	function addEnvGroupFromInput () {
+		addEnvGroup(envGroupInput)
+		envGroupInput = ''
+	}
+
+	/**
+	 * @param {string} name
+	 */
+	function removeEnvGroup (name) {
+		form.envGroups = form.envGroups.filter((g) => g !== name)
 	}
 
 	function convertSidecars () {
@@ -283,6 +331,7 @@
 	onMount(() => {
 		changeLocation()
 		parseEnvValue()
+		fetchEnvGroups()
 	})
 </script>
 
@@ -665,6 +714,63 @@
 		<br>
 		<hr>
 		<br>
+
+		<h6><strong>Env Groups</strong></h6>
+		<small class="helper">
+			Env groups are project-scoped sets of environment variables that are merged into the deployment.
+			Variables defined here take precedence over those defined in env groups.
+		</small>
+		{#if permission.envGroups}
+			<div class="nm-field _dp-f">
+				<div class="nm-select">
+					{#key envGroups}
+						<select onchange={selectEnvGroupChanged}>
+							<option value="" disabled selected>Select Env Group</option>
+							{#each envGroups.filter((g) => !form.envGroups.includes(g.name)) as it (it.name)}
+								<option value={it.name}>{it.name}</option>
+							{/each}
+						</select>
+					{/key}
+				</div>
+			</div>
+		{:else}
+			<div class="nm-field _dp-f _g-5">
+				<div class="nm-input _f-1">
+					<input placeholder="Env Group Name" bind:value={envGroupInput}>
+				</div>
+				<button class="nm-button" type="button" onclick={addEnvGroupFromInput}>Add</button>
+			</div>
+			<p class="_fs-1">* You don't have permission to list env groups</p>
+		{/if}
+		<div class="nm-table-container">
+			<table class="nm-table is-variant-compact">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th class="is-collapse is-align-right"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each form.envGroups as name (name)}
+						<tr>
+							<td>{name}</td>
+							<td>
+								<button class="icon-button" type="button" aria-label="Remove env group"
+									onclick={() => removeEnvGroup(name)}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</td>
+						</tr>
+					{:else}
+						<tr>
+							<td colspan="2" class="_tta-c _co-co-50">No env groups</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+
+		<hr>
 
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
