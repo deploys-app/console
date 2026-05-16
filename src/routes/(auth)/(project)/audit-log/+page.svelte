@@ -108,10 +108,18 @@
 </script>
 
 <style lang="scss">
-	.filter-grid {
+	.filter-row {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		grid-template-columns: repeat(3, 1fr);
 		gap: 1rem;
+
+		@media (max-width: 768px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.actor-row {
+		margin-top: 1rem;
 	}
 
 	.filter-actions {
@@ -291,7 +299,7 @@
 <br>
 <div class="nm-panel is-level-300">
 	<form onsubmit={apply}>
-		<div class="filter-grid">
+		<div class="filter-row">
 			<div class="nm-field">
 				<label class="nm-label" for="filter-resource-type">Resource type</label>
 				<div class="nm-select">
@@ -301,13 +309,6 @@
 							<option value={t.value}>{t.label}</option>
 						{/each}
 					</select>
-				</div>
-			</div>
-			<div class="nm-field">
-				<label class="nm-label" for="filter-actor">Actor</label>
-				<div class="nm-input">
-					<input id="filter-actor" type="text" placeholder="email or service account"
-						bind:value={form.actor}>
 				</div>
 			</div>
 			<div class="nm-field">
@@ -348,6 +349,15 @@
 						{/if}
 					</button>
 				</DatePicker>
+			</div>
+		</div>
+		<div class="actor-row">
+			<div class="nm-field">
+				<label class="nm-label" for="filter-actor">Actor</label>
+				<div class="nm-input">
+					<input id="filter-actor" type="text" placeholder="email or service account"
+						bind:value={form.actor}>
+				</div>
 			</div>
 		</div>
 
