@@ -22,7 +22,6 @@
 		{ value: 'role', label: 'Role' },
 		{ value: 'serviceAccount', label: 'Service Account' }
 	]
-	const LIMIT_OPTIONS = [10, 25, 50, 100]
 
 	/**
 	 * @param {string} v
@@ -39,8 +38,7 @@
 		actor: data.filters.actor,
 		outcome: data.filters.outcome,
 		startDate: parseDate(data.filters.after),
-		endDate: parseDate(data.filters.before),
-		limit: data.filters.limit
+		endDate: parseDate(data.filters.before)
 	})))
 
 	let isDatePickerOpen = $state(false)
@@ -78,7 +76,6 @@
 			if (form.outcome) q.set('outcome', form.outcome)
 			if (form.startDate) q.set('after', new Date(form.startDate).toISOString())
 			if (form.endDate) q.set('before', new Date(form.endDate).toISOString())
-			if (form.limit && form.limit !== 50) q.set('limit', String(form.limit))
 			await goto(`/audit-log?${q.toString()}`, { keepFocus: true })
 		} finally {
 			applying = false
@@ -94,7 +91,6 @@
 			form.outcome = ''
 			form.startDate = null
 			form.endDate = null
-			form.limit = 50
 			await goto(`/audit-log?project=${project}`, { keepFocus: true })
 		} finally {
 			applying = false
@@ -181,24 +177,53 @@
 
 	:global(.datepicker[data-picker-theme='audit-log-dp']) {
 		--datepicker-container-background: hsl(var(--hsl-base-200));
-		--datepicker-container-border: 1px solid hsl(var(--hsl-content)/0.15);
+		--datepicker-container-border: 1px solid hsl(var(--hsl-content)/0.2);
 		--datepicker-color: hsl(var(--hsl-content));
 		--datepicker-border-color: hsl(var(--hsl-content)/0.15);
 		--datepicker-state-active: hsl(var(--hsl-primary));
-		--datepicker-state-hover: hsl(var(--hsl-content)/0.08);
+		--datepicker-state-hover: hsl(var(--hsl-content)/0.1);
+
 		--datepicker-calendar-header-color: hsl(var(--hsl-content));
-		--datepicker-calendar-dow-color: hsl(var(--hsl-content)/0.7);
-		--datepicker-calendar-day-color: hsl(var(--hsl-content));
-		--datepicker-calendar-day-color-disabled: hsl(var(--hsl-content)/0.3);
-		--datepicker-calendar-range-selected-background: hsl(var(--hsl-primary)/0.18);
-		--datepicker-calendar-range-selected-color: hsl(var(--hsl-content));
+		--datepicker-calendar-header-text-color: hsl(var(--hsl-content));
 		--datepicker-calendar-header-month-nav-color: hsl(var(--hsl-content));
-		--datepicker-calendar-header-month-nav-background-hover: hsl(var(--hsl-content)/0.08);
-		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content)/0.1);
-		--datepicker-calendar-presets-background: hsl(var(--hsl-base-300));
-		--datepicker-calendar-presets-button-color: hsl(var(--hsl-content));
-		--datepicker-calendar-presets-button-background: transparent;
-		--datepicker-calendar-presets-button-background-hover: hsl(var(--hsl-content)/0.08);
+		--datepicker-calendar-header-month-nav-background-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-header-month-nav-icon-next-filter: invert(1);
+		--datepicker-calendar-header-month-nav-icon-prev-filter: invert(1);
+		--datepicker-calendar-header-year-nav-icon-next-filter: invert(1);
+		--datepicker-calendar-header-year-nav-icon-prev-filter: invert(1);
+
+		--datepicker-calendar-dow-color: hsl(var(--hsl-content)/0.65);
+		--datepicker-calendar-day-color: hsl(var(--hsl-content));
+		--datepicker-calendar-day-color-hover: hsl(var(--hsl-content));
+		--datepicker-calendar-day-background-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-day-color-disabled: hsl(var(--hsl-content)/0.35);
+		--datepicker-calendar-day-other-color: hsl(var(--hsl-content)/0.35);
+
+		--datepicker-calendar-today-border: 1px solid hsl(var(--hsl-primary));
+		--datepicker-calendar-today-background: transparent;
+
+		--datepicker-calendar-range-color: hsl(var(--hsl-content));
+		--datepicker-calendar-range-background: hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-included-background: hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-included-color: hsl(var(--hsl-content));
+		--datepicker-calendar-range-included-box-shadow: inset 20px 0 0 hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-start-box-shadow: inset -20px 0 0 hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-end-box-shadow: inset 20px 0 0 hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-selected-background: hsl(var(--hsl-primary));
+		--datepicker-calendar-range-selected-color: hsl(var(--hsl-primary-content));
+		--datepicker-calendar-range-start-end-background: hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-range-start-end-color: hsl(var(--hsl-content));
+
+		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content)/0.12);
+
+		--datepicker-presets-border: 1px solid hsl(var(--hsl-content)/0.12);
+		--datepicker-presets-button-color: hsl(var(--hsl-content));
+		--datepicker-presets-button-color-hover: hsl(var(--hsl-content));
+		--datepicker-presets-button-color-focus: hsl(var(--hsl-content));
+		--datepicker-presets-button-color-active: hsl(var(--hsl-primary-content));
+		--datepicker-presets-button-background: transparent;
+		--datepicker-presets-button-background-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-presets-button-background-active: hsl(var(--hsl-primary));
 	}
 
 	.outcome-badge {
@@ -315,16 +340,6 @@
 						{/if}
 					</button>
 				</DatePicker>
-			</div>
-			<div class="nm-field">
-				<label class="nm-label" for="filter-limit">Limit</label>
-				<div class="nm-select">
-					<select id="filter-limit" bind:value={form.limit}>
-						{#each LIMIT_OPTIONS as n (n)}
-							<option value={n}>{n}</option>
-						{/each}
-					</select>
-				</div>
 			</div>
 		</div>
 

@@ -1,5 +1,7 @@
 import api from '$lib/api'
 
+const LIMIT = 50
+
 /**
  * @param {string | null} v
  * @returns {string | undefined}
@@ -11,17 +13,6 @@ function toRFC3339 (v) {
 	return d.toISOString()
 }
 
-/**
- * @param {string | null} v
- * @returns {number}
- */
-function parseLimit (v) {
-	const n = Number(v)
-	if (!Number.isInteger(n) || n < 1) return 50
-	if (n > 100) return 100
-	return n
-}
-
 export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
 
@@ -30,8 +21,7 @@ export async function load ({ url, parent, fetch }) {
 		actor: url.searchParams.get('actor') ?? '',
 		outcome: url.searchParams.get('outcome') ?? '',
 		after: url.searchParams.get('after') ?? '',
-		before: url.searchParams.get('before') ?? '',
-		limit: parseLimit(url.searchParams.get('limit'))
+		before: url.searchParams.get('before') ?? ''
 	}
 
 	const args = {
@@ -41,7 +31,7 @@ export async function load ({ url, parent, fetch }) {
 		outcome: filters.outcome,
 		after: toRFC3339(filters.after),
 		before: toRFC3339(filters.before),
-		limit: filters.limit
+		limit: LIMIT
 	}
 
 	/** @type {Api.Response<Api.List<Api.AuditLogItem>>} */
