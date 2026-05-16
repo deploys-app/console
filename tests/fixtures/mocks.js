@@ -135,6 +135,7 @@ export const sampleDeployment = {
 	revision: 1,
 	image: 'nginx:latest',
 	env: {},
+	envGroups: [],
 	command: [],
 	args: [],
 	workloadIdentity: '',

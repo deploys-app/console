@@ -252,6 +252,30 @@
 	</div>
 </div>
 
+<h6><strong>Env Groups</strong></h6>
+<div class="nm-table-container">
+	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+		<thead>
+		<tr>
+			<th>Name</th>
+		</tr>
+		</thead>
+		<tbody>
+		{#each deployment.envGroups || [] as name (name)}
+			<tr>
+				<td>
+					<a class="nm-link" href={`/env-group/create?project=${deployment.project}&name=${name}`}>
+						{name}
+					</a>
+				</td>
+			</tr>
+		{:else}
+			<NoDataRow span={1} />
+		{/each}
+		</tbody>
+	</table>
+</div>
+
 <h6><strong>Environment Variables</strong></h6>
 <div class="nm-table-container">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">

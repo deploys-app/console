@@ -294,6 +294,7 @@ declare namespace Api {
         revision: number
         image: string
         env: Env
+        envGroups: string[]
         command: string[]
         args: string[]
         workloadIdentity: string

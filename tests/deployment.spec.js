@@ -151,3 +151,79 @@ test.describe('deployment deploy — sidecars', () => {
 		await expect(main.locator('#input-sidecar-port-0')).toHaveValue('3306')
 	})
 })
+
+test.describe('deployment detail — env groups', () => {
+	test('lists attached env groups with links to their edit page', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: { ...sampleDeployment, envGroups: ['shared-config', 'secrets'] }
+			},
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
+		await expect(main.getByRole('link', { name: 'shared-config' }))
+			.toHaveAttribute('href', '/env-group/create?project=test-project&name=shared-config')
+		await expect(main.getByRole('link', { name: 'secrets' }))
+			.toHaveAttribute('href', '/env-group/create?project=test-project&name=secrets')
+	})
+
+	test('shows no data when deployment has no env groups', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		const envGroupTable = main.locator('section, div').filter({
+			has: page.getByRole('heading', { name: 'Env Groups' })
+		})
+		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
+		await expect(envGroupTable.getByText('No data').first()).toBeVisible()
+	})
+})
+
+test.describe('deployment deploy — env groups', () => {
+	test('hydrates existing env groups when editing a revision', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: { ...sampleDeployment, envGroups: ['shared-config'] }
+			},
+			'location.get': { ok: true, result: defaultLocation },
+			'envGroup.list': {
+				ok: true,
+				result: {
+					items: [
+						{
+							project: 'test-project',
+							name: 'shared-config',
+							env: {},
+							createdAt: '2024-01-01T00:00:00Z',
+							createdBy: '[email protected]'
+						},
+						{
+							project: 'test-project',
+							name: 'secrets',
+							env: {},
+							createdAt: '2024-01-01T00:00:00Z',
+							createdBy: '[email protected]'
+						}
+					]
+				}
+			}
+		})
+
+		await page.goto('/deployment/deploy?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
+		await expect(main.getByRole('cell', { name: 'shared-config' })).toBeVisible()
+	})
+})
