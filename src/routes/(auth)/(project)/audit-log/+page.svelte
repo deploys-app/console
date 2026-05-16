@@ -176,6 +176,8 @@
 	}
 
 	:global(.datepicker[data-picker-theme='audit-log-dp']) {
+		--range-tint: hsl(var(--hsl-primary) / 0.22);
+
 		--datepicker-container-background: hsl(var(--hsl-base-200));
 		--datepicker-container-border: 1px solid hsl(var(--hsl-content)/0.2);
 		--datepicker-color: hsl(var(--hsl-content));
@@ -203,15 +205,21 @@
 		--datepicker-calendar-today-background: transparent;
 
 		--datepicker-calendar-range-color: hsl(var(--hsl-content));
-		--datepicker-calendar-range-background: hsl(var(--hsl-primary)/0.18);
-		--datepicker-calendar-range-included-background: hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-background: var(--range-tint);
+		--datepicker-calendar-range-background-disabled: var(--range-tint);
+
+		--datepicker-calendar-range-included-background: var(--range-tint);
 		--datepicker-calendar-range-included-color: hsl(var(--hsl-content));
-		--datepicker-calendar-range-included-box-shadow: inset 20px 0 0 hsl(var(--hsl-primary)/0.18);
-		--datepicker-calendar-range-start-box-shadow: inset -20px 0 0 hsl(var(--hsl-primary)/0.18);
-		--datepicker-calendar-range-end-box-shadow: inset 20px 0 0 hsl(var(--hsl-primary)/0.18);
+		--datepicker-calendar-range-included-box-shadow: inset 20px 0 0 var(--range-tint);
+
+		--datepicker-calendar-range-start-box-shadow: inset -20px 0 0 var(--range-tint);
+		--datepicker-calendar-range-end-box-shadow: inset 20px 0 0 var(--range-tint);
+		--datepicker-calendar-range-start-box-shadow-selected: inset -20px 0 0 var(--range-tint);
+		--datepicker-calendar-range-end-box-shadow-selected: inset 20px 0 0 var(--range-tint);
+
 		--datepicker-calendar-range-selected-background: hsl(var(--hsl-primary));
 		--datepicker-calendar-range-selected-color: hsl(var(--hsl-primary-content));
-		--datepicker-calendar-range-start-end-background: hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-range-start-end-background: var(--range-tint);
 		--datepicker-calendar-range-start-end-color: hsl(var(--hsl-content));
 
 		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content)/0.12);
