@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { goto } from '$app/navigation'
+	import { DateInput } from 'date-picker-svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import * as format from '$lib/format'
@@ -12,7 +13,34 @@
 	const items = $derived(data.items)
 	const error = $derived(data.error)
 
-	const form = $state(untrack(() => ({ ...data.filters })))
+	const RESOURCE_TYPES = [
+		{ value: 'deployment', label: 'Deployment' },
+		{ value: 'disk', label: 'Disk' },
+		{ value: 'domain', label: 'Domain' },
+		{ value: 'pullSecret', label: 'Pull Secret' },
+		{ value: 'role', label: 'Role' },
+		{ value: 'serviceAccount', label: 'Service Account' }
+	]
+	const LIMIT_OPTIONS = [25, 50, 100]
+
+	/**
+	 * @param {string} v
+	 * @returns {Date | null}
+	 */
+	function parseDate (v) {
+		if (!v) return null
+		const d = new Date(v)
+		return isNaN(d.getTime()) ? null : d
+	}
+
+	const form = $state(untrack(() => ({
+		resourceType: data.filters.resourceType,
+		actor: data.filters.actor,
+		outcome: data.filters.outcome,
+		after: parseDate(data.filters.after),
+		before: parseDate(data.filters.before),
+		limit: data.filters.limit
+	})))
 
 	let applying = $state(false)
 
@@ -29,8 +57,8 @@
 			if (form.resourceType) q.set('resourceType', form.resourceType)
 			if (form.actor) q.set('actor', form.actor)
 			if (form.outcome) q.set('outcome', form.outcome)
-			if (form.after) q.set('after', form.after)
-			if (form.before) q.set('before', form.before)
+			if (form.after) q.set('after', form.after.toISOString())
+			if (form.before) q.set('before', form.before.toISOString())
 			if (form.limit && form.limit !== 50) q.set('limit', String(form.limit))
 			await goto(`/audit-log?${q.toString()}`, { keepFocus: true })
 		} finally {
@@ -45,8 +73,8 @@
 			form.resourceType = ''
 			form.actor = ''
 			form.outcome = ''
-			form.after = ''
-			form.before = ''
+			form.after = null
+			form.before = null
 			form.limit = 50
 			await goto(`/audit-log?project=${project}`, { keepFocus: true })
 		} finally {
@@ -129,6 +157,44 @@
 		color: hsl(var(--hsl-content)/0.7);
 		vertical-align: middle;
 	}
+
+	.date-field :global(.date-time-field) {
+		width: 100%;
+	}
+
+	.date-field :global(.date-time-field input) {
+		width: 100%;
+		min-height: var(--form-element-height, 2.25rem);
+		padding: 0 0.625rem;
+		border: 1px solid hsl(var(--hsl-content)/0.15);
+		border-radius: var(--form-element-border-radius, 0.25rem);
+		background: transparent;
+		color: hsl(var(--hsl-content));
+		font: inherit;
+		transition: border-color 0.16s ease-in-out, box-shadow 0.16s ease-in-out;
+
+		&:hover {
+			border-color: hsl(var(--hsl-content)/0.25);
+		}
+
+		&:focus {
+			outline: none;
+			border-color: hsl(var(--hsl-primary));
+			box-shadow: 0 0 0 0.175rem hsl(var(--hsl-primary)/0.3);
+		}
+	}
+
+	.date-field :global(.date-time-picker) {
+		background: hsl(var(--hsl-base-200));
+		color: hsl(var(--hsl-content));
+		border: 1px solid hsl(var(--hsl-content)/0.15);
+		--date-picker-background: hsl(var(--hsl-base-200));
+		--date-picker-foreground: hsl(var(--hsl-content));
+		--date-picker-highlight-border: hsl(var(--hsl-primary));
+		--date-picker-highlight-shadow: hsl(var(--hsl-primary)/0.3);
+		--date-picker-selected-color: hsl(var(--hsl-primary-content));
+		--date-picker-selected-background: hsl(var(--hsl-primary));
+	}
 </style>
 
 <h6>Audit Logs</h6>
@@ -138,9 +204,13 @@
 		<div class="filter-grid">
 			<div class="nm-field">
 				<label class="nm-label" for="filter-resource-type">Resource type</label>
-				<div class="nm-input">
-					<input id="filter-resource-type" type="text" placeholder="e.g. deployment"
-						bind:value={form.resourceType}>
+				<div class="nm-select">
+					<select id="filter-resource-type" bind:value={form.resourceType}>
+						<option value="">All</option>
+						{#each RESOURCE_TYPES as t (t.value)}
+							<option value={t.value}>{t.label}</option>
+						{/each}
+					</select>
 				</div>
 			</div>
 			<div class="nm-field">
@@ -160,23 +230,24 @@
 					</select>
 				</div>
 			</div>
-			<div class="nm-field">
+			<div class="nm-field date-field">
 				<label class="nm-label" for="filter-after">After</label>
-				<div class="nm-input">
-					<input id="filter-after" type="datetime-local" bind:value={form.after}>
-				</div>
+				<DateInput id="filter-after" bind:value={form.after}
+					format="yyyy-MM-dd HH:mm" placeholder="From" closeOnSelection={true} />
 			</div>
-			<div class="nm-field">
+			<div class="nm-field date-field">
 				<label class="nm-label" for="filter-before">Before</label>
-				<div class="nm-input">
-					<input id="filter-before" type="datetime-local" bind:value={form.before}>
-				</div>
+				<DateInput id="filter-before" bind:value={form.before}
+					format="yyyy-MM-dd HH:mm" placeholder="To" closeOnSelection={true} />
 			</div>
 			<div class="nm-field">
 				<label class="nm-label" for="filter-limit">Limit</label>
-				<div class="nm-input">
-					<input id="filter-limit" type="number" min="1" max="100"
-						bind:value={form.limit}>
+				<div class="nm-select">
+					<select id="filter-limit" bind:value={form.limit}>
+						{#each LIMIT_OPTIONS as n (n)}
+							<option value={n}>{n}</option>
+						{/each}
+					</select>
 				</div>
 			</div>
 		</div>

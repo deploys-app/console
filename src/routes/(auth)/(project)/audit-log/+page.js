@@ -1,5 +1,7 @@
 import api from '$lib/api'
 
+const ALLOWED_LIMITS = [25, 50, 100]
+
 /**
  * @param {string | null} v
  * @returns {string | undefined}
@@ -11,6 +13,16 @@ function toRFC3339 (v) {
 	return d.toISOString()
 }
 
+/**
+ * @param {string | null} v
+ * @returns {number}
+ */
+function parseLimit (v) {
+	const n = Number(v)
+	if (ALLOWED_LIMITS.includes(n)) return n
+	return 50
+}
+
 export async function load ({ url, parent, fetch }) {
 	const { project } = await parent()
 
@@ -20,7 +32,7 @@ export async function load ({ url, parent, fetch }) {
 		outcome: url.searchParams.get('outcome') ?? '',
 		after: url.searchParams.get('after') ?? '',
 		before: url.searchParams.get('before') ?? '',
-		limit: Number(url.searchParams.get('limit')) || 50
+		limit: parseLimit(url.searchParams.get('limit'))
 	}
 
 	const args = {

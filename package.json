@@ -40,5 +40,8 @@
     "vite": "^8.0.13",
     "wrangler": "^4.91.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "date-picker-svelte": "^2.17.0"
+  }
 }
