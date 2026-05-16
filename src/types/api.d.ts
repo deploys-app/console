@@ -362,4 +362,30 @@ declare namespace Api {
     export type RepositoryManifestResult =
         List<RepositoryManifest>
         & { name: string }
+
+    export type AuditActorType = 'User' | 'ServiceAccount'
+
+    export type AuditOutcome = 'success' | 'failure'
+
+    export type AuditLogActor = {
+        email: string
+        type: AuditActorType
+    }
+
+    export type AuditLogResource = {
+        type: string
+        id: string
+        name: string
+        locationId: string
+    }
+
+    export type AuditLogItem = {
+        id: number
+        resource: AuditLogResource
+        actor: AuditLogActor
+        action: string
+        outcome: AuditOutcome
+        detail: string
+        createdAt: string
+    }
 }

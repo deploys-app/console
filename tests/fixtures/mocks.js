@@ -115,6 +115,10 @@ export function defaultMocks () {
 		'/__registry/getProjectStorage': {
 			ok: true,
 			result: { size: 0 }
+		},
+		'/auditLog.list': {
+			ok: true,
+			result: { items: [] }
 		}
 	}
 }
@@ -264,6 +268,24 @@ export const sampleBillingAccount = {
 export const sampleRepository = {
 	name: 'web',
 	size: 12345678,
+	createdAt: now
+}
+
+export const sampleAuditLogItem = {
+	id: 1,
+	resource: {
+		type: 'deployment',
+		id: 'd-1',
+		name: 'web',
+		locationId: 'gke'
+	},
+	actor: {
+		email: '[email protected]',
+		type: 'User'
+	},
+	action: 'deployment.deploy',
+	outcome: 'success',
+	detail: 'deployed revision 1',
 	createdAt: now
 }
 

@@ -40,5 +40,8 @@
     "vite": "^8.0.13",
     "wrangler": "^4.91.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@svelte-plugins/datepicker": "^1.0.11"
+  }
 }
