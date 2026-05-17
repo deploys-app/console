@@ -6,7 +6,6 @@
 	const { data } = $props()
 	const project = $derived(data.project)
 	const locations = $derived(data.locations)
-	const projectInfo = $derived(data.projectInfo)
 
 	const form = $state({
 		domain: '',
@@ -96,7 +95,7 @@
 		</div>
 		<div class="nm-field">
 			<div class="nm-checkbox">
-				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={!projectInfo.config.domainAllowDisableCdn}>
+				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled>
 				<label for="input-cdn">CDN (DDoS Protection)</label>
 			</div>
 		</div>
