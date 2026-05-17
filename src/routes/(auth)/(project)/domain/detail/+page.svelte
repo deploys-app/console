@@ -439,7 +439,7 @@
 		</div>
 	{:else}
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="nm-button" onclick={upgradeCdn}>Add CDN (DDoS Protection)</button>
+			<button class="nm-button" onclick={upgradeCdn} disabled>Add CDN (DDoS Protection)</button>
 		</div>
 	{/if}
 
