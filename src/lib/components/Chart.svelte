@@ -16,6 +16,7 @@
 	 * @property {string} unit
 	 * @property {Series[]} series
 	 * @property {'line' | 'spline'} [type]
+	 * @property {string} [range]
 	 */
 
 	/** @type {Props} */
@@ -23,14 +24,15 @@
 		title,
 		unit,
 		series,
-		type = 'line'
+		type = 'line',
+		range = ''
 	} = $props()
 
 	/** @type {HTMLDivElement} */
 	let el
 
-	/** @type {import('highcharts').Chart} */
-	let chart
+	/** @type {import('highcharts').Chart | undefined} */
+	let chart = $state.raw(undefined)
 
 	onMount(() => {
 		hc.init()
@@ -40,9 +42,12 @@
 				text: title
 			},
 			xAxis: {
-				type: 'datetime'
+				type: 'datetime',
+				showEmpty: true
 			},
 			yAxis: {
+				min: 0,
+				showEmpty: true,
 				labels: {
 					formatter () {
 						return formatter(this.value)
@@ -60,20 +65,21 @@
 
 	function update (name, lines, dashStyle, color) {
 		if (!browser || !chart) return
+		const c = chart
 		if (!lines) lines = []
 
 		lines.forEach((l) => {
 			const lineName = name + ' ' + l.name
 			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
 
-			const s = chart.series?.find((it) => it.name === lineName)
+			const s = c.series?.find((it) => it.name === lineName)
 			// already exists, update
 			if (s) {
 				s.setData(data, false)
 				return
 			}
 
-			chart.addSeries({
+			c.addSeries({
 				type,
 				name: lineName,
 				marker: {
@@ -106,7 +112,23 @@
 		return v
 	}
 
+	/** @param {string} r */
+	function rangeToMs (r) {
+		if (!r) return null
+		const base = r.replace('agg', '')
+		const num = parseInt(base)
+		const unit = base.slice(String(num).length)
+		const multiplier = unit === 'h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000
+		return num * multiplier
+	}
+
 	$effect(() => {
+		if (!chart) return
+		const ms = rangeToMs(range)
+		if (ms) {
+			const now = Date.now()
+			chart.xAxis[0].setExtremes(now - ms, now, false)
+		}
 		if (series?.length === 0) clear()
 		series?.forEach((s) => {
 			update(s.prefix, s.lines, s.dashStyle, s.color)
