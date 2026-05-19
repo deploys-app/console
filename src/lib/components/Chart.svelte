@@ -65,20 +65,21 @@
 
 	function update (name, lines, dashStyle, color) {
 		if (!browser || !chart) return
+		const c = chart
 		if (!lines) lines = []
 
 		lines.forEach((l) => {
 			const lineName = name + ' ' + l.name
 			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
 
-			const s = chart.series?.find((it) => it.name === lineName)
+			const s = c.series?.find((it) => it.name === lineName)
 			// already exists, update
 			if (s) {
 				s.setData(data, false)
 				return
 			}
 
-			chart.addSeries({
+			c.addSeries({
 				type,
 				name: lineName,
 				marker: {
