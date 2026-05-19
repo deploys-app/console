@@ -16,6 +16,7 @@
 	 * @property {string} unit
 	 * @property {Series[]} series
 	 * @property {'line' | 'spline'} [type]
+	 * @property {string} [range]
 	 */
 
 	/** @type {Props} */
@@ -23,7 +24,8 @@
 		title,
 		unit,
 		series,
-		type = 'line'
+		type = 'line',
+		range = ''
 	} = $props()
 
 	/** @type {HTMLDivElement} */
@@ -40,9 +42,12 @@
 				text: title
 			},
 			xAxis: {
-				type: 'datetime'
+				type: 'datetime',
+				showEmpty: true
 			},
 			yAxis: {
+				min: 0,
+				showEmpty: true,
 				labels: {
 					formatter () {
 						return formatter(this.value)
@@ -106,7 +111,23 @@
 		return v
 	}
 
+	/** @param {string} r */
+	function rangeToMs (r) {
+		if (!r) return null
+		const base = r.replace('agg', '')
+		const num = parseInt(base)
+		const unit = base.slice(String(num).length)
+		const multiplier = unit === 'h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000
+		return num * multiplier
+	}
+
 	$effect(() => {
+		if (!chart) return
+		const ms = rangeToMs(range)
+		if (ms) {
+			const now = Date.now()
+			chart.xAxis[0].setExtremes(now - ms, now, false)
+		}
 		if (series?.length === 0) clear()
 		series?.forEach((s) => {
 			update(s.prefix, s.lines, s.dashStyle, s.color)
