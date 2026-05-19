@@ -26,9 +26,7 @@
 	})
 
 	const targetPlaceholder = $derived({
-		'redirect://': 'https://example.com',
-		'ipfs://': 'QmUVTKsrYJpaxUT7dr9FpKq6AoKHhEM7eG1ZHGL56haKLG',
-		'ipns://': 'k51qzi5uqu5dkkciu33khkzbcmxtyhn376i1e83tya8kuy7z9euedzyr5nhoew'
+		'redirect://': 'https://example.com'
 	}[form.targetPrefix] || '')
 
 	/** @type {Api.Domain[]} */
@@ -189,9 +187,6 @@
 						<option value="" selected disabled>Select Type</option>
 						<option value="deployment://">Deployment</option>
 						<option value="redirect://">Redirect</option>
-						<option value="ipfs://">IPFS</option>
-						<option value="ipns://">IPNS</option>
-						<option value="dnslink://">DNSLink</option>
 					</select>
 				</div>
 			</div>
@@ -208,7 +203,7 @@
 						</select>
 					</div>
 				</div>
-			{:else if form.targetPrefix && form.targetPrefix !== 'dnslink://'}
+			{:else if form.targetPrefix}
 				<div class="nm-field">
 					<label for="input-target_value">Value</label>
 					<div class="nm-input">
