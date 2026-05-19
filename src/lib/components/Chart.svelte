@@ -31,8 +31,8 @@
 	/** @type {HTMLDivElement} */
 	let el
 
-	/** @type {import('highcharts').Chart} */
-	let chart
+	/** @type {import('highcharts').Chart | undefined} */
+	let chart = $state.raw(undefined)
 
 	onMount(() => {
 		hc.init()
