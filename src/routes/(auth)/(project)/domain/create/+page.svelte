@@ -89,13 +89,15 @@
 
 		<div class="nm-field">
 			<div class="nm-checkbox">
-				<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
+				<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard} disabled={form.cdn}
+					onchange={() => { if (form.wildcard) form.cdn = false }}>
 				<label for="input-wildcard">Wildcard</label>
 			</div>
 		</div>
 		<div class="nm-field">
 			<div class="nm-checkbox">
-				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled>
+				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled={form.wildcard}
+					onchange={() => { if (form.cdn) form.wildcard = false }}>
 				<label for="input-cdn">CDN</label>
 			</div>
 		</div>
