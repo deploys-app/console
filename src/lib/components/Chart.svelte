@@ -124,15 +124,18 @@
 
 	$effect(() => {
 		if (!chart) return
-		const ms = rangeToMs(range)
-		if (ms) {
-			const now = Date.now()
-			chart.xAxis[0].setExtremes(now - ms, now, false)
-		}
+
 		if (series?.length === 0) clear()
 		series?.forEach((s) => {
 			update(s.prefix, s.lines, s.dashStyle, s.color)
 		})
+
+		const ms = rangeToMs(range)
+		if (ms) {
+			const now = Date.now()
+			chart.xAxis[0].update({ min: now - ms, max: now }, false)
+		}
+
 		chart?.redraw()
 	})
 </script>
