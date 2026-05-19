@@ -96,7 +96,7 @@
 		<div class="nm-field">
 			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled>
-				<label for="input-cdn">CDN (DDoS Protection)</label>
+				<label for="input-cdn">CDN</label>
 			</div>
 		</div>
 
