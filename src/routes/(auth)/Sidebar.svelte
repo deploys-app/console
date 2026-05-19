@@ -81,7 +81,7 @@
 			icon: 'fa-user-lock',
 			link: '/service-account'
 		},
-{
+		{
 			id: 'dropbox',
 			title: 'Dropbox',
 			icon: 'fa-box-open',
