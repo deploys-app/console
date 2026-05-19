@@ -122,20 +122,14 @@
 	}
 
 	$effect(() => {
-		// Read reactive deps before any early return so Svelte tracks them.
-		// Without this, if chart is undefined on first run (before onMount),
-		// the effect would never re-run when series or range change.
-		const _series = series
-		const _range = range
 		if (!chart) return
-
-		const ms = rangeToMs(_range)
+		const ms = rangeToMs(range)
 		if (ms) {
 			const now = Date.now()
 			chart.xAxis[0].setExtremes(now - ms, now, false)
 		}
-		if (_series?.length === 0) clear()
-		_series?.forEach((s) => {
+		if (series?.length === 0) clear()
+		series?.forEach((s) => {
 			update(s.prefix, s.lines, s.dashStyle, s.color)
 		})
 		chart?.redraw()
