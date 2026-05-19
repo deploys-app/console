@@ -124,36 +124,15 @@
 
 	$effect(() => {
 		if (!chart) return
-
+		const ms = rangeToMs(range)
+		if (ms) {
+			const now = Date.now()
+			chart.xAxis[0].setExtremes(now - ms, now, false)
+		}
 		if (series?.length === 0) clear()
 		series?.forEach((s) => {
 			update(s.prefix, s.lines, s.dashStyle, s.color)
 		})
-
-		// Remove stale placeholder (may have been added on a previous run)
-		chart.series?.find((s) => s.name === '__placeholder__')?.remove(false)
-
-		const ms = rangeToMs(range)
-		if (ms) {
-			const now = Date.now()
-			if (chart.series?.length === 0) {
-				// No real data — add an invisible two-point series so Highcharts
-				// renders the axes over the correct time window with a 0 baseline.
-				chart.addSeries({
-					type: 'line',
-					name: '__placeholder__',
-					data: [[now - ms, 0], [now, 0]],
-					showInLegend: false,
-					enableMouseTracking: false,
-					lineWidth: 0,
-					marker: { enabled: false },
-					color: 'transparent'
-				}, false)
-			} else {
-				chart.xAxis[0].setExtremes(now - ms, now, false)
-			}
-		}
-
 		chart?.redraw()
 	})
 </script>
