@@ -81,13 +81,7 @@
 			icon: 'fa-user-lock',
 			link: '/service-account'
 		},
-		{
-			id: 'email',
-			title: 'Emails',
-			icon: 'fa-envelope',
-			link: '/email'
-		},
-		{
+{
 			id: 'dropbox',
 			title: 'Dropbox',
 			icon: 'fa-box-open',
