@@ -133,29 +133,29 @@
 
 <br>
 
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _alit-ct _jtfct-sb">
-		<h6>
+<div class="nm-panel is-level-300 audit-widget">
+	<div class="_dp-f _alit-ct _jtfct-spbtw">
+		<div class="widget-title">
 			<i class="fa-solid fa-clock-rotate-left"></i>
-			<strong class="_mgl-6">Recent Activity</strong>
-		</h6>
-		<a class="nm-link" href="/audit-log?project={projectInfo.project}">
+			<strong class="_mgl-4">Recent Activity</strong>
+		</div>
+		<a class="nm-link _fs-2" href="/audit-log?project={projectInfo.project}">
 			View all
-			<i class="fa-solid fa-arrow-right _mgl-4"></i>
+			<i class="fa-solid fa-arrow-right _mgl-3"></i>
 		</a>
 	</div>
 	<hr>
 	{#if auditLog.error?.forbidden}
-		<div class="_tal-ct _pd-6 _cl-content-600">
-			<i class="fa-solid fa-lock _mgr-4"></i>
+		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
+			<i class="fa-solid fa-lock _mgr-3"></i>
 			You don't have permission to view audit logs
 		</div>
 	{:else if auditLog.error}
-		<div class="_tal-ct _pd-6 _cl-content-600">
+		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
 			{auditLog.error.message || auditLog.error}
 		</div>
 	{:else if !auditLog.items.length}
-		<div class="_tal-ct _pd-6 _cl-content-600">
+		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
 			No recent activity
 		</div>
 	{:else}
@@ -194,6 +194,31 @@
 </div>
 
 <style lang="scss">
+	.audit-widget {
+		font-size: 0.875rem;
+
+		.widget-title {
+			display: inline-flex;
+			align-items: center;
+			font-size: 0.9375rem;
+			font-weight: 600;
+		}
+
+		hr {
+			margin: 0.5rem 0 0.25rem;
+		}
+	}
+
+	.audit-widget :global(.nm-table) {
+		font-size: 0.8125rem;
+	}
+
+	.audit-widget :global(.nm-table th),
+	.audit-widget :global(.nm-table td) {
+		padding-top: 0.4rem;
+		padding-bottom: 0.4rem;
+	}
+
 	.action-cell {
 		font-family: var(--font-family-mono, ui-monospace, monospace);
 		font-size: 0.8125rem;

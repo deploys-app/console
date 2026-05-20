@@ -10,7 +10,7 @@ export async function load ({ parent, fetch }) {
 	] = await Promise.all([
 		api.invoke('project.usage', { project }, fetch),
 		api.invoke('billing.project', { project }, fetch),
-		api.invoke('auditLog.list', { project, limit: 5 }, fetch)
+		api.invoke('auditLog.list', { project, limit: 4 }, fetch)
 	])
 	return {
 		menu: 'dashboard',
