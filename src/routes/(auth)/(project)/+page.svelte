@@ -156,62 +156,90 @@
 				No recent activity
 			</div>
 		{:else}
-			<div class="nm-table-container">
-				<table class="nm-table is-variant-compact">
-					<thead>
-						<tr>
-							<th>Time</th>
-							<th>Outcome</th>
-							<th>Actor</th>
-							<th>Action</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each auditLog.items as it (it.id)}
-							<tr>
-								<td>{format.datetime(it.createdAt)}</td>
-								<td><OutcomeBadge outcome={it.outcome} /></td>
-								<td class="ellipsis">{it.actor.email}</td>
-								<td>
-									<span class="action-cell">{it.action}</span>
-									{#if it.resource.type}
-										<div class="resource-line">
-											<strong>{it.resource.type}</strong>
-											{#if it.resource.name}
-												<span class="resource-name">/ {it.resource.name}</span>
-											{/if}
-										</div>
-									{/if}
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
+			<ul class="activity-feed">
+				{#each auditLog.items as it (it.id)}
+					<li>
+						<OutcomeBadge outcome={it.outcome} />
+						<div class="activity-body">
+							<div class="activity-line">
+								<span class="actor">{it.actor.email}</span>
+								<span class="action">{it.action}</span>
+								{#if it.resource.type}
+									<span class="resource">
+										<strong>{it.resource.type}</strong>{#if it.resource.name}<span class="resource-name">/{it.resource.name}</span>{/if}
+									</span>
+								{/if}
+							</div>
+							<time class="activity-time">{format.datetime(it.createdAt)}</time>
+						</div>
+					</li>
+				{/each}
+			</ul>
 		{/if}
 	</div>
 </div>
 
 <style lang="scss">
-	.action-cell {
+	.activity-feed {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+
+		li {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.625rem;
+			padding: 0.5rem 0;
+
+			& + li {
+				border-top: 1px solid hsl(var(--hsl-content)/0.08);
+			}
+		}
+	}
+
+	.activity-body {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.activity-line {
+		display: flex;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+		font-size: 0.875rem;
+		line-height: 1.3;
+	}
+
+	.actor {
+		color: hsl(var(--hsl-content));
+		font-weight: 500;
+		max-width: 16rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.action {
 		font-family: var(--font-family-mono, ui-monospace, monospace);
 		font-size: 0.8125rem;
 		color: hsl(var(--hsl-content)/0.85);
 	}
 
-	.resource-line {
+	.resource {
 		font-size: 0.8125rem;
-		margin-top: 0.15rem;
+		color: hsl(var(--hsl-content)/0.9);
 	}
 
 	.resource-name {
-		color: hsl(var(--hsl-content)/0.65);
+		color: hsl(var(--hsl-content)/0.6);
+		margin-left: 0.1rem;
 	}
 
-	.ellipsis {
-		max-width: 14rem;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+	.activity-time {
+		display: block;
+		margin-top: 0.15rem;
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content)/0.55);
 	}
 </style>
