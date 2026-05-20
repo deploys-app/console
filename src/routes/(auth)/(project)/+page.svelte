@@ -129,103 +129,89 @@
 			</div>
 		</div>
 	</div>
-</div>
 
-<br>
-
-<div class="nm-panel is-level-300 audit-widget">
-	<div class="_dp-f _alit-ct _jtfct-spbtw">
-		<div class="widget-title">
-			<i class="fa-solid fa-clock-rotate-left"></i>
-			<strong class="_mgl-4">Recent Activity</strong>
+	<div class="nm-panel is-level-300 lo-12 _g-7">
+		<div class="_dp-f _alit-ct _jtfct-spbtw">
+			<h6>
+				<i class="fa-solid fa-clock-rotate-left"></i>
+				<strong class="_mgl-6">Recent Activity</strong>
+			</h6>
+			<a class="nm-link" href="/audit-log?project={projectInfo.project}">
+				View all
+				<i class="fa-solid fa-arrow-right _mgl-3"></i>
+			</a>
 		</div>
-		<a class="nm-link _fs-2" href="/audit-log?project={projectInfo.project}">
-			View all
-			<i class="fa-solid fa-arrow-right _mgl-3"></i>
-		</a>
-	</div>
-	<hr>
-	{#if auditLog.error?.forbidden}
-		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
-			<i class="fa-solid fa-lock _mgr-3"></i>
-			You don't have permission to view audit logs
-		</div>
-	{:else if auditLog.error}
-		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
-			{auditLog.error.message || auditLog.error}
-		</div>
-	{:else if !auditLog.items.length}
-		<div class="_tal-ct _pd-5 _cl-content-600 _fs-2">
-			No recent activity
-		</div>
-	{:else}
-		<div class="nm-table-container">
-			<table class="nm-table is-variant-compact">
-				<thead>
-					<tr>
-						<th>Time</th>
-						<th>Outcome</th>
-						<th>Actor</th>
-						<th>Action</th>
-						<th>Resource</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each auditLog.items as it (it.id)}
+		<hr>
+		{#if auditLog.error?.forbidden}
+			<div class="_tal-ct _pd-6 _cl-content-600">
+				<i class="fa-solid fa-lock _mgr-4"></i>
+				You don't have permission to view audit logs
+			</div>
+		{:else if auditLog.error}
+			<div class="_tal-ct _pd-6 _cl-content-600">
+				{auditLog.error.message || auditLog.error}
+			</div>
+		{:else if !auditLog.items.length}
+			<div class="_tal-ct _pd-6 _cl-content-600">
+				No recent activity
+			</div>
+		{:else}
+			<div class="nm-table-container">
+				<table class="nm-table is-variant-compact">
+					<thead>
 						<tr>
-							<td>{format.datetime(it.createdAt)}</td>
-							<td><OutcomeBadge outcome={it.outcome} /></td>
-							<td>{it.actor.email}</td>
-							<td><span class="action-cell">{it.action}</span></td>
-							<td>
-								{#if it.resource.type}
-									<strong>{it.resource.type}</strong>
-									{#if it.resource.name}
-										<span class="resource-name">/ {it.resource.name}</span>
-									{/if}
-								{/if}
-							</td>
+							<th>Time</th>
+							<th>Outcome</th>
+							<th>Actor</th>
+							<th>Action</th>
 						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</div>
-	{/if}
+					</thead>
+					<tbody>
+						{#each auditLog.items as it (it.id)}
+							<tr>
+								<td>{format.datetime(it.createdAt)}</td>
+								<td><OutcomeBadge outcome={it.outcome} /></td>
+								<td class="ellipsis">{it.actor.email}</td>
+								<td>
+									<span class="action-cell">{it.action}</span>
+									{#if it.resource.type}
+										<div class="resource-line">
+											<strong>{it.resource.type}</strong>
+											{#if it.resource.name}
+												<span class="resource-name">/ {it.resource.name}</span>
+											{/if}
+										</div>
+									{/if}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style lang="scss">
-	.audit-widget {
-		font-size: 0.875rem;
-
-		.widget-title {
-			display: inline-flex;
-			align-items: center;
-			font-size: 0.9375rem;
-			font-weight: 600;
-		}
-
-		hr {
-			margin: 0.5rem 0 0.25rem;
-		}
-	}
-
-	.audit-widget :global(.nm-table) {
-		font-size: 0.8125rem;
-	}
-
-	.audit-widget :global(.nm-table th),
-	.audit-widget :global(.nm-table td) {
-		padding-top: 0.4rem;
-		padding-bottom: 0.4rem;
-	}
-
 	.action-cell {
 		font-family: var(--font-family-mono, ui-monospace, monospace);
 		font-size: 0.8125rem;
 		color: hsl(var(--hsl-content)/0.85);
 	}
 
+	.resource-line {
+		font-size: 0.8125rem;
+		margin-top: 0.15rem;
+	}
+
 	.resource-name {
 		color: hsl(var(--hsl-content)/0.65);
+	}
+
+	.ellipsis {
+		max-width: 14rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 </style>
