@@ -234,7 +234,7 @@
 		<div class="nm-field _mgt-5">
 			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
-				<label for="input-cdn">CDN (DDoS Protection)</label>
+				<label for="input-cdn">CDN</label>
 			</div>
 		</div>
 		<div class="nm-field">
@@ -435,11 +435,11 @@
 	<hr>
 	{#if domain.cdn}
 		<div class="_dp-f _alit-ct _fw-w">
-			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN (DDoS Protection)</a>
+			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
 		</div>
 	{:else}
 		<div class="_dp-f _alit-ct _fw-w">
-			<button class="nm-button" onclick={upgradeCdn} disabled>Add CDN (DDoS Protection)</button>
+			<button class="nm-button" onclick={upgradeCdn} disabled>Add CDN</button>
 		</div>
 	{/if}
 
