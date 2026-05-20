@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import * as format from '$lib/format'
+	import OutcomeBadge from '$lib/components/OutcomeBadge.svelte'
 
 	const { data } = $props()
 
@@ -24,6 +26,7 @@
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
+	const auditLog = $derived(data.auditLog)
 	const billing = $derived({
 		price: formatNumber(price.price),
 		cpu: formatNumber(usage.cpuUsage),
@@ -127,3 +130,77 @@
 		</div>
 	</div>
 </div>
+
+<br>
+
+<div class="nm-panel is-level-300">
+	<div class="_dp-f _alit-ct _jtfct-sb">
+		<h6>
+			<i class="fa-solid fa-clock-rotate-left"></i>
+			<strong class="_mgl-6">Recent Activity</strong>
+		</h6>
+		<a class="nm-link" href="/audit-log?project={projectInfo.project}">
+			View all
+			<i class="fa-solid fa-arrow-right _mgl-4"></i>
+		</a>
+	</div>
+	<hr>
+	{#if auditLog.error?.forbidden}
+		<div class="_tal-ct _pd-6 _cl-content-600">
+			<i class="fa-solid fa-lock _mgr-4"></i>
+			You don't have permission to view audit logs
+		</div>
+	{:else if auditLog.error}
+		<div class="_tal-ct _pd-6 _cl-content-600">
+			{auditLog.error.message || auditLog.error}
+		</div>
+	{:else if !auditLog.items.length}
+		<div class="_tal-ct _pd-6 _cl-content-600">
+			No recent activity
+		</div>
+	{:else}
+		<div class="nm-table-container">
+			<table class="nm-table is-variant-compact">
+				<thead>
+					<tr>
+						<th>Time</th>
+						<th>Outcome</th>
+						<th>Actor</th>
+						<th>Action</th>
+						<th>Resource</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each auditLog.items as it (it.id)}
+						<tr>
+							<td>{format.datetime(it.createdAt)}</td>
+							<td><OutcomeBadge outcome={it.outcome} /></td>
+							<td>{it.actor.email}</td>
+							<td><span class="action-cell">{it.action}</span></td>
+							<td>
+								{#if it.resource.type}
+									<strong>{it.resource.type}</strong>
+									{#if it.resource.name}
+										<span class="resource-name">/ {it.resource.name}</span>
+									{/if}
+								{/if}
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
+	{/if}
+</div>
+
+<style lang="scss">
+	.action-cell {
+		font-family: var(--font-family-mono, ui-monospace, monospace);
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content)/0.85);
+	}
+
+	.resource-name {
+		color: hsl(var(--hsl-content)/0.65);
+	}
+</style>
