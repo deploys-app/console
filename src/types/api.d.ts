@@ -57,8 +57,10 @@ declare namespace Api {
         cpu: number
         memory: number
         egress: number
+        registryEgress: number
         disk: number
         replica: number
+        domainCdn: number
     }
 
     export type BillingProject = {
