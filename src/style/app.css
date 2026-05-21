@@ -652,42 +652,97 @@
 		border-bottom-color: hsl(var(--hsl-primary));
 	}
 
-	/* Tables */
+	/* Tables — horizontal rhythm comes from per-cell left/right padding
+	 * (24px gutter) instead of cell padding shorthand, so default and
+	 * compact variants only differ in vertical padding. Mirrors the
+	 * original nomimono behavior so list-style pages and detail-style
+	 * pages line up visually. */
 	.nm-table-container {
+		position: relative;
 		overflow-x: auto;
-		border-radius: 0.5rem;
+		overflow-y: visible;
+		border-radius: 0.25rem;
 	}
 
 	.nm-table {
 		width: 100%;
-		border-collapse: collapse;
-		font-size: var(--fs-4);
+		max-width: 100%;
+		border-spacing: 0;
+		border-collapse: separate;
+		word-break: normal;
 	}
 
-	.nm-table thead th {
+	.nm-table thead {
+		font-size: 0.9375rem;
+	}
+
+	.nm-table tbody {
+		font-size: var(--table-data-font-size, 0.875rem);
+	}
+
+	.nm-table th,
+	.nm-table td {
 		text-align: left;
-		padding: 0.75rem 1rem;
-		background-color: hsl(var(--hsl-base-400) / 0.3);
+		vertical-align: middle;
+	}
+
+	.nm-table th:first-child,
+	.nm-table td:first-child {
+		padding-left: 1.5rem;
+	}
+
+	.nm-table th:not(:first-child),
+	.nm-table td:not(:first-child) {
+		padding-left: 1.5rem;
+	}
+
+	.nm-table th:last-child,
+	.nm-table td:last-child {
+		padding-right: 1.5rem;
+	}
+
+	.nm-table td {
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		white-space: nowrap;
+	}
+
+	.nm-table td p {
+		white-space: normal;
+	}
+
+	.nm-table td.is-collapse,
+	.nm-table th.is-collapse {
+		width: 1%;
+	}
+
+	.nm-table th {
+		font-family: var(--ffml-secondary);
 		font-weight: 600;
-		font-size: 0.875rem;
-		color: hsl(var(--hsl-content) / 0.8);
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
 		white-space: nowrap;
+		color: hsl(var(--hsl-content));
+		background-color: hsl(var(--hsl-base-400) / 0.3);
+		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line) / 0.7));
 	}
 
-	.nm-table tbody td {
-		padding: 0.75rem 1rem;
-		border-top: 1px solid hsl(var(--hsl-line) / 0.5);
+	.nm-table th p {
+		white-space: normal;
 	}
 
-	.nm-table.is-variant-compact thead th,
-	.nm-table.is-variant-compact tbody td {
-		padding: 0.5rem 0.75rem;
+	.nm-table tr:not(:last-child) td {
+		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line) / 0.7));
 	}
 
-	.nm-table .is-collapse {
-		width: 1px;
-		white-space: nowrap;
+	.nm-table.is-variant-compact td {
+		padding-top: 0.625rem;
+		padding-bottom: 0.625rem;
 	}
+
+	.nm-table .is-align-left { text-align: left; }
+	.nm-table .is-align-center { text-align: center; }
+	.nm-table .is-align-right { text-align: right; }
 
 	/* Dropdown + menu */
 	.nm-dropdown {
