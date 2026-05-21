@@ -43,7 +43,7 @@
 	function billingElapsedSeconds () {
 		const now = new Date()
 		const start = new Date(now.getFullYear(), now.getMonth(), 1)
-		return Math.max((now - start) / 1000, 1)
+		return Math.max((now.getTime() - start.getTime()) / 1000, 1)
 	}
 	function formatAvgCount (seconds, unit) {
 		const avg = seconds / billingElapsedSeconds()
