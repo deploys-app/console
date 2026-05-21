@@ -509,16 +509,24 @@
 		margin-top: 0.25rem;
 	}
 
-	/* Input wrapper + native input/select */
+	/* Input wrapper + native input/select. The wrapper carries the border,
+	 * background, and a `min-height` so span-based read-only displays
+	 * (used on disk/detail and domain/detail) line up with real inputs. */
 	.nm-input,
 	.nm-textarea,
 	.nm-select {
 		display: flex;
+		align-items: stretch;
 		width: 100%;
+		min-height: 2.5rem;
 		background-color: hsl(var(--hsl-base-400) / 0.2);
 		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
 		border-radius: 0.375rem;
 		transition: border-color var(--timing-faster) ease, background-color var(--timing-faster) ease;
+	}
+
+	.nm-textarea {
+		min-height: 6rem;
 	}
 
 	:root:not(.dark) .nm-input,
@@ -541,7 +549,7 @@
 		flex: 1;
 		width: 100%;
 		min-width: 0;
-		padding: 0.625rem 0.75rem;
+		padding: 0.5rem 0.75rem;
 		background: transparent;
 		border: 0;
 		outline: 0;
@@ -551,8 +559,33 @@
 	}
 
 	.nm-textarea > textarea {
-		min-height: 6rem;
 		resize: vertical;
+	}
+
+	/* Span-based read-only display inside .nm-input — match the padding
+	 * the real input uses and vertically center the text. */
+	.nm-input > span {
+		flex: 1;
+		min-width: 0;
+		display: inline-flex;
+		align-items: center;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.875rem;
+		color: inherit;
+	}
+
+	/* Readonly/disabled tint applied at the wrapper so it covers the whole
+	 * row (including the padding gap around the native control or span).
+	 * `:has` is well-supported across modern browsers; we additionally
+	 * paint the inner control so it stays consistent with the wrapper. */
+	.nm-input:has(> input[readonly]),
+	.nm-input:has(> input[disabled]),
+	.nm-input:has(> select[disabled]),
+	.nm-input:has(> span),
+	.nm-textarea:has(> textarea[readonly]),
+	.nm-textarea:has(> textarea[disabled]),
+	.nm-select:has(> select[disabled]) {
+		background-color: hsl(var(--hsl-content) / 0.05);
 	}
 
 	.nm-input > input[readonly],
@@ -561,7 +594,6 @@
 	.nm-textarea > textarea[readonly],
 	.nm-textarea > textarea[disabled],
 	.nm-select > select[disabled] {
-		background-color: hsl(var(--hsl-content) / 0.05);
 		cursor: not-allowed;
 	}
 
