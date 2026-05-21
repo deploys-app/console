@@ -30,6 +30,16 @@
 			maximumFractionDigits: 2
 		})
 	}
+	function formatStorage (bytes, unitSuffix) {
+		const gib = bytes / unitGiB
+		if (gib >= 1024) {
+			const tib = gib / 1024
+			const unit = unitSuffix ? `TiB-${unitSuffix}` : 'TiB'
+			return { value: formatCompact(tib), full: formatNumber(tib), unit }
+		}
+		const unit = unitSuffix ? `GiB-${unitSuffix}` : 'GiB'
+		return { value: formatCompact(gib), full: formatNumber(gib), unit }
+	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
@@ -55,33 +65,25 @@
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
-			value: formatCompact(usage.memory / unitGiB),
-			full: formatNumber(usage.memory / unitGiB),
-			unit: 'GiB-s'
+			...formatStorage(usage.memory, 's')
 		},
 		{
 			key: 'disk',
 			icon: 'fa-hard-drive',
 			label: 'Disk',
-			value: formatCompact(usage.disk / unitGiB),
-			full: formatNumber(usage.disk / unitGiB),
-			unit: 'GiB-s'
+			...formatStorage(usage.disk, 's')
 		},
 		{
 			key: 'egress',
 			icon: 'fa-cloud-arrow-up',
 			label: 'Egress',
-			value: formatCompact(usage.egress / unitGiB),
-			full: formatNumber(usage.egress / unitGiB),
-			unit: 'GiB'
+			...formatStorage(usage.egress, '')
 		},
 		{
 			key: 'registryEgress',
 			icon: 'fa-box-archive',
 			label: 'Registry Egress',
-			value: formatCompact(usage.registryEgress / unitGiB),
-			full: formatNumber(usage.registryEgress / unitGiB),
-			unit: 'GiB'
+			...formatStorage(usage.registryEgress, '')
 		},
 		{
 			key: 'replica',
