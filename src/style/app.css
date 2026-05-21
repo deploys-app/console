@@ -945,68 +945,68 @@
 		background-color: hsl(var(--hsl-content) / 0.08);
 		color: hsl(var(--hsl-content));
 	}
-}
 
-/* ---------------------------------------------------------------------------
- * Shared utilities — small helpers used outside of the Tailwind generator
- * (e.g., copy/icon buttons inside <pre>).
- * ------------------------------------------------------------------------- */
-.icon-button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	border: 0;
-	background-color: transparent;
-	color: hsl(var(--hsl-content));
-	border-radius: 9999px;
-	font-size: 12px;
-	cursor: pointer;
-	transition: transform var(--timing-faster) ease;
-}
+	/* Shared helpers — kept inside @layer components so that other component
+	 * rules (e.g. `.nm-input.-has-icon-right > .icon`) can override these
+	 * via specificity. Unlayered styles always beat layered ones in the
+	 * cascade, regardless of specificity, so the order matters. */
+	.icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border: 0;
+		background-color: transparent;
+		color: hsl(var(--hsl-content));
+		border-radius: 9999px;
+		font-size: 12px;
+		cursor: pointer;
+		transition: transform var(--timing-faster) ease;
+	}
 
-.icon-button:hover {
-	transform: scale(1.1);
-}
+	.icon-button:hover {
+		transform: scale(1.1);
+	}
 
-pre > .copy {
-	position: absolute;
-	top: 0;
-	right: 0;
-	background-color: inherit;
-	padding: 6px 10px;
-	font-size: 16px;
-	font-weight: 600;
-	cursor: pointer;
-	user-select: none;
-	border: 0;
-	color: hsl(var(--hsl-content));
-	outline: 0;
-}
+	pre > .copy {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: inherit;
+		padding: 6px 10px;
+		font-size: 16px;
+		font-weight: 600;
+		cursor: pointer;
+		user-select: none;
+		border: 0;
+		color: hsl(var(--hsl-content));
+		outline: 0;
+	}
 
-pre > .copy:hover,
-pre > .copy:hover:active {
-	background-color: hsl(var(--hsl-base-100));
-}
+	pre > .copy:hover,
+	pre > .copy:hover:active {
+		background-color: hsl(var(--hsl-base-100));
+	}
 
-pre.pre-scoll {
-	min-height: 800px;
-	max-height: 800px;
-	overflow-y: auto;
-}
+	pre.pre-scoll {
+		min-height: 800px;
+		max-height: 800px;
+		overflow-y: auto;
+	}
 
-.icon {
-	color: hsl(var(--hsl-content) / 0.5);
-	cursor: pointer;
-	font-size: var(--fs-4);
-	user-select: none;
-}
+	.icon {
+		color: hsl(var(--hsl-content) / 0.5);
+		cursor: pointer;
+		font-size: var(--fs-4);
+		user-select: none;
+	}
 
-.icon.copy {
-	font-size: var(--fs-6);
-}
+	.icon.copy {
+		font-size: var(--fs-6);
+	}
 
-.icon:hover {
-	color: hsl(var(--hsl-content));
+	.icon:hover {
+		color: hsl(var(--hsl-content));
+	}
 }
