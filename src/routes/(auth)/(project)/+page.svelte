@@ -345,7 +345,19 @@
 		line-height: 1.25rem;
 	}
 
-.billing-card-value {
+	@supports (grid-template-rows: subgrid) {
+		.billing-card {
+			display: grid;
+			grid-template-rows: subgrid;
+			grid-row: span 2;
+		}
+
+		.billing-card-head {
+			min-height: 0;
+		}
+	}
+
+	.billing-card-value {
 		display: flex;
 		align-items: baseline;
 		gap: 0.3rem;
