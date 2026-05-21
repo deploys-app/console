@@ -119,8 +119,8 @@
 <br>
 
 <div class="nm-panel is-level-300">
-	<div class="lo-grid-span-horizontal _g-5">
-		<div class="lo-grid-span-horizontal _g-4">
+	<div class="grid grid-flow-col justify-start gap-3">
+		<div class="grid grid-flow-col justify-start gap-2">
 			<div class="nm-select">
 				<select bind:value={filter.range} onchange={fetchReport}>
 					<option value="this_month">This month</option>
@@ -133,10 +133,10 @@
 		</div>
 	</div>
 
-	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-8">
-		<div class="_dp-f _fw-w">
+	<div class="flex flex-wrap justify-between items-center mt-8">
+		<div class="flex flex-wrap">
 			{#each (report?.projectList ?? []) as it (it.sid)}
-				<div class="nm-checkbox _mgbt-4 _mgr-5">
+				<div class="nm-checkbox mb-2 mr-3">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} onchange={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>
@@ -144,12 +144,12 @@
 		</div>
 	</div>
 
-	<div bind:this={chartEl} class="_mgv-5"></div>
+	<div bind:this={chartEl} class="my-3"></div>
 
 	<br>
 
 	<h5><strong>Billings</strong></h5>
-	<div class="nm-table-container _mgt-6">
+	<div class="nm-table-container mt-4">
 		<table class="nm-table">
 			<thead>
 				<tr>

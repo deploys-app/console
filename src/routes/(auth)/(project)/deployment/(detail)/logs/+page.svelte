@@ -35,5 +35,5 @@
 </script>
 
 <h6><strong>Logs</strong></h6>
-<a class="nm-button _jtfs-fst" href={`${deployment.logUrl}&type=text&raw=1`} target="_blank">Stream Raw Logs</a>
+<a class="nm-button justify-self-start" href={`${deployment.logUrl}&type=text&raw=1`} target="_blank">Stream Raw Logs</a>
 <pre class="pre-scoll" id="js-logs">{text}</pre>

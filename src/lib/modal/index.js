@@ -25,9 +25,9 @@ export async function confirm ({ title, html, yes, callback }) {
 		color: 'var(--modal-panel-color)',
 		confirmButtonText: yes || 'Yes',
 		customClass: {
-			confirmButton: 'nm-button is-variant-negative _mgr-6',
+			confirmButton: 'nm-button is-variant-negative mr-4',
 			cancelButton: 'nm-button is-variant-tertiary',
-			actions: '_mgt-7'
+			actions: 'mt-6'
 		}
 	})
 	if (!result.value) {
@@ -75,7 +75,7 @@ export async function error ({ error, callback }) {
 		background: 'var(--modal-panel-background)',
 		color: 'var(--modal-panel-color)',
 		customClass: {
-			actions: '_mgt-7',
+			actions: 'mt-6',
 			confirmButton: 'nm-button is-variant-negative'
 		}
 	})
@@ -99,7 +99,7 @@ export async function success ({ content }) {
 		background: 'var(--modal-panel-background)',
 		color: 'var(--modal-panel-color)',
 		customClass: {
-			actions: '_mgt-7',
+			actions: 'mt-6',
 			confirmButton: 'nm-button is-variant-negative'
 		}
 	})

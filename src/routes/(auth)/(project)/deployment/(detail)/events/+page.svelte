@@ -30,7 +30,7 @@
 
 <h6><strong>Events</strong></h6>
 
-<div class="nm-table-container _mgt-6">
+<div class="nm-table-container mt-4">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>

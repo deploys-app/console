@@ -53,8 +53,8 @@
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<strong>CDN Downgrade</strong>
 		</h3>
@@ -62,7 +62,7 @@
 
 	<hr>
 
-	<div class="content _dp-g _g-6 _w-100pct">
+	<div class="content grid gap-4 w-full">
 		<div class="nm-field">
 			<label for="input-gsa">Domain</label>
 			<div class="nm-input">
@@ -87,7 +87,7 @@
 			<div class="nm-field">
 				<label for="input-ip">A Record</label>
 				{#each [location.endpoint] as ip, i (i)}
-					<div class="nm-input -has-icon-right _mgbt-3">
+					<div class="nm-input -has-icon-right mb-1">
 						<input id="input-ip" value={ip} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={ip}>
@@ -101,7 +101,7 @@
 		<!--	<div class="nm-field">-->
 		<!--		<label for="input-ipv6">AAAA Record</label>-->
 		<!--		{#each domain.dnsConfig.ipv6 as ip}-->
-		<!--			<div class="nm-input -has-icon-right _mgbt-3">-->
+		<!--			<div class="nm-input -has-icon-right mb-1">-->
 		<!--				<input id="input-ipv6" value={ip} readonly disabled>-->
 		<!--				<span class="icon -is-right copy"-->
 		<!--					data-clipboard-text={ip}>-->
@@ -128,8 +128,8 @@
 	</div>
 
 	<hr>
-	<div class="_dp-f _g-6">
-		<div class="_dp-f _alit-ct _fw-w">
+	<div class="flex gap-4">
+		<div class="flex items-center flex-wrap">
 			<button class="nm-button" onclick={downgradeCdn}>Downgrade</button>
 		</div>
 	</div>

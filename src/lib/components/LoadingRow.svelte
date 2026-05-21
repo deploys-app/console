@@ -8,6 +8,6 @@
 	const { span = 1 } = $props()
 </script>
 
-<td colspan={span} class="_tal-ct">
+<td colspan={span} class="text-center">
 	Loading...
 </td>

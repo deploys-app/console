@@ -11,7 +11,7 @@
 
 {#if error}
 	<tr>
-		<td colspan={span} class="_tal-ct">
+		<td colspan={span} class="text-center">
 			{#if error.forbidden}
 				You don't have permission to view data
 			{:else if error.message}

@@ -14,7 +14,7 @@
 	})
 </script>
 
-<style lang="scss">
+<style>
 	.outcome-badge {
 		display: inline-flex;
 		align-items: center;
@@ -23,17 +23,17 @@
 		border-radius: 999px;
 		font-size: 0.8125rem;
 		line-height: 1.25;
-		background: hsl(var(--hsl-content)/0.08);
+		background: hsl(var(--hsl-content) / 0.08);
+	}
 
-		&.is-positive {
-			color: hsl(var(--hsl-positive));
-			background: hsl(var(--hsl-positive)/0.12);
-		}
+	.outcome-badge.is-positive {
+		color: hsl(var(--hsl-positive));
+		background: hsl(var(--hsl-positive) / 0.12);
+	}
 
-		&.is-negative {
-			color: hsl(var(--hsl-negative));
-			background: hsl(var(--hsl-negative)/0.12);
-		}
+	.outcome-badge.is-negative {
+		color: hsl(var(--hsl-negative));
+		background: hsl(var(--hsl-negative) / 0.12);
 	}
 </style>
 

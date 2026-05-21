@@ -66,10 +66,10 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<div class="flex items-center">
+			<h3 class="mr-6 mb-4 xl:mb-0"><strong>
 				{#if id}
 					Update service account "{serviceAccount.sid}"
 				{:else}
@@ -81,7 +81,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={save}>
 		{#if id}
 			<div class="nm-field">
 				<label for="input-email">Email</label>
@@ -112,6 +112,6 @@
 			</div>
 		</div>
 
-		<button class="nm-button _mgr-at" class:is-loading={saving} disabled={saving}>Save</button>
+		<button class="nm-button mr-auto" class:is-loading={saving} disabled={saving}>Save</button>
 	</form>
 </div>

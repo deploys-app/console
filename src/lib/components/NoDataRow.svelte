@@ -11,7 +11,7 @@
 
 {#if !list?.length}
 	<tr>
-		<td colspan={span} class="_tal-ct">
+		<td colspan={span} class="text-center">
 			No data
 		</td>
 	</tr>

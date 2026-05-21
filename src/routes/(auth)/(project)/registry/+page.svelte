@@ -33,9 +33,9 @@
 <div class="nm-panel is-level-300">
 	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
 	{#if storage !== null}
-		<p class="_mgt-4">Total Storage: <strong>{format.storage(storage.size)}</strong></p>
+		<p class="mt-2">Total Storage: <strong>{format.storage(storage.size)}</strong></p>
 	{/if}
-	<div class="nm-table-container _mgt-6">
+	<div class="nm-table-container mt-4">
 		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>

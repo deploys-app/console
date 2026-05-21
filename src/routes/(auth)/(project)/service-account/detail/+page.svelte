@@ -74,16 +74,16 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<h3 class="mr-6 mb-4 xl:mb-0">
 			<strong>{serviceAccount.name}</strong>
 		</h3>
 	</div>
 
 	<hr>
 
-	<div class="content _dp-g _g-6 _w-100pct">
+	<div class="content grid gap-4 w-full">
 		<div class="nm-field">
 			<label for="input-email">Email</label>
 			<div class="nm-input">
@@ -118,7 +118,7 @@
 		<hr>
 
 		<h6><strong>Keys</strong></h6>
-		<div class="_dp-g _g-6 _w-100pct">
+		<div class="grid gap-4 w-full">
 			{#each (serviceAccount.keys ?? []) as key, i (i)}
 				<div class="nm-input -has-icon-right">
 					<input value="{key.secret}" readonly>
@@ -128,9 +128,9 @@
 				</div>
 			{/each}
 
-			<div class="_dp-g _g-6 _w-100pct">
-				<button class="nm-button _mgh-at" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
-					<i class="fa-solid fa-plus _mgr-5"></i>
+			<div class="grid gap-4 w-full">
+				<button class="nm-button mx-auto" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
+					<i class="fa-solid fa-plus mr-3"></i>
 					Create key
 				</button>
 			</div>
@@ -138,7 +138,7 @@
 
 		<hr>
 
-		<div class="_dp-f">
+		<div class="flex">
 			<button class="nm-button" type="button" onclick={deleteItem}>
 				Delete
 			</button>

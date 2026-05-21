@@ -28,8 +28,8 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<StatusIcon status={disk.status} />
 			<strong>Disk: {disk.name}</strong>
@@ -38,7 +38,7 @@
 
 	<hr>
 
-	<div class="nm-tabs is-variant-underline _mgbt-0:lg _w-100pct _fdrt-cl _fdrt-r:md">
+	<div class="nm-tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
 		<a class="tab-button"
 			class:is-active={$page.url.pathname === '/disk/metrics'}
 			href={`/disk/metrics?project=${project}&location=${disk.location}&name=${disk.name}`}>

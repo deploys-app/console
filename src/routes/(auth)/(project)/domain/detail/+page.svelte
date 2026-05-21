@@ -90,9 +90,9 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Purge',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				confirmButton: 'nm-button is-variant-negative mr-4',
 				cancelButton: 'nm-button is-variant-tertiary',
-				actions: '_mgt-7'
+				actions: 'mt-6'
 			}
 		})
 		if (!result.isConfirmed || !result.value) {
@@ -132,9 +132,9 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Purge',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				confirmButton: 'nm-button is-variant-negative mr-4',
 				cancelButton: 'nm-button is-variant-tertiary',
-				actions: '_mgt-7'
+				actions: 'mt-6'
 			}
 		})
 		if (!result.isConfirmed || !result.value) {
@@ -209,8 +209,8 @@
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<strong>Domain: {domain.domain}</strong>
 		</h3>
@@ -218,7 +218,7 @@
 
 	<hr>
 
-	<div class="content _dp-g _g-6 _w-100pct">
+	<div class="content grid gap-4 w-full">
 		<div class="nm-field">
 			<label for="input-gsa">Domain</label>
 			<div class="nm-input">
@@ -231,7 +231,7 @@
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
-		<div class="nm-field _mgt-5">
+		<div class="nm-field mt-3">
 			<div class="nm-checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
 				<label for="input-cdn">CDN</label>
@@ -259,7 +259,7 @@
 		{#if domain.status === 'pending'}
 			<hr>
 			<p><strong>Domain Verification</strong></p>
-			<div class="_fs-8">
+			<div class="text-2xl">
 				<i class="fa-solid fa-spinner-third fa-spin"></i>
 			</div>
 		{/if}
@@ -269,12 +269,12 @@
 			<p><strong>Domain Verification</strong></p>
 			{#if (domain.verification.ownership.errors ?? []).length > 0}
 				{#each domain.verification.ownership.errors as e, i (i)}
-					<p class="_cl-negative _cl-opacity-80">{e}</p>
+					<p class="text-negative text-content/80">{e}</p>
 				{/each}
 			{/if}
 			<div class="nm-field">
 				<label for="input-owner_name">TXT Name</label>
-				<div class="nm-input -has-icon-right _mgbt-3">
+				<div class="nm-input -has-icon-right mb-1">
 					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
 					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
@@ -284,7 +284,7 @@
 			</div>
 			<div class="nm-field">
 				<label for="input-owner_value">TXT Value</label>
-				<div class="nm-input -has-icon-right _mgbt-3">
+				<div class="nm-input -has-icon-right mb-1">
 					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
 					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
@@ -301,7 +301,7 @@
 			{#if domain.verification.ssl.dcv.name}
 				<div class="nm-field">
 					<label for="input-ssl_dcv_name">CNAME Name</label>
-					<div class="nm-input -has-icon-right _mgbt-3">
+					<div class="nm-input -has-icon-right mb-1">
 						<input id="input-ssl_dcv_name" value={domain.verification.ssl.dcv.name} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.name}>
@@ -311,7 +311,7 @@
 				</div>
 				<div class="nm-field">
 					<label for="input-ssl_dcv_value">CNAME Value</label>
-					<div class="nm-input -has-icon-right _mgbt-3">
+					<div class="nm-input -has-icon-right mb-1">
 						<input id="input-ssl_dcv_value" value={domain.verification.ssl.dcv.value} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.value}>
@@ -323,7 +323,7 @@
 				{#each domain.verification.ssl.records as it, index (index)}
 					<div class="nm-field">
 						<label for={`input-ssl_name_${index}`}>TXT Name</label>
-						<div class="nm-input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right mb-1">
 							<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={it.txtName}>
@@ -333,7 +333,7 @@
 					</div>
 					<div class="nm-field">
 						<label for={`input-ssl_value_${index}`}>TXT Value</label>
-						<div class="nm-input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right mb-1">
 							<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={it.txtValue}>
@@ -351,7 +351,7 @@
 				<div class="nm-field">
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip, i (i)}
-						<div class="nm-input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right mb-1">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -365,7 +365,7 @@
 				<div class="nm-field">
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip, i (i)}
-						<div class="nm-input -has-icon-right _mgbt-3">
+						<div class="nm-input -has-icon-right mb-1">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -394,34 +394,34 @@
 		{#if domain.cdn && domain.status === 'success'}
 			<hr>
 			<div>
-				<div class="_mgbt-5">
+				<div class="mb-3">
 					<strong>Purge Cache</strong>
 				</div>
-				<div class="_bgcl-base-100 _pd-7 _bdw-1 _bdcl-negative _bdcl-opacity-70 _bdrd-4">
-					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
-						<div class="_f-1 lo-12 _g-3">
+				<div class="bg-base-100 p-6 border border-negative border-current/70 rounded-md">
+					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge everything</strong></div>
-							<p class="_fs-2 _opct-80">Remove all cached resources</p>
+							<p class="text-sm opacity-80">Remove all cached resources</p>
 						</div>
 						<button class="nm-button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
-					<hr class="_mgv-7">
-					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
-						<div class="_f-1 lo-12 _g-3">
+					<hr class="my-6">
+					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge prefix</strong></div>
-							<p class="_fs-2 _opct-80">Remove cached resources at prefix path</p>
+							<p class="text-sm opacity-80">Remove cached resources at prefix path</p>
 						</div>
 						<button class="nm-button" class:is-loading={purging} onclick={purgeCachePrefix}>
 							Purge prefix
 						</button>
 					</div>
-					<hr class="_mgv-7">
-					<div class="_dp-f _fdrt-r:md _fdrt-cl _g-7 _alit-ct:md">
-						<div class="_f-1 lo-12 _g-3">
+					<hr class="my-6">
+					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge file</strong></div>
-							<p class="_fs-2 _opct-80">Remove cached resources at exact path</p>
+							<p class="text-sm opacity-80">Remove cached resources at exact path</p>
 						</div>
 						<button class="nm-button" class:is-loading={purging} onclick={purgeCacheFile}>
 							Purge file
@@ -434,17 +434,17 @@
 
 	<hr>
 	{#if domain.cdn}
-		<div class="_dp-f _alit-ct _fw-w">
+		<div class="flex items-center flex-wrap">
 			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
 		</div>
 	{:else}
-		<div class="_dp-f _alit-ct _fw-w">
+		<div class="flex items-center flex-wrap">
 			<button class="nm-button" onclick={upgradeCdn} disabled>Add CDN</button>
 		</div>
 	{/if}
 
 	<hr>
-	<div class="_dp-f _g-6">
+	<div class="flex gap-4">
 		<button class="nm-button" type="button" onclick={deleteItem}>
 			Delete
 		</button>

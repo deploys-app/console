@@ -101,13 +101,15 @@
 
 </script>
 
-<style lang="scss">
+<style>
 	.filter-row {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		gap: 1rem;
+	}
 
-		@media (max-width: 768px) {
+	@media (max-width: 768px) {
+		.filter-row {
 			grid-template-columns: 1fr;
 		}
 	}
@@ -130,7 +132,7 @@
 		width: 100%;
 		min-height: var(--form-element-height, 2.25rem);
 		padding: 0 0.625rem;
-		border: 1px solid hsl(var(--hsl-content)/0.15);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: var(--form-element-border-radius, 0.25rem);
 		background: transparent;
 		color: hsl(var(--hsl-content));
@@ -138,70 +140,70 @@
 		text-align: left;
 		cursor: pointer;
 		transition: border-color 0.16s ease-in-out, box-shadow 0.16s ease-in-out;
+	}
 
-		&:hover {
-			border-color: hsl(var(--hsl-content)/0.25);
-		}
+	.date-range-trigger:hover {
+		border-color: hsl(var(--hsl-content) / 0.25);
+	}
 
-		&:focus-visible {
-			outline: none;
-			border-color: hsl(var(--hsl-primary));
-			box-shadow: 0 0 0 0.175rem hsl(var(--hsl-primary)/0.3);
-		}
+	.date-range-trigger:focus-visible {
+		outline: none;
+		border-color: hsl(var(--hsl-primary));
+		box-shadow: 0 0 0 0.175rem hsl(var(--hsl-primary) / 0.3);
+	}
 
-		.placeholder {
-			color: hsl(var(--hsl-content)/0.5);
-		}
+	.date-range-trigger .placeholder {
+		color: hsl(var(--hsl-content) / 0.5);
+	}
 
-		.value {
-			flex: 1;
-		}
+	.date-range-trigger .value {
+		flex: 1;
+	}
 
-		.icon-clear {
-			display: inline-flex;
-			padding: 0.2rem;
-			border-radius: 4px;
-			color: hsl(var(--hsl-content)/0.6);
-			background: transparent;
-			border: 0;
-			cursor: pointer;
+	.date-range-trigger .icon-clear {
+		display: inline-flex;
+		padding: 0.2rem;
+		border-radius: 4px;
+		color: hsl(var(--hsl-content) / 0.6);
+		background: transparent;
+		border: 0;
+		cursor: pointer;
+	}
 
-			&:hover {
-				color: hsl(var(--hsl-content));
-				background: hsl(var(--hsl-content)/0.08);
-			}
-		}
+	.date-range-trigger .icon-clear:hover {
+		color: hsl(var(--hsl-content));
+		background: hsl(var(--hsl-content) / 0.08);
+	}
 
-		.icon-cal {
-			color: hsl(var(--hsl-content)/0.5);
-		}
+	.date-range-trigger .icon-cal {
+		color: hsl(var(--hsl-content) / 0.5);
 	}
 
 	:global(.datepicker[data-picker-theme='audit-log-dp']) {
 		--range-tint: hsl(var(--hsl-primary) / 0.22);
 
 		--datepicker-container-background: hsl(var(--hsl-base-200));
-		--datepicker-container-border: 1px solid hsl(var(--hsl-content)/0.2);
+		--datepicker-container-border: 1px solid hsl(var(--hsl-content) / 0.2);
 		--datepicker-color: hsl(var(--hsl-content));
-		--datepicker-border-color: hsl(var(--hsl-content)/0.15);
+		--datepicker-border-color: hsl(var(--hsl-content) / 0.15);
 		--datepicker-state-active: hsl(var(--hsl-primary));
-		--datepicker-state-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-state-hover: hsl(var(--hsl-content) / 0.1);
 
 		--datepicker-calendar-header-color: hsl(var(--hsl-content));
 		--datepicker-calendar-header-text-color: hsl(var(--hsl-content));
 		--datepicker-calendar-header-month-nav-color: hsl(var(--hsl-content));
-		--datepicker-calendar-header-month-nav-background-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-calendar-header-month-nav-background-hover: hsl(var(--hsl-content) / 0.1);
 		--datepicker-calendar-header-month-nav-icon-next-filter: invert(1);
 		--datepicker-calendar-header-month-nav-icon-prev-filter: invert(1);
 		--datepicker-calendar-header-year-nav-icon-next-filter: invert(1);
 		--datepicker-calendar-header-year-nav-icon-prev-filter: invert(1);
 
-		--datepicker-calendar-dow-color: hsl(var(--hsl-content)/0.65);
+		--datepicker-calendar-dow-color: hsl(var(--hsl-content) / 0.65);
 		--datepicker-calendar-day-color: hsl(var(--hsl-content));
 		--datepicker-calendar-day-color-hover: hsl(var(--hsl-content));
-		--datepicker-calendar-day-background-hover: hsl(var(--hsl-content)/0.1);
-		--datepicker-calendar-day-color-disabled: hsl(var(--hsl-content)/0.35);
-		--datepicker-calendar-day-other-color: hsl(var(--hsl-content)/0.35);
+		--datepicker-calendar-day-background-hover: hsl(var(--hsl-content) / 0.1);
+		--datepicker-calendar-day-color-disabled: hsl(var(--hsl-content) / 0.35);
+		--datepicker-calendar-day-other-color: hsl(var(--hsl-content) / 0.35);
 
 		--datepicker-calendar-today-border: 1px solid hsl(var(--hsl-primary));
 		--datepicker-calendar-today-background: transparent;
@@ -224,36 +226,36 @@
 		--datepicker-calendar-range-start-end-background: var(--range-tint);
 		--datepicker-calendar-range-start-end-color: hsl(var(--hsl-content));
 
-		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content)/0.12);
+		--datepicker-calendar-split-border: 1px solid hsl(var(--hsl-content) / 0.12);
 
-		--datepicker-presets-border: 1px solid hsl(var(--hsl-content)/0.12);
+		--datepicker-presets-border: 1px solid hsl(var(--hsl-content) / 0.12);
 		--datepicker-presets-button-color: hsl(var(--hsl-content));
 		--datepicker-presets-button-color-hover: hsl(var(--hsl-content));
 		--datepicker-presets-button-color-focus: hsl(var(--hsl-content));
 		--datepicker-presets-button-color-active: hsl(var(--hsl-primary-content));
 		--datepicker-presets-button-background: transparent;
-		--datepicker-presets-button-background-hover: hsl(var(--hsl-content)/0.1);
+		--datepicker-presets-button-background-hover: hsl(var(--hsl-content) / 0.1);
 		--datepicker-presets-button-background-active: hsl(var(--hsl-primary));
 	}
 
 	.action-cell {
 		font-family: var(--font-family-mono, ui-monospace, monospace);
 		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content)/0.85);
+		color: hsl(var(--hsl-content) / 0.85);
 	}
 
 	.resource-name {
-		color: hsl(var(--hsl-content)/0.65);
+		color: hsl(var(--hsl-content) / 0.65);
 	}
 
 	.resource-location {
-		color: hsl(var(--hsl-content)/0.55);
+		color: hsl(var(--hsl-content) / 0.55);
 		font-size: 0.8125rem;
 		margin-left: 0.25rem;
 	}
 
 	.detail-text {
-		color: hsl(var(--hsl-content)/0.75);
+		color: hsl(var(--hsl-content) / 0.75);
 	}
 
 	.actor-tag {
@@ -262,8 +264,8 @@
 		padding: 0.05rem 0.4rem;
 		border-radius: 4px;
 		font-size: 0.7rem;
-		background: hsl(var(--hsl-content)/0.08);
-		color: hsl(var(--hsl-content)/0.7);
+		background: hsl(var(--hsl-content) / 0.08);
+		color: hsl(var(--hsl-content) / 0.7);
 		vertical-align: middle;
 	}
 </style>
@@ -341,7 +343,7 @@
 		</div>
 	</form>
 
-	<div class="nm-table-container _mgt-6">
+	<div class="nm-table-container mt-4">
 		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>

@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="_dp-g _g-6 _w-100pct">
+<div class="grid gap-4 w-full">
 	<div class="nm-field">
 		<label for="input-name">Name</label>
 		<div class="nm-input">
@@ -62,7 +62,7 @@
 
 <hr>
 
-<div class="_dp-f _g-6">
+<div class="flex gap-4">
 	<a class="nm-button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 
 	<button class="nm-button" type="button" onclick={deleteItem}>

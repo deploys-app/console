@@ -10,13 +10,13 @@
 
 	const iconClassByStatus = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
-		success: 'fa-solid fa-check-circle _cl-positive _cl-opacity-80',
-		error: 'fa-solid fa-times _cl-negative _cl-opacity-80',
-		cancelled: 'fa-solid fa-ban _cl-negative _cl-opacity-80',
-		verify: 'fa-solid fa-exclamation-triangle _cl-warning'
+		success: 'fa-solid fa-check-circle text-positive/80',
+		error: 'fa-solid fa-times text-negative/80',
+		cancelled: 'fa-solid fa-ban text-negative/80',
+		verify: 'fa-solid fa-exclamation-triangle text-warning'
 	}
 
-	const iconClass = $derived(iconClassByStatus[status] || 'fa-solid fa-minus _cl-light')
+	const iconClass = $derived(iconClassByStatus[status] || 'fa-solid fa-minus text-white')
 </script>
 
-<i class={`${iconClass} _mgh-5`}></i>
+<i class={`${iconClass} mx-3`}></i>

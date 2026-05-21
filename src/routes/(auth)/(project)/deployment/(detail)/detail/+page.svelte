@@ -52,7 +52,7 @@
 					<tr>
 						<td>URL</td>
 						<td>
-							<a class="nm-link _tdcrt-udl" href={`https://${deployment.url}`} target="_blank">
+							<a class="nm-link underline" href={`https://${deployment.url}`} target="_blank">
 								{`https://${deployment.url}`}
 							</a>
 							<span class="icon copy" data-clipboard-text={`https://${deployment.url}`}>
@@ -195,7 +195,7 @@
 				<tr>
 					<td>Sidecars</td>
 					<td>
-						<ul class="_mg-0 _pdl-6">
+						<ul class="m-0 pl-4">
 							{#each deployment.sidecars as s, i (i)}
 								{#if s.cloudSqlProxy}
 									<li>
@@ -203,7 +203,7 @@
 										&nbsp;—&nbsp;
 										<span>{s.cloudSqlProxy.instance}</span>
 										{#if s.cloudSqlProxy.port}
-											<span class="_cl-light">:{s.cloudSqlProxy.port}</span>
+											<span class="text-white">:{s.cloudSqlProxy.port}</span>
 										{/if}
 									</li>
 								{/if}
@@ -216,7 +216,7 @@
 				<tr>
 					<td>Auto-delete</td>
 					<td>
-						<i class="fa-regular fa-clock _mgr-5 _cl-negative"></i>
+						<i class="fa-regular fa-clock mr-3 text-negative"></i>
 						Expired — pending deletion
 					</td>
 				</tr>
@@ -224,9 +224,9 @@
 				<tr>
 					<td>Auto-delete</td>
 					<td>
-						<i class="fa-regular fa-clock _mgr-5 _cl-warning"></i>
+						<i class="fa-regular fa-clock mr-3 text-warning"></i>
 						{format.ttlExpireAt(deployment.ttl)}
-						<span class="_cl-light _mgl-3">(in {format.duration(deployment.ttl)})</span>
+						<span class="text-white ml-1">(in {format.duration(deployment.ttl)})</span>
 					</td>
 				</tr>
 			{/if}
@@ -246,8 +246,8 @@
 	</table>
 </div>
 
-<div class="_dp-f _fw-w _alit-ct _mgv-8">
-	<div class="_mgl-at:lg _mgbt-5 _mgbt-0:lg">
+<div class="flex flex-wrap items-center my-8">
+	<div class="xl:ml-auto mb-3 xl:mb-0">
 		<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
 	</div>
 </div>
@@ -313,7 +313,7 @@
 		{#each Object.entries(deployment.mountData || {}) as [k, v] (k)}
 			<tr>
 				<td>{k}</td>
-				<td class="_wsp-p">{v}</td>
+				<td class="whitespace-pre">{v}</td>
 			</tr>
 		{:else}
 			<NoDataRow span={2} />

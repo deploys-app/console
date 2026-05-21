@@ -105,8 +105,8 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-6">
-	<div class="lo-12 _g-5">
+<div class="nm-panel is-level-300 grid gap-4">
+	<div class="grid grid-cols-1 gap-3">
 		<h3><strong>
 			{#if role}
 				Update role "{form.role}"
@@ -118,7 +118,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-role">Role ID</label>
 			<div class="nm-input">
@@ -137,10 +137,10 @@
 		<hr>
 		<br>
 
-		<div class="_dp-g _g-6">
+		<div class="grid gap-4">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="nm-field _dp-f _mgbt-5">
+			<div class="nm-field flex mb-3">
 				<div class="nm-select">
 					<select onchange={selectPermissionChanged}>
 						<option value="" disabled selected>Select Permission</option>
@@ -180,7 +180,7 @@
 
 		<hr>
 
-		<div class="_dp-f _g-6">
+		<div class="flex gap-4">
 			<button class="nm-button" class:is-loading={saving}>
 				{#if role}Update{:else}Create{/if}
 			</button>

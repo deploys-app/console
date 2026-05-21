@@ -68,14 +68,14 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Account information</strong></h3>
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<div class="flex items-center">
+			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Account information</strong></h3>
 		</div>
 	</div>
 	<hr>
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-name">Account name</label>
 			<div class="nm-input">
@@ -83,7 +83,7 @@
 			</div>
 		</div>
 
-		<h4 class="_mgbt-5">Billing Information</h4>
+		<h4 class="mb-3">Billing Information</h4>
 
 		<div class="nm-field">
 			<label for="input-tax_id">Tax ID</label>
@@ -108,6 +108,6 @@
 
 		<hr>
 
-		<button class="nm-button _mgr-at" class:is-loading={saving}>Save</button>
+		<button class="nm-button mr-auto" class:is-loading={saving}>Save</button>
 	</form>
 </div>

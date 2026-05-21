@@ -102,106 +102,96 @@
 	]
 </script>
 
-<style lang="scss">
+<style>
 	.sidebar {
 		width: var(--width-sidebar, 300px);
 		min-height: 100vh;
-
 		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
 	}
 
-	.sidebar-menus {
-		.menu-item {
-			display: grid;
-			grid-auto-flow: column;
-			grid-gap: .75rem;
+	.sidebar-menus .menu-item {
+		display: grid;
+		grid-auto-flow: column;
+		grid-gap: .75rem;
+		justify-content: start;
+		align-items: center;
+		padding: .75rem 1rem;
+		font-size: var(--fs-2);
+		color: hsl(var(--hsl-content) / 0.75);
+		cursor: pointer;
+	}
 
-			justify-content: start;
-			align-items: center;
+	.sidebar-menus .menu-item:hover {
+		background: hsl(var(--hsl-base-200));
+	}
 
-			padding: .75rem 1rem;
+	.sidebar-menus .menu-item.is-active {
+		color: hsl(var(--hsl-content));
+		background: hsl(var(--hsl-base-200));
+	}
 
-			font-size: var(--fs-2);
-			color: hsl(var(--hsl-content)/0.75);
-
-			cursor: pointer;
-
-			&:hover {
-				background: hsl(var(--hsl-base-200));
-			}
-
-			&.is-active {
-				color: hsl(var(--hsl-content));
-				background: hsl(var(--hsl-base-200));
-			}
-		}
-
-		.menu-icon {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-
-			width: 1.5rem;
-			height: 1.5rem;
-		}
+	.sidebar-menus .menu-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
 	}
 
 	.site-logo {
 		margin: 0 auto;
 		width: 100px;
+	}
 
-		img {
-			width: 100%;
-			max-width: 100%;
-			height: auto;
-		}
+	.site-logo img {
+		width: 100%;
+		max-width: 100%;
+		height: auto;
 	}
 
 	.project-box {
 		display: flex;
 		padding: 10px 12px;
-		background-color: hsl(var(--hsl-base-400)/0.2);
+		background-color: hsl(var(--hsl-base-400) / 0.2);
 		font-size: 0.9375rem;
 		border-radius: 4px;
-		border: 1px solid hsl(var(--hsl-base-400)/0.3);
+		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
 		color: hsl(var(--hsl-content));
 		outline: none;
 		transition: all var(--timing-normal) ease;
 		box-shadow: var(--raised-z6);
-
-		&:hover {
-			border: 1px solid hsl(var(--hsl-base-400)/0.7);
-		}
-
-		span {
-			width: 150px;
-			flex: 1;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			overflow-x: hidden;
-		}
 	}
 
-	.social > a {
-		&:hover {
-			background-color: hsl(var(--hsl-base-200));
-		}
+	.project-box:hover {
+		border: 1px solid hsl(var(--hsl-base-400) / 0.7);
+	}
+
+	.project-box span {
+		width: 150px;
+		flex: 1;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow-x: hidden;
+	}
+
+	.social > a:hover {
+		background-color: hsl(var(--hsl-base-200));
 	}
 </style>
 
-<nav class="sidebar _pdt-6 _pst-asl _zid-1 _dp-f _fdrt-cl _h-100vh _ovfy-at">
+<nav class="sidebar pt-4 absolute z-[1] flex flex-col h-screen overflow-y-auto">
 	<div class="site-logo">
 		<img src="/images/logo.webp" alt="Deploys.app" draggable="false">
 	</div>
 
-	<div class="_f-1">
-		<div class="lo-12 _g-5 _pdh-5 _mgt-8">
-			<small class="_dp-f _jtfct-spbtw">
+	<div class="flex-1">
+		<div class="grid grid-cols-1 gap-3 px-3 mt-8">
+			<small class="flex justify-between">
 				<strong>CURRENT PROJECT</strong>
 			</small>
 
-			<div class="project-box _cs-pt" role="button" tabindex="0"
+			<div class="project-box cursor-pointer" role="button" tabindex="0"
 				onclick={openProjectModal} onkeypress={openProjectModal}>
 				<span>
 					{#if project}
@@ -210,10 +200,10 @@
 						&#45;&#45;PROJECT&#45;&#45;
 					{/if}
 				</span>
-				<i class="fa-solid fa-caret-down _mgl-3"></i>
+				<i class="fa-solid fa-caret-down ml-1"></i>
 			</div>
 
-			<div class="_dp-f _jtfct-fe">
+			<div class="flex justify-end">
 				<a href="/project">
 					<small class="nm-link">View all projects</small>
 				</a>
@@ -221,7 +211,7 @@
 		</div>
 		<br>
 
-		<div class="_dp-n">
+		<div class="hidden">
 			<!-- Preload codes -->
 			{#each projectMenuList as menu (menu.id)}
 				<a href="{menu.link}?project={project}" title={menu.title}>{menu.title}</a>
@@ -248,19 +238,19 @@
 		</div>
 	</div>
 
-	<div class="_mgt-6 _pdbt-5">
-		<div class="_pdh-5 _mgbt-5">
+	<div class="mt-4 pb-3">
+		<div class="px-3 mb-3">
 			<hr>
 		</div>
-		<div class="_dp-f _jtfct-spbtw _alit-ct _fdrt-cl">
-			<div class="social _dp-f _jtfct-fe _alit-ct _g-4 _w-100pct _pdh-6">
-				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Go to GitHub">
+		<div class="flex justify-between items-center flex-col">
+			<div class="social flex justify-end items-center gap-2 w-full px-4">
+				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="flex justify-center items-center rounded w-8 h-8" aria-label="Go to GitHub">
 					<i class="fa-brands fa-github"></i>
 				</a>
-				<a href="https://discord.gg/5ZttPJsypS" target="_blank" rel="external" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Go to Discord">
+				<a href="https://discord.gg/5ZttPJsypS" target="_blank" rel="external" class="flex justify-center items-center rounded w-8 h-8" aria-label="Go to Discord">
 					<i class="fa-brands fa-discord"></i>
 				</a>
-				<a href="mailto:contact@moonrhythm.io" target="_blank" class="_dp-f _jtfct-ct _alit-ct _bdrd-3 _w-8 _h-8" aria-label="Email">
+				<a href="mailto:contact@moonrhythm.io" target="_blank" class="flex justify-center items-center rounded w-8 h-8" aria-label="Email">
 					<i class="fa-solid fa-envelope"></i>
 				</a>
 			</div>

@@ -34,15 +34,15 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-6">
-	<div class="lo-12 _g-5">
-		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>"{billingAccount.name}" account information</strong></h3>
+<div class="nm-panel is-level-300 grid gap-4">
+	<div class="grid grid-cols-1 gap-3">
+		<h3 class="mr-6 mb-4 xl:mb-0"><strong>"{billingAccount.name}" account information</strong></h3>
 	</div>
 
 	<hr>
 
-	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="nm-table-container _mgt-6">
+	<div class="content grid gap-4 w-full">
+		<div class="nm-table-container mt-4">
 			<table class="nm-table" style="--table-data-border-color: none">
 				<tbody>
 				<tr>
@@ -65,7 +65,7 @@
 			</table>
 		</div>
 
-		<div class="_dp-f _g-6">
+		<div class="flex gap-4">
 			<a class="nm-button" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
 			<a class="nm-button" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
 			<button class="nm-button" type="button" onclick={deleteItem}>Delete account</button>

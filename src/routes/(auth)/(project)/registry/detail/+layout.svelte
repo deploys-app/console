@@ -20,18 +20,18 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<h3 class="mr-6 mb-4 xl:mb-0">
 			<strong>{repository.name}</strong>
-			<div class="_fs-4 _mgt-3 _wb-ba">registry.deploys.app/{project}/{repository.name}</div>
-			<div class="_fs-4 _mgt-3 _wb-ba">{format.storage(repository.size)}</div>
+			<div class="text-base mt-1 break-all">registry.deploys.app/{project}/{repository.name}</div>
+			<div class="text-base mt-1 break-all">{format.storage(repository.size)}</div>
 		</h3>
 	</div>
 
 	<hr>
 
-	<div class="nm-tabs is-variant-underline _mgbt-0:lg _w-100pct _fdrt-cl _fdrt-r:md">
+	<div class="nm-tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
 		<a class="tab-button"
 			class:is-active={$page.url.pathname === '/registry/detail/tags'}
 			href={`/registry/detail/tags?project=${project}&repository=${id}`}>

@@ -24,9 +24,9 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Delete',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative _mgr-6',
+				confirmButton: 'nm-button is-variant-negative mr-4',
 				cancelButton: 'nm-button is-variant-tertiary',
-				actions: '_mgt-7'
+				actions: 'mt-6'
 			},
 			preConfirm: (input) => input === project
 		})
@@ -46,15 +46,15 @@
 <h6>Projects</h6>
 <br>
 <div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
 			<a class="nm-button -small" href="/project/create">
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
+	<div class="nm-table-container mt-4">
 		<table class="nm-table is-variant-compact">
 			<thead>
 				<tr>

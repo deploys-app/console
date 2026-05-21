@@ -49,12 +49,12 @@
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _jtfit-st _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 justify-items-start gap-3">
 		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
 	</div>
 	<hr>
-	<div class="content _dp-g _g-6 _w-100pct">
+	<div class="content grid gap-4 w-full">
 		<div class="nm-field">
 			<label for="input-gsa">GSA</label>
 			<div class="nm-input">
@@ -94,7 +94,7 @@
 
 		<hr>
 
-		<div class="_dp-f _g-6">
+		<div class="flex gap-4">
 			<button class="nm-button" onclick={deleteItem}>Delete</button>
 		</div>
 	</div>

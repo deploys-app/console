@@ -353,8 +353,8 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _jtfit-st _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 justify-items-start gap-3">
 		{#if deployment}
 			<h5><strong>Deploy New Revision</strong></h5>
 		{:else}
@@ -363,7 +363,7 @@
 	</div>
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={save}>
 		{#if deployment}
 			<div class="nm-field">
 				<label for="input-location-readonly">Location</label>
@@ -443,7 +443,7 @@
 				<div class="nm-input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
-				<p class="_fs-1">* You don't have permission to list pull secrets</p>
+				<p class="text-xs">* You don't have permission to list pull secrets</p>
 			</div>
 		{/if}
 
@@ -468,7 +468,7 @@
 					<div class="nm-input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
-					<p class="_fs-1">* You don't have permission to list workload identities</p>
+					<p class="text-xs">* You don't have permission to list workload identities</p>
 				</div>
 			{/if}
 		{/if}
@@ -503,9 +503,9 @@
 
 		<div class="nm-field">
 			<label for="div-command">Command</label>
-			<div id="div-command" class="_pdbt-4">
+			<div id="div-command" class="pb-2">
 				{#each form.command as _, i (i)}
-					<div class="nm-input -has-icon-right _mgbt-4">
+					<div class="nm-input -has-icon-right mb-2">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right" type="button" aria-label="Remove"
 							onclick={() => { form.command = form.command.filter((_, k) => k !== i) }}>
@@ -514,17 +514,17 @@
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button" onclick={() => { form.command = [...form.command, ''] }}>
-				<i class="fa-solid fa-plus _mgr-5"></i>
+			<button class="nm-button m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
+				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
 
 		<div class="nm-field">
 			<label for="div-args">Args</label>
-			<div id="div-args" class="_pdbt-4">
+			<div id="div-args" class="pb-2">
 				{#each form.args as _, i (i)}
-					<div class="nm-input -has-icon-right _mgbt-4">
+					<div class="nm-input -has-icon-right mb-2">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right" type="button" aria-label="Remove an argument"
 							onclick={() => { form.args = form.args.filter((_, k) => k !== i) }}>
@@ -533,9 +533,9 @@
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button _mg-at" type="button"
+			<button class="nm-button m-auto" type="button"
 					onclick={() => { form.args = [...form.args, ''] }}>
-				<i class="fa-solid fa-plus _mgr-5"></i>
+				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Arg</span>
 			</button>
 		</div>
@@ -550,7 +550,7 @@
 		{/if}
 
 		{#if selectedLocation.features.disk}
-			<div class="_dp-g _g-6">
+			<div class="grid gap-4">
 				<br>
 				<hr>
 				<br>
@@ -577,7 +577,7 @@
 						<div class="nm-input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
-						<p class="_fs-1">* You don't have permission to list disks</p>
+						<p class="text-xs">* You don't have permission to list disks</p>
 					</div>
 				{/if}
 
@@ -603,7 +603,7 @@
 		<br>
 
 		<h6><strong>Auto-delete (TTL)</strong></h6>
-		<div class="lo-6 _g-6">
+		<div class="grid grid-cols-2 gap-4">
 			<div class="nm-field">
 				<label for="input-ttl_unit">Unit</label>
 				<div class="nm-select">
@@ -631,13 +631,13 @@
 
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
-				<div class="_dp-g _g-6">
+				<div class="grid gap-4">
 					<br>
 					<hr>
 					<br>
 
 					<h6><strong>Autoscaling</strong></h6>
-					<div class="lo-6 _g-6">
+					<div class="grid grid-cols-2 gap-4">
 						<div class="nm-field">
 							<label for="input-min_replicas">Min Replicas</label>
 							<div class="nm-input">
@@ -721,7 +721,7 @@
 			Variables defined here take precedence over those defined in env groups.
 		</small>
 		{#if permission.envGroups}
-			<div class="nm-field _dp-f">
+			<div class="nm-field flex">
 				<div class="nm-select">
 					{#key envGroups}
 						<select onchange={selectEnvGroupChanged}>
@@ -734,13 +734,13 @@
 				</div>
 			</div>
 		{:else}
-			<div class="nm-field _dp-f _g-5">
-				<div class="nm-input _f-1">
+			<div class="nm-field flex gap-3">
+				<div class="nm-input flex-1">
 					<input placeholder="Env Group Name" bind:value={envGroupInput}>
 				</div>
 				<button class="nm-button" type="button" onclick={addEnvGroupFromInput}>Add</button>
 			</div>
-			<p class="_fs-1">* You don't have permission to list env groups</p>
+			<p class="text-xs">* You don't have permission to list env groups</p>
 		{/if}
 		<div class="nm-table-container">
 			<table class="nm-table is-variant-compact">
@@ -763,7 +763,7 @@
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="2" class="_tta-c _co-co-50">No env groups</td>
+							<td colspan="2" class="capitalize text-content/50">No env groups</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -779,7 +779,7 @@
 					<thead>
 						<tr>
 							<th>Key</th>
-							<th class="is-collapse _pd-0"></th>
+							<th class="is-collapse p-0"></th>
 							<th>Value</th>
 							<th class="is-collapse is-align-right"></th>
 						</tr>
@@ -792,8 +792,8 @@
 										<input bind:value={it.k} placeholder="Variable name" onchange={parseEnvValue}>
 									</div>
 								</td>
-								<td class="_pd-0 _pdl-5">:</td>
-								<td class="_pdl-5">
+								<td class="p-0 pl-3">:</td>
+								<td class="pl-3">
 									<div class="nm-input">
 										<input bind:value={it.v} placeholder="Value" onchange={parseEnvValue}>
 									</div>
@@ -810,9 +810,9 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="nm-button _dp-f _mg-at" type="button"
+								<button class="nm-button flex m-auto" type="button"
 									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
-									<i class="fa-solid fa-plus _mgr-5"></i>
+									<i class="fa-solid fa-plus mr-3"></i>
 									<span>Add Variable</span>
 								</button>
 							</td>
@@ -821,11 +821,11 @@
 				</table>
 			</div>
 
-			<button class="nm-button _dp-f _mg-at" type="button" onclick={() => showEnvText = !showEnvText}>
+			<button class="nm-button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="nm-textarea _mgt-5">
+				<div class="nm-textarea mt-3">
 					<textarea rows="20" bind:value={envText} onchange={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -840,7 +840,7 @@
 					<thead>
 						<tr>
 							<th>Path</th>
-							<th class="is-collapse _pd-0"></th>
+							<th class="is-collapse p-0"></th>
 							<th>Data</th>
 							<th class="is-collapse is-align-right"></th>
 						</tr>
@@ -853,8 +853,8 @@
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
-								<td class="_pd-0 _pdl-5">:</td>
-								<td class="_pdl-5">
+								<td class="p-0 pl-3">:</td>
+								<td class="pl-3">
 									<div class="nm-textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
@@ -871,9 +871,9 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="nm-button _dp-f _mg-at" type="button"
+							<button class="nm-button flex m-auto" type="button"
 								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
-								<i class="fa-solid fa-plus _mgr-5"></i>
+								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Data</span>
 							</button>
 						</td>
@@ -886,10 +886,10 @@
 		<hr>
 
 		<h6><strong>Sidecars</strong></h6>
-		<div class="_dp-g _g-6">
+		<div class="grid gap-4">
 			{#each form.sidecars as sidecar, i (i)}
-				<div class="nm-panel is-level-200 _dp-g _g-5">
-					<div class="_dp-f _jtfct-spbtw _alit-ct">
+				<div class="nm-panel is-level-200 grid gap-3">
+					<div class="flex justify-between items-center">
 						<strong>Sidecar #{i + 1}</strong>
 						<button class="icon-button" type="button" aria-label="Remove sidecar"
 							onclick={() => removeSidecar(i)}>
@@ -928,8 +928,8 @@
 				</div>
 			{/each}
 			{#if form.sidecars.length < sidecarMax}
-				<button class="nm-button _dp-f _mg-at" type="button" onclick={addSidecar}>
-					<i class="fa-solid fa-plus _mgr-5"></i>
+				<button class="nm-button flex m-auto" type="button" onclick={addSidecar}>
+					<i class="fa-solid fa-plus mr-3"></i>
 					<span>Add Sidecar</span>
 				</button>
 			{/if}
@@ -937,7 +937,7 @@
 
 		<hr>
 
-		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
+		<button class="nm-button mt-4 mr-auto" class:is-loading={saving}>
 			Deploy
 		</button>
 	{/if}

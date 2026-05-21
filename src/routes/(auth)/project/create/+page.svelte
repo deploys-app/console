@@ -67,8 +67,8 @@
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _jtfit-st _g-5">
+<div class="nm-panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 justify-items-start gap-3">
 		{#if project}
 			<h5><strong>Update Project: {project.name}</strong></h5>
 		{:else}
@@ -78,7 +78,7 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="nm-field">
 			<label for="input-project">ID</label>
 			<div class="nm-input">
@@ -105,7 +105,7 @@
 			</div>
 		</div>
 
-		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
+		<button class="nm-button mt-4 mr-auto" class:is-loading={saving}>
 			{#if project}
 				Update Project
 			{:else}

@@ -45,7 +45,7 @@
 		<div class="nm-modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
-		<div class="nm-table-container _mgt-6">
+		<div class="nm-table-container mt-4">
 			<table class="nm-table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
 				<thead>
 					<tr>
@@ -59,13 +59,13 @@
 					<tr>
 						<td>
 							{#if project === it.project}
-								<i class="fas fa-check _cl-primary _fs-6"></i>
+								<i class="fas fa-check text-primary text-xl"></i>
 							{/if}
 						</td>
 						<td>
 							<div onclick={() => setProject(it.project)} onkeypress={() => setProject(it.project)}
 								tabindex="0" role="link"
-								class="_tdcrt-udl _cs-pt _cl-primary:hover"
+								class="underline cursor-pointer hover:text-primary"
 								style="font-weight: 500">
 								{it.name}
 							</div>
@@ -79,7 +79,7 @@
 	</div>
 </div>
 
-<style lang="scss">
+<style>
 	.nm-table-container {
 		max-height: 405px;
 		overflow: auto;

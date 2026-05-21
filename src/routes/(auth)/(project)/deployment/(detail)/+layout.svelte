@@ -30,7 +30,7 @@
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
+<div class="nm-panel is-level-300 grid gap-6">
 	<Header {deployment} invalidate={() => api.invalidate('deployment.get')} />
 
 	{@render children?.()}

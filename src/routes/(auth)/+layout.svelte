@@ -1,5 +1,5 @@
 <script>
-	import '$style/main.scss'
+	import '$style/app.css'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import { onMount } from 'svelte'
@@ -38,7 +38,7 @@
 		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} />
 	</div>
 
-	<div class="sidebar-wrapper _zid-2">
+	<div class="sidebar-wrapper z-[2]">
 		<div class="sidebar-backdrop" role="button" tabindex="0"
 			onclick={hideSidebar} onkeypress={hideSidebar}></div>
 		<Sidebar {projects} openProjectModal={() => projectModal?.open()} />

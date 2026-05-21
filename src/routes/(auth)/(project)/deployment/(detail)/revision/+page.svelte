@@ -30,7 +30,7 @@
 </script>
 
 <h6><strong>Revision</strong></h6>
-<div class="nm-table-container _mgt-6 _wsp-nw">
+<div class="nm-table-container mt-4 whitespace-nowrap">
 	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
