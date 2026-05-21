@@ -320,14 +320,15 @@
 			0 2px 6px hsl(220 20% 20% / 0.04);
 	}
 
-	/* Buttons */
+	/* Buttons — templates space icon ↔ label with explicit margin utilities
+	 * (e.g. `<i class="… mr-3">`), so we DON'T set a flex gap here. */
 	.nm-button {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		gap: 0.5rem;
-		height: 2.5rem;
-		padding: 0 1rem;
+		min-height: 2.5rem;
+		padding: 0 1.125rem;
 		border: 0;
 		border-radius: 0.5rem;
 		background-color: hsl(var(--hsl-primary));
@@ -337,12 +338,15 @@
 		font-weight: 600;
 		line-height: 1;
 		cursor: pointer;
-		transition: background-color var(--timing-faster) ease, opacity var(--timing-faster) ease;
 		text-decoration: none;
 		user-select: none;
+		transition: background-color var(--timing-faster) ease,
+			border-color var(--timing-faster) ease,
+			opacity var(--timing-faster) ease;
 	}
 
-	.nm-button:hover:not([disabled]) {
+	.nm-button:hover:not([disabled]):not(.is-loading),
+	.nm-button:focus-visible:not([disabled]) {
 		background-color: hsl(var(--hsl-primary-active));
 	}
 
@@ -353,41 +357,48 @@
 
 	.nm-button.is-size-small,
 	.nm-button.-small {
-		height: 1.75rem;
-		padding: 0 0.75rem;
+		min-height: 1.75rem;
+		padding: 0 1rem;
 		font-size: 0.8125rem;
 	}
 
 	.nm-button.is-size-large {
-		height: 3rem;
+		min-height: 3rem;
 		padding: 0 1.25rem;
 		font-size: 1.125rem;
 	}
 
+	.nm-button.is-icon-left,
+	.nm-button.is-icon-right {
+		gap: 0.5em;
+	}
+
 	.nm-button.is-icon-left {
-		padding-left: 0.75rem;
+		padding-left: 0.75em;
 	}
 
 	.nm-button.is-icon-right {
-		padding-right: 0.75rem;
+		padding-right: 0.75em;
 	}
 
 	.nm-button.is-variant-secondary {
-		background-color: hsl(var(--hsl-base-400) / 0.3);
+		background-color: transparent;
 		color: hsl(var(--hsl-content));
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 	}
 
-	.nm-button.is-variant-secondary:hover:not([disabled]) {
-		background-color: hsl(var(--hsl-base-400) / 0.5);
+	.nm-button.is-variant-secondary:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-content) / 0.05);
+		border-color: hsl(var(--hsl-content) / 0.2);
 	}
 
 	.nm-button.is-variant-tertiary {
-		background-color: transparent;
+		background-color: hsl(var(--hsl-content) / 0.08);
 		color: hsl(var(--hsl-content));
 	}
 
-	.nm-button.is-variant-tertiary:hover:not([disabled]) {
-		background-color: hsl(var(--hsl-content) / 0.06);
+	.nm-button.is-variant-tertiary:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-content) / 0.15);
 	}
 
 	.nm-button.is-variant-negative {
@@ -395,7 +406,7 @@
 		color: hsl(var(--hsl-negative-content));
 	}
 
-	.nm-button.is-variant-negative:hover:not([disabled]) {
+	.nm-button.is-variant-negative:hover:not([disabled]):not(.is-loading) {
 		background-color: hsl(var(--hsl-negative) / 0.85);
 	}
 
@@ -404,21 +415,77 @@
 		color: hsl(var(--hsl-positive-content));
 	}
 
-	.nm-button.is-variant-positive:hover:not([disabled]) {
+	.nm-button.is-variant-positive:hover:not([disabled]):not(.is-loading) {
 		background-color: hsl(var(--hsl-positive) / 0.85);
+	}
+
+	.nm-button.is-variant-accent {
+		background-color: hsl(var(--hsl-accent));
+		color: hsl(var(--hsl-accent-content));
+	}
+
+	.nm-button.is-variant-accent:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-accent-active));
 	}
 
 	.nm-button.is-variant-underline {
 		background: transparent;
 		color: hsl(var(--hsl-primary));
 		padding: 0;
-		height: auto;
+		min-height: auto;
 		font-weight: 500;
 	}
 
 	.nm-button.is-variant-underline:hover:not([disabled]) {
 		background: transparent;
 		text-decoration: underline;
+	}
+
+	/* Loading state — text becomes transparent, a spinner spins on top.
+	 * `currentColor` makes the spinner pick up the appropriate content color
+	 * for each variant; we re-establish it just above the transparent rule
+	 * via a CSS var so ::after can read it. */
+	.nm-button.is-loading {
+		color: transparent !important;
+		pointer-events: none;
+		--nm-spinner-color: hsl(var(--hsl-primary-content));
+	}
+
+	.nm-button.is-variant-secondary.is-loading,
+	.nm-button.is-variant-tertiary.is-loading,
+	.nm-button.is-variant-underline.is-loading {
+		--nm-spinner-color: hsl(var(--hsl-primary));
+	}
+
+	.nm-button.is-variant-negative.is-loading {
+		--nm-spinner-color: hsl(var(--hsl-negative-content));
+	}
+
+	.nm-button.is-variant-positive.is-loading {
+		--nm-spinner-color: hsl(var(--hsl-positive-content));
+	}
+
+	.nm-button.is-variant-accent.is-loading {
+		--nm-spinner-color: hsl(var(--hsl-accent-content));
+	}
+
+	.nm-button.is-loading::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 1em;
+		height: 1em;
+		margin: -0.5em 0 0 -0.5em;
+		border: 2px solid transparent;
+		border-top-color: var(--nm-spinner-color);
+		border-right-color: var(--nm-spinner-color);
+		border-radius: 9999px;
+		animation: nm-button-spin 0.48s linear infinite;
+	}
+
+	@keyframes nm-button-spin {
+		to { transform: rotate(360deg); }
 	}
 
 	/* Form field group */
@@ -486,6 +553,16 @@
 	.nm-textarea > textarea {
 		min-height: 6rem;
 		resize: vertical;
+	}
+
+	.nm-input > input[readonly],
+	.nm-input > input[disabled],
+	.nm-input > select[disabled],
+	.nm-textarea > textarea[readonly],
+	.nm-textarea > textarea[disabled],
+	.nm-select > select[disabled] {
+		background-color: hsl(var(--hsl-content) / 0.05);
+		cursor: not-allowed;
 	}
 
 	.nm-input.-has-icon-left,
@@ -621,35 +698,54 @@
 		text-decoration: underline;
 	}
 
-	/* Tabs */
+	/* Tabs — the `.tab-button` child carries the per-tab styling, with a
+	 * 3px ::after rule beneath it. Active gets the primary color. */
 	.nm-tabs {
+		position: relative;
 		display: flex;
-		gap: 0.25rem;
-		border-bottom: 1px solid hsl(var(--hsl-line));
-		margin-bottom: 1rem;
 	}
 
+	.nm-tabs .tab-button,
 	.nm-tabs > a,
-	.nm-tabs > button,
-	.nm-tabs .tab {
+	.nm-tabs > button {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
-		height: 2.5rem;
+		justify-content: center;
+		min-height: 2.5rem;
 		padding: 0 1.25rem;
+		font-family: var(--ffml-secondary);
 		font-size: 0.9375rem;
 		font-weight: 500;
-		color: hsl(var(--hsl-content) / 0.7);
-		border-bottom: 2px solid transparent;
+		color: hsl(var(--hsl-content) / 0.75);
 		cursor: pointer;
 		text-decoration: none;
+		background: transparent;
+		border: 0;
 	}
 
+	.nm-tabs .tab-button.is-active,
 	.nm-tabs > a.is-active,
-	.nm-tabs > button.is-active,
-	.nm-tabs .tab.is-active {
-		color: hsl(var(--hsl-primary));
-		border-bottom-color: hsl(var(--hsl-primary));
+	.nm-tabs > button.is-active {
+		color: hsl(var(--hsl-content));
+	}
+
+	.nm-tabs.is-variant-underline .tab-button::after,
+	.nm-tabs.is-variant-underline > a::after,
+	.nm-tabs.is-variant-underline > button::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 3px;
+		background-color: hsl(var(--hsl-content) / 0.12);
+	}
+
+	.nm-tabs.is-variant-underline .tab-button.is-active::after,
+	.nm-tabs.is-variant-underline > a.is-active::after,
+	.nm-tabs.is-variant-underline > button.is-active::after {
+		background-color: hsl(var(--hsl-primary));
 	}
 
 	/* Tables — horizontal rhythm comes from per-cell left/right padding

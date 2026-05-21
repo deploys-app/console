@@ -156,7 +156,7 @@
 	}
 
 	.icon-nav-menu:hover {
-		background: rgba(190, 197, 255, 0.075);
+		background: hsl(var(--hsl-content) / 0.05);
 	}
 
 	.avatar {
@@ -169,6 +169,6 @@
 	}
 
 	.avatar:hover {
-		background: rgba(190, 197, 255, 0.075);
+		background: hsl(var(--hsl-content) / 0.05);
 	}
 </style>
