@@ -308,15 +308,17 @@
 
 	.billing-card-head {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		gap: 0.4rem;
 		color: hsl(var(--hsl-primary));
 		font-size: 0.8125rem;
+		min-height: 2.5rem;
 
 		i {
 			font-size: 0.875rem;
 			width: 1rem;
 			text-align: center;
+			line-height: 1.25rem;
 		}
 	}
 
@@ -324,6 +326,7 @@
 		font-weight: 600;
 		color: hsl(var(--hsl-content)/0.85);
 		font-size: 0.8125rem;
+		line-height: 1.25rem;
 	}
 
 	.billing-card-value {
