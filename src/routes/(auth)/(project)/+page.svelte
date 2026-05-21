@@ -45,9 +45,13 @@
 		const start = new Date(now.getFullYear(), now.getMonth(), 1)
 		return Math.max((now.getTime() - start.getTime()) / 1000, 1)
 	}
-	function formatAvgCount (seconds, unit) {
+	function formatAvgCount (seconds, unit, rawUnit) {
 		const avg = seconds / billingElapsedSeconds()
-		return { value: formatCompact(avg), full: formatNumber(avg), unit }
+		return { value: formatCompact(avg), full: formatNumber(avg), unit, tooltip: `${formatNumber(seconds)} ${rawUnit}` }
+	}
+	function rawStorageTooltip (bytes) {
+		const r = formatStorage(bytes, 's')
+		return `${r.full} ${r.unit}`
 	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
@@ -58,25 +62,27 @@
 			key: 'cpuUsage',
 			icon: 'fa-microchip',
 			label: 'CPU Usage',
-			...formatAvgCount(usage.cpuUsage, 'vCPUs')
+			...formatAvgCount(usage.cpuUsage, 'vCPUs', 'vCPU-s')
 		},
 		{
 			key: 'cpu',
 			icon: 'fa-gauge-high',
 			label: 'CPU Allocated',
-			...formatAvgCount(usage.cpu, 'vCPUs')
+			...formatAvgCount(usage.cpu, 'vCPUs', 'vCPU-s')
 		},
 		{
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
-			...formatStorage(usage.memory / billingElapsedSeconds(), '')
+			...formatStorage(usage.memory / billingElapsedSeconds(), ''),
+			tooltip: rawStorageTooltip(usage.memory)
 		},
 		{
 			key: 'disk',
 			icon: 'fa-hard-drive',
 			label: 'Disk',
-			...formatStorage(usage.disk / billingElapsedSeconds(), '')
+			...formatStorage(usage.disk / billingElapsedSeconds(), ''),
+			tooltip: rawStorageTooltip(usage.disk)
 		},
 		{
 			key: 'egress',
@@ -94,13 +100,13 @@
 			key: 'replica',
 			icon: 'fa-clone',
 			label: 'Replica',
-			...formatAvgCount(usage.replica, 'replicas')
+			...formatAvgCount(usage.replica, 'replicas', 'replica-s')
 		},
 		{
 			key: 'domainCdn',
 			icon: 'fa-globe',
 			label: 'Domain CDN',
-			...formatAvgCount(usage.domainCdn, 'domains')
+			...formatAvgCount(usage.domainCdn, 'domains', 'domain-s')
 		}
 	])
 </script>
@@ -170,7 +176,7 @@
 
 		<div class="billing-grid">
 			{#each billing as item (item.key)}
-				<div class="billing-card" title={`${item.full} ${item.unit}`}>
+				<div class="billing-card" title={item.tooltip ?? `${item.full} ${item.unit}`}>
 					<div class="billing-card-head">
 						<i class="fa-solid {item.icon}"></i>
 						<span class="billing-card-label">{item.label}</span>
