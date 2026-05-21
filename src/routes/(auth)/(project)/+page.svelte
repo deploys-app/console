@@ -23,6 +23,13 @@
 		if (v == null || Number.isNaN(v)) return '?'
 		return v.toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
+	function formatCompact (v) {
+		if (v == null || Number.isNaN(v)) return '?'
+		return v.toLocaleString(undefined, {
+			notation: 'compact',
+			maximumFractionDigits: 2
+		})
+	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
@@ -32,56 +39,64 @@
 			key: 'cpuUsage',
 			icon: 'fa-microchip',
 			label: 'CPU Usage',
-			value: formatNumber(usage.cpuUsage),
+			value: formatCompact(usage.cpuUsage),
+			full: formatNumber(usage.cpuUsage),
 			unit: 'vCPU-s'
 		},
 		{
 			key: 'cpu',
 			icon: 'fa-gauge-high',
 			label: 'CPU Allocated',
-			value: formatNumber(usage.cpu),
+			value: formatCompact(usage.cpu),
+			full: formatNumber(usage.cpu),
 			unit: 'vCPU-s'
 		},
 		{
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
-			value: formatNumber(usage.memory / unitGiB),
+			value: formatCompact(usage.memory / unitGiB),
+			full: formatNumber(usage.memory / unitGiB),
 			unit: 'GiB-s'
 		},
 		{
 			key: 'disk',
 			icon: 'fa-hard-drive',
 			label: 'Disk',
-			value: formatNumber(usage.disk / unitGiB),
+			value: formatCompact(usage.disk / unitGiB),
+			full: formatNumber(usage.disk / unitGiB),
 			unit: 'GiB-s'
 		},
 		{
 			key: 'egress',
 			icon: 'fa-cloud-arrow-up',
 			label: 'Egress',
-			value: formatNumber(usage.egress / unitGiB),
+			value: formatCompact(usage.egress / unitGiB),
+			full: formatNumber(usage.egress / unitGiB),
 			unit: 'GiB'
 		},
 		{
 			key: 'registryEgress',
 			icon: 'fa-box-archive',
 			label: 'Registry Egress',
-			value: formatNumber(usage.registryEgress / unitGiB),
+			value: formatCompact(usage.registryEgress / unitGiB),
+			full: formatNumber(usage.registryEgress / unitGiB),
 			unit: 'GiB'
 		},
 		{
 			key: 'replica',
 			icon: 'fa-clone',
 			label: 'Replica',
-			value: formatNumber(usage.replica),
+			value: formatCompact(usage.replica),
+			full: formatNumber(usage.replica),
 			unit: 'replica-s'
 		},
 		{
 			key: 'domainCdn',
 			icon: 'fa-globe',
 			label: 'Domain CDN',
-			value: formatNumber(usage.domainCdn),
+			value: formatCompact(usage.domainCdn),
+			full: formatNumber(usage.domainCdn),
 			unit: 'domain-s'
 		}
 	])
@@ -152,7 +167,7 @@
 
 		<div class="billing-grid">
 			{#each billing as item (item.key)}
-				<div class="billing-card">
+				<div class="billing-card" title={`${item.full} ${item.unit}`}>
 					<div class="billing-card-head">
 						<i class="fa-solid {item.icon}"></i>
 						<span class="billing-card-label">{item.label}</span>
