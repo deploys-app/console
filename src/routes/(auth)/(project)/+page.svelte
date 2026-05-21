@@ -35,10 +35,12 @@
 		if (gib >= 1024) {
 			const tib = gib / 1024
 			const unit = unitSuffix ? `TiB-${unitSuffix}` : 'TiB'
-			return { value: formatCompact(tib), full: formatNumber(tib), unit }
+			const full = formatNumber(tib)
+			return { value: formatCompact(tib), full, unit, tooltip: `${full} ${unit}` }
 		}
 		const unit = unitSuffix ? `GiB-${unitSuffix}` : 'GiB'
-		return { value: formatCompact(gib), full: formatNumber(gib), unit }
+		const full = formatNumber(gib)
+		return { value: formatCompact(gib), full, unit, tooltip: `${full} ${unit}` }
 	}
 	function billingElapsedSeconds () {
 		const now = new Date()
@@ -176,7 +178,7 @@
 
 		<div class="billing-grid">
 			{#each billing as item (item.key)}
-				<div class="billing-card" title={item.tooltip ?? `${item.full} ${item.unit}`}>
+				<div class="billing-card" title={item.tooltip}>
 					<div class="billing-card-head">
 						<i class="fa-solid {item.icon}"></i>
 						<span class="billing-card-label">{item.label}</span>
