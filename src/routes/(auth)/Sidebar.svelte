@@ -106,8 +106,13 @@
 	.sidebar {
 		width: var(--width-sidebar, 300px);
 		min-height: 100vh;
+		min-height: 100dvh;
 		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
+	}
+
+	.sidebar-bottom {
+		padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 	}
 
 	.sidebar-menus .menu-item {
@@ -180,7 +185,7 @@
 	}
 </style>
 
-<nav class="sidebar pt-4 absolute z-[1] flex flex-col h-screen overflow-y-auto">
+<nav class="sidebar pt-4 absolute z-[1] flex flex-col h-screen h-dvh overflow-y-auto">
 	<div class="site-logo">
 		<img src="/images/logo.webp" alt="Deploys.app" draggable="false">
 	</div>
@@ -238,7 +243,7 @@
 		</div>
 	</div>
 
-	<div class="mt-4 pb-3">
+	<div class="sidebar-bottom mt-4">
 		<div class="px-3 mb-3">
 			<hr>
 		</div>
