@@ -19,18 +19,18 @@
 	}, 4000))
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/deployment?project=${project}`} class="nm-link"><h6>Deployments</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{deployment.name}</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<Header {deployment} invalidate={() => api.invalidate('deployment.get')} />
 
 	{@render children?.()}

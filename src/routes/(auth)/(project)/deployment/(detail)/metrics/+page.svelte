@@ -79,7 +79,7 @@
 <h6><strong>Metric</strong></h6>
 
 <div class="grid gap-4 justify-start">
-	<div class="nm-select">
+	<div class="select">
 		<select bind:value={filter.range} onchange={() => fetchMetrics(true)}>
 			<option value="1h">1 Hour</option>
 			<option value="6h">6 Hours</option>

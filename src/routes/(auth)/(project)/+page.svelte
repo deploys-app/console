@@ -116,52 +116,52 @@
 <h6>Dashboard</h6>
 <br>
 <div class="grid grid-cols-1 lg:grid lg:grid-cols-2 gap-6 items-stretch">
-	<div class="nm-panel is-level-300 gap-6 dashboard-panel">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="ml-4">Project Info</strong>
 		</h6>
 		<hr>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_name">Project Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_name" readonly value={projectInfo.name}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_id">Project ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_id" readonly value={projectInfo.project}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_number">Project Number</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_number" readonly value={projectInfo.id}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_billing">Billing Account ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
 			</div>
 		</div>
 
 <!--		<hr>-->
 
-<!--		<a class="nm-link flex items-center" href="">-->
+<!--		<a class="link flex items-center" href="">-->
 <!--			<i class="fa-solid fa-arrow-right text-xl"></i>-->
 <!--			<span class="ml-4">Project Settings</span>-->
 <!--		</a>-->
 	</div>
 
-	<div class="nm-panel is-level-300 gap-6 dashboard-panel">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<div class="flex items-center justify-between">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
 				<strong class="ml-4">Billing</strong>
 			</h6>
-			<a class="nm-link" href="/billing">
+			<a class="link" href="/billing">
 				View billing
 				<i class="fa-solid fa-arrow-right ml-1"></i>
 			</a>
@@ -192,13 +192,13 @@
 		</div>
 	</div>
 
-	<div class="nm-panel is-level-300 gap-6 dashboard-panel">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<div class="flex items-center justify-between">
 			<h6>
 				<i class="fa-solid fa-clock-rotate-left"></i>
 				<strong class="ml-4">Recent Activity</strong>
 			</h6>
-			<a class="nm-link" href="/audit-log?project={projectInfo.project}">
+			<a class="link" href="/audit-log?project={projectInfo.project}">
 				View all
 				<i class="fa-solid fa-arrow-right ml-1"></i>
 			</a>

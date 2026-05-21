@@ -71,13 +71,13 @@ Tailwind CSS v4 via `@tailwindcss/vite`. The single entry stylesheet is `src/sty
 - `:root` and `.dark` blocks that hold the raw HSL/spacing/typography/shadow CSS variables.
 - A `@theme inline { … }` block that exposes those variables to Tailwind as `--color-*` / `--font-*` tokens, so utilities like `bg-primary`, `text-content`, `border-line`, `text-positive/80` resolve dynamically per theme.
 - An `@layer base` block with element resets and typography rules.
-- An `@layer components` block defining the **`nm-*` component family** (`nm-panel`, `nm-button` with `is-variant-*` / `is-size-*` modifiers, `nm-input`, `nm-field`, `nm-select`, `nm-textarea`, `nm-checkbox`, `nm-link`, `nm-label`, `nm-breadcrumb(-item)`, `nm-tabs`, `nm-table(-container)`, `nm-dropdown` / `nm-menu`, `nm-modal(-panel/-close)`). These replace the removed nomimono dependency — keep using the existing class names rather than reinventing them.
+- An `@layer components` block defining the project's component classes: `panel` (with `is-level-{200,300,400}`), `button` (with `is-variant-{secondary,tertiary,negative,positive,accent,underline}`, `is-size-{small,large}`, `is-icon-{left,right}`, `is-loading`), `input` / `select` / `textarea` (with their `[readonly]` / `[disabled]` and `.-has-icon-{left,right}` states), `field`, `checkbox`, `link`, `label`, `breadcrumb(-item)`, `tabs` (with `is-variant-underline`), `table(-container)` (with `is-variant-compact`, `is-collapse`), `dropdown` / `menu` (with `is-card` / `is-compact`), `modal(-panel/-close)`. These replace the removed nomimono dependency — keep using the existing class names rather than reinventing them.
 
 **Dark mode** is the Tailwind class strategy: `<html class="dark">` activates dark utilities. The `dark` variant is registered with `@custom-variant dark (&:where(.dark, .dark *))`. The theme toggle in `Navbar.svelte` writes the cookie and toggles the class on `document.documentElement`.
 
 **Conventions when adding UI**:
 - Reach for Tailwind utilities first (`flex`, `gap-3`, `mt-6`, `text-content/70`, `lg:grid-cols-2`, etc.).
-- Use the `nm-*` component classes for buttons, inputs, panels, tables, etc. — don't re-derive them with bare utilities.
+- Use the project component classes (`button`, `input`, `panel`, `field`, `table`, `link`, etc.) — don't re-derive them with bare utilities.
 - Reference design tokens via the Tailwind utility (`text-primary`) or the underlying CSS var (`hsl(var(--hsl-primary) / 0.12)`) inside scoped `<style>` blocks; both stay in sync with light/dark.
 - Scoped `<style>` blocks are plain CSS (no `lang="scss"`, no SCSS nesting) — `sass` is no longer a dependency.
 

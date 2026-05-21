@@ -297,7 +297,7 @@
 
 <h6>Dropbox</h6>
 <br>
-<div class="nm-panel is-level-300 grid gap-4">
+<div class="panel is-level-300 grid gap-4">
 	<div>
 		<p class="mb-0.5">Upload a file and get a shareable download URL.</p>
 		<small class="text-content/60">
@@ -350,7 +350,7 @@
 
 		<div class="flex gap-4 justify-end">
 			<button
-				class="nm-button"
+				class="button"
 				class:is-loading={uploading}
 				type="submit"
 				disabled={!selectedFile || uploading}>

@@ -335,25 +335,25 @@
 	})
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/deployment?project=${project}`} class="nm-link"><h6>Deployments</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/deployment?project=${project}`} class="link"><h6>Deployments</h6></a>
 	</div>
 	{#if deployment}
-		<div class="nm-breadcrumb-item">
-			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="nm-link">
+		<div class="breadcrumb-item">
+			<a href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`} class="link">
 				<h6>{deployment.name}</h6>
 			</a>
 		</div>
 	{/if}
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>Deploy</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 justify-items-start gap-3">
 		{#if deployment}
 			<h5><strong>Deploy New Revision</strong></h5>
@@ -365,16 +365,16 @@
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		{#if deployment}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-location-readonly">Location</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-location-readonly" value={deployment.location} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-location">Location</label>
-				<div class="nm-select">
+				<div class="select">
 					<select id="input-location" bind:value={form.location} onchange={changeLocation} required>
 						<option value="" selected disabled>Select Location</option>
 						{#each locations as it (it.id)}
@@ -388,24 +388,24 @@
 		{/if}
 
 		{#if selectedLocation}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-name">Name</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!deployment}>
 				</div>
 			</div>
 
 			{#if deployment}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-type-readonly">Type</label>
-					<div class="nm-input">
+					<div class="input">
 						<input id="input-type-readonly" value={format.deploymentType(deployment.type)} readonly>
 					</div>
 				</div>
 			{:else}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-type">Type</label>
-					<div class="nm-select">
+					<div class="select">
 						<select id="input-type" class="js-type" bind:value={form.type}>
 							<option value="WebService">Web Service</option>
 							<option value="InternalTCPService">Internal TCP Service</option>
@@ -416,17 +416,17 @@
 				</div>
 			{/if}
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-image">Image</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-image" placeholder="image" bind:value={form.image}>
 			</div>
 		</div>
 
 		{#if permission.pullSecrets}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-pull_secret">Pull Secret</label>
-				<div class="nm-select">
+				<div class="select">
 					{#key pullSecrets}
 						<select id="input-pull_secret" bind:value={form.pullSecret}>
 							<option value="">No Pull Secret</option>
@@ -438,9 +438,9 @@
 				</div>
 			</div>
 		{:else}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-pull_secret-text">Pull Secret</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
 				</div>
 				<p class="text-xs">* You don't have permission to list pull secrets</p>
@@ -449,9 +449,9 @@
 
 		{#if selectedLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-workload_identity">Workload Identity</label>
-					<div class="nm-select">
+					<div class="select">
 						{#key workloadIdentities}
 							<select id="input-workload_identity" bind:value={form.workloadIdentity}>
 								<option value="">No Workload Identity</option>
@@ -463,9 +463,9 @@
 					</div>
 				</div>
 			{:else}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-workload_identity-text">Workload Identity</label>
-					<div class="nm-input">
+					<div class="input">
 						<input id="input-workload_identity-text" placeholder="Workload Identity Name" bind:value={form.workloadIdentity}>
 					</div>
 					<p class="text-xs">* You don't have permission to list workload identities</p>
@@ -474,18 +474,18 @@
 		{/if}
 
 		{#if ['WebService', 'TCPService', 'InternalTCPService'].includes(form.type)}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-port">Port</label>
-				<div class="nm-input">
+				<div class="input">
 					<input class="-no-arrow" id="input-port" placeholder="8080" type="number" bind:value={form.port}>
 				</div>
 			</div>
 		{/if}
 
 		{#if form.type === 'WebService'}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-protocol">Protocol</label>
-				<div class="nm-select">
+				<div class="select">
 					<select id="input-protocol" bind:value={form.protocol}>
 						<option value="http">http</option>
 						<option value="https">https</option>
@@ -493,19 +493,19 @@
 					</select>
 				</div>
 			</div>
-			<div class="nm-field">
-				<div class="nm-checkbox">
+			<div class="field">
+				<div class="checkbox">
 					<input id="input-internal" type="checkbox" bind:checked={form.internal}>
 					<label for="input-internal">Internal Service</label>
 				</div>
 			</div>
 		{/if}
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="pb-2">
 				{#each form.command as _, i (i)}
-					<div class="nm-input -has-icon-right mb-2">
+					<div class="input -has-icon-right mb-2">
 						<input bind:value={form.command[i]}>
 						<button class="icon-button icon -is-right" type="button" aria-label="Remove"
 							onclick={() => { form.command = form.command.filter((_, k) => k !== i) }}>
@@ -514,17 +514,17 @@
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
+			<button class="button m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Command</span>
 			</button>
 		</div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="div-args">Args</label>
 			<div id="div-args" class="pb-2">
 				{#each form.args as _, i (i)}
-					<div class="nm-input -has-icon-right mb-2">
+					<div class="input -has-icon-right mb-2">
 						<input bind:value={form.args[i]}>
 						<button class="icon-button icon -is-right" type="button" aria-label="Remove an argument"
 							onclick={() => { form.args = form.args.filter((_, k) => k !== i) }}>
@@ -533,7 +533,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="nm-button m-auto" type="button"
+			<button class="button m-auto" type="button"
 					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Arg</span>
@@ -541,9 +541,9 @@
 		</div>
 
 		{#if form.type === 'CronJob'}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-schedule">Schedule</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-schedule" placeholder="*/5 * * * *" bind:value={form.schedule}>
 				</div>
 			</div>
@@ -558,9 +558,9 @@
 				<h6><strong>Disk</strong></h6>
 
 				{#if permission.disks}
-					<div class="nm-field">
+					<div class="field">
 						<label for="input-disk_name">Name</label>
-						<div class="nm-select">
+						<div class="select">
 							{#key disks}
 								<select id="input-disk_name" bind:value={form.disk.name}>
 									<option value="">No Disk</option>
@@ -572,9 +572,9 @@
 						</div>
 					</div>
 				{:else}
-					<div class="nm-field">
+					<div class="field">
 						<label for="input-disk_name-text">Name</label>
-						<div class="nm-input">
+						<div class="input">
 							<input id="input-disk_name-text" placeholder="Disk Name" bind:value={form.disk.name}>
 						</div>
 						<p class="text-xs">* You don't have permission to list disks</p>
@@ -582,15 +582,15 @@
 				{/if}
 
 				{#if form.disk.name}
-					<div class="nm-field">
+					<div class="field">
 						<label for="input-disk_mount_path">Mount Path</label>
-						<div class="nm-input">
+						<div class="input">
 							<input id="input-disk_mount_path" placeholder="" bind:value={form.disk.mountPath}>
 						</div>
 					</div>
-					<div class="nm-field">
+					<div class="field">
 						<label for="input-disk_sub_path">Sub Path</label>
-						<div class="nm-input">
+						<div class="input">
 							<input id="input-disk_sub_path" placeholder="" bind:value={form.disk.subPath}>
 						</div>
 					</div>
@@ -604,9 +604,9 @@
 
 		<h6><strong>Auto-delete (TTL)</strong></h6>
 		<div class="grid grid-cols-2 gap-4">
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-ttl_unit">Unit</label>
-				<div class="nm-select">
+				<div class="select">
 					<select id="input-ttl_unit" bind:value={form.ttlUnit}>
 						<option value="0">No auto-delete</option>
 						<option value="60">Minutes</option>
@@ -617,9 +617,9 @@
 			</div>
 
 			{#if form.ttlUnit !== '0'}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-ttl_value">Duration</label>
-					<div class="nm-input">
+					<div class="input">
 						<input id="input-ttl_value" type="number" min="1" bind:value={form.ttlValue}>
 					</div>
 				</div>
@@ -638,9 +638,9 @@
 
 					<h6><strong>Autoscaling</strong></h6>
 					<div class="grid grid-cols-2 gap-4">
-						<div class="nm-field">
+						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
-							<div class="nm-input">
+							<div class="input">
 								<input id="input-min_replicas"
 									bind:value={form.minReplicas}
 									type="number"
@@ -649,9 +649,9 @@
 							</div>
 						</div>
 
-						<div class="nm-field">
+						<div class="field">
 							<label for="input-max_replicas">Max Replicas</label>
-							<div class="nm-input">
+							<div class="input">
 								<input id="input-max_replicas"
 									bind:value={form.maxReplicas}
 									type="number"
@@ -668,9 +668,9 @@
 		<hr>
 		<br>
 
-<!--        <div class="nm-field">-->
+<!--        <div class="field">-->
 <!--            <label for="input-cpu">CPU allocated</label>-->
-<!--            <div class="nm-select">-->
+<!--            <div class="select">-->
 <!--                <select id="input-cpu" name="cpu">-->
 <!--                    {{range .Location.CPUAllocatable}}-->
 <!--                    <option value="{{.}}" {{if eq . $.Form.CPU}}selected{{end}}>{{. | textDeploymentCPU}}</option>-->
@@ -682,9 +682,9 @@
 <!--            </small>-->
 <!--        </div>-->
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-cpu-limit">CPU limited</label>
-            <div class="nm-select">
+            <div class="select">
                 <select id="input-cpu-limit" name="cpu" bind:value={form.resources.limits.cpu}>
                     <option value="0">Cluster Default</option>
                     <option value="1">1</option>
@@ -697,9 +697,9 @@
             </small>
         </div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-memory">Memory allocated</label>
-			<div class="nm-select">
+			<div class="select">
 				<select id="input-memory" bind:value={form.resources.requests.memory}>
 					{#each selectedLocation.memoryAllocatable as it, i (i)}
 						<option value={it}>{format.memory(it)}</option>
@@ -721,8 +721,8 @@
 			Variables defined here take precedence over those defined in env groups.
 		</small>
 		{#if permission.envGroups}
-			<div class="nm-field flex">
-				<div class="nm-select">
+			<div class="field flex">
+				<div class="select">
 					{#key envGroups}
 						<select onchange={selectEnvGroupChanged}>
 							<option value="" disabled selected>Select Env Group</option>
@@ -734,16 +734,16 @@
 				</div>
 			</div>
 		{:else}
-			<div class="nm-field flex gap-3">
-				<div class="nm-input flex-1">
+			<div class="field flex gap-3">
+				<div class="input flex-1">
 					<input placeholder="Env Group Name" bind:value={envGroupInput}>
 				</div>
-				<button class="nm-button" type="button" onclick={addEnvGroupFromInput}>Add</button>
+				<button class="button" type="button" onclick={addEnvGroupFromInput}>Add</button>
 			</div>
 			<p class="text-xs">* You don't have permission to list env groups</p>
 		{/if}
-		<div class="nm-table-container">
-			<table class="nm-table is-variant-compact">
+		<div class="table-container">
+			<table class="table is-variant-compact">
 				<thead>
 					<tr>
 						<th>Name</th>
@@ -774,8 +774,8 @@
 
 		<h6><strong>Environment Variables</strong></h6>
 		<div>
-			<div class="nm-table-container">
-				<table class="nm-table">
+			<div class="table-container">
+				<table class="table">
 					<thead>
 						<tr>
 							<th>Key</th>
@@ -788,13 +788,13 @@
 						{#each form.env as it, i (i)}
 							<tr>
 								<td>
-									<div class="nm-input">
+									<div class="input">
 										<input bind:value={it.k} placeholder="Variable name" onchange={parseEnvValue}>
 									</div>
 								</td>
 								<td class="p-0 pl-3">:</td>
 								<td class="pl-3">
-									<div class="nm-input">
+									<div class="input">
 										<input bind:value={it.v} placeholder="Value" onchange={parseEnvValue}>
 									</div>
 								</td>
@@ -810,7 +810,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="nm-button flex m-auto" type="button"
+								<button class="button flex m-auto" type="button"
 									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus mr-3"></i>
 									<span>Add Variable</span>
@@ -821,11 +821,11 @@
 				</table>
 			</div>
 
-			<button class="nm-button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
+			<button class="button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
-				<div class="nm-textarea mt-3">
+				<div class="textarea mt-3">
 					<textarea rows="20" bind:value={envText} onchange={parseEnvText}></textarea>
 				</div>
 			{/if}
@@ -835,8 +835,8 @@
 
 		<h6><strong>Mount Data</strong></h6>
 		<div>
-			<div class="nm-table-container">
-				<table class="nm-table">
+			<div class="table-container">
+				<table class="table">
 					<thead>
 						<tr>
 							<th>Path</th>
@@ -849,13 +849,13 @@
 						{#each form.mountData as it, i (i)}
 							<tr>
 								<td>
-									<div class="nm-input">
+									<div class="input">
 										<input bind:value={it.k} placeholder="Path">
 									</div>
 								</td>
 								<td class="p-0 pl-3">:</td>
 								<td class="pl-3">
-									<div class="nm-textarea">
+									<div class="textarea">
 										<textarea bind:value={it.v} placeholder="Data"></textarea>
 									</div>
 								</td>
@@ -871,7 +871,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="nm-button flex m-auto" type="button"
+							<button class="button flex m-auto" type="button"
 								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Data</span>
@@ -888,7 +888,7 @@
 		<h6><strong>Sidecars</strong></h6>
 		<div class="grid gap-4">
 			{#each form.sidecars as sidecar, i (i)}
-				<div class="nm-panel is-level-200 grid gap-3">
+				<div class="panel is-level-200 grid gap-3">
 					<div class="flex justify-between items-center">
 						<strong>Sidecar #{i + 1}</strong>
 						<button class="icon-button" type="button" aria-label="Remove sidecar"
@@ -896,9 +896,9 @@
 							<i class="fa-solid fa-trash-alt"></i>
 						</button>
 					</div>
-					<div class="nm-field">
+					<div class="field">
 						<label for="input-sidecar-type-{i}">Type</label>
-						<div class="nm-select">
+						<div class="select">
 							<select id="input-sidecar-type-{i}" bind:value={sidecar.type}>
 								<option value="" disabled>Select Type</option>
 								<option value="cloudSqlProxy">Cloud SQL Proxy</option>
@@ -906,21 +906,21 @@
 						</div>
 					</div>
 					{#if sidecar.type === 'cloudSqlProxy'}
-						<div class="nm-field">
+						<div class="field">
 							<label for="input-sidecar-instance-{i}">Instance</label>
-							<div class="nm-input">
+							<div class="input">
 								<input id="input-sidecar-instance-{i}" placeholder="project:region:instance" bind:value={sidecar.cloudSqlProxy.instance} required>
 							</div>
 						</div>
-						<div class="nm-field">
+						<div class="field">
 							<label for="input-sidecar-port-{i}">Port</label>
-							<div class="nm-input">
+							<div class="input">
 								<input class="-no-arrow" id="input-sidecar-port-{i}" placeholder="3300" type="number" bind:value={sidecar.cloudSqlProxy.port}>
 							</div>
 						</div>
-						<div class="nm-field">
+						<div class="field">
 							<label for="input-sidecar-credentials-{i}">Credentials</label>
-							<div class="nm-input">
+							<div class="input">
 								<input id="input-sidecar-credentials-{i}" placeholder="Credentials JSON" bind:value={sidecar.cloudSqlProxy.credentials}>
 							</div>
 						</div>
@@ -928,7 +928,7 @@
 				</div>
 			{/each}
 			{#if form.sidecars.length < sidecarMax}
-				<button class="nm-button flex m-auto" type="button" onclick={addSidecar}>
+				<button class="button flex m-auto" type="button" onclick={addSidecar}>
 					<i class="fa-solid fa-plus mr-3"></i>
 					<span>Add Sidecar</span>
 				</button>
@@ -937,7 +937,7 @@
 
 		<hr>
 
-		<button class="nm-button mt-4 mr-auto" class:is-loading={saving}>
+		<button class="button mt-4 mr-auto" class:is-loading={saving}>
 			Deploy
 		</button>
 	{/if}

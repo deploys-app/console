@@ -52,23 +52,23 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/disk?project=${project}`} class="nm-link"><h6>Disks</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
 	</div>
 	{#if disk}
-		<div class="nm-breadcrumb-item">
-			<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="nm-link"><h6>{disk.name}</h6></a>
+		<div class="breadcrumb-item">
+			<a href={`/disk/detail?project=${project}&location=${disk.location}&name=${disk.name}`} class="link"><h6>{disk.name}</h6></a>
 		</div>
 	{/if}
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{#if disk}Update{:else}Create{/if}</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<div class="flex items-center">
 			<h3 class="mr-6 mb-4 xl:mb-0"><strong>
@@ -84,20 +84,20 @@
 	<hr>
 
 	<form class="grid gap-4 w-full max-w-[512px]" onsubmit={save}>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-name">Disk name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" placeholder="name" bind:value={form.name} readonly={!!disk}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-location">Location</label>
 			{#if disk}
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-location" value={form.location} readonly>
 				</div>
 			{:else}
-				<div class="nm-select">
+				<div class="select">
 					<select id="input-location" bind:value={form.location} required>
 						<option value="">Select Location</option>
 						{#each locations as it (it.id)}
@@ -111,14 +111,14 @@
 				</div>
 			{/if}
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-size">Disk size (GiB)</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-size" type="number" placeholder="disk size" min="1" max="100" bind:value={form.size}>
 			</div>
 		</div>
 
-		<button class="nm-button mr-auto" class:is-loading={saving}>
+		<button class="button mr-auto" class:is-loading={saving}>
 			{#if disk}
 				Save
 			{:else}

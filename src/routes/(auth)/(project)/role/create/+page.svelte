@@ -85,19 +85,19 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/role?project=${project}`} class="nm-link"><h6>Roles</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/role?project=${project}`} class="link"><h6>Roles</h6></a>
 	</div>
 	{#if role}
-		<div class="nm-breadcrumb-item">
+		<div class="breadcrumb-item">
 			<h6>{role.role}</h6>
 		</div>
-		<div class="nm-breadcrumb-item">
+		<div class="breadcrumb-item">
 			<h6>Update</h6>
 		</div>
 	{:else}
-		<div class="nm-breadcrumb-item">
+		<div class="breadcrumb-item">
 			<h6>Create</h6>
 		</div>
 	{/if}
@@ -105,7 +105,7 @@
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-4">
+<div class="panel is-level-300 grid gap-4">
 	<div class="grid grid-cols-1 gap-3">
 		<h3><strong>
 			{#if role}
@@ -119,16 +119,16 @@
 	<hr>
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-role">Role ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-role" bind:value={form.role} placeholder="Role" required readonly={!!role}>
 			</div>
 		</div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" bind:value={form.name} placeholder="Role name" required>
 			</div>
 		</div>
@@ -140,8 +140,8 @@
 		<div class="grid gap-4">
 			<h6><strong>Permissions</strong></h6>
 
-			<div class="nm-field flex mb-3">
-				<div class="nm-select">
+			<div class="field flex mb-3">
+				<div class="select">
 					<select onchange={selectPermissionChanged}>
 						<option value="" disabled selected>Select Permission</option>
 						{#each permissions.filter((x) => !form.permissions.includes(x)) as it (it)}
@@ -151,8 +151,8 @@
 				</div>
 			</div>
 
-			<div class="nm-table-container">
-				<table class="nm-table is-variant-compact">
+			<div class="table-container">
+				<table class="table is-variant-compact">
 					<thead>
 						<tr>
 							<th>Permission</th>
@@ -181,11 +181,11 @@
 		<hr>
 
 		<div class="flex gap-4">
-			<button class="nm-button" class:is-loading={saving}>
+			<button class="button" class:is-loading={saving}>
 				{#if role}Update{:else}Create{/if}
 			</button>
 			{#if role}
-				<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
+				<button class="button" type="button" onclick={deleteItem}>Delete</button>
 			{/if}
 			</div>
 	</form>

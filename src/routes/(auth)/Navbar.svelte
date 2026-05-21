@@ -50,12 +50,12 @@
 	</div>
 
 	<div class="flex ml-auto">
-		<div class="nm-dropdown ml-auto mt-auto mb-auto">
-			<div class="nm-button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
+		<div class="dropdown ml-auto mt-auto mb-auto">
+			<div class="button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
 				<i class="fa-solid fa-palette"></i>
 				Theme
 			</div>
-			<ul class="nm-menu is-card is-compact">
+			<ul class="menu is-card is-compact">
 				<li><div onclick={() => setTheme('dark')} onkeypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
 				<li><div onclick={() => setTheme('light')} onkeypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
 			</ul>

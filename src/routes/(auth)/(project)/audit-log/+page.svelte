@@ -272,12 +272,12 @@
 
 <h6>Audit Logs</h6>
 <br>
-<div class="nm-panel is-level-300">
+<div class="panel is-level-300">
 	<form onsubmit={apply}>
 		<div class="filter-row">
-			<div class="nm-field">
-				<label class="nm-label" for="filter-resource-type">Resource type</label>
-				<div class="nm-select">
+			<div class="field">
+				<label class="label" for="filter-resource-type">Resource type</label>
+				<div class="select">
 					<select id="filter-resource-type" bind:value={form.resourceType}>
 						<option value="">All</option>
 						{#each RESOURCE_TYPES as t (t.value)}
@@ -286,9 +286,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="nm-field">
-				<label class="nm-label" for="filter-outcome">Outcome</label>
-				<div class="nm-select">
+			<div class="field">
+				<label class="label" for="filter-outcome">Outcome</label>
+				<div class="select">
 					<select id="filter-outcome" bind:value={form.outcome}>
 						<option value="">All</option>
 						<option value="success">Success</option>
@@ -296,8 +296,8 @@
 					</select>
 				</div>
 			</div>
-			<div class="nm-field">
-				<span class="nm-label">Date range</span>
+			<div class="field">
+				<span class="label">Date range</span>
 				<DatePicker
 					theme="audit-log-dp"
 					bind:isOpen={isDatePickerOpen}
@@ -327,9 +327,9 @@
 			</div>
 		</div>
 		<div class="actor-row">
-			<div class="nm-field">
-				<label class="nm-label" for="filter-actor">Actor</label>
-				<div class="nm-input">
+			<div class="field">
+				<label class="label" for="filter-actor">Actor</label>
+				<div class="input">
 					<input id="filter-actor" type="text" placeholder="email or service account"
 						bind:value={form.actor}>
 				</div>
@@ -337,14 +337,14 @@
 		</div>
 
 		<div class="filter-actions">
-			<button type="button" class="nm-button is-variant-secondary"
+			<button type="button" class="button is-variant-secondary"
 				onclick={reset} disabled={applying}>Reset</button>
-			<button type="submit" class="nm-button" class:is-loading={applying}>Apply</button>
+			<button type="submit" class="button" class:is-loading={applying}>Apply</button>
 		</div>
 	</form>
 
-	<div class="nm-table-container mt-4">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Time</th>

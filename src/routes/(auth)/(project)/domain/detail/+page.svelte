@@ -90,8 +90,8 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Purge',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative mr-4',
-				cancelButton: 'nm-button is-variant-tertiary',
+				confirmButton: 'button is-variant-negative mr-4',
+				cancelButton: 'button is-variant-tertiary',
 				actions: 'mt-6'
 			}
 		})
@@ -132,8 +132,8 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Purge',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative mr-4',
-				cancelButton: 'nm-button is-variant-tertiary',
+				confirmButton: 'button is-variant-negative mr-4',
+				cancelButton: 'button is-variant-tertiary',
 				actions: 'mt-6'
 			}
 		})
@@ -199,17 +199,17 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/domain?project=${project}`} class="nm-link"><h6>Domains</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{domain.domain}</h6>
 	</div>
 </div>
 
 <br>
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<strong>Domain: {domain.domain}</strong>
@@ -219,39 +219,39 @@
 	<hr>
 
 	<div class="content grid gap-4 w-full">
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-gsa">Domain</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-gsa" value={domain.domain} readonly disabled>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
-		<div class="nm-field mt-3">
-			<div class="nm-checkbox">
+		<div class="field mt-3">
+			<div class="checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
 				<label for="input-cdn">CDN</label>
 			</div>
 		</div>
-		<div class="nm-field">
-			<div class="nm-checkbox">
+		<div class="field">
+			<div class="checkbox">
 				<input id="input-wildcard" type="checkbox" bind:checked={domain.wildcard} disabled readonly>
 				<label for="input-wildcard">Wildcard</label>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="text-created_at">Created at</label>
-			<div class="nm-input">
+			<div class="input">
 				<span id="text-created_at">{format.datetime(domain.createdAt)}</span>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="text-creted_by">Created by</label>
-			<div class="nm-input">
+			<div class="input">
 				<span id="text-creted_by">{domain.createdBy}</span>
 			</div>
 		</div>
@@ -272,9 +272,9 @@
 					<p class="text-negative text-content/80">{e}</p>
 				{/each}
 			{/if}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-owner_name">TXT Name</label>
-				<div class="nm-input -has-icon-right mb-1">
+				<div class="input -has-icon-right mb-1">
 					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
 					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.name}>
@@ -282,9 +282,9 @@
 					</span>
 				</div>
 			</div>
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-owner_value">TXT Value</label>
-				<div class="nm-input -has-icon-right mb-1">
+				<div class="input -has-icon-right mb-1">
 					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
 					<span class="icon -is-right copy"
 						data-clipboard-text={domain.verification.ownership.value}>
@@ -299,9 +299,9 @@
 			<p><strong>SSL/TLS Verification</strong></p>
 
 			{#if domain.verification.ssl.dcv.name}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-ssl_dcv_name">CNAME Name</label>
-					<div class="nm-input -has-icon-right mb-1">
+					<div class="input -has-icon-right mb-1">
 						<input id="input-ssl_dcv_name" value={domain.verification.ssl.dcv.name} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.name}>
@@ -309,9 +309,9 @@
 							</span>
 					</div>
 				</div>
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-ssl_dcv_value">CNAME Value</label>
-					<div class="nm-input -has-icon-right mb-1">
+					<div class="input -has-icon-right mb-1">
 						<input id="input-ssl_dcv_value" value={domain.verification.ssl.dcv.value} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={domain.verification.ssl.dcv.value}>
@@ -321,9 +321,9 @@
 				</div>
 			{:else}
 				{#each domain.verification.ssl.records as it, index (index)}
-					<div class="nm-field">
+					<div class="field">
 						<label for={`input-ssl_name_${index}`}>TXT Name</label>
-						<div class="nm-input -has-icon-right mb-1">
+						<div class="input -has-icon-right mb-1">
 							<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={it.txtName}>
@@ -331,9 +331,9 @@
 								</span>
 						</div>
 					</div>
-					<div class="nm-field">
+					<div class="field">
 						<label for={`input-ssl_value_${index}`}>TXT Value</label>
-						<div class="nm-input -has-icon-right mb-1">
+						<div class="input -has-icon-right mb-1">
 							<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={it.txtValue}>
@@ -348,10 +348,10 @@
 		{#if domain.status === 'success' || domain.status === 'verify'}
 			<hr>
 			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-ip">A Record</label>
 					{#each domain.dnsConfig.ipv4 as ip, i (i)}
-						<div class="nm-input -has-icon-right mb-1">
+						<div class="input -has-icon-right mb-1">
 							<input id="input-ip" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -362,10 +362,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-ipv6">AAAA Record</label>
 					{#each domain.dnsConfig.ipv6 as ip, i (i)}
-						<div class="nm-input -has-icon-right mb-1">
+						<div class="input -has-icon-right mb-1">
 							<input id="input-ipv6" value={ip} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={ip}>
@@ -376,10 +376,10 @@
 				</div>
 			{/if}
 			{#if (domain.dnsConfig.cname ?? []).length > 0}
-				<div class="nm-field">
+				<div class="field">
 					<label for="input-cname">CNAME Record</label>
 					{#each domain.dnsConfig.cname as cname, i (i)}
-						<div class="nm-input -has-icon-right">
+						<div class="input -has-icon-right">
 							<input id="input-cname" value={cname} readonly disabled>
 							<span class="icon -is-right copy"
 								data-clipboard-text={cname}>
@@ -403,7 +403,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="text-sm opacity-80">Remove all cached resources</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
+						<button class="button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
@@ -413,7 +413,7 @@
 							<div><strong>Purge prefix</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at prefix path</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} onclick={purgeCachePrefix}>
+						<button class="button" class:is-loading={purging} onclick={purgeCachePrefix}>
 							Purge prefix
 						</button>
 					</div>
@@ -423,7 +423,7 @@
 							<div><strong>Purge file</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at exact path</p>
 						</div>
-						<button class="nm-button" class:is-loading={purging} onclick={purgeCacheFile}>
+						<button class="button" class:is-loading={purging} onclick={purgeCacheFile}>
 							Purge file
 						</button>
 					</div>
@@ -435,17 +435,17 @@
 	<hr>
 	{#if domain.cdn}
 		<div class="flex items-center flex-wrap">
-			<a class="nm-button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
+			<a class="button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
 		</div>
 	{:else}
 		<div class="flex items-center flex-wrap">
-			<button class="nm-button" onclick={upgradeCdn} disabled>Add CDN</button>
+			<button class="button" onclick={upgradeCdn} disabled>Add CDN</button>
 		</div>
 	{/if}
 
 	<hr>
 	<div class="flex gap-4">
-		<button class="nm-button" type="button" onclick={deleteItem}>
+		<button class="button" type="button" onclick={deleteItem}>
 			Delete
 		</button>
 	</div>

@@ -28,33 +28,33 @@
 </script>
 
 <div class="grid gap-4 w-full">
-	<div class="nm-field">
+	<div class="field">
 		<label for="input-name">Name</label>
-		<div class="nm-input">
+		<div class="input">
 			<input id="input-name" value={disk.name} readonly disabled>
 		</div>
 	</div>
-	<div class="nm-field">
+	<div class="field">
 		<label for="input-location">Location</label>
-		<div class="nm-input">
+		<div class="input">
 			<input id="input-location" value={disk.location} readonly disabled>
 		</div>
 	</div>
-	<div class="nm-field">
+	<div class="field">
 		<label for="input-size">Size (GiB)</label>
-		<div class="nm-input">
+		<div class="input">
 			<input id="input-size" value={disk.size} readonly disabled>
 		</div>
 	</div>
-	<div class="nm-field">
+	<div class="field">
 		<label for="input-created_at">Created at</label>
-		<div class="nm-input">
+		<div class="input">
 			<span id="input-created_at">{format.datetime(disk.createdAt)}</span>
 		</div>
 	</div>
-	<div class="nm-field">
+	<div class="field">
 		<label for="input-created_by">Created by</label>
-		<div class="nm-input">
+		<div class="input">
 			<span id="input-created_by">{disk.createdBy}</span>
 		</div>
 	</div>
@@ -63,9 +63,9 @@
 <hr>
 
 <div class="flex gap-4">
-	<a class="nm-button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+	<a class="button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 
-	<button class="nm-button" type="button" onclick={deleteItem}>
+	<button class="button" type="button" onclick={deleteItem}>
 		Delete
 	</button>
 </div>

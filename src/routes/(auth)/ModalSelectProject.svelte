@@ -40,13 +40,13 @@
 	}
 </script>
 
-<div class="nm-modal" onclick={close} class:is-active={isActive} aria-hidden="true">
-	<div class="nm-modal-panel">
-		<div class="nm-modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
+<div class="modal" onclick={close} class:is-active={isActive} aria-hidden="true">
+	<div class="modal-panel">
+		<div class="modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
 
-		<div class="nm-table-container mt-4">
-			<table class="nm-table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
+		<div class="table-container mt-4">
+			<table class="table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
 				<thead>
 					<tr>
 						<th class="is-collapse"></th>
@@ -80,17 +80,17 @@
 </div>
 
 <style>
-	.nm-table-container {
+	.table-container {
 		max-height: 405px;
 		overflow: auto;
 	}
 
-	.nm-table td {
+	.table td {
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
 	}
 
-	.nm-modal-panel {
+	.modal-panel {
 		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
 		width: 100%;
 		max-width: 48rem;

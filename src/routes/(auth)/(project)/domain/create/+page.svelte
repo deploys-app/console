@@ -46,18 +46,18 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/domain?project=${project}`} class="nm-link"><h6>Domains</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>Create</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<div class="flex items-center">
 			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Create domain</strong></h3>
@@ -65,15 +65,15 @@
 	</div>
 	<hr>
 	<form class="grid gap-4 w-full" onsubmit={save}>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-domain">Domain</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-domain" bind:value={form.domain}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="nm-select">
+			<div class="select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" selected disabled>Select Location</option>
 					{#each locations as it (it.id)}
@@ -83,18 +83,18 @@
 			</div>
 		</div>
 
-		<div class="nm-field mt-3">
+		<div class="field mt-3">
 			<h6><strong>Advanced Settings</strong></h6>
 		</div>
 
-		<div class="nm-field">
-			<div class="nm-checkbox">
+		<div class="field">
+			<div class="checkbox">
 				<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
 				<label for="input-wildcard">Wildcard</label>
 			</div>
 		</div>
-		<div class="nm-field">
-			<div class="nm-checkbox">
+		<div class="field">
+			<div class="checkbox">
 				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled>
 				<label for="input-cdn">CDN</label>
 			</div>
@@ -102,7 +102,7 @@
 
 		<hr>
 
-		<button class="nm-button mr-auto" class:is-loading={saving}>Save</button>
+		<button class="button mr-auto" class:is-loading={saving}>Save</button>
 	</form>
 </div>
 

@@ -10,17 +10,17 @@
 
 <h6>Billing</h6>
 <br>
-<div class="nm-panel is-level-300">
+<div class="panel is-level-300">
 	<div class="flex justify-between items-center">
 		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="nm-button" href="/billing/create">
+			<a class="button" href="/billing/create">
                 Create account
             </a>
 		</div>
 	</div>
 	<br>
-	<div class="nm-table-container mt-4">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 				<tr>
 					<th>Billing name</th>
@@ -32,7 +32,7 @@
 				{#each billingAccounts as it (it.id)}
 					<tr>
 						<td>
-							<a class="nm-link" href="/billing/detail?id={it.id}">{it.name}</a>
+							<a class="link" href="/billing/detail?id={it.id}">{it.name}</a>
 						</td>
 						<td>{it.id}</td>
 						<td class="is-align-center">

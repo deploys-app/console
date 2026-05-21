@@ -44,15 +44,15 @@
 </script>
 
 <h6><strong>Deployment Details</strong></h6>
-<div class="nm-table-container">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<tbody>
 			{#if deployment.type === 'WebService'}
 				{#if !deployment.internal}
 					<tr>
 						<td>URL</td>
 						<td>
-							<a class="nm-link underline" href={`https://${deployment.url}`} target="_blank">
+							<a class="link underline" href={`https://${deployment.url}`} target="_blank">
 								{`https://${deployment.url}`}
 							</a>
 							<span class="icon copy" data-clipboard-text={`https://${deployment.url}`}>
@@ -248,13 +248,13 @@
 
 <div class="flex flex-wrap items-center my-8">
 	<div class="xl:ml-auto mb-3 xl:mb-0">
-		<button class="nm-button" type="button" onclick={deleteItem}>Delete</button>
+		<button class="button" type="button" onclick={deleteItem}>Delete</button>
 	</div>
 </div>
 
 <h6><strong>Env Groups</strong></h6>
-<div class="nm-table-container">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th>Name</th>
@@ -264,7 +264,7 @@
 		{#each deployment.envGroups || [] as name (name)}
 			<tr>
 				<td>
-					<a class="nm-link" href={`/env-group/create?project=${deployment.project}&name=${name}`}>
+					<a class="link" href={`/env-group/create?project=${deployment.project}&name=${name}`}>
 						{name}
 					</a>
 				</td>
@@ -277,8 +277,8 @@
 </div>
 
 <h6><strong>Environment Variables</strong></h6>
-<div class="nm-table-container">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th class="is-collapse" style="min-width: 256px">Env</th>
@@ -301,8 +301,8 @@
 </div>
 
 <h6><strong>Mount Data</strong></h6>
-<div class="nm-table-container">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th class="is-collapse" style="min-width: 256px">Path</th>

@@ -13,17 +13,17 @@
 
 <h6>Pull Secrets</h6>
 <br>
-<div class="nm-panel is-level-300">
+<div class="panel is-level-300">
 	<div class="flex justify-between items-center">
 		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="nm-button" href="/pull-secret/create?project={project}">
+			<a class="button" href="/pull-secret/create?project={project}">
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="nm-table-container mt-4">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -37,7 +37,7 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="nm-link" href="/pull-secret/detail?project={project}&location={it.location}&name={it.name}">
+							<a class="link" href="/pull-secret/detail?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>

@@ -30,8 +30,8 @@
 </script>
 
 <h6><strong>Revision</strong></h6>
-<div class="nm-table-container mt-4 whitespace-nowrap">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container mt-4 whitespace-nowrap">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th>Revision</th>
@@ -50,7 +50,7 @@
 				<td>{it.createdBy}</td>
 				<td>
 					{#if index > 0}
-						<button class="nm-button is-size-small" type="button" onclick={() => rollback(it.revision)}>Rollback</button>
+						<button class="button is-size-small" type="button" onclick={() => rollback(it.revision)}>Rollback</button>
 					{/if}
 				</td>
 			</tr>

@@ -30,13 +30,13 @@
 
 <h6>Registry</h6>
 <br>
-<div class="nm-panel is-level-300">
+<div class="panel is-level-300">
 	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
 	{#if storage !== null}
 		<p class="mt-2">Total Storage: <strong>{format.storage(storage.size)}</strong></p>
 	{/if}
-	<div class="nm-table-container mt-4">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Repository</th>
@@ -47,7 +47,7 @@
 				{#each repositories as repo (repo.name)}
 					<tr>
 						<td>
-							<a class="nm-link"
+							<a class="link"
 							   href="/registry/detail?project={project}&repository={repo.name}">
 								{repo.name}
 							</a>

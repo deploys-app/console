@@ -40,20 +40,20 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/domain?project=${project}`} class="nm-link"><h6>Domains</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
-		<a href="/domain/detail?project={project}&domain={domain.domain}" class="nm-link"><h6>{domain.domain}</h6></a>
+	<div class="breadcrumb-item">
+		<a href="/domain/detail?project={project}&domain={domain.domain}" class="link"><h6>{domain.domain}</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>CDN Downgrade</h6>
 	</div>
 </div>
 
 <br>
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<strong>CDN Downgrade</strong>
@@ -63,20 +63,20 @@
 	<hr>
 
 	<div class="content grid gap-4 w-full">
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-gsa">Domain</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-gsa" value={domain.domain} readonly disabled>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-location" value={domain.location} readonly disabled>
 			</div>
 		</div>
-		<div class="nm-field">
-			<div class="nm-checkbox">
+		<div class="field">
+			<div class="checkbox">
 				<input id="input-wildcard" type="checkbox" bind:checked={domain.wildcard} disabled readonly>
 				<label for="input-wildcard">Wildcard</label>
 			</div>
@@ -84,10 +84,10 @@
 
 		<hr>
 		{#if location.endpoint}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-ip">A Record</label>
 				{#each [location.endpoint] as ip, i (i)}
-					<div class="nm-input -has-icon-right mb-1">
+					<div class="input -has-icon-right mb-1">
 						<input id="input-ip" value={ip} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={ip}>
@@ -98,10 +98,10 @@
 			</div>
 		{/if}
 		<!--{#if (domain.dnsConfig.ipv6 ?? []).length > 0}-->
-		<!--	<div class="nm-field">-->
+		<!--	<div class="field">-->
 		<!--		<label for="input-ipv6">AAAA Record</label>-->
 		<!--		{#each domain.dnsConfig.ipv6 as ip}-->
-		<!--			<div class="nm-input -has-icon-right mb-1">-->
+		<!--			<div class="input -has-icon-right mb-1">-->
 		<!--				<input id="input-ipv6" value={ip} readonly disabled>-->
 		<!--				<span class="icon -is-right copy"-->
 		<!--					data-clipboard-text={ip}>-->
@@ -112,10 +112,10 @@
 		<!--	</div>-->
 		<!--{/if}-->
 		{#if location.cname}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-cname">CNAME Record</label>
 				{#each [location.cname] as cname, i (i)}
-					<div class="nm-input -has-icon-right">
+					<div class="input -has-icon-right">
 						<input id="input-cname" value={cname} readonly disabled>
 						<span class="icon -is-right copy"
 							data-clipboard-text={cname}>
@@ -130,7 +130,7 @@
 	<hr>
 	<div class="flex gap-4">
 		<div class="flex items-center flex-wrap">
-			<button class="nm-button" onclick={downgradeCdn}>Downgrade</button>
+			<button class="button" onclick={downgradeCdn}>Downgrade</button>
 		</div>
 	</div>
 </div>

@@ -36,17 +36,17 @@
 
 <h6>Routes</h6>
 <br>
-<div class="nm-panel is-level-300">
+<div class="panel is-level-300">
 	<div class="flex justify-between items-center">
 		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="nm-button" href={`/route/create?project=${project}`}>
+			<a class="button" href={`/route/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="nm-table-container mt-4">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Route</th>
@@ -62,7 +62,7 @@
 				{#each routes as it (`${it.domain}${it.path}-${it.location}`)}
 					<tr>
 						<td>
-							<a class="nm-link underline"
+							<a class="link underline"
 							   href={`https://${it.domain}${it.path}`}
 							   target="_blank">https://{it.domain}{it.path}</a>
 						</td>

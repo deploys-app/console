@@ -210,7 +210,7 @@
 
 			<div class="flex justify-end">
 				<a href="/project">
-					<small class="nm-link">View all projects</small>
+					<small class="link">View all projects</small>
 				</a>
 			</div>
 		</div>

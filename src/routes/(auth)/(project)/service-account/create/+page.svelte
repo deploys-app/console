@@ -43,17 +43,17 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
+<div class="breadcrumb">
 	{#if id}
-		<div class="nm-breadcrumb-item">
-			<a href={`/service-account?project=${project}&id=${id}`} class="nm-link"><h6>{serviceAccount.sid}</h6></a>
+		<div class="breadcrumb-item">
+			<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
 		</div>
 	{:else}
-		<div class="nm-breadcrumb-item">
-			<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
+		<div class="breadcrumb-item">
+			<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
 		</div>
 	{/if}
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>
 			{#if id}
 				Update
@@ -66,7 +66,7 @@
 
 <br>
 
-<div class="nm-panel is-level-300 grid gap-6">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<div class="flex items-center">
 			<h3 class="mr-6 mb-4 xl:mb-0"><strong>
@@ -83,35 +83,35 @@
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		{#if id}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-email">Email</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-email" value={serviceAccount.email} readonly>
 				</div>
 			</div>
 		{:else}
-			<div class="nm-field">
+			<div class="field">
 				<label for="input-sid">ID</label>
-				<div class="nm-input">
+				<div class="input">
 					<input id="input-sid" placeholder="ID" bind:value={sid}>
 				</div>
 			</div>
 		{/if}
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" placeholder="Name" required bind:value={name}>
 			</div>
 		</div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-description">Description</label>
-			<div class="nm-textarea">
+			<div class="textarea">
 				<textarea id="input-description" rows="5" placeholder="Description" bind:value={desc}></textarea>
 			</div>
 		</div>
 
-		<button class="nm-button mr-auto" class:is-loading={saving} disabled={saving}>Save</button>
+		<button class="button mr-auto" class:is-loading={saving} disabled={saving}>Save</button>
 	</form>
 </div>

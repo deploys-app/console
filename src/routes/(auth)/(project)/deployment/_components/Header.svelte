@@ -69,20 +69,20 @@
 			</div>
 		</h3>
 		<div class="flex items-center flex-wrap">
-			<a class="nm-button xl:ml-auto mr-6 mb-4 xl:mb-0"
+			<a class="button xl:ml-auto mr-6 mb-4 xl:mb-0"
 				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
 				Deploy New Revision
 			</a>
 			{#if canPause}
 				<div>
-					<button class="nm-button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
+					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="nm-button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
+					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>
@@ -93,7 +93,7 @@
 
 <hr>
 
-<div class="nm-tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
+<div class="tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
 	<a class="tab-button"
 		class:is-active={$page.url.pathname === '/deployment/metrics'}
 		href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
