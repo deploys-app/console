@@ -40,6 +40,15 @@
 		const unit = unitSuffix ? `GiB-${unitSuffix}` : 'GiB'
 		return { value: formatCompact(gib), full: formatNumber(gib), unit }
 	}
+	function billingElapsedSeconds () {
+		const now = new Date()
+		const start = new Date(now.getFullYear(), now.getMonth(), 1)
+		return Math.max((now - start) / 1000, 1)
+	}
+	function formatAvgCount (seconds, unit) {
+		const avg = seconds / billingElapsedSeconds()
+		return { value: formatCompact(avg), full: formatNumber(avg), unit }
+	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
@@ -49,17 +58,13 @@
 			key: 'cpuUsage',
 			icon: 'fa-microchip',
 			label: 'CPU Usage',
-			value: formatCompact(usage.cpuUsage),
-			full: formatNumber(usage.cpuUsage),
-			unit: 'vCPU-s'
+			...formatAvgCount(usage.cpuUsage, 'vCPUs')
 		},
 		{
 			key: 'cpu',
 			icon: 'fa-gauge-high',
 			label: 'CPU Allocated',
-			value: formatCompact(usage.cpu),
-			full: formatNumber(usage.cpu),
-			unit: 'vCPU-s'
+			...formatAvgCount(usage.cpu, 'vCPUs')
 		},
 		{
 			key: 'memory',
@@ -89,17 +94,13 @@
 			key: 'replica',
 			icon: 'fa-clone',
 			label: 'Replica',
-			value: formatCompact(usage.replica),
-			full: formatNumber(usage.replica),
-			unit: 'replica-s'
+			...formatAvgCount(usage.replica, 'replicas')
 		},
 		{
 			key: 'domainCdn',
 			icon: 'fa-globe',
 			label: 'Domain CDN',
-			value: formatCompact(usage.domainCdn),
-			full: formatNumber(usage.domainCdn),
-			unit: 'domain-s'
+			...formatAvgCount(usage.domainCdn, 'domains')
 		}
 	])
 </script>
