@@ -30,6 +30,31 @@
 			maximumFractionDigits: 2
 		})
 	}
+	function formatStorage (bytes, unitSuffix) {
+		const gib = bytes / unitGiB
+		if (gib >= 1024) {
+			const tib = gib / 1024
+			const unit = unitSuffix ? `TiB-${unitSuffix}` : 'TiB'
+			const full = formatNumber(tib)
+			return { value: formatCompact(tib), full, unit, tooltip: `${full} ${unit}` }
+		}
+		const unit = unitSuffix ? `GiB-${unitSuffix}` : 'GiB'
+		const full = formatNumber(gib)
+		return { value: formatCompact(gib), full, unit, tooltip: `${full} ${unit}` }
+	}
+	function billingElapsedSeconds () {
+		const now = new Date()
+		const start = new Date(now.getFullYear(), now.getMonth(), 1)
+		return Math.max((now.getTime() - start.getTime()) / 1000, 1)
+	}
+	function formatAvgCount (seconds, unit, rawUnit) {
+		const avg = seconds / billingElapsedSeconds()
+		return { value: formatCompact(avg), full: formatNumber(avg), unit, tooltip: `${formatNumber(seconds)} ${rawUnit}` }
+	}
+	function rawStorageTooltip (bytes) {
+		const r = formatStorage(bytes, 's')
+		return `${r.full} ${r.unit}`
+	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
@@ -39,65 +64,51 @@
 			key: 'cpuUsage',
 			icon: 'fa-microchip',
 			label: 'CPU Usage',
-			value: formatCompact(usage.cpuUsage),
-			full: formatNumber(usage.cpuUsage),
-			unit: 'vCPU-s'
+			...formatAvgCount(usage.cpuUsage, 'vCPUs', 'vCPU-s')
 		},
 		{
 			key: 'cpu',
 			icon: 'fa-gauge-high',
 			label: 'CPU Allocated',
-			value: formatCompact(usage.cpu),
-			full: formatNumber(usage.cpu),
-			unit: 'vCPU-s'
+			...formatAvgCount(usage.cpu, 'vCPUs', 'vCPU-s')
 		},
 		{
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
-			value: formatCompact(usage.memory / unitGiB),
-			full: formatNumber(usage.memory / unitGiB),
-			unit: 'GiB-s'
+			...formatStorage(usage.memory / billingElapsedSeconds(), ''),
+			tooltip: rawStorageTooltip(usage.memory)
 		},
 		{
 			key: 'disk',
 			icon: 'fa-hard-drive',
 			label: 'Disk',
-			value: formatCompact(usage.disk / unitGiB),
-			full: formatNumber(usage.disk / unitGiB),
-			unit: 'GiB-s'
+			...formatStorage(usage.disk / billingElapsedSeconds(), ''),
+			tooltip: rawStorageTooltip(usage.disk)
 		},
 		{
 			key: 'egress',
 			icon: 'fa-cloud-arrow-up',
 			label: 'Egress',
-			value: formatCompact(usage.egress / unitGiB),
-			full: formatNumber(usage.egress / unitGiB),
-			unit: 'GiB'
+			...formatStorage(usage.egress, '')
 		},
 		{
 			key: 'registryEgress',
 			icon: 'fa-box-archive',
 			label: 'Registry Egress',
-			value: formatCompact(usage.registryEgress / unitGiB),
-			full: formatNumber(usage.registryEgress / unitGiB),
-			unit: 'GiB'
+			...formatStorage(usage.registryEgress, '')
 		},
 		{
 			key: 'replica',
 			icon: 'fa-clone',
 			label: 'Replica',
-			value: formatCompact(usage.replica),
-			full: formatNumber(usage.replica),
-			unit: 'replica-s'
+			...formatAvgCount(usage.replica, 'replicas', 'replica-s')
 		},
 		{
 			key: 'domainCdn',
 			icon: 'fa-globe',
 			label: 'Domain CDN',
-			value: formatCompact(usage.domainCdn),
-			full: formatNumber(usage.domainCdn),
-			unit: 'domain-s'
+			...formatAvgCount(usage.domainCdn, 'domains', 'domain-s')
 		}
 	])
 </script>
@@ -105,7 +116,7 @@
 <h6>Dashboard</h6>
 <br>
 <div class="lo-12 lo-6:md _g-7 _alit-str">
-	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
+	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="_mgl-6">Project Info</strong>
@@ -144,7 +155,7 @@
 <!--		</a>-->
 	</div>
 
-	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
+	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
 		<div class="_dp-f _alit-ct _jtfct-spbtw">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
@@ -167,7 +178,7 @@
 
 		<div class="billing-grid">
 			{#each billing as item (item.key)}
-				<div class="billing-card" title={`${item.full} ${item.unit}`}>
+				<div class="billing-card" title={item.tooltip}>
 					<div class="billing-card-head">
 						<i class="fa-solid {item.icon}"></i>
 						<span class="billing-card-label">{item.label}</span>
@@ -181,7 +192,7 @@
 		</div>
 	</div>
 
-	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
+	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
 		<div class="_dp-f _alit-ct _jtfct-spbtw">
 			<h6>
 				<i class="fa-solid fa-clock-rotate-left"></i>
@@ -232,8 +243,9 @@
 
 <style lang="scss">
 	.dashboard-panel {
+		display: flex;
+		flex-direction: column;
 		min-height: 28rem;
-		align-content: start;
 	}
 
 	.billing-total {
