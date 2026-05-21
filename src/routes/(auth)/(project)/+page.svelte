@@ -104,8 +104,8 @@
 
 <h6>Dashboard</h6>
 <br>
-<div class="lo-12 lo-6:md _g-7 _alit-st">
-	<div class="nm-panel is-level-300 lo-12 _g-7">
+<div class="lo-12 lo-6:md _g-7 _alit-str">
+	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
 			<strong class="_mgl-6">Project Info</strong>
@@ -144,7 +144,7 @@
 <!--		</a>-->
 	</div>
 
-	<div class="nm-panel is-level-300 lo-12 _g-7">
+	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
 		<div class="_dp-f _alit-ct _jtfct-spbtw">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
@@ -181,7 +181,7 @@
 		</div>
 	</div>
 
-	<div class="nm-panel is-level-300 lo-12 _g-7">
+	<div class="nm-panel is-level-300 lo-12 _g-7 dashboard-panel">
 		<div class="_dp-f _alit-ct _jtfct-spbtw">
 			<h6>
 				<i class="fa-solid fa-clock-rotate-left"></i>
@@ -231,6 +231,10 @@
 </div>
 
 <style lang="scss">
+	.dashboard-panel {
+		min-height: 28rem;
+	}
+
 	.billing-total {
 		display: flex;
 		align-items: baseline;
