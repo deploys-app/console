@@ -233,6 +233,7 @@
 <style lang="scss">
 	.dashboard-panel {
 		min-height: 28rem;
+		align-content: start;
 	}
 
 	.billing-total {
