@@ -119,6 +119,7 @@
 			left: 0;
 			width: 100vw;
 			height: 100vh;
+			/* dvh after vh so it wins where supported (iOS Safari toolbar). */
 			height: 100dvh;
 		}
 	}

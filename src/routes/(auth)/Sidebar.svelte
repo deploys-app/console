@@ -105,8 +105,16 @@
 <style>
 	.sidebar {
 		width: var(--width-sidebar, 300px);
-		min-height: 100vh;
-		min-height: 100dvh;
+		/* Two declarations, ordered so dvh wins where supported. iOS
+		 * Safari's bottom toolbar shrinks dvh, so this keeps the bottom
+		 * social row above the toolbar. The Tailwind h-screen / h-dvh
+		 * utilities were unreliable here because their order in the
+		 * generated stylesheet is not stable. */
+		height: 100vh;
+		height: 100dvh;
+		display: flex;
+		flex-direction: column;
+		overflow-y: auto;
 		background-color: hsl(var(--hsl-base-300));
 		box-shadow: var(--raised-z10);
 	}
@@ -185,7 +193,7 @@
 	}
 </style>
 
-<nav class="sidebar pt-4 absolute z-[1] flex flex-col h-screen h-dvh overflow-y-auto">
+<nav class="sidebar pt-4 absolute z-[1]">
 	<div class="site-logo">
 		<img src="/images/logo.webp" alt="Deploys.app" draggable="false">
 	</div>
