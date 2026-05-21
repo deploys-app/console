@@ -70,13 +70,13 @@
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
-			...formatStorage(usage.memory, 's')
+			...formatStorage(usage.memory / billingElapsedSeconds(), '')
 		},
 		{
 			key: 'disk',
 			icon: 'fa-hard-drive',
 			label: 'Disk',
-			...formatStorage(usage.disk, 's')
+			...formatStorage(usage.disk / billingElapsedSeconds(), '')
 		},
 		{
 			key: 'egress',
