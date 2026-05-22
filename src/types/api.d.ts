@@ -136,6 +136,11 @@ declare namespace Api {
                 }[]
                 errors: string[]
             }
+            dns: {
+                verifiedAt?: string
+                lastCheckedAt?: string
+                errors?: string[]
+            }
         },
         dnsConfig: {
             ipv4: string[]
