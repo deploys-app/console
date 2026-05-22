@@ -103,15 +103,15 @@
 			</div>
 		</div>
 		<div class="field">
-			<label for="text-created_at">Created At</label>
+			<label for="input-created_at">Created At</label>
 			<div class="input">
-				<span id="text-created_at">{format.datetime(serviceAccount.createdAt)}</span>
+				<input id="input-created_at" value={format.datetime(serviceAccount.createdAt)} readonly>
 			</div>
 		</div>
 		<div class="field">
-			<label for="text-created_by">Created By</label>
+			<label for="input-created_by">Created By</label>
 			<div class="input">
-				<span id="text-created_by">{serviceAccount.createdBy}</span>
+				<input id="input-created_by" value={serviceAccount.createdBy} readonly>
 			</div>
 		</div>
 

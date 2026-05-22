@@ -244,15 +244,15 @@
 			</div>
 		</div>
 		<div class="field">
-			<label for="text-created_at">Created at</label>
+			<label for="input-created_at">Created at</label>
 			<div class="input">
-				<span id="text-created_at">{format.datetime(domain.createdAt)}</span>
+				<input id="input-created_at" value={format.datetime(domain.createdAt)} readonly disabled>
 			</div>
 		</div>
 		<div class="field">
-			<label for="text-creted_by">Created by</label>
+			<label for="input-created_by">Created by</label>
 			<div class="input">
-				<span id="text-creted_by">{domain.createdBy}</span>
+				<input id="input-created_by" value={domain.createdBy} readonly disabled>
 			</div>
 		</div>
 

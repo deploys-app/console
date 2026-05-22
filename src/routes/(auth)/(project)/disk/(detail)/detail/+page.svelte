@@ -49,13 +49,13 @@
 	<div class="field">
 		<label for="input-created_at">Created at</label>
 		<div class="input">
-			<span id="input-created_at">{format.datetime(disk.createdAt)}</span>
+			<input id="input-created_at" value={format.datetime(disk.createdAt)} readonly disabled>
 		</div>
 	</div>
 	<div class="field">
 		<label for="input-created_by">Created by</label>
 		<div class="input">
-			<span id="input-created_by">{disk.createdBy}</span>
+			<input id="input-created_by" value={disk.createdBy} readonly disabled>
 		</div>
 	</div>
 </div>
