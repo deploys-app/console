@@ -45,7 +45,7 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-4">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
 	</div>

@@ -34,7 +34,7 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-4">
+<div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
 		<h3 class="mr-6 mb-4 xl:mb-0"><strong>"{billingAccount.name}" account information</strong></h3>
 	</div>

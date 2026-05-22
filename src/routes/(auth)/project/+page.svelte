@@ -48,9 +48,9 @@
 <div class="panel is-level-300">
 	<div class="flex justify-between items-center">
 		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button -small" href="/project/create">
-                Create
-            </a>
+			<a class="button" href="/project/create">
+				Create
+			</a>
 		</div>
 	</div>
 
