@@ -11,6 +11,8 @@
 
 	const project = $derived(data.project)
 	const domain = $derived(data.domain)
+	const dnsErrors = $derived(domain.verification?.dns?.errors ?? [])
+	const hasDnsErrors = $derived(dnsErrors.length > 0)
 
 	onMount(() => {
 		return setupCopy('.copy')
@@ -24,15 +26,15 @@
 		}
 	})
 	function handleReload () {
-		const nonCdnAwaitingDns = !domain.cdn && domain.status !== 'success'
-		if (!['pending', 'verify'].includes(domain.status) && !nonCdnAwaitingDns) {
+		const nonCdnDnsNeedsAttention = !domain.cdn && (domain.status !== 'success' || hasDnsErrors)
+		if (!['pending', 'verify'].includes(domain.status) && !nonCdnDnsNeedsAttention) {
 			return
 		}
 		const f = async () => {
 			reloadTimeout = null
 			await api.invalidate('domain.get')
 			// Non-CDN DNS verification runs on a cron at minute-scale, no point polling faster.
-			if (!domain.cdn && domain.status !== 'success') {
+			if (!domain.cdn && (domain.status !== 'success' || hasDnsErrors)) {
 				reloadTimeout = setTimeout(f, 30000)
 			} else if (domain.status === 'pending') {
 				reloadTimeout = setTimeout(f, 3000)
@@ -265,28 +267,36 @@
 			</div>
 		{/if}
 
-		{#if !domain.cdn && domain.status !== 'success'}
+		{#if !domain.cdn && (domain.status !== 'success' || hasDnsErrors)}
 			<hr>
 			<p><strong>DNS Verification</strong></p>
-			<p class="text-sm opacity-80">
-				{#if domain.wildcard}
-					Wildcard DNS can't resolve to a single IP, so verify ownership by
-					adding the TXT record below. We re-check every few minutes and
-					switch the domain to <strong>success</strong> once the record is
-					visible.
-				{:else}
-					Point your DNS at the records below. We re-check every few minutes
-					and switch the domain to <strong>success</strong> once it resolves
-					to this location. If your DNS is behind a CDN/proxy and the A/AAAA
-					records can't resolve to us directly, add the TXT record under
-					<em>Proxied DNS (alternative)</em> instead.
-				{/if}
-			</p>
+			{#if domain.status !== 'success'}
+				<p class="text-sm opacity-80">
+					{#if domain.wildcard}
+						Wildcard DNS can't resolve to a single IP, so verify ownership by
+						adding the TXT record below. We re-check every few minutes and
+						switch the domain to <strong>success</strong> once the record is
+						visible.
+					{:else}
+						Point your DNS at the records below. We re-check every few minutes
+						and switch the domain to <strong>success</strong> once it resolves
+						to this location. If your DNS is behind a CDN/proxy and the A/AAAA
+						records can't resolve to us directly, add the TXT record under
+						<em>Proxied DNS (alternative)</em> instead.
+					{/if}
+				</p>
 
-			{#if domain.status === 'error'}
+				{#if domain.status === 'error'}
+					<p class="text-negative text-content/80">
+						DNS verification has been failing for over 48 hours. The certificate
+						has been torn down. Re-point DNS and we'll re-verify automatically.
+					</p>
+				{/if}
+			{:else}
 				<p class="text-negative text-content/80">
-					DNS verification has been failing for over 48 hours. The certificate
-					has been torn down. Re-point DNS and we'll re-verify automatically.
+					DNS verification is currently failing. If this isn't resolved within
+					48 hours, the certificate will be torn down. Re-check your DNS
+					configuration against the records below.
 				</p>
 			{/if}
 
@@ -296,8 +306,8 @@
 			<p class="text-sm opacity-80">
 				Last checked: {format.datetime(domain.verification?.dns?.lastCheckedAt) || '-'}
 			</p>
-			{#if (domain.verification?.dns?.errors ?? []).length > 0}
-				{#each domain.verification.dns.errors as e, i (i)}
+			{#if hasDnsErrors}
+				{#each dnsErrors as e, i (i)}
 					<p class="text-negative text-content/80">{e}</p>
 				{/each}
 			{/if}

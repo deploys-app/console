@@ -56,10 +56,15 @@
 			</thead>
 			<tbody>
 				{#each domains as it (`${it.domain}-${it.location}`)}
+					{@const dnsHasErrors = !it.cdn && (it.verification?.dns?.errors?.length ?? 0) > 0}
 					<tr>
 						<td>
 							<StatusIcon status={it.cdn && it.verification.ssl.pending ? 'verify' : it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
+							{#if dnsHasErrors}
+								<i class="fa-solid fa-triangle-exclamation text-warning ml-2"
+									title="DNS verification is failing. Open the domain to see details."></i>
+							{/if}
 						</td>
 						<td>
 							{#if it.wildcard}
