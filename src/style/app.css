@@ -1014,7 +1014,25 @@
 	}
 
 	.icon.copy {
+		position: relative;
 		font-size: var(--fs-6);
+	}
+
+	.icon.copy[data-copied]::after {
+		content: 'Copied!';
+		position: absolute;
+		bottom: calc(100% + 6px);
+		left: 50%;
+		transform: translateX(-50%);
+		background: hsl(var(--hsl-content));
+		color: hsl(var(--hsl-base-100));
+		padding: 2px 8px;
+		border-radius: 4px;
+		font-size: var(--fs-7);
+		line-height: 1.5;
+		white-space: nowrap;
+		pointer-events: none;
+		z-index: 50;
 	}
 
 	.icon:hover {

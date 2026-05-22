@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
-	import ClipboardJS from 'clipboard'
+	import { setupCopy } from '$lib/clipboard'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -12,10 +12,7 @@
 	const location = $derived(data.location)
 
 	onMount(() => {
-		const copyList = new ClipboardJS('.copy')
-		return () => {
-			copyList.destroy()
-		}
+		return setupCopy('.copy')
 	})
 
 	function downgradeCdn () {

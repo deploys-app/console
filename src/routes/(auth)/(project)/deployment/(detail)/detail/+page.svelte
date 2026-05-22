@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
-	import ClipboardJS from 'clipboard'
+	import { setupCopy } from '$lib/clipboard'
 	import * as format from '$lib/format'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -17,10 +17,7 @@
 	const hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
 
 	onMount(() => {
-		const copyList = new ClipboardJS('.copy')
-		return () => {
-			copyList.destroy()
-		}
+		return setupCopy('.copy')
 	})
 
 	function deleteItem () {

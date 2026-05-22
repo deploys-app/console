@@ -1,7 +1,7 @@
 <script>
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
-	import ClipboardJS from 'clipboard'
+	import { setupCopy } from '$lib/clipboard'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
@@ -15,10 +15,7 @@
 	const error = $derived(data.error)
 
 	onMount(() => {
-		const copyList = new ClipboardJS('.copy')
-		return () => {
-			copyList.destroy()
-		}
+		return setupCopy('.copy')
 	})
 
 	function untagTag (tag) {

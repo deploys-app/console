@@ -1,5 +1,5 @@
 <script>
-	import ClipboardJS from 'clipboard'
+	import { setupCopy } from '$lib/clipboard'
 	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -13,10 +13,7 @@
 	const pullSecret = $derived(data.pullSecret)
 
 	onMount(() => {
-		const copyList = new ClipboardJS('.copy')
-		return () => {
-			copyList?.destroy()
-		}
+		return setupCopy('.copy')
 	})
 
 	function deleteItem () {
