@@ -4,7 +4,7 @@ import ClipboardJS from 'clipboard'
  * @param {string} selector
  * @returns {() => void}
  */
-export function setupCopy(selector) {
+export function setupCopy (selector) {
 	const clip = new ClipboardJS(selector)
 	clip.on('success', (e) => {
 		const trigger = /** @type {HTMLElement} */ (e.trigger)
