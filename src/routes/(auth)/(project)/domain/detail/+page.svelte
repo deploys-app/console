@@ -1,7 +1,7 @@
 <script>
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
-	import ClipboardJS from 'clipboard'
+	import { setupCopy } from '$lib/clipboard'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -13,10 +13,7 @@
 	const domain = $derived(data.domain)
 
 	onMount(() => {
-		const copyList = new ClipboardJS('.copy')
-		return () => {
-			copyList.destroy()
-		}
+		return setupCopy('.copy')
 	})
 
 	let reloadTimeout

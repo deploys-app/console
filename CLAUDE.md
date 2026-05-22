@@ -14,6 +14,12 @@ bun lint         # ESLint
 bun test         # Playwright e2e tests
 ```
 
+Before marking any task as complete, always run:
+```bash
+bun lint   # must pass with zero errors
+bun check  # must pass with zero errors
+```
+
 For deployment:
 ```bash
 make build   # build Docker image and push to registry.deploys.app

@@ -1,8 +1,12 @@
 <script>
+	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import { setupCopy } from '$lib/clipboard'
+
+	onMount(() => setupCopy('.copy'))
 
 	const { data } = $props()
 
@@ -120,9 +124,14 @@
 		<h6><strong>Keys</strong></h6>
 		<div class="grid gap-4 w-full">
 			{#each (serviceAccount.keys ?? []) as key, i (i)}
-				<div class="input -has-icon-right">
-					<input value="{key.secret}" readonly>
-					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button" aria-label="Remove">
+				<div class="flex items-center gap-2">
+					<div class="input -has-icon-right flex-1">
+						<input value={key.secret} readonly>
+						<span class="icon -is-right copy" data-clipboard-text={key.secret} aria-label="Copy">
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
+					<button class="icon" onclick={() => deleteKey(key.secret)} type="button" aria-label="Delete">
 						<i class="fa-solid fa-trash-alt"></i>
 					</button>
 				</div>
