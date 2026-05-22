@@ -24,13 +24,17 @@
 		}
 	})
 	function handleReload () {
-		if (!['pending', 'verify'].includes(domain.status)) {
+		const nonCdnAwaitingDns = !domain.cdn && domain.status !== 'success'
+		if (!['pending', 'verify'].includes(domain.status) && !nonCdnAwaitingDns) {
 			return
 		}
 		const f = async () => {
 			reloadTimeout = null
 			await api.invalidate('domain.get')
-			if (domain.status === 'pending') {
+			// Non-CDN DNS verification runs on a cron at minute-scale, no point polling faster.
+			if (!domain.cdn && domain.status !== 'success') {
+				reloadTimeout = setTimeout(f, 30000)
+			} else if (domain.status === 'pending') {
 				reloadTimeout = setTimeout(f, 3000)
 			} else if (domain.status === 'verify') {
 				reloadTimeout = setTimeout(f, 5000)
@@ -253,7 +257,7 @@
 			</div>
 		</div>
 
-		{#if domain.status === 'pending'}
+		{#if domain.cdn && domain.status === 'pending'}
 			<hr>
 			<p><strong>Domain Verification</strong></p>
 			<div class="text-2xl">
@@ -261,34 +265,95 @@
 			</div>
 		{/if}
 
-		{#if domain.verification?.ownership?.type}
+		{#if !domain.cdn && domain.status !== 'success'}
 			<hr>
-			<p><strong>Domain Verification</strong></p>
-			{#if (domain.verification.ownership.errors ?? []).length > 0}
-				{#each domain.verification.ownership.errors as e, i (i)}
+			<p><strong>DNS Verification</strong></p>
+			<p class="text-sm opacity-80">
+				{#if domain.wildcard}
+					Wildcard DNS can't resolve to a single IP, so verify ownership by
+					adding the TXT record below. We re-check every few minutes and
+					switch the domain to <strong>success</strong> once the record is
+					visible.
+				{:else}
+					Point your DNS at the records below. We re-check every few minutes
+					and switch the domain to <strong>success</strong> once it resolves
+					to this location. If your DNS is behind a CDN/proxy and the A/AAAA
+					records can't resolve to us directly, add the TXT record under
+					<em>Proxied DNS (alternative)</em> instead.
+				{/if}
+			</p>
+
+			{#if domain.status === 'error'}
+				<p class="text-negative text-content/80">
+					DNS verification has been failing for over 48 hours. The certificate
+					has been torn down. Re-point DNS and we'll re-verify automatically.
+				</p>
+			{/if}
+
+			<p class="text-sm opacity-80">
+				Last verified: {format.datetime(domain.verification?.dns?.verifiedAt) || '-'}
+			</p>
+			<p class="text-sm opacity-80">
+				Last checked: {format.datetime(domain.verification?.dns?.lastCheckedAt) || '-'}
+			</p>
+			{#if (domain.verification?.dns?.errors ?? []).length > 0}
+				{#each domain.verification.dns.errors as e, i (i)}
 					<p class="text-negative text-content/80">{e}</p>
 				{/each}
 			{/if}
-			<div class="field">
-				<label for="input-owner_name">TXT Name</label>
-				<div class="input -has-icon-right mb-1">
-					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
-					<span class="icon -is-right copy"
-						data-clipboard-text={domain.verification.ownership.name}>
-						<i class="fa-light fa-copy"></i>
-					</span>
+		{/if}
+
+		{#snippet ownershipBlock()}
+			{#if domain.verification?.ownership?.type}
+				<hr>
+				<p>
+					<strong>
+						{#if domain.cdn}
+							Domain Verification
+						{:else if domain.wildcard}
+							Ownership TXT Record
+						{:else}
+							Proxied DNS (alternative)
+						{/if}
+					</strong>
+				</p>
+				{#if !domain.cdn && !domain.wildcard}
+					<p class="text-sm opacity-80">
+						If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
+						records can't resolve to this location directly, add this TXT record
+						to prove ownership and we'll accept the proxied setup.
+					</p>
+				{/if}
+				{#if (domain.verification.ownership.errors ?? []).length > 0}
+					{#each domain.verification.ownership.errors as e, i (i)}
+						<p class="text-negative text-content/80">{e}</p>
+					{/each}
+				{/if}
+				<div class="field">
+					<label for="input-owner_name">TXT Name</label>
+					<div class="input -has-icon-right mb-1">
+						<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
+						<span class="icon -is-right copy"
+							data-clipboard-text={domain.verification.ownership.name}>
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
 				</div>
-			</div>
-			<div class="field">
-				<label for="input-owner_value">TXT Value</label>
-				<div class="input -has-icon-right mb-1">
-					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
-					<span class="icon -is-right copy"
-						data-clipboard-text={domain.verification.ownership.value}>
-						<i class="fa-light fa-copy"></i>
-					</span>
+				<div class="field">
+					<label for="input-owner_value">TXT Value</label>
+					<div class="input -has-icon-right mb-1">
+						<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
+						<span class="icon -is-right copy"
+							data-clipboard-text={domain.verification.ownership.value}>
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
 				</div>
-			</div>
+			{/if}
+		{/snippet}
+
+		{#if domain.cdn || domain.wildcard}
+			{@render ownershipBlock()}
 		{/if}
 
 		{#if (domain.verification?.ssl?.records ?? []).length > 0}
@@ -342,7 +407,7 @@
 			{/if}
 		{/if}
 
-		{#if domain.status === 'success' || domain.status === 'verify'}
+		{#if domain.status === 'success' || domain.status === 'verify' || (!domain.cdn && !domain.wildcard)}
 			<hr>
 			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
 				<div class="field">
@@ -386,6 +451,10 @@
 					{/each}
 				</div>
 			{/if}
+		{/if}
+
+		{#if !domain.cdn && !domain.wildcard}
+			{@render ownershipBlock()}
 		{/if}
 
 		{#if domain.cdn && domain.status === 'success'}

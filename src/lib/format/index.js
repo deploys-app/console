@@ -46,11 +46,11 @@ export function storage (v) {
 }
 
 /**
- * @param {string} v
+ * @param {string | undefined | null} v
  * @returns {string}
  */
 export function datetime (v) {
-	if (!v) {
+	if (!v || v.startsWith('0001-01-01')) {
 		return ''
 	}
 	return dayjs(v).format('YYYY-MM-DD HH:mm:ss')
