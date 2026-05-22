@@ -971,7 +971,7 @@
 		background-color: transparent;
 		color: hsl(var(--hsl-content));
 		border-radius: 9999px;
-		font-size: 12px;
+		font-size: 0.75rem;
 		cursor: pointer;
 		transition: transform var(--timing-faster) ease;
 	}
@@ -986,7 +986,7 @@
 		right: 0;
 		background-color: inherit;
 		padding: 6px 10px;
-		font-size: 16px;
+		font-size: 1rem;
 		font-weight: 600;
 		cursor: pointer;
 		user-select: none;

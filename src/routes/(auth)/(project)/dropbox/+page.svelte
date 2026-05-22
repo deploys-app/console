@@ -236,7 +236,7 @@
 
 	.upload-item .upload-icon {
 		color: hsl(var(--hsl-positive));
-		font-size: 1.1rem;
+		font-size: 1.125rem;
 	}
 
 	.upload-item .upload-info {

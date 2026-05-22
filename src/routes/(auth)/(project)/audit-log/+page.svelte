@@ -263,7 +263,7 @@
 		margin-left: 0.25rem;
 		padding: 0.05rem 0.4rem;
 		border-radius: 4px;
-		font-size: 0.7rem;
+		font-size: 0.75rem;
 		background: hsl(var(--hsl-content) / 0.08);
 		color: hsl(var(--hsl-content) / 0.7);
 		vertical-align: middle;
