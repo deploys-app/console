@@ -57,32 +57,32 @@
 	}
 </script>
 
-<div class="lo-12 _g-5">
-	<div class="_dp-g _g-5 _gatf-r _gatf-cl:lg">
-		<h3 class="_dp-f _fw-w _alit-fst _mgr-7 _mgbt-6 _mgbt-0:lg">
+<div class="grid grid-cols-1 gap-3">
+	<div class="grid gap-3 grid-flow-row xl:grid-flow-col">
+		<h3 class="flex flex-wrap items-start mr-6 mb-4 xl:mb-0">
 			<div>
 				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} type={deployment.type} />
 			</div>
 			<div>
 				{deployment.name}
-				<div class="image _fs-4 _mgt-3 _wb-ba">{deployment.image}</div>
+				<div class="image text-base mt-1 break-all">{deployment.image}</div>
 			</div>
 		</h3>
-		<div class="_dp-f _alit-ct _fw-w">
-			<a class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg"
+		<div class="flex items-center flex-wrap">
+			<a class="button xl:ml-auto mr-6 mb-4 xl:mb-0"
 				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
 				Deploy New Revision
 			</a>
 			{#if canPause}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={pause}>
+					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="nm-button _mgl-at:lg _mgr-7 _mgbt-6 _mgbt-0:lg" type="button" onclick={resume}>
+					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>
@@ -93,7 +93,7 @@
 
 <hr>
 
-<div class="nm-tabs is-variant-underline _mgbt-0:lg _w-100pct _fdrt-cl _fdrt-r:md">
+<div class="tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
 	<a class="tab-button"
 		class:is-active={$page.url.pathname === '/deployment/metrics'}
 		href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>

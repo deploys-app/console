@@ -124,36 +124,33 @@
 	}
 </script>
 
-<style lang="scss">
+<style>
 	.drop-zone {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		gap: 0.5rem;
-
 		padding: 2.5rem 1rem;
-
 		border: 2px dashed hsl(var(--hsl-base-400) / 0.6);
 		border-radius: 8px;
 		background-color: hsl(var(--hsl-base-400) / 0.08);
-
 		text-align: center;
 		color: hsl(var(--hsl-content) / 0.75);
-
 		cursor: pointer;
 		transition: all var(--timing-normal) ease;
+	}
 
-		&:hover, &.is-drag-over {
-			border-color: hsl(var(--hsl-primary));
-			background-color: hsl(var(--hsl-primary) / 0.06);
-			color: hsl(var(--hsl-content));
-		}
+	.drop-zone:hover,
+	.drop-zone.is-drag-over {
+		border-color: hsl(var(--hsl-primary));
+		background-color: hsl(var(--hsl-primary) / 0.06);
+		color: hsl(var(--hsl-content));
+	}
 
-		.drop-icon {
-			font-size: 2rem;
-			color: hsl(var(--hsl-content) / 0.6);
-		}
+	.drop-zone .drop-icon {
+		font-size: 2rem;
+		color: hsl(var(--hsl-content) / 0.6);
 	}
 
 	.hidden-input {
@@ -168,60 +165,55 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-
 		padding: 0.75rem 1rem;
-
 		background-color: hsl(var(--hsl-base-400) / 0.12);
 		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
 		border-radius: 6px;
+	}
 
-		.file-icon {
-			font-size: 1.25rem;
-			color: hsl(var(--hsl-content) / 0.7);
-		}
+	.selected-file .file-icon {
+		font-size: 1.25rem;
+		color: hsl(var(--hsl-content) / 0.7);
+	}
 
-		.file-meta {
-			flex: 1;
-			min-width: 0;
-		}
+	.selected-file .file-meta {
+		flex: 1;
+		min-width: 0;
+	}
 
-		.file-name {
-			font-weight: 600;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
+	.selected-file .file-name {
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-		.file-size {
-			font-size: var(--fs-1);
-			color: hsl(var(--hsl-content) / 0.6);
-		}
+	.selected-file .file-size {
+		font-size: var(--fs-1);
+		color: hsl(var(--hsl-content) / 0.6);
+	}
 
-		.file-clear {
-			background: none;
-			border: none;
-			padding: 0.25rem 0.5rem;
-			color: hsl(var(--hsl-content) / 0.6);
-			cursor: pointer;
+	.selected-file .file-clear {
+		background: none;
+		border: none;
+		padding: 0.25rem 0.5rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		cursor: pointer;
+	}
 
-			&:hover {
-				color: hsl(var(--hsl-content));
-			}
-		}
+	.selected-file .file-clear:hover {
+		color: hsl(var(--hsl-content));
 	}
 
 	.error-banner {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-
 		padding: 0.75rem 1rem;
 		border-radius: 6px;
-
-		background-color: hsl(var(--hsl-danger) / 0.1);
-		color: hsl(var(--hsl-danger));
-		border: 1px solid hsl(var(--hsl-danger) / 0.3);
-
+		background-color: hsl(var(--hsl-negative) / 0.1);
+		color: hsl(var(--hsl-negative));
+		border: 1px solid hsl(var(--hsl-negative) / 0.3);
 		font-size: var(--fs-2);
 	}
 
@@ -236,90 +228,84 @@
 		grid-template-columns: auto 1fr auto;
 		gap: 0.75rem;
 		align-items: center;
-
 		padding: 0.75rem 1rem;
-
 		background-color: hsl(var(--hsl-base-400) / 0.08);
 		border: 1px solid hsl(var(--hsl-base-400) / 0.25);
 		border-radius: 6px;
+	}
 
-		.upload-icon {
-			color: hsl(var(--hsl-success));
-			font-size: 1.1rem;
-		}
+	.upload-item .upload-icon {
+		color: hsl(var(--hsl-positive));
+		font-size: 1.125rem;
+	}
 
-		.upload-info {
-			min-width: 0;
+	.upload-item .upload-info {
+		min-width: 0;
+	}
 
-			.upload-name {
-				font-weight: 600;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
+	.upload-item .upload-info .upload-name {
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-			.upload-url {
-				font-family: var(--ff-mono, monospace);
-				font-size: var(--fs-1);
-				color: hsl(var(--hsl-content) / 0.7);
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
+	.upload-item .upload-info .upload-url {
+		font-family: var(--ff-mono, monospace);
+		font-size: var(--fs-1);
+		color: hsl(var(--hsl-content) / 0.7);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-			.upload-sub {
-				font-size: var(--fs-1);
-				color: hsl(var(--hsl-content) / 0.55);
-			}
-		}
+	.upload-item .upload-info .upload-sub {
+		font-size: var(--fs-1);
+		color: hsl(var(--hsl-content) / 0.55);
+	}
 
-		.upload-actions {
-			display: flex;
-			gap: 0.25rem;
+	.upload-item .upload-actions {
+		display: flex;
+		gap: 0.25rem;
+	}
 
-			.icon-button {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
+	.upload-item .upload-actions .icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		background: none;
+		border: 1px solid hsl(var(--hsl-base-400) / 0.4);
+		border-radius: 4px;
+		color: hsl(var(--hsl-content) / 0.75);
+		cursor: pointer;
+		transition: all var(--timing-faster) ease;
+	}
 
-				width: 2rem;
-				height: 2rem;
+	.upload-item .upload-actions .icon-button:hover {
+		background-color: hsl(var(--hsl-base-400) / 0.15);
+		color: hsl(var(--hsl-content));
+		border-color: hsl(var(--hsl-base-400) / 0.7);
+	}
 
-				background: none;
-				border: 1px solid hsl(var(--hsl-base-400) / 0.4);
-				border-radius: 4px;
-
-				color: hsl(var(--hsl-content) / 0.75);
-
-				cursor: pointer;
-				transition: all var(--timing-fast) ease;
-
-				&:hover {
-					background-color: hsl(var(--hsl-base-400) / 0.15);
-					color: hsl(var(--hsl-content));
-					border-color: hsl(var(--hsl-base-400) / 0.7);
-				}
-
-				&.is-copied {
-					color: hsl(var(--hsl-success));
-					border-color: hsl(var(--hsl-success) / 0.5);
-				}
-			}
-		}
+	.upload-item .upload-actions .icon-button.is-copied {
+		color: hsl(var(--hsl-positive));
+		border-color: hsl(var(--hsl-positive) / 0.5);
 	}
 </style>
 
 <h6>Dropbox</h6>
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-6">
+<div class="panel is-level-300 grid gap-4">
 	<div>
-		<p class="_mgbt-2">Upload a file and get a shareable download URL.</p>
-		<small class="_co-content/.6">
+		<p class="mb-0.5">Upload a file and get a shareable download URL.</p>
+		<small class="text-content/60">
 			Files are scoped to this project. Drag a file into the drop zone or click to browse.
 		</small>
 	</div>
 
-	<form class="_dp-g _g-5 _w-100pct" onsubmit={upload}>
+	<form class="grid gap-3 w-full" onsubmit={upload}>
 		<label
 			class="drop-zone"
 			class:is-drag-over={dragOver}
@@ -362,13 +348,13 @@
 			</div>
 		{/if}
 
-		<div class="_dp-f _g-6 _jtfct-fe">
+		<div class="flex gap-4 justify-end">
 			<button
-				class="nm-button"
+				class="button"
 				class:is-loading={uploading}
 				type="submit"
 				disabled={!selectedFile || uploading}>
-				<i class="fa-solid fa-upload _mgr-3"></i>
+				<i class="fa-solid fa-upload mr-1"></i>
 				Upload
 			</button>
 		</div>
@@ -377,9 +363,9 @@
 	{#if uploads.length > 0}
 		<hr>
 		<div>
-			<div class="_dp-f _jtfct-spbtw _alit-ct _mgbt-5">
+			<div class="flex justify-between items-center mb-3">
 				<strong>Recent uploads</strong>
-				<small class="_co-content/.6">cleared on page reload</small>
+				<small class="text-content/60">cleared on page reload</small>
 			</div>
 
 			<div class="uploads">

@@ -24,9 +24,9 @@
 			color: 'var(--modal-panel-color)',
 			confirmButtonText: 'Delete',
 			customClass: {
-				confirmButton: 'nm-button is-variant-negative _mgr-6',
-				cancelButton: 'nm-button is-variant-tertiary',
-				actions: '_mgt-7'
+				confirmButton: 'button is-variant-negative mr-4',
+				cancelButton: 'button is-variant-tertiary',
+				actions: 'mt-6'
 			},
 			preConfirm: (input) => input === project
 		})
@@ -45,17 +45,17 @@
 
 <h6>Projects</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button -small" href="/project/create">
-                Create
-            </a>
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
+			<a class="button" href="/project/create">
+				Create
+			</a>
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -68,7 +68,7 @@
 				{#each projects as it (it.project)}
 					<tr>
 						<td>
-							<a href={`/?project=${it.project}`} class="nm-link">
+							<a href={`/?project=${it.project}`} class="link">
 								<strong>{it.name}</strong>
 							</a>
 						</td>

@@ -13,17 +13,17 @@
 
 <h6>Deployments</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href="/deployment/deploy?project={project}">
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
+			<a class="button" href="/deployment/deploy?project={project}">
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -42,12 +42,12 @@
 						<td>
 							<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
 							{#if it.ttl === -1}
-								<i class="fa-regular fa-clock _mgr-5 _cl-negative" title="Expired — pending deletion"></i>
+								<i class="fa-regular fa-clock mr-3 text-negative" title="Expired — pending deletion"></i>
 							{:else if it.ttl > 0}
-								<i class="fa-regular fa-clock _mgr-5 _cl-warning"
+								<i class="fa-regular fa-clock mr-3 text-warning"
 									title={`Auto-delete at ${format.ttlExpireAt(it.ttl)} (in ${format.duration(it.ttl)})`}></i>
 							{/if}
-							<a class="nm-link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+							<a class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 								{it.name}
 							</a>
 						</td>

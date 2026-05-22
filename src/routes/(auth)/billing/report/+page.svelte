@@ -104,24 +104,24 @@
 	})
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href="/billing" class="nm-link"><h6>Billing</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href="/billing" class="link"><h6>Billing</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
-		<a href={`/billing/detail?id=${billingAccount.id}`} class="nm-link"><h6>{billingAccount.name}</h6></a>
+	<div class="breadcrumb-item">
+		<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>Report</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300">
-	<div class="lo-grid-span-horizontal _g-5">
-		<div class="lo-grid-span-horizontal _g-4">
-			<div class="nm-select">
+<div class="panel is-level-300">
+	<div class="grid grid-flow-col justify-start gap-3">
+		<div class="grid grid-flow-col justify-start gap-2">
+			<div class="select">
 				<select bind:value={filter.range} onchange={fetchReport}>
 					<option value="this_month">This month</option>
 					<option value="prev_month">Previous month</option>
@@ -133,10 +133,10 @@
 		</div>
 	</div>
 
-	<div class="_dp-f _fw-w _jtfct-spbtw _alit-ct _mgt-8">
-		<div class="_dp-f _fw-w">
+	<div class="flex flex-wrap justify-between items-center mt-8">
+		<div class="flex flex-wrap">
 			{#each (report?.projectList ?? []) as it (it.sid)}
-				<div class="nm-checkbox _mgbt-4 _mgr-5">
+				<div class="checkbox mb-2 mr-3">
 					<input id={`c-${it.sid}`} type=checkbox value={it.sid} bind:group={filter.projectSids} onchange={fetchReport}>
 					<label for={`c-${it.sid}`}>{it.sid}</label>
 				</div>
@@ -144,13 +144,13 @@
 		</div>
 	</div>
 
-	<div bind:this={chartEl} class="_mgv-5"></div>
+	<div bind:this={chartEl} class="my-3"></div>
 
 	<br>
 
 	<h5><strong>Billings</strong></h5>
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 				<tr>
 					<th>Project</th>

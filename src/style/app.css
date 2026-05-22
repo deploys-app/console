@@ -1,0 +1,1023 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Design tokens
+ * ---------------------------------------------------------------------------
+ * Light mode is the default; .dark on <html> activates dark palette.
+ * HSL channels are stored as bare triplets so consumers can do
+ * hsl(var(--hsl-primary) / 0.5) for alpha.
+ * ------------------------------------------------------------------------- */
+:root {
+	/* Light palette */
+	--hue-primary: 336;
+	--hsl-primary: var(--hue-primary) 62% 48%;
+	--hsl-primary-active: var(--hue-primary) 62% 42%;
+	--hsl-primary-content: var(--hue-primary) 70% 98%;
+	--hue-accent: 267;
+	--hsl-accent: var(--hue-accent) 70% 55%;
+	--hsl-accent-active: var(--hue-accent) 70% 48%;
+	--hsl-accent-content: var(--hue-accent) 93% 98%;
+	--hue-base: 220;
+	--hsl-base-100: var(--hue-base) 20% 100%;
+	--hsl-base-200: var(--hue-base) 20% 96%;
+	--hsl-base-300: 0 0% 100%;
+	--hsl-base-400: var(--hue-base) 16% 93%;
+	--hsl-line: 220 14% 88%;
+	--hsl-content: 220 18% 20%;
+	--hsl-content-inv: 0 0% 85%;
+	--hsl-positive: 168 72% 35%;
+	--hsl-positive-content: 168 80% 95%;
+	--hsl-negative: 5 78% 50%;
+	--hsl-negative-content: 5 80% 97.5%;
+	--hsl-warning: 45 90% 48%;
+	--hsl-warning-content: 45 80% 97%;
+	--hsl-info: 197 70% 54%;
+	--hsl-info-content: 197 90% 97%;
+	--hsl-black: 0 0% 0%;
+	--hsl-white: 0 0% 100%;
+	--modal-panel-background: hsl(var(--hsl-base-300));
+	--modal-panel-color: hsl(var(--hsl-content));
+}
+
+.dark {
+	--hue-primary: 342;
+	--hsl-primary: var(--hue-primary) 80% 58%;
+	--hsl-primary-active: var(--hue-primary) 80% 54%;
+	--hsl-primary-content: var(--hue-primary) 80% 98%;
+	--hue-accent: 267;
+	--hsl-accent: var(--hue-accent) 93% 65%;
+	--hsl-accent-active: var(--hue-accent) 93% 60%;
+	--hsl-accent-content: var(--hue-accent) 93% 98%;
+	--hue-base: 226;
+	--hsl-base-100: var(--hue-base) 39% 11%;
+	--hsl-base-200: var(--hue-base) 39% 15%;
+	--hsl-base-300: var(--hue-base) 39% 20%;
+	--hsl-base-400: var(--hue-base) 39% 46%;
+	--hsl-line: 227 30% 35%;
+	--hsl-content: 227 100% 93%;
+	--modal-panel-background: hsl(var(--hsl-base-300));
+	--modal-panel-color: hsl(var(--hsl-content));
+}
+
+:root {
+	/* Typography */
+	--ffml-primary: 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	--ffml-secondary: 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	--fs-14: 4.5rem;
+	--fs-13: 3.5rem;
+	--fs-12: 3rem;
+	--fs-11: 2.5rem;
+	--fs-10: 2.25rem;
+	--fs-9: 2rem;
+	--fs-8: 1.75rem;
+	--fs-7: 1.5rem;
+	--fs-6: 1.25rem;
+	--fs-5: 1.125rem;
+	--fs-4: 1rem;
+	--fs-3: 0.9375rem;
+	--fs-2: 0.875rem;
+	--fs-1: 0.75rem;
+
+	/* Spacing */
+	--spc-0: 0rem;
+	--spc-1: 0.0625rem;
+	--spc-2: 0.125rem;
+	--spc-3: 0.25rem;
+	--spc-4: 0.5rem;
+	--spc-5: 0.75rem;
+	--spc-6: 1rem;
+	--spc-7: 1.5rem;
+	--spc-8: 2rem;
+	--spc-9: 2.5rem;
+	--spc-10: 3rem;
+	--spc-11: 4rem;
+	--spc-12: 6rem;
+	--spc-13: 8rem;
+
+	/* Animation timing */
+	--timing-normal: 320ms;
+	--timing-faster: 160ms;
+	--timing-fastest: 80ms;
+
+	/* Layout */
+	--lo-container-side-padding: 24px;
+
+	/* Elevation — Material-style raised shadows */
+	--raised-z0: none;
+	--raised-z1: 0px 2px 1px -1px rgba(0, 0, 0, 0.06), 0px 1px 1px 0px rgba(0, 0, 0, 0.042), 0px 1px 3px 0px rgba(0, 0, 0, 0.036);
+	--raised-z2: 0px 3px 1px -2px rgba(0, 0, 0, 0.06), 0px 2px 2px 0px rgba(0, 0, 0, 0.042), 0px 1px 5px 0px rgba(0, 0, 0, 0.036);
+	--raised-z3: 0px 3px 3px -2px rgba(0, 0, 0, 0.06), 0px 3px 4px 0px rgba(0, 0, 0, 0.042), 0px 1px 8px 0px rgba(0, 0, 0, 0.036);
+	--raised-z4: 0px 2px 4px -1px rgba(0, 0, 0, 0.06), 0px 4px 5px 0px rgba(0, 0, 0, 0.042), 0px 1px 10px 0px rgba(0, 0, 0, 0.036);
+	--raised-z5: 0px 3px 5px -1px rgba(0, 0, 0, 0.06), 0px 5px 8px 0px rgba(0, 0, 0, 0.042), 0px 1px 14px 0px rgba(0, 0, 0, 0.036);
+	--raised-z6: 0px 3px 5px -1px rgba(0, 0, 0, 0.06), 0px 6px 10px 0px rgba(0, 0, 0, 0.042), 0px 1px 18px 0px rgba(0, 0, 0, 0.036);
+	--raised-z7: 0px 4px 5px -2px rgba(0, 0, 0, 0.06), 0px 7px 10px 1px rgba(0, 0, 0, 0.042), 0px 2px 16px 1px rgba(0, 0, 0, 0.036);
+	--raised-z8: 0px 5px 5px -3px rgba(0, 0, 0, 0.06), 0px 8px 10px 1px rgba(0, 0, 0, 0.042), 0px 3px 14px 2px rgba(0, 0, 0, 0.036);
+	--raised-z9: 0px 5px 6px -3px rgba(0, 0, 0, 0.06), 0px 9px 12px 1px rgba(0, 0, 0, 0.042), 0px 3px 16px 2px rgba(0, 0, 0, 0.036);
+	--raised-z10: 0px 6px 6px -3px rgba(0, 0, 0, 0.06), 0px 10px 14px 1px rgba(0, 0, 0, 0.042), 0px 4px 18px 3px rgba(0, 0, 0, 0.036);
+	--raised-z11: 0px 6px 7px -4px rgba(0, 0, 0, 0.06), 0px 11px 15px 1px rgba(0, 0, 0, 0.042), 0px 4px 20px 3px rgba(0, 0, 0, 0.036);
+	--raised-z12: 0px 7px 8px -4px rgba(0, 0, 0, 0.06), 0px 12px 17px 2px rgba(0, 0, 0, 0.042), 0px 5px 22px 4px rgba(0, 0, 0, 0.036);
+}
+
+/* ---------------------------------------------------------------------------
+ * Tailwind theme mapping — exposes the design tokens as Tailwind utilities.
+ * `inline` lets the variables resolve dynamically at use-time, so `bg-primary`
+ * follows light/dark mode without rebuilding utilities.
+ * ------------------------------------------------------------------------- */
+@theme inline {
+	--font-sans: var(--ffml-primary);
+	--font-serif: var(--ffml-secondary);
+
+	--color-primary: hsl(var(--hsl-primary));
+	--color-primary-active: hsl(var(--hsl-primary-active));
+	--color-primary-content: hsl(var(--hsl-primary-content));
+	--color-accent: hsl(var(--hsl-accent));
+	--color-accent-active: hsl(var(--hsl-accent-active));
+	--color-accent-content: hsl(var(--hsl-accent-content));
+	--color-base-100: hsl(var(--hsl-base-100));
+	--color-base-200: hsl(var(--hsl-base-200));
+	--color-base-300: hsl(var(--hsl-base-300));
+	--color-base-400: hsl(var(--hsl-base-400));
+	--color-line: hsl(var(--hsl-line));
+	--color-content: hsl(var(--hsl-content));
+	--color-content-inv: hsl(var(--hsl-content-inv));
+	--color-positive: hsl(var(--hsl-positive));
+	--color-positive-content: hsl(var(--hsl-positive-content));
+	--color-negative: hsl(var(--hsl-negative));
+	--color-negative-content: hsl(var(--hsl-negative-content));
+	--color-warning: hsl(var(--hsl-warning));
+	--color-warning-content: hsl(var(--hsl-warning-content));
+	--color-info: hsl(var(--hsl-info));
+	--color-info-content: hsl(var(--hsl-info-content));
+}
+
+/* ---------------------------------------------------------------------------
+ * Reset + globals
+ * ------------------------------------------------------------------------- */
+@layer base {
+	html,
+	body {
+		background-color: hsl(var(--hsl-base-200));
+		color: hsl(var(--hsl-content));
+		font-family: var(--ffml-primary);
+		min-height: 100vh;
+	}
+
+	body,
+	h1, h2, h3, h4, h5, h6 {
+		line-height: 1.25;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: var(--ffml-secondary);
+		font-weight: 400;
+		margin: 0;
+	}
+
+	h1 {
+		font-size: var(--fs-10);
+	}
+	@media (min-width: 1024px) {
+		h1 { font-size: var(--fs-11); }
+	}
+
+	h2 {
+		font-size: var(--fs-9);
+	}
+	@media (min-width: 1024px) {
+		h2 { font-size: var(--fs-10); }
+	}
+
+	h3 {
+		font-size: var(--fs-8);
+	}
+	@media (min-width: 1024px) {
+		h3 { font-size: var(--fs-9); }
+	}
+
+	h4 { font-size: var(--fs-7); }
+	h5 { font-size: var(--fs-6); }
+	h6 { font-size: var(--fs-5); }
+
+	p {
+		font-size: var(--fs-4);
+		margin: 0;
+		line-height: 1.65;
+	}
+
+	ul, ol {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+	}
+
+	hr {
+		border: 0;
+		border-top: 1px solid hsl(var(--hsl-line));
+		margin: 0;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	button {
+		font-family: inherit;
+	}
+
+	*::placeholder {
+		color: hsl(var(--hsl-content) / 0.45);
+	}
+
+	.dark *::placeholder {
+		color: rgba(255, 255, 255, 0.3);
+	}
+
+	input:-webkit-autofill,
+	input:-webkit-autofill:hover,
+	input:-webkit-autofill:focus,
+	textarea:-webkit-autofill,
+	textarea:-webkit-autofill:hover,
+	textarea:-webkit-autofill:focus,
+	select:-webkit-autofill,
+	select:-webkit-autofill:hover,
+	select:-webkit-autofill:focus {
+		-webkit-text-fill-color: hsl(var(--hsl-content));
+		-webkit-box-shadow: 0 0 0 1000px hsl(var(--hsl-base-400) / 0.2) inset;
+		transition: background-color 5000s ease-in-out 0s;
+	}
+
+	pre {
+		position: relative;
+		border: none;
+		padding: 20px;
+		border-radius: 3px;
+		margin-bottom: 30px;
+		white-space: pre-wrap;
+		word-wrap: break-word;
+		background-color: hsl(var(--hsl-base-200));
+	}
+
+	pre code {
+		white-space: pre-wrap;
+		display: block;
+	}
+
+	input[type='number'].no-arrow {
+		-moz-appearance: textfield;
+	}
+
+	input[type='number'].no-arrow::-webkit-outer-spin-button,
+	input[type='number'].no-arrow::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+}
+
+/* ---------------------------------------------------------------------------
+ * Component classes — these replace the nomimono `*` component family.
+ * Keep the `*` prefix because templates already use it.
+ * ------------------------------------------------------------------------- */
+@layer components {
+	/* Panels (card-like surfaces) */
+	.panel {
+		background-color: hsl(var(--hsl-base-300));
+		border-radius: 0.5rem;
+		padding: 1.75rem 1.5rem;
+		box-shadow: var(--raised-z2);
+	}
+
+	.panel form,
+	.panel .content {
+		max-width: 768px;
+	}
+
+	.panel.is-level-200 {
+		background-color: hsl(var(--hsl-base-200));
+		box-shadow: var(--raised-z1);
+	}
+
+	.panel.is-level-300 {
+		background-color: hsl(var(--hsl-base-300));
+		box-shadow: var(--raised-z3);
+	}
+
+	.panel.is-level-400 {
+		background-color: hsl(var(--hsl-base-400));
+		box-shadow: var(--raised-z4);
+	}
+
+	:root:not(.dark) .panel.is-level-300,
+	:root:not(.dark) .panel.is-level-400 {
+		border: 1px solid hsl(var(--hsl-line));
+		box-shadow:
+			0 1px 2px hsl(220 20% 20% / 0.04),
+			0 2px 6px hsl(220 20% 20% / 0.04);
+	}
+
+	/* Buttons — templates space icon ↔ label with explicit margin utilities
+	 * (e.g. `<i class="… mr-3">`), so we DON'T set a flex gap here. */
+	.button {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.5rem;
+		padding: 0 1.125rem;
+		border: 0;
+		border-radius: 0.5rem;
+		background-color: hsl(var(--hsl-primary));
+		color: hsl(var(--hsl-primary-content));
+		font-family: var(--ffml-primary);
+		font-size: 0.9375rem;
+		font-weight: 600;
+		line-height: 1;
+		cursor: pointer;
+		text-decoration: none;
+		user-select: none;
+		transition: background-color var(--timing-faster) ease,
+			border-color var(--timing-faster) ease,
+			opacity var(--timing-faster) ease;
+	}
+
+	.button:hover:not([disabled]):not(.is-loading),
+	.button:focus-visible:not([disabled]) {
+		background-color: hsl(var(--hsl-primary-active));
+	}
+
+	.button[disabled] {
+		opacity: 0.55;
+	}
+
+	.button.is-size-small,
+	.button.-small {
+		min-height: 1.75rem;
+		padding: 0 1rem;
+		font-size: 0.8125rem;
+	}
+
+	.button.is-size-large {
+		min-height: 3rem;
+		padding: 0 1.25rem;
+		font-size: 1.125rem;
+	}
+
+	.button.is-icon-left,
+	.button.is-icon-right {
+		gap: 0.5em;
+	}
+
+	.button.is-icon-left {
+		padding-left: 0.75em;
+	}
+
+	.button.is-icon-right {
+		padding-right: 0.75em;
+	}
+
+	.button.is-variant-secondary {
+		background-color: transparent;
+		color: hsl(var(--hsl-content));
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
+	}
+
+	.button.is-variant-secondary:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-content) / 0.05);
+		border-color: hsl(var(--hsl-content) / 0.2);
+	}
+
+	.button.is-variant-tertiary {
+		background-color: hsl(var(--hsl-content) / 0.08);
+		color: hsl(var(--hsl-content));
+	}
+
+	.button.is-variant-tertiary:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-content) / 0.15);
+	}
+
+	.button.is-variant-negative {
+		background-color: hsl(var(--hsl-negative));
+		color: hsl(var(--hsl-negative-content));
+	}
+
+	.button.is-variant-negative:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-negative) / 0.85);
+	}
+
+	.button.is-variant-positive {
+		background-color: hsl(var(--hsl-positive));
+		color: hsl(var(--hsl-positive-content));
+	}
+
+	.button.is-variant-positive:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-positive) / 0.85);
+	}
+
+	.button.is-variant-accent {
+		background-color: hsl(var(--hsl-accent));
+		color: hsl(var(--hsl-accent-content));
+	}
+
+	.button.is-variant-accent:hover:not([disabled]):not(.is-loading) {
+		background-color: hsl(var(--hsl-accent-active));
+	}
+
+	.button.is-variant-underline {
+		background: transparent;
+		color: hsl(var(--hsl-primary));
+		padding: 0;
+		min-height: auto;
+		font-weight: 500;
+	}
+
+	.button.is-variant-underline:hover:not([disabled]) {
+		background: transparent;
+		text-decoration: underline;
+	}
+
+	/* Loading state — text becomes transparent, a spinner spins on top.
+	 * `currentColor` makes the spinner pick up the appropriate content color
+	 * for each variant; we re-establish it just above the transparent rule
+	 * via a CSS var so ::after can read it. */
+	.button.is-loading {
+		color: transparent !important;
+		pointer-events: none;
+		--spinner-color: hsl(var(--hsl-primary-content));
+	}
+
+	.button.is-variant-secondary.is-loading,
+	.button.is-variant-tertiary.is-loading,
+	.button.is-variant-underline.is-loading {
+		--spinner-color: hsl(var(--hsl-primary));
+	}
+
+	.button.is-variant-negative.is-loading {
+		--spinner-color: hsl(var(--hsl-negative-content));
+	}
+
+	.button.is-variant-positive.is-loading {
+		--spinner-color: hsl(var(--hsl-positive-content));
+	}
+
+	.button.is-variant-accent.is-loading {
+		--spinner-color: hsl(var(--hsl-accent-content));
+	}
+
+	.button.is-loading::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 1em;
+		height: 1em;
+		margin: -0.5em 0 0 -0.5em;
+		border: 2px solid transparent;
+		border-top-color: var(--spinner-color);
+		border-right-color: var(--spinner-color);
+		border-radius: 9999px;
+		animation: button-spin 0.48s linear infinite;
+	}
+
+	@keyframes button-spin {
+		to { transform: rotate(360deg); }
+	}
+
+	/* Form field group — flex column with internal gap between label,
+	 * control, and helper. Inter-field spacing is the responsibility of
+	 * the OUTER container (panels use `gap-6`, forms use `gap-4`, etc.),
+	 * so the field itself has no margin. */
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	.field > label {
+		font-size: 0.875rem;
+		font-weight: 600;
+		font-family: var(--ffml-secondary);
+		color: hsl(var(--hsl-content));
+	}
+
+	.field > .helper {
+		color: hsl(var(--hsl-content) / 0.75);
+		font-size: 0.8125rem;
+	}
+
+	/* Input wrapper + native input/select. The wrapper carries the border,
+	 * background, and a `min-height` so span-based read-only displays
+	 * (used on disk/detail and domain/detail) line up with real inputs. */
+	.input,
+	.textarea,
+	.select {
+		display: flex;
+		align-items: stretch;
+		width: 100%;
+		min-height: 2.5rem;
+		background-color: hsl(var(--hsl-base-400) / 0.2);
+		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
+		border-radius: 0.375rem;
+		transition: border-color var(--timing-faster) ease, background-color var(--timing-faster) ease;
+	}
+
+	.textarea {
+		min-height: 6rem;
+	}
+
+	:root:not(.dark) .input,
+	:root:not(.dark) .textarea,
+	:root:not(.dark) .select {
+		border-color: hsl(var(--hsl-line));
+		background-color: hsl(var(--hsl-base-100));
+	}
+
+	.input:focus-within,
+	.textarea:focus-within,
+	.select:focus-within {
+		border-color: hsl(var(--hsl-primary));
+	}
+
+	.input > input,
+	.input > select,
+	.select > select,
+	.textarea > textarea {
+		flex: 1;
+		width: 100%;
+		min-width: 0;
+		padding: 0.5rem 0.75rem;
+		background: transparent;
+		border: 0;
+		outline: 0;
+		color: inherit;
+		font: inherit;
+		font-size: 0.875rem;
+	}
+
+	.textarea > textarea {
+		resize: vertical;
+	}
+
+	/* Readonly/disabled tint applied at the wrapper so it covers the
+	 * whole row (including the padding gap around the native control).
+	 * `:has` is well-supported across modern browsers. */
+	.input:has(> input[readonly]),
+	.input:has(> input[disabled]),
+	.input:has(> select[disabled]),
+	.textarea:has(> textarea[readonly]),
+	.textarea:has(> textarea[disabled]),
+	.select:has(> select[disabled]) {
+		background-color: hsl(var(--hsl-content) / 0.05);
+	}
+
+	.input.-has-icon-left,
+	.input.-has-icon-right {
+		position: relative;
+	}
+
+	.input.-has-icon-left > .icon,
+	.input.-has-icon-right > .icon {
+		position: absolute;
+		top: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.625rem;
+		height: 100%;
+	}
+
+	.input.-has-icon-left > input {
+		padding-left: 2.625rem;
+	}
+
+	.input.-has-icon-left > .icon:not(.-is-right) {
+		left: 0;
+	}
+
+	.input.-has-icon-right > input {
+		padding-right: 2.625rem;
+	}
+
+	.input.-has-icon-right > .icon.-is-right {
+		right: 0;
+	}
+
+	/* Checkbox */
+	.checkbox {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+	}
+
+	.checkbox input[type='checkbox'] {
+		appearance: none;
+		flex-shrink: 0;
+		width: 1rem;
+		height: 1rem;
+		border: 1px solid hsl(var(--hsl-base-400) / 0.6);
+		border-radius: 0.25rem;
+		background-color: hsl(var(--hsl-base-400) / 0.2);
+		cursor: pointer;
+		position: relative;
+	}
+
+	.checkbox input[type='checkbox']:checked {
+		background-color: hsl(var(--hsl-primary));
+		border-color: hsl(var(--hsl-primary));
+	}
+
+	.checkbox input[type='checkbox']:checked::after {
+		content: '';
+		position: absolute;
+		left: 4px;
+		top: 1px;
+		width: 5px;
+		height: 9px;
+		border: solid hsl(var(--hsl-primary-content));
+		border-width: 0 2px 2px 0;
+		transform: rotate(45deg);
+	}
+
+	/* Disabled state — dim both the box and the adjacent label. */
+	.checkbox input[type='checkbox']:disabled {
+		opacity: 0.6;
+	}
+
+	.checkbox input[type='checkbox']:disabled + label,
+	.checkbox:has(input[type='checkbox']:disabled) {
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	/* Label — form-field label sibling. Used as either a `<label>` or
+	 * `<span>` above a control. Not a badge/chip. */
+	.label {
+		display: block;
+		font-family: var(--ffml-secondary);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: hsl(var(--hsl-content));
+		margin-bottom: 0.375rem;
+	}
+
+	/* Link */
+	.link {
+		color: hsl(var(--hsl-primary));
+		cursor: pointer;
+		text-decoration: none;
+		transition: color var(--timing-faster) ease;
+	}
+
+	.link:hover {
+		color: hsl(var(--hsl-primary-active));
+		text-decoration: underline;
+	}
+
+	/* Breadcrumb */
+	.breadcrumb {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.9375rem;
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+
+	.breadcrumb-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		color: inherit;
+	}
+
+	.breadcrumb-item:not(:last-child)::after {
+		content: '/';
+		opacity: 0.5;
+		margin-left: 0.375rem;
+	}
+
+	.breadcrumb-item a {
+		color: hsl(var(--hsl-primary));
+	}
+
+	.breadcrumb-item a:hover {
+		text-decoration: underline;
+	}
+
+	/* Tabs — the `.tab-button` child carries the per-tab styling, with a
+	 * 3px ::after rule beneath it. Active gets the primary color. */
+	.tabs {
+		position: relative;
+		display: flex;
+	}
+
+	.tabs .tab-button,
+	.tabs > a,
+	.tabs > button {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 2.5rem;
+		padding: 0 1.25rem;
+		font-family: var(--ffml-secondary);
+		font-size: 0.9375rem;
+		font-weight: 500;
+		color: hsl(var(--hsl-content) / 0.75);
+		cursor: pointer;
+		text-decoration: none;
+		background: transparent;
+		border: 0;
+	}
+
+	.tabs .tab-button.is-active,
+	.tabs > a.is-active,
+	.tabs > button.is-active {
+		color: hsl(var(--hsl-content));
+	}
+
+	.tabs.is-variant-underline .tab-button::after,
+	.tabs.is-variant-underline > a::after,
+	.tabs.is-variant-underline > button::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 3px;
+		background-color: hsl(var(--hsl-content) / 0.12);
+	}
+
+	.tabs.is-variant-underline .tab-button.is-active::after,
+	.tabs.is-variant-underline > a.is-active::after,
+	.tabs.is-variant-underline > button.is-active::after {
+		background-color: hsl(var(--hsl-primary));
+	}
+
+	/* Tables — horizontal rhythm comes from per-cell left/right padding
+	 * (24px gutter) instead of cell padding shorthand, so default and
+	 * compact variants only differ in vertical padding. Mirrors the
+	 * original nomimono behavior so list-style pages and detail-style
+	 * pages line up visually. */
+	.table-container {
+		position: relative;
+		overflow-x: auto;
+		overflow-y: visible;
+		border-radius: 0.25rem;
+	}
+
+	.table {
+		width: 100%;
+		max-width: 100%;
+		border-spacing: 0;
+		border-collapse: separate;
+		word-break: normal;
+	}
+
+	.table thead {
+		font-size: 0.9375rem;
+	}
+
+	.table tbody {
+		font-size: var(--table-data-font-size, 0.875rem);
+	}
+
+	.table th,
+	.table td {
+		text-align: left;
+		vertical-align: middle;
+	}
+
+	.table th:first-child,
+	.table td:first-child {
+		padding-left: 1.5rem;
+	}
+
+	.table th:not(:first-child),
+	.table td:not(:first-child) {
+		padding-left: 1.5rem;
+	}
+
+	.table th:last-child,
+	.table td:last-child {
+		padding-right: 1.5rem;
+	}
+
+	.table td {
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		white-space: nowrap;
+	}
+
+	.table td p {
+		white-space: normal;
+	}
+
+	.table td.is-collapse,
+	.table th.is-collapse {
+		width: 1%;
+	}
+
+	.table th {
+		font-family: var(--ffml-secondary);
+		font-weight: 600;
+		padding-top: 0.75rem;
+		padding-bottom: 0.75rem;
+		white-space: nowrap;
+		color: hsl(var(--hsl-content));
+		background-color: hsl(var(--hsl-base-400) / 0.3);
+		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line) / 0.7));
+	}
+
+	.table th p {
+		white-space: normal;
+	}
+
+	.table tr:not(:last-child) td {
+		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line) / 0.7));
+	}
+
+	.table.is-variant-compact td {
+		padding-top: 0.625rem;
+		padding-bottom: 0.625rem;
+	}
+
+	.table .is-align-left { text-align: left; }
+	.table .is-align-center { text-align: center; }
+	.table .is-align-right { text-align: right; }
+
+	/* Dropdown + menu */
+	.dropdown {
+		position: relative;
+		display: inline-block;
+	}
+
+	.dropdown > .menu {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(-4px);
+		transition: all var(--timing-faster) ease;
+		pointer-events: none;
+		z-index: 20;
+	}
+
+	.dropdown:hover > .menu,
+	.dropdown:focus-within > .menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+
+	/* Menu shrinks to its widest item (matches the original nomimono
+	 * `inline-flex` behaviour) so e.g. a Dark/Light list doesn't stretch
+	 * to 12rem just because the dropdown trigger is fixed-width. */
+	.menu {
+		display: inline-flex;
+		flex-direction: column;
+		background-color: hsl(var(--hsl-base-300));
+		border-radius: 0.5rem;
+		padding: 0.375rem;
+		list-style: none;
+		margin: 0;
+	}
+
+	.menu.is-card {
+		box-shadow: var(--raised-z6);
+	}
+
+	.menu.is-compact {
+		padding: 0.25rem;
+	}
+
+	.menu > li > div,
+	.menu > li > a {
+		display: block;
+		padding: 0.5rem 0.75rem;
+		border-radius: 0.375rem;
+		cursor: pointer;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content));
+	}
+
+	.menu > li > div:hover,
+	.menu > li > a:hover {
+		background-color: hsl(var(--hsl-base-200));
+	}
+
+	/* Modal */
+	.modal {
+		position: fixed;
+		inset: 0;
+		display: none;
+		align-items: center;
+		justify-content: center;
+		background: rgb(0 0 0 / 0.5);
+		z-index: 50;
+		padding: 1rem;
+	}
+
+	.modal.is-active {
+		display: flex;
+	}
+
+	.modal-panel {
+		position: relative;
+		background-color: hsl(var(--hsl-base-300));
+		border-radius: 0.5rem;
+		padding: 1.5rem;
+		max-width: 32rem;
+		width: 100%;
+		max-height: calc(100vh - 2rem);
+		overflow-y: auto;
+		box-shadow: var(--raised-z10);
+	}
+
+	.modal-close {
+		position: absolute;
+		top: 0.75rem;
+		right: 1rem;
+		width: 2rem;
+		height: 2rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 9999px;
+		cursor: pointer;
+		font-size: 1.125rem;
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+
+	.modal-close:hover {
+		background-color: hsl(var(--hsl-content) / 0.08);
+		color: hsl(var(--hsl-content));
+	}
+
+	/* Shared helpers — kept inside @layer components so that other component
+	 * rules (e.g. `.input.-has-icon-right > .icon`) can override these
+	 * via specificity. Unlayered styles always beat layered ones in the
+	 * cascade, regardless of specificity, so the order matters. */
+	.icon-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2rem;
+		height: 2rem;
+		border: 0;
+		background-color: transparent;
+		color: hsl(var(--hsl-content));
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		cursor: pointer;
+		transition: transform var(--timing-faster) ease;
+	}
+
+	.icon-button:hover {
+		transform: scale(1.1);
+	}
+
+	pre > .copy {
+		position: absolute;
+		top: 0;
+		right: 0;
+		background-color: inherit;
+		padding: 6px 10px;
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		user-select: none;
+		border: 0;
+		color: hsl(var(--hsl-content));
+		outline: 0;
+	}
+
+	pre > .copy:hover,
+	pre > .copy:hover:active {
+		background-color: hsl(var(--hsl-base-100));
+	}
+
+	pre.pre-scoll {
+		min-height: 800px;
+		max-height: 800px;
+		overflow-y: auto;
+	}
+
+	.icon {
+		color: hsl(var(--hsl-content) / 0.5);
+		cursor: pointer;
+		font-size: var(--fs-4);
+		user-select: none;
+	}
+
+	.icon.copy {
+		font-size: var(--fs-6);
+	}
+
+	.icon:hover {
+		color: hsl(var(--hsl-content));
+	}
+}

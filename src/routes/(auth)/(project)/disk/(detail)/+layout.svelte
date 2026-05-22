@@ -17,19 +17,19 @@
 	}, 4000))
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/disk?project=${project}`} class="nm-link"><h6>Disks</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/disk?project=${project}`} class="link"><h6>Disks</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{disk.name}</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
 		<h3>
 			<StatusIcon status={disk.status} />
 			<strong>Disk: {disk.name}</strong>
@@ -38,7 +38,7 @@
 
 	<hr>
 
-	<div class="nm-tabs is-variant-underline _mgbt-0:lg _w-100pct _fdrt-cl _fdrt-r:md">
+	<div class="tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
 		<a class="tab-button"
 			class:is-active={$page.url.pathname === '/disk/metrics'}
 			href={`/disk/metrics?project=${project}&location=${disk.location}&name=${disk.name}`}>

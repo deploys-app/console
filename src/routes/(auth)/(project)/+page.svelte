@@ -115,55 +115,55 @@
 
 <h6>Dashboard</h6>
 <br>
-<div class="lo-12 lo-6:md _g-7 _alit-str">
-	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
+<div class="grid grid-cols-1 lg:grid lg:grid-cols-2 gap-6 items-stretch">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<h6>
 			<i class="fa-solid fa-project-diagram"></i>
-			<strong class="_mgl-6">Project Info</strong>
+			<strong class="ml-4">Project Info</strong>
 		</h6>
 		<hr>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_name">Project Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_name" readonly value={projectInfo.name}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_id">Project ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_id" readonly value={projectInfo.project}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_number">Project Number</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_number" readonly value={projectInfo.id}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-project_billing">Billing Account ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
 			</div>
 		</div>
 
 <!--		<hr>-->
 
-<!--		<a class="nm-link _dp-f _alit-ct" href="">-->
-<!--			<i class="fa-solid fa-arrow-right _fs-20"></i>-->
-<!--			<span class="_mgl-6">Project Settings</span>-->
+<!--		<a class="link flex items-center" href="">-->
+<!--			<i class="fa-solid fa-arrow-right text-xl"></i>-->
+<!--			<span class="ml-4">Project Settings</span>-->
 <!--		</a>-->
 	</div>
 
-	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
-		<div class="_dp-f _alit-ct _jtfct-spbtw">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
+		<div class="flex items-center justify-between">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
-				<strong class="_mgl-6">Billing</strong>
+				<strong class="ml-4">Billing</strong>
 			</h6>
-			<a class="nm-link" href="/billing">
+			<a class="link" href="/billing">
 				View billing
-				<i class="fa-solid fa-arrow-right _mgl-3"></i>
+				<i class="fa-solid fa-arrow-right ml-1"></i>
 			</a>
 		</div>
 		<hr>
@@ -192,29 +192,29 @@
 		</div>
 	</div>
 
-	<div class="nm-panel is-level-300 _g-7 dashboard-panel">
-		<div class="_dp-f _alit-ct _jtfct-spbtw">
+	<div class="panel is-level-300 gap-6 dashboard-panel">
+		<div class="flex items-center justify-between">
 			<h6>
 				<i class="fa-solid fa-clock-rotate-left"></i>
-				<strong class="_mgl-6">Recent Activity</strong>
+				<strong class="ml-4">Recent Activity</strong>
 			</h6>
-			<a class="nm-link" href="/audit-log?project={projectInfo.project}">
+			<a class="link" href="/audit-log?project={projectInfo.project}">
 				View all
-				<i class="fa-solid fa-arrow-right _mgl-3"></i>
+				<i class="fa-solid fa-arrow-right ml-1"></i>
 			</a>
 		</div>
 		<hr>
 		{#if auditLog.error?.forbidden}
-			<div class="_tal-ct _pd-6 _cl-content-600">
-				<i class="fa-solid fa-lock _mgr-4"></i>
+			<div class="text-center p-4 text-content/70">
+				<i class="fa-solid fa-lock mr-2"></i>
 				You don't have permission to view audit logs
 			</div>
 		{:else if auditLog.error}
-			<div class="_tal-ct _pd-6 _cl-content-600">
+			<div class="text-center p-4 text-content/70">
 				{auditLog.error.message || auditLog.error}
 			</div>
 		{:else if !auditLog.items.length}
-			<div class="_tal-ct _pd-6 _cl-content-600">
+			<div class="text-center p-4 text-content/70">
 				No recent activity
 			</div>
 		{:else}
@@ -241,7 +241,7 @@
 	</div>
 </div>
 
-<style lang="scss">
+<style>
 	.dashboard-panel {
 		display: flex;
 		flex-direction: column;
@@ -258,10 +258,10 @@
 		border-radius: 0.625rem;
 		background: linear-gradient(
 			135deg,
-			hsl(var(--hsl-primary)/0.12) 0%,
-			hsl(var(--hsl-accent)/0.12) 100%
+			hsl(var(--hsl-primary) / 0.12) 0%,
+			hsl(var(--hsl-accent) / 0.12) 100%
 		);
-		border: 1px solid hsl(var(--hsl-primary)/0.18);
+		border: 1px solid hsl(var(--hsl-primary) / 0.18);
 		margin-bottom: 1rem;
 	}
 
@@ -270,7 +270,7 @@
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
-		color: hsl(var(--hsl-content)/0.7);
+		color: hsl(var(--hsl-content) / 0.7);
 	}
 
 	.billing-total-value {
@@ -290,15 +290,17 @@
 	.billing-total-currency {
 		font-size: 0.9375rem;
 		font-weight: 600;
-		color: hsl(var(--hsl-content)/0.7);
+		color: hsl(var(--hsl-content) / 0.7);
 	}
 
 	.billing-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0.625rem;
+	}
 
-		@media (min-width: 640px) {
+	@media (min-width: 640px) {
+		.billing-grid {
 			grid-template-columns: repeat(4, minmax(0, 1fr));
 		}
 	}
@@ -310,17 +312,17 @@
 		padding: 0.75rem 0.875rem;
 		border-radius: 0.5rem;
 		background: hsl(var(--hsl-base-200));
-		border: 1px solid hsl(var(--hsl-line)/0.6);
+		border: 1px solid hsl(var(--hsl-line) / 0.6);
 		transition:
 			background var(--timing-fastest) ease,
 			border-color var(--timing-fastest) ease,
 			transform var(--timing-fastest) ease;
+	}
 
-		&:hover {
-			border-color: hsl(var(--hsl-primary)/0.45);
-			background: hsl(var(--hsl-base-200));
-			transform: translateY(-1px);
-		}
+	.billing-card:hover {
+		border-color: hsl(var(--hsl-primary) / 0.45);
+		background: hsl(var(--hsl-base-200));
+		transform: translateY(-1px);
 	}
 
 	.billing-card-head {
@@ -330,18 +332,18 @@
 		color: hsl(var(--hsl-primary));
 		font-size: 0.8125rem;
 		min-height: 2.5rem;
+	}
 
-		i {
-			font-size: 0.875rem;
-			width: 1rem;
-			text-align: center;
-			line-height: 1.25rem;
-		}
+	.billing-card-head i {
+		font-size: 0.875rem;
+		width: 1rem;
+		text-align: center;
+		line-height: 1.25rem;
 	}
 
 	.billing-card-label {
 		font-weight: 600;
-		color: hsl(var(--hsl-content)/0.85);
+		color: hsl(var(--hsl-content) / 0.85);
 		font-size: 0.8125rem;
 		line-height: 1.25rem;
 	}
@@ -375,24 +377,24 @@
 
 	.billing-card-unit {
 		font-size: 0.75rem;
-		color: hsl(var(--hsl-content)/0.55);
+		color: hsl(var(--hsl-content) / 0.55);
 	}
 
 	.activity-feed {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+	}
 
-		li {
-			display: flex;
-			align-items: flex-start;
-			gap: 0.625rem;
-			padding: 0.5rem 0;
+	.activity-feed li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.625rem;
+		padding: 0.5rem 0;
+	}
 
-			& + li {
-				border-top: 1px solid hsl(var(--hsl-content)/0.08);
-			}
-		}
+	.activity-feed li + li {
+		border-top: 1px solid hsl(var(--hsl-content) / 0.08);
 	}
 
 	.activity-body {
@@ -421,16 +423,16 @@
 	.action {
 		font-family: var(--font-family-mono, ui-monospace, monospace);
 		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content)/0.85);
+		color: hsl(var(--hsl-content) / 0.85);
 	}
 
 	.resource {
 		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content)/0.9);
+		color: hsl(var(--hsl-content) / 0.9);
 	}
 
 	.resource-name {
-		color: hsl(var(--hsl-content)/0.6);
+		color: hsl(var(--hsl-content) / 0.6);
 		margin-left: 0.1rem;
 	}
 
@@ -438,6 +440,6 @@
 		display: block;
 		margin-top: 0.15rem;
 		font-size: 0.75rem;
-		color: hsl(var(--hsl-content)/0.55);
+		color: hsl(var(--hsl-content) / 0.55);
 	}
 </style>

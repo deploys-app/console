@@ -20,9 +20,9 @@
 
 	const statusIconClass = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
-		success: 'fa-solid fa-check-circle _cl-positive _cl-opacity-80',
-		error: 'fa-solid fa-times _cl-negative _cl-opacity-80',
-		cancelled: 'fa-solid fa-ban _cl-negative _cl-opacity-80'
+		success: 'fa-solid fa-check-circle text-positive/80',
+		error: 'fa-solid fa-times text-negative/80',
+		cancelled: 'fa-solid fa-ban text-negative/80'
 	}
 
 	/** @type {Api.PodStatus | null} */
@@ -36,23 +36,23 @@
 	 */
 	function getIconClass () {
 		if (status !== 'success') {
-			return statusIconClass[status] || 'fa-solid fa-minus _cl-light'
+			return statusIconClass[status] || 'fa-solid fa-minus text-white'
 		}
 
 		if (action === 'pause') {
-			return 'fa-solid fa-pause _cl-warning'
+			return 'fa-solid fa-pause text-warning'
 		}
 
 		if (!podStatus) {
-			return 'fa-solid fa-spin fa-spinner _cl-light'
+			return 'fa-solid fa-spin fa-spinner text-white'
 		}
 		if (type === 'CronJob' && podStatus.count === podStatus.succeeded + podStatus.ready) {
-			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
+			return 'fa-solid fa-check-circle text-positive/80'
 		}
 		if (podStatus.count > 0 && podStatus.ready === podStatus.count) {
-			return 'fa-solid fa-check-circle _cl-positive _cl-opacity-80'
+			return 'fa-solid fa-check-circle text-positive/80'
 		}
-		return 'fa-solid fa-exclamation-triangle _cl-warning'
+		return 'fa-solid fa-exclamation-triangle text-warning'
 	}
 
 	let fetchPodStatusTimeout
@@ -98,4 +98,4 @@
 	})
 </script>
 
-<i class={`${iconClass} _mgh-5`}></i>
+<i class={`${iconClass} mx-3`}></i>

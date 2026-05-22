@@ -32,17 +32,17 @@
 
 <h6>Domains</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button -small" href={`/domain/create?project=${project}`}>
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
+			<a class="button" href={`/domain/create?project=${project}`}>
 				Create
 			</a>
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -59,20 +59,20 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.cdn && it.verification.ssl.pending ? 'verify' : it.status} />
-							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="nm-link">{it.domain}</a>
+							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 						</td>
 						<td>
 							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+								<i class="fa-solid fa-circle-xmark text-negative text-content/80"></i>
 							{/if}
 						</td>
 						<td>
 							{#if it.cdn}
-								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
 							{:else}
-								<i class="fa-solid fa-circle-xmark _cl-negative _cl-opacity-80"></i>
+								<i class="fa-solid fa-circle-xmark text-negative text-content/80"></i>
 							{/if}
 						</td>
 						<td>{it.location}</td>

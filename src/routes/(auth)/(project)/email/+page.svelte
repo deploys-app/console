@@ -11,15 +11,15 @@
 
 <h6>Emails</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
 			Contact us to request access
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 			<tr>
 				<th>Domain</th>

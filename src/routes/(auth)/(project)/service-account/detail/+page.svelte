@@ -63,64 +63,64 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/service-account?project=${project}`} class="nm-link"><h6>Service Accounts</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/service-account?project=${project}`} class="link"><h6>Service Accounts</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{serviceAccount.name}</h6>
 	</div>
 </div>
 
 <br>
 
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<h3 class="mr-6 mb-4 xl:mb-0">
 			<strong>{serviceAccount.name}</strong>
 		</h3>
 	</div>
 
 	<hr>
 
-	<div class="content _dp-g _g-6 _w-100pct">
-		<div class="nm-field">
+	<div class="content grid gap-4 w-full">
+		<div class="field">
 			<label for="input-email">Email</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-email" value={serviceAccount.email} readonly>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" value={serviceAccount.name} readonly>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-description">Description</label>
-			<div class="nm-textarea">
+			<div class="textarea">
 				<textarea id="input-description" rows="5" readonly>{serviceAccount.description}</textarea>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-created_at">Created At</label>
-			<div class="nm-input">
-				<input id="input-created_at" value="{format.datetime(serviceAccount.createdAt)}" readonly>
+			<div class="input">
+				<input id="input-created_at" value={format.datetime(serviceAccount.createdAt)} readonly>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-created_by">Created By</label>
-			<div class="nm-input">
-				<input id="input-created_by" value="{serviceAccount.createdBy}" readonly>
+			<div class="input">
+				<input id="input-created_by" value={serviceAccount.createdBy} readonly>
 			</div>
 		</div>
 
 		<hr>
 
 		<h6><strong>Keys</strong></h6>
-		<div class="_dp-g _g-6 _w-100pct">
+		<div class="grid gap-4 w-full">
 			{#each (serviceAccount.keys ?? []) as key, i (i)}
-				<div class="nm-input -has-icon-right">
+				<div class="input -has-icon-right">
 					<input value="{key.secret}" readonly>
 					<button class="icon -is-right" onclick={() => deleteKey(key.secret)} type="button" aria-label="Remove">
 						<i class="fa-solid fa-trash-alt"></i>
@@ -128,9 +128,9 @@
 				</div>
 			{/each}
 
-			<div class="_dp-g _g-6 _w-100pct">
-				<button class="nm-button _mgh-at" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
-					<i class="fa-solid fa-plus _mgr-5"></i>
+			<div class="grid gap-4 w-full">
+				<button class="button mx-auto" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
+					<i class="fa-solid fa-plus mr-3"></i>
 					Create key
 				</button>
 			</div>
@@ -138,8 +138,8 @@
 
 		<hr>
 
-		<div class="_dp-f">
-			<button class="nm-button" type="button" onclick={deleteItem}>
+		<div class="flex">
+			<button class="button" type="button" onclick={deleteItem}>
 				Delete
 			</button>
 		</div>

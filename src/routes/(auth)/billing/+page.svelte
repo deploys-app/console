@@ -10,17 +10,17 @@
 
 <h6>Billing</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href="/billing/create">
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
+			<a class="button" href="/billing/create">
                 Create account
             </a>
 		</div>
 	</div>
 	<br>
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table">
+	<div class="table-container mt-4">
+		<table class="table">
 			<thead>
 				<tr>
 					<th>Billing name</th>
@@ -32,14 +32,14 @@
 				{#each billingAccounts as it (it.id)}
 					<tr>
 						<td>
-							<a class="nm-link" href="/billing/detail?id={it.id}">{it.name}</a>
+							<a class="link" href="/billing/detail?id={it.id}">{it.name}</a>
 						</td>
 						<td>{it.id}</td>
 						<td class="is-align-center">
 							{#if it.active}
-								<i class="fa-solid fa-check-circle _cl-positive _cl-opacity-80"></i>
+								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
 							{:else}
-								<i class="fa-solid fa-times _cl-negative _cl-opacity-80"></i>
+								<i class="fa-solid fa-times text-negative text-content/80"></i>
 							{/if}
 						</td>
 					</tr>

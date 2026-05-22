@@ -12,17 +12,17 @@
 
 <h6>Env Groups</h6>
 <br>
-<div class="nm-panel is-level-300">
-	<div class="_dp-f _jtfct-spbtw _alit-ct">
-		<div class="lo-grid-span-horizontal _g-4 _mgl-at">
-			<a class="nm-button" href="/env-group/create?project={project}">
+<div class="panel is-level-300">
+	<div class="flex justify-between items-center">
+		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
+			<a class="button" href="/env-group/create?project={project}">
                 Create
             </a>
 		</div>
 	</div>
 
-	<div class="nm-table-container _mgt-6">
-		<table class="nm-table is-variant-compact">
+	<div class="table-container mt-4">
+		<table class="table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -36,7 +36,7 @@
 				{#each envGroups as it (it.name)}
 					<tr>
 						<td>
-							<a class="nm-link" href="/env-group/create?project={project}&name={it.name}">
+							<a class="link" href="/env-group/create?project={project}&name={it.name}">
 								<strong>{it.name}</strong>
 							</a>
 						</td>

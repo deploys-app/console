@@ -64,28 +64,28 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/role/users?project=${project}`} class="nm-link"><h6>Users</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/role/users?project=${project}`} class="link"><h6>Users</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>Add</h6>
 	</div>
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Add member to "{project}" project</strong></h3>
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<div class="flex items-center">
+			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Add member to "{project}" project</strong></h3>
 		</div>
 	</div>
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
-		<div class="nm-field">
-			<div class="nm-input">
+	<form class="grid gap-4 w-full" onsubmit={save}>
+		<div class="field">
+			<div class="input">
 				<input type="text" placeholder="Email / allUsers / allAuthenticatedUsers"
 					bind:value={form.email} readonly={!!email} required
 					list="email-suggestions"
@@ -96,8 +96,8 @@
 				<option value="allAuthenticatedUsers"></option>
 			</datalist>
 		</div>
-		<div class="nm-field">
-			<div class="nm-select">
+		<div class="field">
+			<div class="select">
 				<select onchange={selectRoleChanged}>
 					<option value="" disabled selected>Select Role</option>
 					{#each roles as it (it.role)}
@@ -109,8 +109,8 @@
 			</div>
 		</div>
 
-		<div class="nm-table-container">
-			<table class="nm-table is-variant-compact">
+		<div class="table-container">
+			<table class="table is-variant-compact">
 				<thead>
 				<tr>
 					<th>Role</th>
@@ -135,7 +135,7 @@
 			</table>
 		</div>
 
-		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
+		<button class="button mt-4 mr-auto" class:is-loading={saving}>
 			Save
 		</button>
 	</form>

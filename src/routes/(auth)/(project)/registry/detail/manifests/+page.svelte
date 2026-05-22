@@ -27,8 +27,8 @@
 	}
 </script>
 
-<div class="nm-table-container">
-	<table class="nm-table">
+<div class="table-container">
+	<table class="table">
 		<thead>
 		<tr>
 			<th>Digest</th>

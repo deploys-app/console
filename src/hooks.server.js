@@ -11,8 +11,9 @@ async function theme ({ event, resolve }) {
 	if (!allowTheme[t]) {
 		t = 'dark'
 	}
+	const cls = t === 'dark' ? 'dark' : ''
 	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace('data-theme=""', `data-theme="${t}"`)
+		transformPageChunk: ({ html }) => html.replace('%theme%', cls)
 	})
 }
 

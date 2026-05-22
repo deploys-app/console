@@ -52,23 +52,23 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href="/project" class="nm-link"><h6>Projects</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href="/project" class="link"><h6>Projects</h6></a>
 	</div>
 	{#if project}
-		<div class="nm-breadcrumb-item">
-			<a href={`/?project=${project.project}`} class="nm-link"><h6>{project.name}</h6></a>
+		<div class="breadcrumb-item">
+			<a href={`/?project=${project.project}`} class="link"><h6>{project.name}</h6></a>
 		</div>
 	{/if}
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>{#if project}Update{:else}Create{/if}</h6>
 	</div>
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _jtfit-st _g-5">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 justify-items-start gap-3">
 		{#if project}
 			<h5><strong>Update Project: {project.name}</strong></h5>
 		{:else}
@@ -78,24 +78,24 @@
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
-		<div class="nm-field">
+	<form class="grid gap-4 w-full" onsubmit={save}>
+		<div class="field">
 			<label for="input-project">ID</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-project" placeholder="Project ID" bind:value={form.sid} readonly={!!project}>
 			</div>
 		</div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" placeholder="Project name" bind:value={form.name} required>
 			</div>
 		</div>
 
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-billing_account">Billing Account</label>
-			<div class="nm-select">
+			<div class="select">
 				<select id="input-billing_account" bind:value={form.billingAccount} required>
 					<option value="" selected disabled>Select Billing Account</option>
 					{#each billingAccounts as it (it.id)}
@@ -105,7 +105,7 @@
 			</div>
 		</div>
 
-		<button class="nm-button _mgt-6 _mgr-at" class:is-loading={saving}>
+		<button class="button mt-4 mr-auto" class:is-loading={saving}>
 			{#if project}
 				Update Project
 			{:else}

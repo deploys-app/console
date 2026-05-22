@@ -39,23 +39,23 @@
 	}
 
 	function setTheme (value) {
-		document.documentElement.dataset.theme = value
+		document.documentElement.classList.toggle('dark', value === 'dark')
 		Cookie.set('theme', value, { expires: 30 })
 	}
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu _dp-n:md" onclick={toggleSidebar} onkeypress={toggleSidebar} tabindex="0" role="button">
+	<div class="icon-nav-menu" onclick={toggleSidebar} onkeypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
-	<div class="_dp-f _mgl-at">
-		<div class="nm-dropdown _mgl-at _mgt-at _mgbt-at">
-			<div class="nm-button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
+	<div class="flex ml-auto">
+		<div class="dropdown ml-auto mt-auto mb-auto">
+			<div class="button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
 				<i class="fa-solid fa-palette"></i>
 				Theme
 			</div>
-			<ul class="nm-menu is-card is-compact">
+			<ul class="menu is-card is-compact">
 				<li><div onclick={() => setTheme('dark')} onkeypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
 				<li><div onclick={() => setTheme('light')} onkeypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
 			</ul>
@@ -63,14 +63,14 @@
 
 		<div>
 			<div class="avatar" onclick={toggle} onkeypress={toggle} tabindex="0" role="button">
-				<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="_bdrd-max" crossorigin="anonymous" draggable="false">
+				<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="rounded-full" crossorigin="anonymous" draggable="false">
 			</div>
 
 			{#if active}
 				<div class="popup" transition:scale={{ duration: 160 }}>
 					<ul class="user-menu">
 						<li>
-							<a class="item _dp-b" href="/billing" onclick={close}>
+							<a class="item block" href="/billing" onclick={close}>
 								Billing accounts
 							</a>
 						</li>
@@ -78,7 +78,7 @@
 							<div class="item" onclick={doSignOut} onkeypress={doSignOut} tabindex="0" role="button">
 								Sign Out
 							</div>
-							<form class="_dp-n" method="POST" action="/auth/signout" bind:this={signOut}>
+							<form class="hidden" method="POST" action="/auth/signout" bind:this={signOut}>
 								<button>Sign Out</button>
 							</form>
 						</li>
@@ -106,7 +106,7 @@
 		overflow: hidden;
 
 		background: white;
-		color: hsl(var(--hsl-black)/var(--cl-opacity));
+		color: hsl(var(--hsl-black));
 	}
 
 	ul.user-menu > li {
@@ -152,11 +152,19 @@
 		border-radius: 50%;
 
 		cursor: pointer;
-
 	}
 
 	.icon-nav-menu:hover {
-		background: rgba(190, 197, 255, 0.075);
+		background: hsl(var(--hsl-content) / 0.05);
+	}
+
+	/* Hide on desktop (>= lg). The scoped selector includes Svelte's
+	 * hash class, so it outweighs Tailwind's `.lg\:hidden` utility
+	 * — that's why this lives here instead of on the element. */
+	@media (min-width: 1024px) {
+		.icon-nav-menu {
+			display: none;
+		}
 	}
 
 	.avatar {
@@ -169,6 +177,6 @@
 	}
 
 	.avatar:hover {
-		background: rgba(190, 197, 255, 0.075);
+		background: hsl(var(--hsl-content) / 0.05);
 	}
 </style>

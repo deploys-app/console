@@ -30,8 +30,8 @@
 
 <h6><strong>Events</strong></h6>
 
-<div class="nm-table-container _mgt-6">
-	<table class="nm-table is-variant-compact" style="--table-data-border-color: none">
+<div class="table-container mt-4">
+	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
 		<tr>
 			<th>Last Seen</th>

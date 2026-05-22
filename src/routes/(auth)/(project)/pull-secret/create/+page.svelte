@@ -58,35 +58,35 @@
 	}
 </script>
 
-<div class="nm-breadcrumb">
-	<div class="nm-breadcrumb-item">
-		<a href={`/pull-secret?project=${project}`} class="nm-link"><h6>Pull Secrets</h6></a>
+<div class="breadcrumb">
+	<div class="breadcrumb-item">
+		<a href={`/pull-secret?project=${project}`} class="link"><h6>Pull Secrets</h6></a>
 	</div>
-	<div class="nm-breadcrumb-item">
+	<div class="breadcrumb-item">
 		<h6>Create</h6>
 	</div>
 </div>
 
 <br>
-<div class="nm-panel is-level-300 _dp-g _g-7">
-	<div class="lo-12 _g-5">
-		<div class="_dp-f _alit-ct">
-			<h3 class="_mgr-7 _mgbt-6 _mgbt-0:lg"><strong>Create pull secret</strong></h3>
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid grid-cols-1 gap-3">
+		<div class="flex items-center">
+			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Create pull secret</strong></h3>
 		</div>
 	</div>
 
 	<hr>
 
-	<form class="_dp-g _g-6 _w-100pct" onsubmit={save}>
-		<div class="nm-field">
+	<form class="grid gap-4 w-full" onsubmit={save}>
+		<div class="field">
 			<label for="input-name">Name</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-name" placeholder="name" bind:value={form.name}>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="nm-select">
+			<div class="select">
 				<select id="input-location" bind:value={form.location} required>
 					<option value="" disabled selected>Select Location</option>
 					{#each locations as it (it.id)}
@@ -95,27 +95,27 @@
 				</select>
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-server">Server</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-server" bind:value={form.server} placeholder="https://index.docker.io/v2/">
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-username">Username</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-username" bind:value={form.username} placeholder="username or &quot;_json_key&quot;">
 			</div>
 		</div>
-		<div class="nm-field">
+		<div class="field">
 			<label for="input-password">Password</label>
-			<div class="nm-input">
+			<div class="input">
 				<input id="input-password" type="password" bind:value={form.password} placeholder="password or service account json">
 			</div>
 		</div>
 
 		<hr>
 
-		<button class="nm-button _mgr-at" class:is-loading={saving}>Save</button>
+		<button class="button mr-auto" class:is-loading={saving}>Save</button>
 	</form>
 </div>
