@@ -68,15 +68,15 @@
 			</div>
 		</div>
 		<div class="field">
-			<label for="div-created_at">Created at</label>
-			<div id="div-created_at" class="input">
-				{format.datetime(workloadIdentity.createdAt)}
+			<label for="text-created_at">Created at</label>
+			<div class="input">
+				<span id="text-created_at">{format.datetime(workloadIdentity.createdAt)}</span>
 			</div>
 		</div>
 		<div class="field">
-			<label for="div-created_by">Created by</label>
-			<div id="div-created_by" class="input">
-				{workloadIdentity.createdBy}
+			<label for="text-created_by">Created by</label>
+			<div class="input">
+				<span id="text-created_by">{workloadIdentity.createdBy}</span>
 			</div>
 		</div>
 
