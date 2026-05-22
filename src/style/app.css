@@ -172,6 +172,7 @@
 	h1, h2, h3, h4, h5, h6 {
 		font-family: var(--ffml-secondary);
 		font-weight: 400;
+		margin: 0;
 	}
 
 	h1 {
@@ -214,7 +215,7 @@
 	hr {
 		border: 0;
 		border-top: 1px solid hsl(var(--hsl-line));
-		margin: 0.75rem 0;
+		margin: 0;
 	}
 
 	[disabled] {
@@ -488,25 +489,26 @@
 		to { transform: rotate(360deg); }
 	}
 
-	/* Form field group */
+	/* Form field group — flex column with internal gap between label,
+	 * control, and helper. Inter-field spacing is the responsibility of
+	 * the OUTER container (panels use `gap-6`, forms use `gap-4`, etc.),
+	 * so the field itself has no margin. */
 	.field {
-		display: block;
-		margin-bottom: 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
 	}
 
 	.field > label {
-		display: block;
 		font-size: 0.875rem;
 		font-weight: 600;
 		font-family: var(--ffml-secondary);
 		color: hsl(var(--hsl-content));
-		margin-bottom: 0.375rem;
 	}
 
 	.field > .helper {
 		color: hsl(var(--hsl-content) / 0.75);
 		font-size: 0.8125rem;
-		margin-top: 0.25rem;
 	}
 
 	/* Input wrapper + native input/select. The wrapper carries the border,
