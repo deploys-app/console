@@ -290,16 +290,12 @@
 				</p>
 			{/if}
 
-			{#if domain.verification?.dns?.verifiedAt}
-				<p class="text-sm opacity-80">
-					Last verified: {format.datetime(domain.verification.dns.verifiedAt)}
-				</p>
-			{/if}
-			{#if domain.verification?.dns?.lastCheckedAt}
-				<p class="text-sm opacity-80">
-					Last checked: {format.datetime(domain.verification.dns.lastCheckedAt)}
-				</p>
-			{/if}
+			<p class="text-sm opacity-80">
+				Last verified: {format.datetime(domain.verification?.dns?.verifiedAt) || '-'}
+			</p>
+			<p class="text-sm opacity-80">
+				Last checked: {format.datetime(domain.verification?.dns?.lastCheckedAt) || '-'}
+			</p>
 			{#if (domain.verification?.dns?.errors ?? []).length > 0}
 				{#each domain.verification.dns.errors as e, i (i)}
 					<p class="text-negative text-content/80">{e}</p>
