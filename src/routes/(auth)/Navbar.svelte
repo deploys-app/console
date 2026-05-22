@@ -45,7 +45,7 @@
 </script>
 
 <nav class="navbar">
-	<div class="icon-nav-menu lg:hidden" onclick={toggleSidebar} onkeypress={toggleSidebar} tabindex="0" role="button">
+	<div class="icon-nav-menu" onclick={toggleSidebar} onkeypress={toggleSidebar} tabindex="0" role="button">
 		<i class="fa-light fa-bars"></i>
 	</div>
 
@@ -152,11 +152,19 @@
 		border-radius: 50%;
 
 		cursor: pointer;
-
 	}
 
 	.icon-nav-menu:hover {
 		background: hsl(var(--hsl-content) / 0.05);
+	}
+
+	/* Hide on desktop (>= lg). The scoped selector includes Svelte's
+	 * hash class, so it outweighs Tailwind's `.lg\:hidden` utility
+	 * — that's why this lives here instead of on the element. */
+	@media (min-width: 1024px) {
+		.icon-nav-menu {
+			display: none;
+		}
 	}
 
 	.avatar {
