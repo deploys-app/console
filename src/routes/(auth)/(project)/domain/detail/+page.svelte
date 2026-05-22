@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import Swal from 'sweetalert2'
 
 	const { data } = $props()
@@ -13,6 +14,7 @@
 	const domain = $derived(data.domain)
 	const dnsErrors = $derived(domain.verification?.dns?.errors ?? [])
 	const hasDnsErrors = $derived(dnsErrors.length > 0)
+	const headerStatus = $derived(domain.cdn && domain.verification?.ssl?.pending ? 'verify' : domain.status)
 
 	onMount(() => {
 		return setupCopy('.copy')
@@ -214,8 +216,13 @@
 <br>
 <div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
-		<h3>
+		<h3 class="flex items-center">
+			<StatusIcon status={headerStatus} />
 			<strong>Domain: {domain.domain}</strong>
+			{#if hasDnsErrors}
+				<i class="fa-solid fa-triangle-exclamation text-warning ml-3"
+					title="DNS verification is failing. See details below."></i>
+			{/if}
 		</h3>
 	</div>
 
