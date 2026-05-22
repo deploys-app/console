@@ -307,51 +307,57 @@
 			{/if}
 		{/if}
 
-		{#if domain.verification?.ownership?.type}
-			<hr>
-			<p>
-				<strong>
-					{#if domain.cdn}
-						Domain Verification
-					{:else if domain.wildcard}
-						Ownership TXT Record
-					{:else}
-						Proxied DNS (alternative)
-					{/if}
-				</strong>
-			</p>
-			{#if !domain.cdn && !domain.wildcard}
-				<p class="text-sm opacity-80">
-					If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
-					records can't resolve to this location directly, add this TXT record
-					to prove ownership and we'll accept the proxied setup.
+		{#snippet ownershipBlock()}
+			{#if domain.verification?.ownership?.type}
+				<hr>
+				<p>
+					<strong>
+						{#if domain.cdn}
+							Domain Verification
+						{:else if domain.wildcard}
+							Ownership TXT Record
+						{:else}
+							Proxied DNS (alternative)
+						{/if}
+					</strong>
 				</p>
-			{/if}
-			{#if (domain.verification.ownership.errors ?? []).length > 0}
-				{#each domain.verification.ownership.errors as e, i (i)}
-					<p class="text-negative text-content/80">{e}</p>
-				{/each}
-			{/if}
-			<div class="field">
-				<label for="input-owner_name">TXT Name</label>
-				<div class="input -has-icon-right mb-1">
-					<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
-					<span class="icon -is-right copy"
-						data-clipboard-text={domain.verification.ownership.name}>
-						<i class="fa-light fa-copy"></i>
-					</span>
+				{#if !domain.cdn && !domain.wildcard}
+					<p class="text-sm opacity-80">
+						If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
+						records can't resolve to this location directly, add this TXT record
+						to prove ownership and we'll accept the proxied setup.
+					</p>
+				{/if}
+				{#if (domain.verification.ownership.errors ?? []).length > 0}
+					{#each domain.verification.ownership.errors as e, i (i)}
+						<p class="text-negative text-content/80">{e}</p>
+					{/each}
+				{/if}
+				<div class="field">
+					<label for="input-owner_name">TXT Name</label>
+					<div class="input -has-icon-right mb-1">
+						<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
+						<span class="icon -is-right copy"
+							data-clipboard-text={domain.verification.ownership.name}>
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
 				</div>
-			</div>
-			<div class="field">
-				<label for="input-owner_value">TXT Value</label>
-				<div class="input -has-icon-right mb-1">
-					<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
-					<span class="icon -is-right copy"
-						data-clipboard-text={domain.verification.ownership.value}>
-						<i class="fa-light fa-copy"></i>
-					</span>
+				<div class="field">
+					<label for="input-owner_value">TXT Value</label>
+					<div class="input -has-icon-right mb-1">
+						<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
+						<span class="icon -is-right copy"
+							data-clipboard-text={domain.verification.ownership.value}>
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
 				</div>
-			</div>
+			{/if}
+		{/snippet}
+
+		{#if domain.cdn || domain.wildcard}
+			{@render ownershipBlock()}
 		{/if}
 
 		{#if (domain.verification?.ssl?.records ?? []).length > 0}
@@ -449,6 +455,10 @@
 					{/each}
 				</div>
 			{/if}
+		{/if}
+
+		{#if !domain.cdn && !domain.wildcard}
+			{@render ownershipBlock()}
 		{/if}
 
 		{#if domain.cdn && domain.status === 'success'}
