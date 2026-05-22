@@ -1021,14 +1021,14 @@
 	.icon.copy[data-copied]::after {
 		content: 'Copied!';
 		position: absolute;
-		bottom: calc(100% + 6px);
+		bottom: calc(100% + 4px);
 		left: 50%;
 		transform: translateX(-50%);
 		background: hsl(var(--hsl-content));
 		color: hsl(var(--hsl-base-100));
-		padding: 2px 8px;
-		border-radius: 4px;
-		font-size: var(--fs-7);
+		padding: 1px 6px;
+		border-radius: 3px;
+		font-size: var(--fs-1);
 		line-height: 1.5;
 		white-space: nowrap;
 		pointer-events: none;
