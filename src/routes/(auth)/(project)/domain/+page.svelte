@@ -35,7 +35,7 @@
 <div class="panel is-level-300">
 	<div class="flex justify-between items-center">
 		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button -small" href={`/domain/create?project=${project}`}>
+			<a class="button" href={`/domain/create?project=${project}`}>
 				Create
 			</a>
 		</div>
