@@ -209,7 +209,7 @@
 		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 	</div>
 	<div class="breadcrumb-item min-w-0">
-		<h6 class="min-w-0 break-all">{domain.domain}</h6>
+		<h6 class="min-w-0 wrap-anywhere">{domain.domain}</h6>
 	</div>
 </div>
 
@@ -218,7 +218,7 @@
 	<div class="grid grid-cols-1 gap-3">
 		<h3 class="flex flex-wrap items-center gap-y-2 min-w-0">
 			<StatusIcon status={headerStatus} />
-			<strong class="min-w-0 break-all">Domain: {domain.domain}</strong>
+			<strong class="min-w-0 wrap-anywhere">Domain: {domain.domain}</strong>
 			{#if hasDnsErrors}
 				<i class="fa-solid fa-triangle-exclamation text-warning ml-3"
 					title="DNS verification is failing. See details below."></i>
@@ -323,7 +323,7 @@
 			</p>
 			{#if hasDnsErrors}
 				{#each dnsErrors as e, i (i)}
-					<p class="text-negative text-content/80 break-all">{e}</p>
+					<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
 				{/each}
 			{/if}
 		{/if}
@@ -351,7 +351,7 @@
 				{/if}
 				{#if (domain.verification.ownership.errors ?? []).length > 0}
 					{#each domain.verification.ownership.errors as e, i (i)}
-						<p class="text-negative text-content/80 break-all">{e}</p>
+						<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
 					{/each}
 				{/if}
 				<div class="field">
