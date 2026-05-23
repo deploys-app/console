@@ -289,7 +289,9 @@
 						and switch the domain to <strong>success</strong> once it resolves
 						to this location. If your DNS is behind a CDN/proxy and the A/AAAA
 						records can't resolve to us directly, add the TXT record under
-						<em>Proxied DNS (alternative)</em> instead.
+						<em>Proxied DNS (alternative)</em>. That proves ownership but
+						doesn't enable certificate issuance — point DNS directly if you
+						need us to issue a TLS certificate.
 					{/if}
 				</p>
 
@@ -307,10 +309,9 @@
 					the CNAME resolves.
 				</p>
 			{:else}
-				<p class="text-negative text-content/80">
-					DNS verification is currently failing. If this isn't resolved within
-					48 hours, the certificate will be torn down. Re-check your DNS
-					configuration against the records below.
+				<p class="text-content/80">
+					We can't issue or renew a TLS certificate with your current DNS
+					setup. Re-check your DNS configuration against the records below.
 				</p>
 			{/if}
 
