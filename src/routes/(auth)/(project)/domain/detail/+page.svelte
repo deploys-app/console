@@ -323,7 +323,7 @@
 			</p>
 			{#if hasDnsErrors}
 				{#each dnsErrors as e, i (i)}
-					<p class="text-negative text-content/80">{e}</p>
+					<p class="text-negative text-content/80 break-all">{e}</p>
 				{/each}
 			{/if}
 		{/if}
@@ -351,7 +351,7 @@
 				{/if}
 				{#if (domain.verification.ownership.errors ?? []).length > 0}
 					{#each domain.verification.ownership.errors as e, i (i)}
-						<p class="text-negative text-content/80">{e}</p>
+						<p class="text-negative text-content/80 break-all">{e}</p>
 					{/each}
 				{/if}
 				<div class="field">
