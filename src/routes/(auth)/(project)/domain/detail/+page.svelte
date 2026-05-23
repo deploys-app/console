@@ -373,7 +373,7 @@
 			{@render ownershipBlock()}
 		{/if}
 
-		{#if (domain.verification?.ssl?.records ?? []).length > 0}
+		{#if (domain.verification?.ssl?.records ?? []).length > 0 || domain.verification?.ssl?.dcv?.name}
 			<hr>
 			<p><strong>SSL/TLS Verification</strong></p>
 
