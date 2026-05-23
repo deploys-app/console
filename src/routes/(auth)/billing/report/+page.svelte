@@ -17,6 +17,7 @@
 
 	let report = $state()
 	let loading = $state(false)
+	let bootstrapped = false
 
 	let filterOpen = $state(false)
 	let filterSearch = $state('')
@@ -119,6 +120,18 @@
 	}
 
 	async function fetchReport () {
+		// After bootstrap, an empty selection means "show nothing".
+		// The backend returns the full dataset when projectSids is empty,
+		// so we render an empty state locally instead of round-tripping.
+		if (bootstrapped && filter.projectSids.length === 0) {
+			report = report
+				? { ...report, list: [], chart: { categories: [], series: [] } }
+				: report
+			chart?.destroy()
+			chart = null
+			return
+		}
+
 		loading = true
 		try {
 			const resp = await api.invoke('billing.report', {
@@ -131,7 +144,10 @@
 			}
 			report = resp.result
 
-			filter.projectSids = report.projectSids ?? []
+			if (!bootstrapped) {
+				filter.projectSids = report.projectSids ?? []
+				bootstrapped = true
+			}
 			initChart()
 		} finally {
 			loading = false
@@ -313,8 +329,14 @@
 			<div class="chart-loading">
 				<i class="fa-solid fa-spinner-third fa-spin"></i>
 			</div>
+		{:else if filter.projectSids.length === 0}
+			<div class="chart-empty">
+				<i class="fa-solid fa-filter-list text-content/40"></i>
+				<p>No projects selected.</p>
+			</div>
 		{/if}
-		<div bind:this={chartEl} class="chart-container" class:is-hidden={!report}></div>
+		<div bind:this={chartEl} class="chart-container"
+			class:is-hidden={!report || filter.projectSids.length === 0}></div>
 	</div>
 
 	<div class="panel is-level-300">
@@ -592,6 +614,21 @@
 		min-height: 18rem;
 		font-size: 2rem;
 		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.chart-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		min-height: 18rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		font-size: 0.9375rem;
+	}
+
+	.chart-empty i {
+		font-size: 2rem;
 	}
 
 	.tabular {
