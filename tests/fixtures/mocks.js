@@ -123,6 +123,10 @@ export function defaultMocks () {
 		'/auditLog.list': {
 			ok: true,
 			result: { items: [] }
+		},
+		'/dropbox.list': {
+			ok: true,
+			result: { items: [] }
 		}
 	}
 }
@@ -285,6 +289,15 @@ export const sampleRepository = {
 	name: 'web',
 	size: 12345678,
 	createdAt: now
+}
+
+export const sampleDropboxItem = {
+	downloadUrl: 'https://dropbox.deploys.app/files/abc123',
+	filename: 'report.pdf',
+	size: 2048,
+	ttl: 1,
+	createdAt: now,
+	expiresAt: '2024-01-02T00:00:00Z'
 }
 
 export const sampleAuditLogItem = {
