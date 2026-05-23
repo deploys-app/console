@@ -208,17 +208,17 @@
 	<div class="breadcrumb-item">
 		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
 	</div>
-	<div class="breadcrumb-item">
-		<h6>{domain.domain}</h6>
+	<div class="breadcrumb-item min-w-0">
+		<h6 class="min-w-0 wrap-anywhere">{domain.domain}</h6>
 	</div>
 </div>
 
 <br>
 <div class="panel is-level-300 grid gap-6">
 	<div class="grid grid-cols-1 gap-3">
-		<h3 class="flex items-center">
+		<h3 class="flex flex-wrap items-center gap-y-2 min-w-0">
 			<StatusIcon status={headerStatus} />
-			<strong>Domain: {domain.domain}</strong>
+			<strong class="min-w-0 wrap-anywhere">Domain: {domain.domain}</strong>
 			{#if hasDnsErrors}
 				<i class="fa-solid fa-triangle-exclamation text-warning ml-3"
 					title="DNS verification is failing. See details below."></i>
@@ -323,7 +323,7 @@
 			</p>
 			{#if hasDnsErrors}
 				{#each dnsErrors as e, i (i)}
-					<p class="text-negative text-content/80">{e}</p>
+					<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
 				{/each}
 			{/if}
 		{/if}
@@ -351,7 +351,7 @@
 				{/if}
 				{#if (domain.verification.ownership.errors ?? []).length > 0}
 					{#each domain.verification.ownership.errors as e, i (i)}
-						<p class="text-negative text-content/80">{e}</p>
+						<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
 					{/each}
 				{/if}
 				<div class="field">
@@ -488,8 +488,8 @@
 				<div class="mb-3">
 					<strong>Purge Cache</strong>
 				</div>
-				<div class="bg-base-100 p-6 border border-negative border-current/70 rounded-md">
-					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+				<div class="bg-base-100 p-4 sm:p-6 border border-negative/70 rounded-md">
+					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
 						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge everything</strong></div>
 							<p class="text-sm opacity-80">Remove all cached resources</p>
@@ -498,8 +498,8 @@
 							Purge everything
 						</button>
 					</div>
-					<hr class="my-6">
-					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+					<hr class="my-4 sm:my-6">
+					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
 						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge prefix</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at prefix path</p>
@@ -508,8 +508,8 @@
 							Purge prefix
 						</button>
 					</div>
-					<hr class="my-6">
-					<div class="flex lg:flex-row flex-col gap-6 lg:items-center">
+					<hr class="my-4 sm:my-6">
+					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
 						<div class="flex-1 grid grid-cols-1 gap-1">
 							<div><strong>Purge file</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at exact path</p>
