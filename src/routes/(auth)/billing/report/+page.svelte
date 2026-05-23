@@ -92,13 +92,9 @@
 		{ value: 'year', label: '1 year' }
 	]
 
-	const totals = $derived.by(() => {
-		const list = report?.list ?? []
-		return {
-			usage: list.reduce((s, it) => s + (it.usageValue ?? 0), 0),
-			billing: list.reduce((s, it) => s + (it.billingValue ?? 0), 0)
-		}
-	})
+	const totalBilling = $derived(
+		(report?.list ?? []).reduce((s, it) => s + (it.billingValue ?? 0), 0)
+	)
 
 	const projectNameBySid = $derived.by(() => {
 		/** @type {Record<string, string>} */
@@ -300,14 +296,8 @@
 		<div class="summary-card is-primary">
 			<div class="summary-label">Total billing</div>
 			<div class="summary-value">
-				<span class="summary-amount">{money(totals.billing)}</span>
+				<span class="summary-amount">{money(totalBilling)}</span>
 				<span class="summary-currency">THB</span>
-			</div>
-		</div>
-		<div class="summary-card">
-			<div class="summary-label">Total usage</div>
-			<div class="summary-value">
-				<span class="summary-amount">{num(totals.usage)}</span>
 			</div>
 		</div>
 		<div class="summary-card">
@@ -373,9 +363,8 @@
 				{#if (report?.list ?? []).length > 0}
 					<tfoot>
 						<tr>
-							<td colspan="2"><strong>Total</strong></td>
-							<td class="is-align-right tabular"><strong>{num(totals.usage)}</strong></td>
-							<td class="is-align-right tabular"><strong>{money(totals.billing)}</strong></td>
+							<td colspan="3"><strong>Total</strong></td>
+							<td class="is-align-right tabular"><strong>{money(totalBilling)}</strong></td>
 						</tr>
 					</tfoot>
 				{/if}
@@ -543,7 +532,7 @@
 
 	@media (min-width: 640px) {
 		.summary-grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
 
