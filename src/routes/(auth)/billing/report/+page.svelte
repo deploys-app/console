@@ -18,6 +18,71 @@
 	let report = $state()
 	let loading = $state(false)
 
+	let filterOpen = $state(false)
+	let filterSearch = $state('')
+
+	const projectListLen = $derived((report?.projectList ?? []).length)
+
+	const selectedLabel = $derived.by(() => {
+		const n = filter.projectSids.length
+		const total = projectListLen
+		if (total === 0) return 'No projects'
+		if (n === total) return `All ${total} projects`
+		if (n === 0) return `0 of ${total} projects`
+		return `${n} of ${total} projects`
+	})
+
+	const filteredProjects = $derived.by(() => {
+		const list = report?.projectList ?? []
+		const q = filterSearch.trim().toLowerCase()
+		if (!q) return list
+		return list.filter((p) =>
+			(p.name || '').toLowerCase().includes(q) ||
+			(p.sid || '').toLowerCase().includes(q)
+		)
+	})
+
+	/** @type {ReturnType<typeof setTimeout> | undefined} */
+	let fetchTimer
+	function scheduleFetch () {
+		if (fetchTimer) clearTimeout(fetchTimer)
+		fetchTimer = setTimeout(() => {
+			fetchTimer = undefined
+			fetchReport()
+		}, 300)
+	}
+
+	function selectAllProjects () {
+		filter.projectSids = (report?.projectList ?? []).map((p) => p.sid)
+		scheduleFetch()
+	}
+
+	function clearAllProjects () {
+		filter.projectSids = []
+		scheduleFetch()
+	}
+
+	/** @param {HTMLElement} node @param {() => void} handler */
+	function clickOutside (node, handler) {
+		/** @param {MouseEvent} e */
+		function onDown (e) {
+			if (e.target instanceof Node && !node.contains(e.target)) {
+				handler()
+			}
+		}
+		document.addEventListener('mousedown', onDown)
+		return {
+			destroy () {
+				document.removeEventListener('mousedown', onDown)
+			}
+		}
+	}
+
+	/** @param {HTMLElement} node */
+	function autofocus (node) {
+		queueMicrotask(() => node.focus())
+	}
+
 	const rangeOptions = [
 		{ value: 'this_month', label: 'This month' },
 		{ value: 'prev_month', label: 'Previous month' },
@@ -166,18 +231,50 @@
 		{#if (report?.projectList ?? []).length > 0}
 			<div class="grid gap-2">
 				<span class="filter-label">Projects</span>
-				<div class="project-group">
-					{#each report.projectList as it (it.sid)}
-						<label class="project-chip">
-							<input type="checkbox" value={it.sid}
-								bind:group={filter.projectSids}
-								onchange={fetchReport}>
-							<span class="project-chip-name">{it.name || it.sid}</span>
-							{#if it.name && it.name !== it.sid}
-								<span class="project-chip-sid">{it.sid}</span>
-							{/if}
-						</label>
-					{/each}
+				<div class="project-filter">
+					<button type="button" class="project-trigger" onclick={() => (filterOpen = !filterOpen)}>
+						<span>{selectedLabel}</span>
+						<i class="fa-solid fa-chevron-down" class:is-open={filterOpen}></i>
+					</button>
+					{#if filterOpen}
+						<div class="project-popover" use:clickOutside={() => (filterOpen = false)}>
+							<div class="project-popover-head">
+								<div class="input -has-icon-left">
+									<span class="icon -is-left"><i class="fa-solid fa-magnifying-glass"></i></span>
+									<input
+										type="text"
+										placeholder="Search projects…"
+										bind:value={filterSearch}
+										use:autofocus
+										onkeydown={(e) => { if (e.key === 'Escape') filterOpen = false }}>
+								</div>
+								<div class="project-popover-bulk">
+									<button type="button" class="link" onclick={selectAllProjects}>Select all</button>
+									<span class="text-content/40">·</span>
+									<button type="button" class="link" onclick={clearAllProjects}>Clear</button>
+								</div>
+							</div>
+							<div class="project-popover-list">
+								{#each filteredProjects as it (it.sid)}
+									<label class="project-row">
+										<input
+											type="checkbox"
+											value={it.sid}
+											bind:group={filter.projectSids}
+											onchange={scheduleFetch}>
+										<div class="grid min-w-0">
+											<span class="truncate">{it.name || it.sid}</span>
+											{#if it.name && it.name !== it.sid}
+												<span class="project-row-sid truncate">{it.sid}</span>
+											{/if}
+										</div>
+									</label>
+								{:else}
+									<div class="project-popover-empty">No projects match.</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/if}
@@ -310,43 +407,107 @@
 		font-weight: 600;
 	}
 
-	.project-group {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
+	.project-filter {
+		position: relative;
+		max-width: 22rem;
 	}
 
-	.project-chip {
-		display: inline-flex;
+	.project-trigger {
+		appearance: none;
+		width: 100%;
+		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.4rem 0.85rem;
-		border-radius: 9999px;
+		justify-content: space-between;
+		gap: 0.75rem;
+		padding: 0.55rem 0.85rem;
+		border-radius: 0.5rem;
 		background: hsl(var(--hsl-base-200));
-		border: 1px solid hsl(var(--hsl-line) / 0.6);
+		border: 1px solid hsl(var(--hsl-line) / 0.7);
+		color: hsl(var(--hsl-content));
+		font-size: 0.9375rem;
 		cursor: pointer;
+		text-align: left;
 		transition: border-color 0.12s ease, background 0.12s ease;
 	}
 
-	.project-chip:hover {
+	.project-trigger:hover {
 		border-color: hsl(var(--hsl-primary) / 0.45);
 	}
 
-	.project-chip:has(input:checked) {
-		border-color: hsl(var(--hsl-primary));
-		background: hsl(var(--hsl-primary) / 0.08);
+	.project-trigger i {
+		transition: transform 0.15s ease;
+		color: hsl(var(--hsl-content) / 0.6);
+		font-size: 0.75rem;
 	}
 
-	.project-chip input {
+	.project-trigger i.is-open {
+		transform: rotate(180deg);
+	}
+
+	.project-popover {
+		position: absolute;
+		top: calc(100% + 0.35rem);
+		left: 0;
+		z-index: 20;
+		width: min(22rem, calc(100vw - 2rem));
+		background: hsl(var(--hsl-base-300));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: 0.625rem;
+		box-shadow:
+			0 4px 12px hsl(220 20% 10% / 0.12),
+			0 12px 32px hsl(220 20% 10% / 0.18);
+		overflow: hidden;
+		display: grid;
+	}
+
+	.project-popover-head {
+		padding: 0.75rem;
+		display: grid;
+		gap: 0.5rem;
+		border-bottom: 1px solid hsl(var(--hsl-line) / 0.6);
+	}
+
+	.project-popover-bulk {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-size: 0.8125rem;
+	}
+
+	.project-popover-list {
+		max-height: 18rem;
+		overflow-y: auto;
+		padding: 0.25rem;
+	}
+
+	.project-popover-empty {
+		padding: 1.25rem;
+		text-align: center;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+
+	.project-row {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		padding: 0.5rem 0.65rem;
+		border-radius: 0.4rem;
+		cursor: pointer;
+		transition: background 0.1s ease;
+	}
+
+	.project-row:hover {
+		background: hsl(var(--hsl-primary) / 0.06);
+	}
+
+	.project-row input {
 		margin: 0;
 		accent-color: hsl(var(--hsl-primary));
+		flex-shrink: 0;
 	}
 
-	.project-chip-name {
-		font-size: 0.875rem;
-	}
-
-	.project-chip-sid {
+	.project-row-sid {
 		font-size: 0.75rem;
 		color: hsl(var(--hsl-content) / 0.6);
 		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
