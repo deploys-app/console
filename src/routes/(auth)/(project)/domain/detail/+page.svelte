@@ -299,6 +299,13 @@
 						has been torn down. Re-point DNS and we'll re-verify automatically.
 					</p>
 				{/if}
+			{:else if domain.wildcard}
+				<p class="text-content/80">
+					Ownership is confirmed. The wildcard certificate can't be issued
+					until you also add the SSL/TLS CNAME record above. We re-check
+					every few minutes and issue the certificate automatically once
+					the CNAME resolves.
+				</p>
 			{:else}
 				<p class="text-negative text-content/80">
 					DNS verification is currently failing. If this isn't resolved within
