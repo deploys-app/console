@@ -68,6 +68,7 @@
 		<div class="flex gap-4">
 			<a class="button" href={`/billing/create?id=${billingAccount.id}`}>Edit</a>
 			<a class="button" href={`/billing/report?id=${billingAccount.id}`}>Report</a>
+			<a class="button" href={`/billing/invoices?id=${billingAccount.id}`}>Invoices</a>
 			<button class="button" type="button" onclick={deleteItem}>Delete account</button>
 		</div>
 	</div>

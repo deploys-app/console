@@ -404,4 +404,53 @@ declare namespace Api {
         detail: string
         createdAt: string
     }
+
+    export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'void'
+
+    export type InvoiceListItem = {
+        id: string
+        number: string
+        currency: string
+        periodStart: string
+        periodEnd: string
+        subtotal: number
+        taxAmount: number
+        total: number
+        status: InvoiceStatus
+        issuedAt: string
+        paidAt: string
+        voidedAt: string
+        createdAt: string
+    }
+
+    export type InvoiceLineItem = {
+        sku: string
+        description: string
+        quantity: number
+        unit: string
+        unitPrice: number
+        amount: number
+    }
+
+    export type Invoice = {
+        id: string
+        billingAccountId: string
+        number: string
+        currency: string
+        periodStart: string
+        periodEnd: string
+        subtotal: number
+        taxRate: number
+        taxAmount: number
+        total: number
+        status: InvoiceStatus
+        taxId: string
+        taxName: string
+        taxAddress: string
+        issuedAt: string
+        paidAt: string
+        voidedAt: string
+        createdAt: string
+        lineItems: InvoiceLineItem[]
+    }
 }
