@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import Swal from 'sweetalert2'
 
@@ -534,10 +535,9 @@
 		</div>
 	{/if}
 
-	<hr>
-	<div class="flex gap-4">
+	<DangerZone description="Permanently delete this domain. Routing and TLS certificates will be removed.">
 		<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 			Delete
 		</button>
-	</div>
+	</DangerZone>
 </div>

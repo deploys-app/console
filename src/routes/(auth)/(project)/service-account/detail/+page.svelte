@@ -4,6 +4,7 @@
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 	import { setupCopy } from '$lib/clipboard'
 
 	onMount(() => setupCopy('.copy'))
@@ -145,12 +146,10 @@
 			</div>
 		</div>
 
-		<hr>
-
-		<div class="flex">
+		<DangerZone description="Permanently delete this service account and revoke all of its keys.">
 			<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 				Delete
 			</button>
-		</div>
+		</DangerZone>
 	</div>
 </div>

@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -201,9 +202,11 @@
 			<button class="button" class:is-loading={saving}>
 				{#if envGroup}Update{:else}Create{/if}
 			</button>
-			{#if envGroup}
-				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-			{/if}
 		</div>
+		{#if envGroup}
+			<DangerZone description="Permanently delete this env group. Deployments referencing it may fail to start.">
+				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+			</DangerZone>
+		{/if}
 	</form>
 </div>

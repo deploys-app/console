@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -93,10 +94,8 @@
 			</div>
 		</div>
 
-		<hr>
-
-		<div class="flex gap-4">
+		<DangerZone description="Permanently delete this pull secret. Deployments using it will fail to pull images.">
 			<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-		</div>
+		</DangerZone>
 	</div>
 </div>

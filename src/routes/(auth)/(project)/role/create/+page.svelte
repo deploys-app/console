@@ -4,6 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 	const role = $derived(data.role)
@@ -184,9 +185,11 @@
 			<button class="button" class:is-loading={saving}>
 				{#if role}Update{:else}Create{/if}
 			</button>
-			{#if role}
+		</div>
+		{#if role}
+			<DangerZone description="Permanently delete this role. Members assigned only this role will lose their access.">
 				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-			{/if}
-			</div>
+			</DangerZone>
+		{/if}
 	</form>
 </div>

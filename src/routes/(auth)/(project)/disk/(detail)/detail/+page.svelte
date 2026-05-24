@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -64,8 +65,10 @@
 
 <div class="flex gap-4">
 	<a class="button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+</div>
 
+<DangerZone description="Permanently delete this disk. All data stored on it will be lost.">
 	<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 		Delete
 	</button>
-</div>
+</DangerZone>
