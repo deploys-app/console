@@ -364,7 +364,7 @@
 			<small class="text-content/60">No files yet. Upload one above to get a shareable download URL.</small>
 		{:else}
 			<div class="uploads">
-				{#each items as it (it.downloadUrl)}
+				{#each items as it, i (i)}
 					<div class="upload-item">
 						<span class="upload-icon">
 							<i class="fa-solid fa-file"></i>
