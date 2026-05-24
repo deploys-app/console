@@ -59,4 +59,20 @@ test.describe('dropbox', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('iam: forbidden')).toBeVisible()
 	})
+
+	test('shows a fallback message when the error has no message', async ({ page }) => {
+		// arpc returns {"ok":false,"error":{}} for internal (500) errors, so
+		// the message is empty — the UI must still say something useful.
+		await setMocks({
+			'dropbox.list': {
+				ok: false,
+				error: {}
+			}
+		})
+
+		await page.goto('/dropbox?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Failed to load files. Please try again.')).toBeVisible()
+	})
 })

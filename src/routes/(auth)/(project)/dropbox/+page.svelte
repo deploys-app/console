@@ -358,7 +358,7 @@
 		{#if loadError}
 			<div class="error-banner">
 				<i class="fa-solid fa-circle-exclamation"></i>
-				<span>{loadError.message}</span>
+				<span>{loadError.message || 'Failed to load files. Please try again.'}</span>
 			</div>
 		{:else if items.length === 0}
 			<small class="text-content/60">No files yet. Upload one above to get a shareable download URL.</small>
