@@ -65,7 +65,7 @@
 <div class="flex gap-4">
 	<a class="button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
 
-	<button class="button" type="button" onclick={deleteItem}>
+	<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 		Delete
 	</button>
 </div>

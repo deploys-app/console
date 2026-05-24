@@ -185,7 +185,7 @@
 				{#if role}Update{:else}Create{/if}
 			</button>
 			{#if role}
-				<button class="button" type="button" onclick={deleteItem}>Delete</button>
+				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
 			{/if}
 			</div>
 	</form>

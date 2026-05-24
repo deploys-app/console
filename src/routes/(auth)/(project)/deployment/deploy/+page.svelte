@@ -517,7 +517,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
+			<button class="button is-variant-secondary m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Command</span>
 			</button>
@@ -536,7 +536,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button m-auto" type="button"
+			<button class="button is-variant-secondary m-auto" type="button"
 					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Arg</span>
@@ -735,7 +735,7 @@
 				<div class="input flex-1">
 					<input placeholder="Env Group Name" bind:value={envGroupInput}>
 				</div>
-				<button class="button" type="button" onclick={addEnvGroupFromInput}>Add</button>
+				<button class="button is-variant-secondary" type="button" onclick={addEnvGroupFromInput}>Add</button>
 			</div>
 			<p class="text-xs">* You don't have permission to list env groups</p>
 		{/if}
@@ -807,7 +807,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="button flex m-auto" type="button"
+								<button class="button is-variant-secondary flex m-auto" type="button"
 									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus mr-3"></i>
 									<span>Add Variable</span>
@@ -818,7 +818,7 @@
 				</table>
 			</div>
 
-			<button class="button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
+			<button class="button is-variant-secondary flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
@@ -868,7 +868,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="button flex m-auto" type="button"
+							<button class="button is-variant-secondary flex m-auto" type="button"
 								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Data</span>
@@ -925,7 +925,7 @@
 				</div>
 			{/each}
 			{#if form.sidecars.length < sidecarMax}
-				<button class="button flex m-auto" type="button" onclick={addSidecar}>
+				<button class="button is-variant-secondary flex m-auto" type="button" onclick={addSidecar}>
 					<i class="fa-solid fa-plus mr-3"></i>
 					<span>Add Sidecar</span>
 				</button>

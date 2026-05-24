@@ -494,7 +494,7 @@
 							<div><strong>Purge everything</strong></div>
 							<p class="text-sm opacity-80">Remove all cached resources</p>
 						</div>
-						<button class="button" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
+						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 							Purge everything
 						</button>
 					</div>
@@ -504,7 +504,7 @@
 							<div><strong>Purge prefix</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at prefix path</p>
 						</div>
-						<button class="button" class:is-loading={purging} onclick={purgeCachePrefix}>
+						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCachePrefix}>
 							Purge prefix
 						</button>
 					</div>
@@ -514,7 +514,7 @@
 							<div><strong>Purge file</strong></div>
 							<p class="text-sm opacity-80">Remove cached resources at exact path</p>
 						</div>
-						<button class="button" class:is-loading={purging} onclick={purgeCacheFile}>
+						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCacheFile}>
 							Purge file
 						</button>
 					</div>
@@ -526,7 +526,7 @@
 	<hr>
 	{#if domain.cdn}
 		<div class="flex items-center flex-wrap">
-			<a class="button" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
+			<a class="button is-variant-secondary" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
 		</div>
 	{:else}
 		<div class="flex items-center flex-wrap">
@@ -536,7 +536,7 @@
 
 	<hr>
 	<div class="flex gap-4">
-		<button class="button" type="button" onclick={deleteItem}>
+		<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 			Delete
 		</button>
 	</div>

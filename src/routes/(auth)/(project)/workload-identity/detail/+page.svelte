@@ -92,7 +92,7 @@
 		<hr>
 
 		<div class="flex gap-4">
-			<button class="button" onclick={deleteItem}>Delete</button>
+			<button class="button is-variant-negative" onclick={deleteItem}>Delete</button>
 		</div>
 	</div>
 </div>

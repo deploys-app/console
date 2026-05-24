@@ -245,7 +245,7 @@
 
 <div class="flex flex-wrap items-center my-8">
 	<div class="xl:ml-auto mb-3 xl:mb-0">
-		<button class="button" type="button" onclick={deleteItem}>Delete</button>
+		<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
 	</div>
 </div>
 

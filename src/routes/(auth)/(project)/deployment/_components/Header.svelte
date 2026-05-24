@@ -75,14 +75,14 @@
 			</a>
 			{#if canPause}
 				<div>
-					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
+					<button class="button is-variant-secondary xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
 						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
 					</button>
 				</div>
 			{/if}
 			{#if canResume}
 				<div>
-					<button class="button xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
+					<button class="button is-variant-secondary xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
 						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
 					</button>
 				</div>

@@ -148,7 +148,7 @@
 		<hr>
 
 		<div class="flex">
-			<button class="button" type="button" onclick={deleteItem}>
+			<button class="button is-variant-negative" type="button" onclick={deleteItem}>
 				Delete
 			</button>
 		</div>
