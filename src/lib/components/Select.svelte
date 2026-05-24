@@ -227,6 +227,8 @@
 						{/if}
 					</div>
 				{/if}
+			{:else}
+				<div class="select-empty">No options</div>
 			{/each}
 		</div>
 	{/if}
@@ -373,6 +375,13 @@
 		height: 1px;
 		margin: 0.25rem 0.4rem;
 		background: hsl(var(--hsl-line) / 0.7);
+	}
+
+	.select-empty {
+		padding: 0.75rem 0.65rem;
+		text-align: center;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content) / 0.6);
 	}
 
 	/* Visually hidden but still focusable so native constraint validation
