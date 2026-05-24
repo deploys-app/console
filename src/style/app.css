@@ -77,10 +77,10 @@
 }
 
 :root {
-	/* Typography — Geist for UI, Bricolage Grotesque for display, Geist Mono for machine data */
-	--ffml-primary: 'Geist', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-	--ffml-secondary: 'Bricolage Grotesque', 'Geist', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	--ffml-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'SFMono-Regular', 'Menlo', monospace;
+	/* Typography — Hanken Grotesk for UI + display, JetBrains Mono for machine data */
+	--ffml-primary: 'Hanken Grotesk', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	--ffml-secondary: 'Hanken Grotesk', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	--ffml-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'SFMono-Regular', 'Menlo', monospace;
 	--font-family-mono: var(--ffml-mono);
 
 	/* Corner radii */
@@ -187,7 +187,6 @@
 		min-height: 100vh;
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
-		font-feature-settings: 'cv01', 'ss01';
 	}
 
 	/* Blueprint grid — a faint structural lattice behind the whole console. */
