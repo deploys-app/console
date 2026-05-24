@@ -20,6 +20,6 @@ test.describe('workload identities', () => {
 	test('empty state when no workload identities', async ({ page }) => {
 		await page.goto('/workload-identity?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

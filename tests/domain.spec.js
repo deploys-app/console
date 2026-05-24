@@ -30,6 +30,6 @@ test.describe('domains', () => {
 	test('empty state when no domains', async ({ page }) => {
 		await page.goto('/domain?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

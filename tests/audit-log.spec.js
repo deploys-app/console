@@ -23,7 +23,7 @@ test.describe('audit log', () => {
 	test('empty state when no entries', async ({ page }) => {
 		await page.goto('/audit-log?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 
 	test('applies filters via query string', async ({ page }) => {

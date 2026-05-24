@@ -36,7 +36,7 @@
 	 */
 	function getIconClass () {
 		if (status !== 'success') {
-			return statusIconClass[status] || 'fa-solid fa-minus text-white'
+			return statusIconClass[status] || 'fa-solid fa-minus text-content/40'
 		}
 
 		if (action === 'pause') {
@@ -44,7 +44,7 @@
 		}
 
 		if (!podStatus) {
-			return 'fa-solid fa-spin fa-spinner text-white'
+			return 'fa-solid fa-spin fa-spinner text-content/40'
 		}
 		if (type === 'CronJob' && podStatus.count === podStatus.succeeded + podStatus.ready) {
 			return 'fa-solid fa-check-circle text-positive/80'

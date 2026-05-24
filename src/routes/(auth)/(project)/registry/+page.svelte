@@ -28,8 +28,12 @@
 	}
 </script>
 
-<h6>Registry</h6>
-<br>
+<div class="page-head">
+	<div>
+		<h4><strong>Registry</strong></h4>
+		<p class="page-sub">{repositories.length} {repositories.length === 1 ? 'repository' : 'repositories'}</p>
+	</div>
+</div>
 <div class="panel is-level-300">
 	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
 	{#if storage !== null}

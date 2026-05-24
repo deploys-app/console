@@ -364,6 +364,9 @@
 	<hr>
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
+		<div class="form-section is-first">
+			<h6 class="form-section-title">General</h6>
+		</div>
 		{#if deployment}
 			<div class="field">
 				<label for="input-location-readonly">Location</label>
@@ -514,7 +517,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
+			<button class="button is-variant-secondary m-auto" type="button" onclick={() => { form.command = [...form.command, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Command</span>
 			</button>
@@ -533,7 +536,7 @@
 					</div>
 				{/each}
 			</div>
-			<button class="button m-auto" type="button"
+			<button class="button is-variant-secondary m-auto" type="button"
 					onclick={() => { form.args = [...form.args, ''] }}>
 				<i class="fa-solid fa-plus mr-3"></i>
 				<span>Add Arg</span>
@@ -551,11 +554,10 @@
 
 		{#if selectedLocation.features.disk}
 			<div class="grid gap-4">
-				<br>
-				<hr>
-				<br>
-
-				<h6><strong>Disk</strong></h6>
+				<div class="form-section">
+					<h6 class="form-section-title">Disk</h6>
+					<span class="form-section-hint">Attach a persistent disk and mount it into the container.</span>
+				</div>
 
 				{#if permission.disks}
 					<div class="field">
@@ -598,11 +600,9 @@
 			</div>
 		{/if}
 
-		<br>
-		<hr>
-		<br>
-
-		<h6><strong>Auto-delete (TTL)</strong></h6>
+		<div class="form-section">
+			<h6 class="form-section-title">Auto-delete (TTL)</h6>
+		</div>
 		<div class="grid grid-cols-2 gap-4">
 			<div class="field">
 				<label for="input-ttl_unit">Unit</label>
@@ -632,11 +632,9 @@
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
 				<div class="grid gap-4">
-					<br>
-					<hr>
-					<br>
-
-					<h6><strong>Autoscaling</strong></h6>
+					<div class="form-section">
+						<h6 class="form-section-title">Autoscaling</h6>
+					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
@@ -664,9 +662,10 @@
 			</div>
 		{/if}
 
-		<br>
-		<hr>
-		<br>
+		<div class="form-section">
+			<h6 class="form-section-title">Resources</h6>
+			<span class="form-section-hint">CPU and memory allocated to each container instance.</span>
+		</div>
 
 <!--        <div class="field">-->
 <!--            <label for="input-cpu">CPU allocated</label>-->
@@ -711,15 +710,13 @@
 			</small>
 		</div>
 
-		<br>
-		<hr>
-		<br>
-
-		<h6><strong>Env Groups</strong></h6>
-		<small class="helper">
-			Env groups are project-scoped sets of environment variables that are merged into the deployment.
-			Variables defined here take precedence over those defined in env groups.
-		</small>
+		<div class="form-section">
+			<h6 class="form-section-title">Env Groups</h6>
+			<span class="form-section-hint">
+				Project-scoped sets of environment variables merged into the deployment.
+				Variables defined below take precedence over env groups.
+			</span>
+		</div>
 		{#if permission.envGroups}
 			<div class="field flex">
 				<div class="select">
@@ -738,7 +735,7 @@
 				<div class="input flex-1">
 					<input placeholder="Env Group Name" bind:value={envGroupInput}>
 				</div>
-				<button class="button" type="button" onclick={addEnvGroupFromInput}>Add</button>
+				<button class="button is-variant-secondary" type="button" onclick={addEnvGroupFromInput}>Add</button>
 			</div>
 			<p class="text-xs">* You don't have permission to list env groups</p>
 		{/if}
@@ -770,9 +767,9 @@
 			</table>
 		</div>
 
-		<hr>
-
-		<h6><strong>Environment Variables</strong></h6>
+		<div class="form-section">
+			<h6 class="form-section-title">Environment Variables</h6>
+		</div>
 		<div>
 			<div class="table-container">
 				<table class="table">
@@ -810,7 +807,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="button flex m-auto" type="button"
+								<button class="button is-variant-secondary flex m-auto" type="button"
 									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus mr-3"></i>
 									<span>Add Variable</span>
@@ -821,7 +818,7 @@
 				</table>
 			</div>
 
-			<button class="button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
+			<button class="button is-variant-secondary flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
@@ -831,9 +828,9 @@
 			{/if}
 		</div>
 
-		<hr>
-
-		<h6><strong>Mount Data</strong></h6>
+		<div class="form-section">
+			<h6 class="form-section-title">Mount Data</h6>
+		</div>
 		<div>
 			<div class="table-container">
 				<table class="table">
@@ -871,7 +868,7 @@
 					<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="button flex m-auto" type="button"
+							<button class="button is-variant-secondary flex m-auto" type="button"
 								onclick={() => { form.mountData = [...form.mountData, { k: '', v: '' }] }}>
 								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Data</span>
@@ -883,9 +880,9 @@
 			</div>
 		</div>
 
-		<hr>
-
-		<h6><strong>Sidecars</strong></h6>
+		<div class="form-section">
+			<h6 class="form-section-title">Sidecars</h6>
+		</div>
 		<div class="grid gap-4">
 			{#each form.sidecars as sidecar, i (i)}
 				<div class="panel is-level-200 grid gap-3">
@@ -928,7 +925,7 @@
 				</div>
 			{/each}
 			{#if form.sidecars.length < sidecarMax}
-				<button class="button flex m-auto" type="button" onclick={addSidecar}>
+				<button class="button is-variant-secondary flex m-auto" type="button" onclick={addSidecar}>
 					<i class="fa-solid fa-plus mr-3"></i>
 					<span>Add Sidecar</span>
 				</button>

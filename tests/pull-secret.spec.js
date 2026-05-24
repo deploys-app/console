@@ -20,6 +20,6 @@ test.describe('pull secrets', () => {
 	test('empty state when no pull secrets', async ({ page }) => {
 		await page.goto('/pull-secret?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

@@ -283,8 +283,12 @@
 	}
 </style>
 
-<h6>Dropbox</h6>
-<br>
+<div class="page-head">
+	<div>
+		<h4><strong>Dropbox</strong></h4>
+		<p class="page-sub">Upload and share files</p>
+	</div>
+</div>
 <div class="panel is-level-300 grid gap-4">
 	<div>
 		<p class="mb-0.5">Upload a file and get a shareable download URL.</p>
@@ -364,7 +368,7 @@
 			<small class="text-content/60">No files yet. Upload one above to get a shareable download URL.</small>
 		{:else}
 			<div class="uploads">
-				{#each items as it (it.downloadUrl)}
+				{#each items as it, i (i)}
 					<div class="upload-item">
 						<span class="upload-icon">
 							<i class="fa-solid fa-file"></i>

@@ -270,8 +270,12 @@
 	}
 </style>
 
-<h6>Audit Logs</h6>
-<br>
+<div class="page-head">
+	<div>
+		<h4><strong>Audit Logs</strong></h4>
+		<p class="page-sub">{items.length} {items.length === 1 ? 'event' : 'events'}</p>
+	</div>
+</div>
 <div class="panel is-level-300">
 	<form onsubmit={apply}>
 		<div class="filter-row">

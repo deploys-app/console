@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -89,10 +90,8 @@
 			</pre>
 		</div>
 
-		<hr>
-
-		<div class="flex gap-4">
-			<button class="button" onclick={deleteItem}>Delete</button>
-		</div>
+		<DangerZone description="Permanently delete this workload identity. Deployments using it will lose GCP access.">
+			<button class="button is-variant-negative" onclick={deleteItem}>Delete</button>
+		</DangerZone>
 	</div>
 </div>

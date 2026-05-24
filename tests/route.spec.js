@@ -27,6 +27,6 @@ test.describe('routes', () => {
 	test('empty state when no routes', async ({ page }) => {
 		await page.goto('/route?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

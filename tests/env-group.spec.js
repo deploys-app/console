@@ -21,7 +21,7 @@ test.describe('env groups', () => {
 	test('empty state when no env groups', async ({ page }) => {
 		await page.goto('/env-group?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 
 	test('shows existing env vars on update', async ({ page }) => {

@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -174,7 +175,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="4">
-								<button class="button flex m-auto" type="button"
+								<button class="button is-variant-secondary flex m-auto" type="button"
 									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
 									<i class="fa-solid fa-plus mr-3"></i>
 									<span>Add Variable</span>
@@ -185,7 +186,7 @@
 				</table>
 			</div>
 
-			<button class="button flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
+			<button class="button is-variant-secondary flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
 				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
 			</button>
 			{#if showEnvText}
@@ -201,9 +202,11 @@
 			<button class="button" class:is-loading={saving}>
 				{#if envGroup}Update{:else}Create{/if}
 			</button>
-			{#if envGroup}
-				<button class="button" type="button" onclick={deleteItem}>Delete</button>
-			{/if}
 		</div>
+		{#if envGroup}
+			<DangerZone description="Permanently delete this env group. Deployments referencing it may fail to start.">
+				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+			</DangerZone>
+		{/if}
 	</form>
 </div>

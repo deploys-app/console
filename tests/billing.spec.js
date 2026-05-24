@@ -27,6 +27,6 @@ test.describe('billing accounts', () => {
 	test('empty state when no billing accounts', async ({ page }) => {
 		await page.goto('/billing')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

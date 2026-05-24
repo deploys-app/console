@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import DangerZone from '$lib/components/DangerZone.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
@@ -200,7 +201,7 @@
 										&nbsp;—&nbsp;
 										<span>{s.cloudSqlProxy.instance}</span>
 										{#if s.cloudSqlProxy.port}
-											<span class="text-white">:{s.cloudSqlProxy.port}</span>
+											<span>:{s.cloudSqlProxy.port}</span>
 										{/if}
 									</li>
 								{/if}
@@ -223,7 +224,7 @@
 					<td>
 						<i class="fa-regular fa-clock mr-3 text-warning"></i>
 						{format.ttlExpireAt(deployment.ttl)}
-						<span class="text-white ml-1">(in {format.duration(deployment.ttl)})</span>
+						<span class="text-content/60 ml-1">(in {format.duration(deployment.ttl)})</span>
 					</td>
 				</tr>
 			{/if}
@@ -243,11 +244,9 @@
 	</table>
 </div>
 
-<div class="flex flex-wrap items-center my-8">
-	<div class="xl:ml-auto mb-3 xl:mb-0">
-		<button class="button" type="button" onclick={deleteItem}>Delete</button>
-	</div>
-</div>
+<DangerZone description="Permanently delete this deployment. All running instances will be stopped and removed.">
+	<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+</DangerZone>
 
 <h6><strong>Env Groups</strong></h6>
 <div class="table-container">

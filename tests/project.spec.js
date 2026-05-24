@@ -21,7 +21,7 @@ test.describe('project list', () => {
 		await expect(main.getByRole('heading', { name: 'Projects' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'Test Project' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'Another' })).toBeVisible()
-		await expect(main.locator('table tbody tr')).toHaveCount(2)
+		await expect(main.locator('.project-open')).toHaveCount(2)
 	})
 
 	test('shows the no-data row when there are no projects', async ({ page }) => {
@@ -32,13 +32,13 @@ test.describe('project list', () => {
 		await page.goto('/project')
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('heading', { name: 'Projects' })).toBeVisible()
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('No projects yet')).toBeVisible()
 	})
 
 	test('exposes the create-project link', async ({ page }) => {
 		await page.goto('/project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/project/create')
+		await expect(main.getByRole('link', { name: 'New project' }).first()).toHaveAttribute('href', '/project/create')
 	})
 })
 
