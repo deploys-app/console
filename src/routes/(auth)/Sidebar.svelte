@@ -116,7 +116,7 @@
 		flex-direction: column;
 		overflow-y: auto;
 		background-color: hsl(var(--hsl-base-300));
-		box-shadow: var(--raised-z10);
+		border-right: 1px solid hsl(var(--hsl-line));
 	}
 
 	.sidebar-bottom {
@@ -124,32 +124,58 @@
 	}
 
 	.sidebar-menus .menu-item {
+		position: relative;
 		display: grid;
 		grid-auto-flow: column;
 		grid-gap: .75rem;
 		justify-content: start;
 		align-items: center;
-		padding: .75rem 1rem;
+		margin: 1px 0.5rem;
+		padding: .625rem .75rem;
+		border-radius: var(--radius-md);
 		font-size: var(--fs-2);
-		color: hsl(var(--hsl-content) / 0.75);
+		font-weight: 500;
+		color: hsl(var(--hsl-content) / 0.7);
 		cursor: pointer;
+		transition: color var(--timing-faster) ease, background-color var(--timing-faster) ease;
 	}
 
 	.sidebar-menus .menu-item:hover {
-		background: hsl(var(--hsl-base-200));
+		color: hsl(var(--hsl-content));
+		background: hsl(var(--hsl-content) / 0.05);
 	}
 
 	.sidebar-menus .menu-item.is-active {
-		color: hsl(var(--hsl-content));
-		background: hsl(var(--hsl-base-200));
+		color: hsl(var(--hsl-primary));
+		background: hsl(var(--hsl-primary) / 0.1);
+	}
+
+	/* Signal bar — the active route gets an accent rail on its leading edge. */
+	.sidebar-menus .menu-item.is-active::before {
+		content: '';
+		position: absolute;
+		left: -0.5rem;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 3px;
+		height: 1.25rem;
+		border-radius: 0 3px 3px 0;
+		background: hsl(var(--hsl-primary));
 	}
 
 	.sidebar-menus .menu-icon {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 1.5rem;
+		width: 1.25rem;
 		height: 1.5rem;
+		font-size: 0.9375rem;
+	}
+
+	.section-caption {
+		font-size: 0.6875rem;
+		letter-spacing: 0.12em;
+		color: hsl(var(--hsl-content) / 0.45);
 	}
 
 	.site-logo {
@@ -165,19 +191,21 @@
 
 	.project-box {
 		display: flex;
+		align-items: center;
 		padding: 10px 12px;
 		background-color: hsl(var(--hsl-base-400) / 0.2);
 		font-size: 0.9375rem;
-		border-radius: 4px;
-		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
+		font-weight: 500;
+		border-radius: var(--radius-md);
+		border: 1px solid hsl(var(--hsl-line));
 		color: hsl(var(--hsl-content));
 		outline: none;
-		transition: all var(--timing-normal) ease;
-		box-shadow: var(--raised-z6);
+		transition: border-color var(--timing-faster) ease, background-color var(--timing-faster) ease;
 	}
 
 	.project-box:hover {
-		border: 1px solid hsl(var(--hsl-base-400) / 0.7);
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		background-color: hsl(var(--hsl-primary) / 0.06);
 	}
 
 	.project-box span {
@@ -188,8 +216,14 @@
 		overflow-x: hidden;
 	}
 
+	.social > a {
+		color: hsl(var(--hsl-content) / 0.6);
+		transition: color var(--timing-faster) ease, background-color var(--timing-faster) ease;
+	}
+
 	.social > a:hover {
-		background-color: hsl(var(--hsl-base-200));
+		color: hsl(var(--hsl-content));
+		background-color: hsl(var(--hsl-content) / 0.06);
 	}
 </style>
 
@@ -200,7 +234,7 @@
 
 	<div class="flex-1">
 		<div class="grid grid-cols-1 gap-3 px-3 mt-8">
-			<small class="flex justify-between">
+			<small class="section-caption flex justify-between">
 				<strong>CURRENT PROJECT</strong>
 			</small>
 

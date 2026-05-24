@@ -102,11 +102,13 @@
 	}
 
 	ul.user-menu {
-		border-radius: 3px;
+		border-radius: var(--radius-md);
 		overflow: hidden;
 
-		background: white;
-		color: hsl(var(--hsl-black));
+		background: hsl(var(--hsl-base-300));
+		color: hsl(var(--hsl-content));
+		border: 1px solid hsl(var(--hsl-line));
+		box-shadow: var(--raised-z8);
 	}
 
 	ul.user-menu > li {
@@ -122,11 +124,11 @@
 	}
 
 	ul.user-menu > li:not(:last-child) .item {
-		border-bottom: 1px solid rgb(238, 238, 238);
+		border-bottom: 1px solid hsl(var(--hsl-line));
 	}
 
 	ul.user-menu > li:hover {
-		background-color: hsl(var(--hsl-primary)/0.05);
+		background-color: hsl(var(--hsl-primary)/0.08);
 		cursor: pointer;
 	}
 
@@ -134,8 +136,10 @@
 		display: flex;
 		width: 100%;
 		height: var(--height-navbar, 20rem);
-		background-color: hsl(var(--hsl-base-300));
-		box-shadow: var(--raised-z10);
+		background-color: hsl(var(--hsl-base-300) / 0.8);
+		backdrop-filter: blur(12px) saturate(140%);
+		-webkit-backdrop-filter: blur(12px) saturate(140%);
+		border-bottom: 1px solid hsl(var(--hsl-line));
 		align-items: center;
 		justify-content: space-between;
 	}

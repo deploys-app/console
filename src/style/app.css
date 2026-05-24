@@ -10,61 +10,83 @@
  * hsl(var(--hsl-primary) / 0.5) for alpha.
  * ------------------------------------------------------------------------- */
 :root {
-	/* Light palette */
-	--hue-primary: 336;
-	--hsl-primary: var(--hue-primary) 62% 48%;
-	--hsl-primary-active: var(--hue-primary) 62% 42%;
-	--hsl-primary-content: var(--hue-primary) 70% 98%;
-	--hue-accent: 267;
-	--hsl-accent: var(--hue-accent) 70% 55%;
-	--hsl-accent-active: var(--hue-accent) 70% 48%;
-	--hsl-accent-content: var(--hue-accent) 93% 98%;
-	--hue-base: 220;
-	--hsl-base-100: var(--hue-base) 20% 100%;
-	--hsl-base-200: var(--hue-base) 20% 96%;
+	/* Light palette — "Paper": cool-white surfaces, ink text, hairline structure */
+	--hue-primary: 334;
+	--hsl-primary: var(--hue-primary) 74% 48%;
+	--hsl-primary-active: var(--hue-primary) 74% 41%;
+	--hsl-primary-content: 0 0% 100%;
+	--hue-accent: 190;
+	--hsl-accent: var(--hue-accent) 88% 38%;
+	--hsl-accent-active: var(--hue-accent) 88% 31%;
+	--hsl-accent-content: 0 0% 100%;
+	--hue-base: 240;
+	--hsl-base-100: 0 0% 100%;
+	--hsl-base-200: var(--hue-base) 22% 97.5%;
 	--hsl-base-300: 0 0% 100%;
-	--hsl-base-400: var(--hue-base) 16% 93%;
-	--hsl-line: 220 14% 88%;
-	--hsl-content: 220 18% 20%;
-	--hsl-content-inv: 0 0% 85%;
-	--hsl-positive: 168 72% 35%;
-	--hsl-positive-content: 168 80% 95%;
-	--hsl-negative: 5 78% 50%;
-	--hsl-negative-content: 5 80% 97.5%;
-	--hsl-warning: 45 90% 48%;
-	--hsl-warning-content: 45 80% 97%;
-	--hsl-info: 197 70% 54%;
-	--hsl-info-content: 197 90% 97%;
+	--hsl-base-400: var(--hue-base) 16% 92%;
+	--hsl-line: var(--hue-base) 15% 88%;
+	--hsl-content: 230 26% 14%;
+	--hsl-content-inv: 0 0% 92%;
+	--hsl-positive: 158 64% 36%;
+	--hsl-positive-content: 158 80% 97%;
+	--hsl-negative: 2 78% 51%;
+	--hsl-negative-content: 5 80% 98%;
+	--hsl-warning: 38 92% 46%;
+	--hsl-warning-content: 38 90% 98%;
+	--hsl-info: 200 85% 42%;
+	--hsl-info-content: 200 90% 98%;
 	--hsl-black: 0 0% 0%;
 	--hsl-white: 0 0% 100%;
 	--modal-panel-background: hsl(var(--hsl-base-300));
 	--modal-panel-color: hsl(var(--hsl-content));
+
+	/* Blueprint grid — faint structural texture on the app shell */
+	--grid-line: hsl(230 24% 14% / 0.04);
 }
 
 .dark {
-	--hue-primary: 342;
-	--hsl-primary: var(--hue-primary) 80% 58%;
-	--hsl-primary-active: var(--hue-primary) 80% 54%;
-	--hsl-primary-content: var(--hue-primary) 80% 98%;
-	--hue-accent: 267;
-	--hsl-accent: var(--hue-accent) 93% 65%;
-	--hsl-accent-active: var(--hue-accent) 93% 60%;
-	--hsl-accent-content: var(--hue-accent) 93% 98%;
-	--hue-base: 226;
-	--hsl-base-100: var(--hue-base) 39% 11%;
-	--hsl-base-200: var(--hue-base) 39% 15%;
-	--hsl-base-300: var(--hue-base) 39% 20%;
-	--hsl-base-400: var(--hue-base) 39% 46%;
-	--hsl-line: 227 30% 35%;
-	--hsl-content: 227 100% 93%;
+	/* Dark palette — "Ink": deep blue-charcoal, electric magenta signal */
+	--hue-primary: 336;
+	--hsl-primary: var(--hue-primary) 86% 60%;
+	--hsl-primary-active: var(--hue-primary) 86% 54%;
+	--hsl-primary-content: var(--hue-primary) 90% 99%;
+	--hue-accent: 188;
+	--hsl-accent: var(--hue-accent) 86% 52%;
+	--hsl-accent-active: var(--hue-accent) 86% 46%;
+	--hsl-accent-content: 190 90% 8%;
+	--hue-base: 230;
+	--hsl-base-100: var(--hue-base) 28% 7%;
+	--hsl-base-200: var(--hue-base) 26% 9%;
+	--hsl-base-300: var(--hue-base) 20% 13%;
+	--hsl-base-400: var(--hue-base) 16% 26%;
+	--hsl-line: var(--hue-base) 16% 22%;
+	--hsl-content: 220 40% 92%;
+	--hsl-content-inv: 230 30% 12%;
+	--hsl-positive: 158 62% 50%;
+	--hsl-positive-content: 158 80% 6%;
+	--hsl-negative: 4 84% 63%;
+	--hsl-negative-content: 5 90% 98%;
+	--hsl-warning: 40 95% 56%;
+	--hsl-warning-content: 40 90% 8%;
+	--hsl-info: 198 88% 58%;
+	--hsl-info-content: 200 90% 8%;
 	--modal-panel-background: hsl(var(--hsl-base-300));
 	--modal-panel-color: hsl(var(--hsl-content));
+
+	--grid-line: hsl(220 40% 92% / 0.04);
 }
 
 :root {
-	/* Typography */
-	--ffml-primary: 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-	--ffml-secondary: 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	/* Typography — Geist for UI, Bricolage Grotesque for display, Geist Mono for machine data */
+	--ffml-primary: 'Geist', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+	--ffml-secondary: 'Bricolage Grotesque', 'Geist', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	--ffml-mono: 'Geist Mono', ui-monospace, 'SF Mono', 'SFMono-Regular', 'Menlo', monospace;
+	--font-family-mono: var(--ffml-mono);
+
+	/* Corner radii */
+	--radius-sm: 0.375rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 0.875rem;
 	--fs-14: 4.5rem;
 	--fs-13: 3.5rem;
 	--fs-12: 3rem;
@@ -104,20 +126,20 @@
 	/* Layout */
 	--lo-container-side-padding: 24px;
 
-	/* Elevation — Material-style raised shadows */
+	/* Elevation — soft, low-contrast shadows; structure comes from hairlines */
 	--raised-z0: none;
-	--raised-z1: 0px 2px 1px -1px rgba(0, 0, 0, 0.06), 0px 1px 1px 0px rgba(0, 0, 0, 0.042), 0px 1px 3px 0px rgba(0, 0, 0, 0.036);
-	--raised-z2: 0px 3px 1px -2px rgba(0, 0, 0, 0.06), 0px 2px 2px 0px rgba(0, 0, 0, 0.042), 0px 1px 5px 0px rgba(0, 0, 0, 0.036);
-	--raised-z3: 0px 3px 3px -2px rgba(0, 0, 0, 0.06), 0px 3px 4px 0px rgba(0, 0, 0, 0.042), 0px 1px 8px 0px rgba(0, 0, 0, 0.036);
-	--raised-z4: 0px 2px 4px -1px rgba(0, 0, 0, 0.06), 0px 4px 5px 0px rgba(0, 0, 0, 0.042), 0px 1px 10px 0px rgba(0, 0, 0, 0.036);
-	--raised-z5: 0px 3px 5px -1px rgba(0, 0, 0, 0.06), 0px 5px 8px 0px rgba(0, 0, 0, 0.042), 0px 1px 14px 0px rgba(0, 0, 0, 0.036);
-	--raised-z6: 0px 3px 5px -1px rgba(0, 0, 0, 0.06), 0px 6px 10px 0px rgba(0, 0, 0, 0.042), 0px 1px 18px 0px rgba(0, 0, 0, 0.036);
-	--raised-z7: 0px 4px 5px -2px rgba(0, 0, 0, 0.06), 0px 7px 10px 1px rgba(0, 0, 0, 0.042), 0px 2px 16px 1px rgba(0, 0, 0, 0.036);
-	--raised-z8: 0px 5px 5px -3px rgba(0, 0, 0, 0.06), 0px 8px 10px 1px rgba(0, 0, 0, 0.042), 0px 3px 14px 2px rgba(0, 0, 0, 0.036);
-	--raised-z9: 0px 5px 6px -3px rgba(0, 0, 0, 0.06), 0px 9px 12px 1px rgba(0, 0, 0, 0.042), 0px 3px 16px 2px rgba(0, 0, 0, 0.036);
-	--raised-z10: 0px 6px 6px -3px rgba(0, 0, 0, 0.06), 0px 10px 14px 1px rgba(0, 0, 0, 0.042), 0px 4px 18px 3px rgba(0, 0, 0, 0.036);
-	--raised-z11: 0px 6px 7px -4px rgba(0, 0, 0, 0.06), 0px 11px 15px 1px rgba(0, 0, 0, 0.042), 0px 4px 20px 3px rgba(0, 0, 0, 0.036);
-	--raised-z12: 0px 7px 8px -4px rgba(0, 0, 0, 0.06), 0px 12px 17px 2px rgba(0, 0, 0, 0.042), 0px 5px 22px 4px rgba(0, 0, 0, 0.036);
+	--raised-z1: 0 1px 2px rgba(15, 18, 30, 0.05);
+	--raised-z2: 0 1px 3px rgba(15, 18, 30, 0.06), 0 1px 2px rgba(15, 18, 30, 0.04);
+	--raised-z3: 0 2px 6px rgba(15, 18, 30, 0.07), 0 1px 2px rgba(15, 18, 30, 0.04);
+	--raised-z4: 0 4px 10px rgba(15, 18, 30, 0.08), 0 1px 3px rgba(15, 18, 30, 0.05);
+	--raised-z5: 0 6px 14px rgba(15, 18, 30, 0.09), 0 2px 4px rgba(15, 18, 30, 0.05);
+	--raised-z6: 0 8px 20px rgba(15, 18, 30, 0.10), 0 2px 6px rgba(15, 18, 30, 0.05);
+	--raised-z7: 0 10px 24px rgba(15, 18, 30, 0.11), 0 3px 8px rgba(15, 18, 30, 0.06);
+	--raised-z8: 0 12px 28px rgba(15, 18, 30, 0.12), 0 4px 10px rgba(15, 18, 30, 0.06);
+	--raised-z9: 0 14px 32px rgba(15, 18, 30, 0.13), 0 5px 12px rgba(15, 18, 30, 0.07);
+	--raised-z10: 0 18px 40px rgba(15, 18, 30, 0.16), 0 6px 14px rgba(15, 18, 30, 0.08);
+	--raised-z11: 0 22px 48px rgba(15, 18, 30, 0.18), 0 8px 16px rgba(15, 18, 30, 0.09);
+	--raised-z12: 0 28px 60px rgba(15, 18, 30, 0.22), 0 10px 20px rgba(15, 18, 30, 0.10);
 }
 
 /* ---------------------------------------------------------------------------
@@ -128,6 +150,7 @@
 @theme inline {
 	--font-sans: var(--ffml-primary);
 	--font-serif: var(--ffml-secondary);
+	--font-mono: var(--ffml-mono);
 
 	--color-primary: hsl(var(--hsl-primary));
 	--color-primary-active: hsl(var(--hsl-primary-active));
@@ -162,6 +185,18 @@
 		color: hsl(var(--hsl-content));
 		font-family: var(--ffml-primary);
 		min-height: 100vh;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		font-feature-settings: 'cv01', 'ss01';
+	}
+
+	/* Blueprint grid — a faint structural lattice behind the whole console. */
+	body {
+		background-image:
+			linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+			linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+		background-size: 44px 44px;
+		background-attachment: fixed;
 	}
 
 	body,
@@ -171,7 +206,8 @@
 
 	h1, h2, h3, h4, h5, h6 {
 		font-family: var(--ffml-secondary);
-		font-weight: 400;
+		font-weight: 600;
+		letter-spacing: -0.015em;
 		margin: 0;
 	}
 
@@ -251,18 +287,47 @@
 
 	pre {
 		position: relative;
-		border: none;
+		border: 1px solid hsl(var(--hsl-line));
 		padding: 20px;
-		border-radius: 3px;
+		border-radius: var(--radius-md);
 		margin-bottom: 30px;
 		white-space: pre-wrap;
 		word-wrap: break-word;
-		background-color: hsl(var(--hsl-base-200));
+		background-color: hsl(var(--hsl-base-100));
+		font-family: var(--ffml-mono);
+		font-size: 0.8125rem;
 	}
 
 	pre code {
 		white-space: pre-wrap;
 		display: block;
+	}
+
+	code, kbd, samp {
+		font-family: var(--ffml-mono);
+		font-size: 0.875em;
+	}
+
+	/* Machine data — IDs, digests, addresses, env keys, metric numbers. */
+	.mono,
+	.tabular {
+		font-family: var(--ffml-mono);
+		font-variant-numeric: tabular-nums;
+	}
+
+	/* Distinctive, accessible focus ring on every interactive surface. */
+	:where(a, button, [role='button'], input, select, textarea, summary):focus-visible {
+		outline: 2px solid hsl(var(--hsl-primary));
+		outline-offset: 2px;
+		border-radius: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*, *::before, *::after {
+			animation-duration: 0.001ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.001ms !important;
+		}
 	}
 
 	input[type='number'].no-arrow {
@@ -281,12 +346,20 @@
  * Keep the `*` prefix because templates already use it.
  * ------------------------------------------------------------------------- */
 @layer components {
-	/* Panels (card-like surfaces) */
+	/* Panels (card-like surfaces) — hairline-defined instrument surfaces.
+	 * Structure comes from a 1px line in both themes; shadow is a faint lift. */
 	.panel {
 		background-color: hsl(var(--hsl-base-300));
-		border-radius: 0.5rem;
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-lg);
 		padding: 1.75rem 1.5rem;
-		box-shadow: var(--raised-z2);
+		box-shadow: var(--raised-z1);
+		animation: panel-in var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
+	@keyframes panel-in {
+		from { opacity: 0; transform: translateY(6px); }
+		to { opacity: 1; transform: translateY(0); }
 	}
 
 	.panel form,
@@ -296,25 +369,17 @@
 
 	.panel.is-level-200 {
 		background-color: hsl(var(--hsl-base-200));
-		box-shadow: var(--raised-z1);
+		box-shadow: var(--raised-z0);
 	}
 
 	.panel.is-level-300 {
 		background-color: hsl(var(--hsl-base-300));
-		box-shadow: var(--raised-z3);
+		box-shadow: var(--raised-z2);
 	}
 
 	.panel.is-level-400 {
 		background-color: hsl(var(--hsl-base-400));
-		box-shadow: var(--raised-z4);
-	}
-
-	:root:not(.dark) .panel.is-level-300,
-	:root:not(.dark) .panel.is-level-400 {
-		border: 1px solid hsl(var(--hsl-line));
-		box-shadow:
-			0 1px 2px hsl(220 20% 20% / 0.04),
-			0 2px 6px hsl(220 20% 20% / 0.04);
+		box-shadow: var(--raised-z3);
 	}
 
 	/* Buttons — templates space icon ↔ label with explicit margin utilities
@@ -333,18 +398,24 @@
 		font-family: var(--ffml-primary);
 		font-size: 0.9375rem;
 		font-weight: 600;
+		letter-spacing: -0.005em;
 		line-height: 1;
 		cursor: pointer;
 		text-decoration: none;
 		user-select: none;
 		transition: background-color var(--timing-faster) ease,
 			border-color var(--timing-faster) ease,
+			transform var(--timing-fastest) ease,
 			opacity var(--timing-faster) ease;
 	}
 
 	.button:hover:not([disabled]):not(.is-loading),
 	.button:focus-visible:not([disabled]) {
 		background-color: hsl(var(--hsl-primary-active));
+	}
+
+	.button:active:not([disabled]):not(.is-loading) {
+		transform: translateY(1px);
 	}
 
 	.button[disabled] {
@@ -518,8 +589,10 @@
 		min-height: 2.5rem;
 		background-color: hsl(var(--hsl-base-400) / 0.2);
 		border: 1px solid hsl(var(--hsl-base-400) / 0.3);
-		border-radius: 0.375rem;
-		transition: border-color var(--timing-faster) ease, background-color var(--timing-faster) ease;
+		border-radius: var(--radius-md);
+		transition: border-color var(--timing-faster) ease,
+			box-shadow var(--timing-faster) ease,
+			background-color var(--timing-faster) ease;
 	}
 
 	.textarea {
@@ -537,6 +610,7 @@
 	.textarea:focus-within,
 	.select:focus-within {
 		border-color: hsl(var(--hsl-primary));
+		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.16);
 	}
 
 	.input > input,
@@ -745,8 +819,9 @@
 		left: 0;
 		right: 0;
 		bottom: 0;
-		height: 3px;
+		height: 2px;
 		background-color: hsl(var(--hsl-content) / 0.12);
+		transition: background-color var(--timing-faster) ease;
 	}
 
 	.tabs.is-variant-underline .tab-button.is-active::after,
@@ -820,14 +895,17 @@
 	}
 
 	.table th {
-		font-family: var(--ffml-secondary);
+		font-family: var(--ffml-primary);
 		font-weight: 600;
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
 		padding-top: 0.75rem;
 		padding-bottom: 0.75rem;
 		white-space: nowrap;
-		color: hsl(var(--hsl-content));
-		background-color: hsl(var(--hsl-base-400) / 0.3);
-		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line) / 0.7));
+		color: hsl(var(--hsl-content) / 0.6);
+		background-color: hsl(var(--hsl-base-400) / 0.25);
+		border-bottom: 1px solid var(--table-data-border-color, hsl(var(--hsl-line)));
 	}
 
 	.table th p {
@@ -880,7 +958,8 @@
 		display: inline-flex;
 		flex-direction: column;
 		background-color: hsl(var(--hsl-base-300));
-		border-radius: 0.5rem;
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-md);
 		padding: 0.375rem;
 		list-style: none;
 		margin: 0;
@@ -928,7 +1007,8 @@
 	.modal-panel {
 		position: relative;
 		background-color: hsl(var(--hsl-base-300));
-		border-radius: 0.5rem;
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-lg);
 		padding: 1.5rem;
 		max-width: 32rem;
 		width: 100%;
