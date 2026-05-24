@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 
 	const { data } = $props()
 
@@ -254,6 +255,20 @@
 	 */
 	function removeEnvGroup (name) {
 		form.envGroups = form.envGroups.filter((g) => g !== name)
+	}
+
+	const envGroupByName = $derived(new Map(envGroups.map((g) => [g.name, g])))
+
+	/** @type {?EnvGroupModal} */
+	let envGroupModal = $state(null)
+
+	/**
+	 * @param {string} name
+	 */
+	function viewEnvGroup (name) {
+		const g = envGroupByName.get(name)
+		if (!g) return
+		envGroupModal?.open(g)
 	}
 
 	function convertSidecars () {
@@ -752,10 +767,18 @@
 						<tr>
 							<td>{name}</td>
 							<td>
-								<button class="icon-button" type="button" aria-label="Remove env group"
-									onclick={() => removeEnvGroup(name)}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
+								<div class="flex gap-2 justify-end">
+									{#if envGroupByName.has(name)}
+										<button class="icon-button" type="button" aria-label="View env group"
+											onclick={() => viewEnvGroup(name)}>
+											<i class="fa-solid fa-eye"></i>
+										</button>
+									{/if}
+									<button class="icon-button" type="button" aria-label="Remove env group"
+										onclick={() => removeEnvGroup(name)}>
+										<i class="fa-solid fa-trash-alt"></i>
+									</button>
+								</div>
 							</td>
 						</tr>
 					{:else}
@@ -940,3 +963,5 @@
 	{/if}
 	</form>
 </div>
+
+<EnvGroupModal bind:this={envGroupModal} />
