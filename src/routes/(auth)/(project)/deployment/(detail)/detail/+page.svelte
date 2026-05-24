@@ -201,7 +201,7 @@
 										&nbsp;—&nbsp;
 										<span>{s.cloudSqlProxy.instance}</span>
 										{#if s.cloudSqlProxy.port}
-											<span class="text-white">:{s.cloudSqlProxy.port}</span>
+											<span>:{s.cloudSqlProxy.port}</span>
 										{/if}
 									</li>
 								{/if}
@@ -224,7 +224,7 @@
 					<td>
 						<i class="fa-regular fa-clock mr-3 text-warning"></i>
 						{format.ttlExpireAt(deployment.ttl)}
-						<span class="text-white ml-1">(in {format.duration(deployment.ttl)})</span>
+						<span class="text-content/60 ml-1">(in {format.duration(deployment.ttl)})</span>
 					</td>
 				</tr>
 			{/if}

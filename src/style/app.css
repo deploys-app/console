@@ -322,10 +322,24 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		/* Disable decorative motion (entrance + transitions)... */
+		.panel {
+			animation: none;
+		}
+
 		*, *::before, *::after {
-			animation-duration: 0.001ms !important;
-			animation-iteration-count: 1 !important;
 			transition-duration: 0.001ms !important;
+		}
+
+		/* ...but keep essential loading spinners turning. FontAwesome's own
+		 * reduced-motion rule freezes .fa-spin to a 1ms duration, which leaves
+		 * a static partial arc that reads as broken; re-enable it. */
+		.fa-spin {
+			animation-name: fa-spin !important;
+			animation-duration: 2s !important;
+			animation-iteration-count: infinite !important;
+			animation-timing-function: linear !important;
+			animation-delay: 0s !important;
 		}
 	}
 
