@@ -226,4 +226,42 @@ test.describe('deployment deploy — env groups', () => {
 		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
 		await expect(main.getByRole('cell', { name: 'shared-config' })).toBeVisible()
 	})
+
+	test('views env group variables in a popup', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: { ...sampleDeployment, envGroups: ['shared-config'] }
+			},
+			'location.get': { ok: true, result: defaultLocation },
+			'envGroup.list': {
+				ok: true,
+				result: {
+					items: [
+						{
+							project: 'test-project',
+							name: 'shared-config',
+							env: { LOG_LEVEL: 'info', REGION: 'apac' },
+							createdAt: '2024-01-01T00:00:00Z',
+							createdBy: '[email protected]'
+						}
+					]
+				}
+			}
+		})
+
+		await page.goto('/deployment/deploy?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('cell', { name: 'shared-config' })).toBeVisible()
+
+		await main.getByRole('button', { name: 'View env group' }).click()
+
+		const dialog = page.getByRole('dialog')
+		await expect(dialog.getByText('Env Group: shared-config')).toBeVisible()
+		await expect(dialog.getByText('LOG_LEVEL')).toBeVisible()
+		await expect(dialog.getByText('info')).toBeVisible()
+		await expect(dialog.getByText('REGION')).toBeVisible()
+		await expect(dialog.getByText('apac')).toBeVisible()
+	})
 })

@@ -104,3 +104,27 @@ export async function success ({ content }) {
 		}
 	})
 }
+
+/**
+ * @typedef {Object} ModalInfoOptions
+ * @property {string} [title]
+ * @property {string} [html]
+ */
+
+/**
+ * @param {ModalInfoOptions} options
+ * @returns {Promise<void>}
+ */
+export async function info ({ title, html }) {
+	await Swal.fire({
+		title,
+		html,
+		background: 'var(--modal-panel-background)',
+		color: 'var(--modal-panel-color)',
+		buttonsStyling: false,
+		customClass: {
+			actions: 'mt-6',
+			confirmButton: 'button is-variant-secondary'
+		}
+	})
+}
