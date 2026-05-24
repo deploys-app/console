@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 
 	const { data } = $props()
 
@@ -258,17 +259,8 @@
 
 	const envGroupByName = $derived(new Map(envGroups.map((g) => [g.name, g])))
 
-	/**
-	 * @param {string} s
-	 */
-	function escapeHtml (s) {
-		return String(s)
-			.replaceAll('&', '&amp;')
-			.replaceAll('<', '&lt;')
-			.replaceAll('>', '&gt;')
-			.replaceAll('"', '&quot;')
-			.replaceAll("'", '&#39;')
-	}
+	/** @type {?EnvGroupModal} */
+	let envGroupModal = $state(null)
 
 	/**
 	 * @param {string} name
@@ -276,15 +268,7 @@
 	function viewEnvGroup (name) {
 		const g = envGroupByName.get(name)
 		if (!g) return
-		const env = g.env ?? {}
-		const keys = Object.keys(env)
-		const body = keys.length
-			? keys.map((k) => `<tr><td>${escapeHtml(k)}</td><td>${escapeHtml(env[k])}</td></tr>`).join('')
-			: '<tr><td colspan="2" class="text-content/50">No variables</td></tr>'
-		modal.info({
-			title: `Env Group: ${name}`,
-			html: `<table class="table is-variant-compact"><thead><tr><th>Key</th><th>Value</th></tr></thead><tbody>${body}</tbody></table>`
-		})
+		envGroupModal?.open(g)
 	}
 
 	function convertSidecars () {
@@ -979,3 +963,5 @@
 	{/if}
 	</form>
 </div>
+
+<EnvGroupModal bind:this={envGroupModal} />

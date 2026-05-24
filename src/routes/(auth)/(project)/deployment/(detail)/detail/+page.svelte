@@ -8,11 +8,27 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 
 	const { data } = $props()
 
 	const deployment = $derived(data.deployment)
 	const location = $derived(data.location)
+
+	/** @type {?EnvGroupModal} */
+	let envGroupModal = $state(null)
+
+	/**
+	 * @param {string} name
+	 */
+	async function viewEnvGroup (name) {
+		const resp = await api.invoke('envGroup.get', { project: deployment.project, name }, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			return
+		}
+		envGroupModal?.open(resp.result)
+	}
 
 	const hasExternalTCPAddress = $derived(['TCPService'].includes(deployment.type))
 	const hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
@@ -260,9 +276,9 @@
 		{#each deployment.envGroups || [] as name (name)}
 			<tr>
 				<td>
-					<a class="link" href={`/env-group/create?project=${deployment.project}&name=${name}`}>
+					<button type="button" class="button is-variant-underline" onclick={() => viewEnvGroup(name)}>
 						{name}
-					</a>
+					</button>
 				</td>
 			</tr>
 		{:else}
@@ -317,3 +333,5 @@
 		</tbody>
 	</table>
 </div>
+
+<EnvGroupModal bind:this={envGroupModal} />

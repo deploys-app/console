@@ -153,23 +153,38 @@ test.describe('deployment deploy — sidecars', () => {
 })
 
 test.describe('deployment detail — env groups', () => {
-	test('lists attached env groups with links to their edit page', async ({ page }) => {
+	test('views attached env group variables in a popup', async ({ page }) => {
 		await setMocks({
 			'deployment.get': {
 				ok: true,
 				result: { ...sampleDeployment, envGroups: ['shared-config', 'secrets'] }
 			},
-			'location.get': { ok: true, result: defaultLocation }
+			'location.get': { ok: true, result: defaultLocation },
+			'envGroup.get': {
+				ok: true,
+				result: {
+					project: 'test-project',
+					name: 'shared-config',
+					env: { LOG_LEVEL: 'info', REGION: 'apac' },
+					createdAt: '2024-01-01T00:00:00Z',
+					createdBy: '[email protected]'
+				}
+			}
 		})
 
 		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
-		await expect(main.getByRole('link', { name: 'shared-config' }))
-			.toHaveAttribute('href', '/env-group/create?project=test-project&name=shared-config')
-		await expect(main.getByRole('link', { name: 'secrets' }))
-			.toHaveAttribute('href', '/env-group/create?project=test-project&name=secrets')
+
+		await main.getByRole('button', { name: 'shared-config' }).click()
+
+		const dialog = page.locator('.modal-panel')
+		await expect(dialog.getByRole('heading', { name: 'shared-config' })).toBeVisible()
+		await expect(dialog.getByText('LOG_LEVEL')).toBeVisible()
+		await expect(dialog.getByText('info')).toBeVisible()
+		await expect(dialog.getByText('REGION')).toBeVisible()
+		await expect(dialog.getByText('apac')).toBeVisible()
 	})
 
 	test('shows no data when deployment has no env groups', async ({ page }) => {
@@ -257,8 +272,8 @@ test.describe('deployment deploy — env groups', () => {
 
 		await main.getByRole('button', { name: 'View env group' }).click()
 
-		const dialog = page.getByRole('dialog')
-		await expect(dialog.getByText('Env Group: shared-config')).toBeVisible()
+		const dialog = page.locator('.modal-panel')
+		await expect(dialog.getByRole('heading', { name: 'shared-config' })).toBeVisible()
 		await expect(dialog.getByText('LOG_LEVEL')).toBeVisible()
 		await expect(dialog.getByText('info')).toBeVisible()
 		await expect(dialog.getByText('REGION')).toBeVisible()
