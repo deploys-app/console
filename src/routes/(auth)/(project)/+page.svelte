@@ -99,6 +99,12 @@
 			...formatStorage(usage.registryEgress, '')
 		},
 		{
+			key: 'dropboxEgress',
+			icon: 'fa-box-open',
+			label: 'Dropbox Egress',
+			...formatStorage(usage.dropboxEgress, '')
+		},
+		{
 			key: 'replica',
 			icon: 'fa-clone',
 			label: 'Replica',

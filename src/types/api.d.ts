@@ -58,6 +58,7 @@ declare namespace Api {
         memory: number
         egress: number
         registryEgress: number
+        dropboxEgress: number
         disk: number
         replica: number
         domainCdn: number
