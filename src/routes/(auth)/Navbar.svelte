@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte'
+	import { browser } from '$app/environment'
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
@@ -14,6 +15,10 @@
 	const { profile = null, toggleSidebar } = $props()
 
 	let active = $state(false)
+
+	/** @type {'system' | 'light' | 'dark'} */
+	let theme = $state(browser ? (/** @type {any} */ (Cookie.get('theme')) ?? 'system') : 'system')
+	const themeIndex = $derived(theme === 'light' ? 1 : theme === 'dark' ? 2 : 0)
 
 	/** @type {?HTMLFormElement} */
 	let signOut = $state(null)
@@ -43,7 +48,9 @@
 		document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches)
 	}
 
+	/** @param {'system' | 'light' | 'dark'} value */
 	function setTheme (value) {
+		theme = value
 		if (value === 'system') {
 			Cookie.remove('theme')
 			applySystemTheme()
@@ -71,17 +78,24 @@
 		<i class="fa-light fa-bars"></i>
 	</div>
 
-	<div class="flex ml-auto">
-		<div class="dropdown ml-auto mt-auto mb-auto">
-			<div class="button is-icon-left is-size-small is-variant-secondary" role="button" tabindex="0">
-				<i class="fa-solid fa-palette"></i>
-				Theme
-			</div>
-			<ul class="menu is-card is-compact">
-				<li><div onclick={() => setTheme('system')} onkeypress={() => setTheme('system')} role="button" tabindex="0">System</div></li>
-				<li><div onclick={() => setTheme('dark')} onkeypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
-				<li><div onclick={() => setTheme('light')} onkeypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
-			</ul>
+	<div class="flex items-center gap-2 ml-auto">
+		<div class="theme-toggle" role="group" aria-label="Theme">
+			<span class="theme-knob" style="transform: translateX({themeIndex * 2}rem)"></span>
+			<button type="button" class="theme-seg" class:on={theme === 'system'}
+				aria-pressed={theme === 'system'} aria-label="System theme" title="System"
+				onclick={() => setTheme('system')}>
+				<i class="fa-solid fa-desktop"></i>
+			</button>
+			<button type="button" class="theme-seg" class:on={theme === 'light'}
+				aria-pressed={theme === 'light'} aria-label="Light theme" title="Light"
+				onclick={() => setTheme('light')}>
+				<i class="fa-solid fa-sun-bright"></i>
+			</button>
+			<button type="button" class="theme-seg" class:on={theme === 'dark'}
+				aria-pressed={theme === 'dark'} aria-label="Dark theme" title="Dark"
+				onclick={() => setTheme('dark')}>
+				<i class="fa-solid fa-moon"></i>
+			</button>
 		</div>
 
 		<div>
@@ -113,6 +127,57 @@
 </nav>
 
 <style>
+	.theme-toggle {
+		position: relative;
+		display: inline-flex;
+		padding: 3px;
+		background-color: hsl(var(--hsl-base-200));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: 9999px;
+	}
+
+	.theme-knob {
+		position: absolute;
+		top: 3px;
+		left: 3px;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 9999px;
+		background-color: hsl(var(--hsl-primary));
+		transition: transform var(--timing-faster) ease;
+		pointer-events: none;
+	}
+
+	.theme-seg {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border: 0;
+		border-radius: 9999px;
+		background: transparent;
+		color: hsl(var(--hsl-content) / 0.6);
+		font-size: 0.8125rem;
+		cursor: pointer;
+		transition: color var(--timing-faster) ease;
+	}
+
+	.theme-seg:hover {
+		color: hsl(var(--hsl-content));
+	}
+
+	.theme-seg.on,
+	.theme-seg.on:hover {
+		color: hsl(var(--hsl-primary-content));
+	}
+
+	.theme-seg:focus-visible {
+		outline: 2px solid hsl(var(--hsl-primary));
+		outline-offset: 2px;
+	}
+
 	.popup {
 		position: absolute;
 		z-index: 1;

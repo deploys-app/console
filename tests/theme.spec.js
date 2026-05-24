@@ -41,8 +41,7 @@ test.describe('theme — system toggle', () => {
 		await page.goto('/project')
 		await expect(page.locator('html')).toHaveClass(/dark/)
 
-		await page.getByRole('button', { name: 'Theme' }).hover()
-		await page.getByRole('button', { name: 'System' }).click()
+		await page.getByRole('button', { name: 'System theme' }).click()
 
 		await expect(page.locator('html')).not.toHaveClass(/dark/)
 	})
