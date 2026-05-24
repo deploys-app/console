@@ -26,6 +26,10 @@ make build   # build Docker image and push to registry.deploys.app
 make deploy  # build and deploy to deploys-app project
 ```
 
+## Workflow
+
+`main` is protected — all changes must go through a pull request; never commit or push directly to `main`. Branch off the latest `main` (`git checkout main && git pull`), make changes, then open a PR. Merging a PR auto-deletes its branch, which can silently leave your local checkout on `main` — so verify the current branch before committing or pushing.
+
 ## Architecture
 
 This is a **SvelteKit 2** console for deploys.app, a deployment platform. It uses **Svelte 5** runes (`$state`, `$derived`, `$props`) and is deployed on Cloudflare (default) or Node.js via env-controlled adapter selection.
@@ -90,7 +94,10 @@ Tailwind CSS v4 via `@tailwindcss/vite`. The single entry stylesheet is `src/sty
 
 ### Modals
 
-Centralized in `src/lib/modal/index.js` — wraps SweetAlert2. Use this for confirmations and form dialogs rather than inline alert/confirm.
+Two complementary patterns:
+
+- **`src/lib/modal/index.js`** — wraps SweetAlert2 (`confirm` / `error` / `success`). Use for transient alerts, confirmations, and simple prompts rather than inline `alert`/`confirm`.
+- **In-page Svelte modal components** — for showing structured or user-provided content, build a small component using the `modal` / `modal-panel` / `modal-close` classes with an exported `open()` and local state (see `ModalSelectProject.svelte`, `EnvGroupModal.svelte`). Prefer this over SweetAlert's `html` option so values render through Svelte interpolation (auto-escaped) instead of hand-built/escaped HTML strings. Bind `aria-hidden` to the open state so the dialog is exposed to assistive tech only while open.
 
 ### Language note
 
