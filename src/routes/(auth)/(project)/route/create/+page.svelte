@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
@@ -140,27 +141,24 @@
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="select">
-				<select id="input-location" bind:value={form.location} onchange={fetchLocationData} required>
-					<option value="" selected disabled>Select Location</option>
-					{#each locations as it (it.id)}
-						<option value={it.id}>{it.id}</option>
-					{/each}
-				</select>
-			</div>
+			<Select
+				id="input-location"
+				bind:value={form.location}
+				onchange={fetchLocationData}
+				required
+				placeholder="Select Location"
+				options={locations.map((it) => ({ value: it.id, label: it.id }))} />
 		</div>
 
 		{#if form.location}
 			<div class="field">
 				<label for="input-domain">Domain</label>
-				<div class="select">
-					<select id="input-domain" bind:value={form.domain} required>
-						<option value="" selected disabled>Select Domain</option>
-						{#each domains as it (it.domain)}
-							<option value={it.domain}>{#if it.wildcard}*.{/if}{it.domain}</option>
-						{/each}
-					</select>
-				</div>
+				<Select
+					id="input-domain"
+					bind:value={form.domain}
+					required
+					placeholder="Select Domain"
+					options={domains.map((it) => ({ value: it.domain, label: (it.wildcard ? '*.' : '') + it.domain }))} />
 			</div>
 
 			{#if selectedDomain?.wildcard}
@@ -182,26 +180,27 @@
 
 			<div class="field">
 				<label for="input-target_prefix">Type</label>
-				<div class="select">
-					<select id="input-target_prefix" bind:value={form.targetPrefix} onchange={() => form.targetValue = ''} required>
-						<option value="" selected disabled>Select Type</option>
-						<option value="deployment://">Deployment</option>
-						<option value="redirect://">Redirect</option>
-					</select>
-				</div>
+				<Select
+					id="input-target_prefix"
+					bind:value={form.targetPrefix}
+					onchange={() => form.targetValue = ''}
+					required
+					placeholder="Select Type"
+					options={[
+						{ value: 'deployment://', label: 'Deployment' },
+						{ value: 'redirect://', label: 'Redirect' }
+					]} />
 			</div>
 
 			{#if form.targetPrefix === 'deployment://'}
 				<div class="field">
 					<label for="input-target_deployment">Deployments</label>
-					<div class="select">
-						<select id="input-target_deployment" bind:value={form.targetValue} required>
-							<option value="" selected disabled>Select Deployment</option>
-							{#each deployments as it (it)}
-								<option value={it}>{it}</option>
-							{/each}
-						</select>
-					</div>
+					<Select
+						id="input-target_deployment"
+						bind:value={form.targetValue}
+						required
+						placeholder="Select Deployment"
+						options={deployments.map((it) => ({ value: it, label: it }))} />
 				</div>
 			{:else if form.targetPrefix}
 				<div class="field">

@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
@@ -95,14 +96,12 @@
 
 		<div class="field">
 			<label for="input-billing_account">Billing Account</label>
-			<div class="select">
-				<select id="input-billing_account" bind:value={form.billingAccount} required>
-					<option value="" selected disabled>Select Billing Account</option>
-					{#each billingAccounts as it (it.id)}
-						<option value={it.id}>{it.name} ({it.id})</option>
-					{/each}
-				</select>
-			</div>
+			<Select
+				id="input-billing_account"
+				bind:value={form.billingAccount}
+				required
+				placeholder="Select Billing Account"
+				options={billingAccounts.map((it) => ({ value: it.id, label: `${it.name} (${it.id})` }))} />
 		</div>
 
 		<button class="button mt-4 mr-auto" class:is-loading={saving}>

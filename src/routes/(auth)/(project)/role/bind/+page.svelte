@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 	const roles = $derived(data.roles)
@@ -27,11 +28,6 @@
 
 	function removeRole (role) {
 		form.roles = form.roles.filter((x) => x !== role)
-	}
-
-	function selectRoleChanged (e) {
-		addRole(e.target.value)
-		e.target.value = ''
 	}
 
 	let saving = $state(false)
@@ -97,16 +93,11 @@
 			</datalist>
 		</div>
 		<div class="field">
-			<div class="select">
-				<select onchange={selectRoleChanged}>
-					<option value="" disabled selected>Select Role</option>
-					{#each roles as it (it.role)}
-						{#if !form.roles.includes(it.role)}
-							<option value={it.role}>{it.name} ({it.role})</option>
-						{/if}
-					{/each}
-				</select>
-			</div>
+			<Select
+				placeholder="Select Role"
+				resetOnSelect
+				onchange={(v) => addRole(String(v))}
+				options={roles.filter((it) => !form.roles.includes(it.role)).map((it) => ({ value: it.role, label: `${it.name} (${it.role})` }))} />
 		</div>
 
 		<div class="table-container">

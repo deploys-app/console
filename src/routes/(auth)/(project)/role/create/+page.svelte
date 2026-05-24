@@ -5,6 +5,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 	const role = $derived(data.role)
@@ -46,11 +47,6 @@
 			...form.permissions,
 			permission
 		]
-	}
-
-	function selectPermissionChanged (e) {
-		addPermission(e.target.value)
-		e.target.value = ''
 	}
 
 	function removePermission (permission) {
@@ -142,14 +138,11 @@
 			<h6><strong>Permissions</strong></h6>
 
 			<div class="field flex mb-3">
-				<div class="select">
-					<select onchange={selectPermissionChanged}>
-						<option value="" disabled selected>Select Permission</option>
-						{#each permissions.filter((x) => !form.permissions.includes(x)) as it (it)}
-							<option value={it}>{it}</option>
-						{/each}
-					</select>
-				</div>
+				<Select
+					placeholder="Select Permission"
+					resetOnSelect
+					onchange={(v) => addPermission(String(v))}
+					options={permissions.filter((x) => !form.permissions.includes(x)).map((it) => ({ value: it, label: it }))} />
 			</div>
 
 			<div class="table-container">

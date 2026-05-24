@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 	const locations = $derived(data.locations)
@@ -97,18 +98,12 @@
 					<input id="input-location" value={form.location} readonly>
 				</div>
 			{:else}
-				<div class="select">
-					<select id="input-location" bind:value={form.location} required>
-						<option value="">Select Location</option>
-						{#each locations as it (it.id)}
-							{#if it.features.disk}
-								<option value={it.id}>
-									{it.id}
-								</option>
-							{/if}
-						{/each}
-					</select>
-				</div>
+				<Select
+					id="input-location"
+					bind:value={form.location}
+					required
+					placeholder="Select Location"
+					options={locations.filter((it) => it.features.disk).map((it) => ({ value: it.id, label: it.id }))} />
 			{/if}
 		</div>
 		<div class="field">

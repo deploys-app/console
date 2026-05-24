@@ -3,10 +3,21 @@
 	import api from '$lib/api'
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
 	const disk = $derived(data.disk)
+
+	const rangeOptions = [
+		{ value: '1h', label: '1 Hour' },
+		{ value: '6h', label: '6 Hours' },
+		{ value: '12h', label: '12 Hours' },
+		{ value: '1d', label: '1 Day' },
+		{ value: '2d', label: '2 Days' },
+		{ value: '7d', label: '7 Days' },
+		{ value: '30d', label: '30 Days' }
+	]
 
 	const reloadInterval = 60 * 1000 // 1m
 
@@ -60,17 +71,10 @@
 <h6><strong>Metric</strong></h6>
 
 <div class="grid gap-4 justify-start">
-	<div class="select">
-		<select bind:value={filter.range} onchange={() => fetchMetrics(true)}>
-			<option value="1h">1 Hour</option>
-			<option value="6h">6 Hours</option>
-			<option value="12h">12 Hours</option>
-			<option value="1d">1 Day</option>
-			<option value="2d">2 Days</option>
-			<option value="7d">7 Days</option>
-			<option value="30d">30 Days</option>
-		</select>
-	</div>
+	<Select
+		bind:value={filter.range}
+		options={rangeOptions}
+		onchange={() => fetchMetrics(true)} />
 </div>
 
 <Chart title="Disk (bytes)" unit="bytes" series={chart} />

@@ -3,8 +3,24 @@
 	import api from '$lib/api'
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
+
+	const rangeOptions = [
+		{ value: '1h', label: '1 Hour' },
+		{ value: '6h', label: '6 Hours' },
+		{ value: '12h', label: '12 Hours' },
+		{ value: '1d', label: '1 Day' },
+		{ separator: true },
+		{ value: '1hagg', label: '1 Hour (Aggregate)' },
+		{ value: '6hagg', label: '6 Hours (Aggregate)' },
+		{ value: '12hagg', label: '12 Hours (Aggregate)' },
+		{ value: '1dagg', label: '1 Day (Aggregate)' },
+		{ value: '2dagg', label: '2 Days (Aggregate)' },
+		{ value: '7dagg', label: '7 Days (Aggregate)' },
+		{ value: '30dagg', label: '30 Days (Aggregate)' }
+	]
 
 	const deployment = $derived(data.deployment)
 
@@ -79,22 +95,10 @@
 <h6><strong>Metric</strong></h6>
 
 <div class="grid gap-4 justify-start">
-	<div class="select">
-		<select bind:value={filter.range} onchange={() => fetchMetrics(true)}>
-			<option value="1h">1 Hour</option>
-			<option value="6h">6 Hours</option>
-			<option value="12h">12 Hours</option>
-			<option value="1d">1 Day</option>
-			<option disabled>----------</option>
-			<option value="1hagg">1 Hour (Aggregate)</option>
-			<option value="6hagg">6 Hours (Aggregate)</option>
-			<option value="12hagg">12 Hours (Aggregate)</option>
-			<option value="1dagg">1 Day (Aggregate)</option>
-			<option value="2dagg">2 Days (Aggregate)</option>
-			<option value="7dagg">7 Days (Aggregate)</option>
-			<option value="30dagg">30 Days (Aggregate)</option>
-		</select>
-	</div>
+	<Select
+		bind:value={filter.range}
+		options={rangeOptions}
+		onchange={() => fetchMetrics(true)} />
 </div>
 
 <Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
