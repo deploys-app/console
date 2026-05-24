@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte'
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
@@ -38,10 +39,31 @@
 		signOut?.submit()
 	}
 
+	function applySystemTheme () {
+		document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches)
+	}
+
 	function setTheme (value) {
+		if (value === 'system') {
+			Cookie.remove('theme')
+			applySystemTheme()
+			return
+		}
 		document.documentElement.classList.toggle('dark', value === 'dark')
 		Cookie.set('theme', value, { expires: 30 })
 	}
+
+	onMount(() => {
+		const mq = window.matchMedia('(prefers-color-scheme: dark)')
+		// Follow OS changes live only while no explicit choice is stored.
+		const onChange = (e) => {
+			if (!Cookie.get('theme')) {
+				document.documentElement.classList.toggle('dark', e.matches)
+			}
+		}
+		mq.addEventListener('change', onChange)
+		return () => mq.removeEventListener('change', onChange)
+	})
 </script>
 
 <nav class="navbar">
@@ -56,6 +78,7 @@
 				Theme
 			</div>
 			<ul class="menu is-card is-compact">
+				<li><div onclick={() => setTheme('system')} onkeypress={() => setTheme('system')} role="button" tabindex="0">System</div></li>
 				<li><div onclick={() => setTheme('dark')} onkeypress={() => setTheme('dark')} role="button" tabindex="0">Dark</div></li>
 				<li><div onclick={() => setTheme('light')} onkeypress={() => setTheme('light')} role="button" tabindex="0">Light</div></li>
 			</ul>

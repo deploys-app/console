@@ -1,17 +1,11 @@
 import { sequence } from '@sveltejs/kit/hooks'
 
-const allowTheme = {
-	dark: true,
-	light: true
-}
-
 /** @type {import('@sveltejs/kit').Handle} */
 async function theme ({ event, resolve }) {
-	let t = event.cookies.get('theme')
-	if (!allowTheme[t]) {
-		t = 'dark'
-	}
-	const cls = t === 'dark' ? 'dark' : ''
+	// Only force a class for an explicit choice. With no cookie the default is
+	// the OS preference, which is unknown server-side — the inline script in
+	// app.html applies it before first paint.
+	const cls = event.cookies.get('theme') === 'dark' ? 'dark' : ''
 	return resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('%theme%', cls)
 	})
