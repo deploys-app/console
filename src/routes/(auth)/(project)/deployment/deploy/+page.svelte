@@ -365,7 +365,7 @@
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="form-section is-first">
-			<span class="form-section-title">General</span>
+			<h6 class="form-section-title">General</h6>
 		</div>
 		{#if deployment}
 			<div class="field">
@@ -555,7 +555,7 @@
 		{#if selectedLocation.features.disk}
 			<div class="grid gap-4">
 				<div class="form-section">
-					<span class="form-section-title">Disk</span>
+					<h6 class="form-section-title">Disk</h6>
 					<span class="form-section-hint">Attach a persistent disk and mount it into the container.</span>
 				</div>
 
@@ -601,7 +601,7 @@
 		{/if}
 
 		<div class="form-section">
-			<span class="form-section-title">Auto-delete (TTL)</span>
+			<h6 class="form-section-title">Auto-delete (TTL)</h6>
 		</div>
 		<div class="grid grid-cols-2 gap-4">
 			<div class="field">
@@ -633,7 +633,7 @@
 			<div>
 				<div class="grid gap-4">
 					<div class="form-section">
-						<span class="form-section-title">Autoscaling</span>
+						<h6 class="form-section-title">Autoscaling</h6>
 					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div class="field">
@@ -663,7 +663,7 @@
 		{/if}
 
 		<div class="form-section">
-			<span class="form-section-title">Resources</span>
+			<h6 class="form-section-title">Resources</h6>
 			<span class="form-section-hint">CPU and memory allocated to each container instance.</span>
 		</div>
 
@@ -711,7 +711,7 @@
 		</div>
 
 		<div class="form-section">
-			<span class="form-section-title">Env Groups</span>
+			<h6 class="form-section-title">Env Groups</h6>
 			<span class="form-section-hint">
 				Project-scoped sets of environment variables merged into the deployment.
 				Variables defined below take precedence over env groups.
@@ -768,7 +768,7 @@
 		</div>
 
 		<div class="form-section">
-			<span class="form-section-title">Environment Variables</span>
+			<h6 class="form-section-title">Environment Variables</h6>
 		</div>
 		<div>
 			<div class="table-container">
@@ -829,7 +829,7 @@
 		</div>
 
 		<div class="form-section">
-			<span class="form-section-title">Mount Data</span>
+			<h6 class="form-section-title">Mount Data</h6>
 		</div>
 		<div>
 			<div class="table-container">
@@ -881,7 +881,7 @@
 		</div>
 
 		<div class="form-section">
-			<span class="form-section-title">Sidecars</span>
+			<h6 class="form-section-title">Sidecars</h6>
 		</div>
 		<div class="grid gap-4">
 			{#each form.sidecars as sidecar, i (i)}

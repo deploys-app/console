@@ -21,6 +21,6 @@ test.describe('roles', () => {
 	test('empty state when no roles', async ({ page }) => {
 		await page.goto('/role?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 })

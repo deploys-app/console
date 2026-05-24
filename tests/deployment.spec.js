@@ -25,7 +25,7 @@ test.describe('deployments', () => {
 		await expect(main.getByRole('heading', { name: 'Deployments' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'web' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'api' })).toBeVisible()
-		await expect(main.getByRole('link', { name: 'Create' })).toHaveAttribute(
+		await expect(main.getByRole('link', { name: 'Deploy' })).toHaveAttribute(
 			'href',
 			'/deployment/deploy?project=test-project'
 		)
@@ -34,7 +34,7 @@ test.describe('deployments', () => {
 	test('shows empty state when there are no deployments', async ({ page }) => {
 		await page.goto('/deployment?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('No data')).toBeVisible()
+		await expect(main.getByText('No deployments yet')).toBeVisible()
 	})
 
 	test('shows error row when the deployment.list API fails', async ({ page }) => {
@@ -185,7 +185,7 @@ test.describe('deployment detail — env groups', () => {
 			has: page.getByRole('heading', { name: 'Env Groups' })
 		})
 		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
-		await expect(envGroupTable.getByText('No data').first()).toBeVisible()
+		await expect(envGroupTable.getByText('Nothing here yet').first()).toBeVisible()
 	})
 })
 
