@@ -440,12 +440,18 @@
 		border-radius: var(--radius-lg);
 		padding: 1.75rem 1.5rem;
 		box-shadow: var(--raised-z1);
-		animation: panel-in var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1) both;
+		/* `backwards` (not `both`): apply the start frame before the run, but
+		 * do NOT retain a transform afterwards — a retained transform creates a
+		 * stacking context that traps descendant popovers behind later panels. */
+		animation: panel-in var(--timing-normal) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 	}
 
 	@keyframes panel-in {
 		from { opacity: 0; transform: translateY(6px); }
-		to { opacity: 1; transform: translateY(0); }
+		/* End on `none` (not translateY(0)) so the panel doesn't retain a
+		 * transform — a retained transform creates a stacking context that
+		 * traps descendant popovers/dropdowns behind later panels. */
+		to { opacity: 1; transform: none; }
 	}
 
 	.panel form,
