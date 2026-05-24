@@ -30,18 +30,18 @@
 	}
 </script>
 
-<h6>Domains</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button" href={`/domain/create?project=${project}`}>
-				Create
-			</a>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Domains</strong></h4>
+		<p class="page-sub">{domains.length} {domains.length === 1 ? 'domain' : 'domains'}</p>
 	</div>
-
-	<div class="table-container mt-4">
+	<a class="button is-icon-left" href={`/domain/create?project=${project}`}>
+		<i class="fa-solid fa-plus"></i>
+		Create
+	</a>
+</div>
+<div class="panel is-level-300">
+	<div class="table-container">
 		<table class="table is-variant-compact">
 			<thead>
 			<tr>

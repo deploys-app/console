@@ -11,18 +11,18 @@
 	const error = $derived(data.error)
 </script>
 
-<h6>Disks</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button" href="/disk/create?project={project}">
-                Create
-            </a>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Disks</strong></h4>
+		<p class="page-sub">{disks.length} {disks.length === 1 ? 'disk' : 'disks'}</p>
 	</div>
-
-	<div class="table-container mt-4">
+	<a class="button is-icon-left" href="/disk/create?project={project}">
+		<i class="fa-solid fa-plus"></i>
+		Create
+	</a>
+</div>
+<div class="panel is-level-300">
+	<div class="table-container">
 		<table class="table is-variant-compact">
 			<thead>
 			<tr>

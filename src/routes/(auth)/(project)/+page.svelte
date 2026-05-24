@@ -112,8 +112,12 @@
 	])
 </script>
 
-<h6>Dashboard</h6>
-<br>
+<div class="page-head">
+	<div>
+		<h4><strong>Dashboard</strong></h4>
+		<p class="page-sub">{projectInfo.name}</p>
+	</div>
+</div>
 <div class="grid grid-cols-1 lg:grid lg:grid-cols-2 gap-6 items-stretch">
 	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<h6>

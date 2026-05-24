@@ -33,18 +33,18 @@
 	}
 </script>
 
-<h6>Users</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button" href="/role/bind?project={project}">
-				Add
-			</a>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Users</strong></h4>
+		<p class="page-sub">{users.length} {users.length === 1 ? 'user' : 'users'}</p>
 	</div>
-
-	<div class="table-container mt-4">
+	<a class="button is-icon-left" href="/role/bind?project={project}">
+		<i class="fa-solid fa-plus"></i>
+		Add
+	</a>
+</div>
+<div class="panel is-level-300">
+	<div class="table-container">
 		<table class="table is-variant-compact">
 			<thead>
 				<tr>

@@ -9,16 +9,15 @@
 	const error = $derived(data.error)
 </script>
 
-<h6>Emails</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			Contact us to request access
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Emails</strong></h4>
+		<p class="page-sub">{domains.length} {domains.length === 1 ? 'domain' : 'domains'}</p>
 	</div>
-
-	<div class="table-container mt-4">
+	<span class="text-content/60 text-sm">Contact us to request access</span>
+</div>
+<div class="panel is-level-300">
+	<div class="table-container">
 		<table class="table">
 			<thead>
 			<tr>
