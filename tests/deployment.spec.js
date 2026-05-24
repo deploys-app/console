@@ -280,3 +280,38 @@ test.describe('deployment deploy — env groups', () => {
 		await expect(dialog.getByText('apac')).toBeVisible()
 	})
 })
+
+test.describe('deployment detail — environment variables', () => {
+	test('show all toggle reveals and hides every value', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: {
+					...sampleDeployment,
+					env: { SECRET_KEY: 'topsecret-value', API_URL: 'https://example.test' }
+				}
+			},
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		const showAll = main.getByRole('button', { name: 'Show all' })
+		await expect(showAll).toBeVisible()
+		await expect(main.getByText('topsecret-value')).toBeHidden()
+		await expect(main.getByText('https://example.test')).toBeHidden()
+
+		await showAll.click()
+
+		await expect(main.getByText('topsecret-value')).toBeVisible()
+		await expect(main.getByText('https://example.test')).toBeVisible()
+
+		const hideAll = main.getByRole('button', { name: 'Hide all' })
+		await expect(hideAll).toBeVisible()
+		await hideAll.click()
+
+		await expect(main.getByText('topsecret-value')).toBeHidden()
+		await expect(main.getByText('https://example.test')).toBeHidden()
+	})
+})

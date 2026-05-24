@@ -3,12 +3,13 @@
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} value
+	 * @property {boolean} [show]
 	 */
 
 	/** @type {Props} */
-	const { value } = $props()
+	const { value, show = false } = $props()
 
-	let isHidden = $state(true)
+	let isHidden = $derived(!show)
 
 	function toggle () {
 		isHidden = !isHidden

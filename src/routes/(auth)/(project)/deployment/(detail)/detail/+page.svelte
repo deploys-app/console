@@ -18,6 +18,8 @@
 	/** @type {?EnvGroupModal} */
 	let envGroupModal = $state(null)
 
+	let showAllEnv = $state(false)
+
 	/**
 	 * @param {string} name
 	 */
@@ -288,7 +290,16 @@
 	</table>
 </div>
 
-<h6><strong>Environment Variables</strong></h6>
+<div class="flex items-center gap-3">
+	<h6><strong>Environment Variables</strong></h6>
+	{#if Object.keys(deployment.env || {}).length}
+		<button type="button" class="button is-variant-secondary is-size-small is-icon-left"
+			onclick={() => showAllEnv = !showAllEnv}>
+			<i class="fa-solid {showAllEnv ? 'fa-eye-slash' : 'fa-eye'}"></i>
+			{showAllEnv ? 'Hide all' : 'Show all'}
+		</button>
+	{/if}
+</div>
 <div class="table-container">
 	<table class="table is-variant-compact" style="--table-data-border-color: none">
 		<thead>
@@ -302,7 +313,7 @@
 			<tr>
 				<td>{k}</td>
 				<td>
-					<Secret value={v} />
+					<Secret value={v} show={showAllEnv} />
 				</td>
 			</tr>
 		{:else}
