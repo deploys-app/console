@@ -67,12 +67,6 @@
 			...formatAvgCount(usage.cpuUsage, 'vCPUs', 'vCPU-s')
 		},
 		{
-			key: 'cpu',
-			icon: 'fa-gauge-high',
-			label: 'CPU Allocated',
-			...formatAvgCount(usage.cpu, 'vCPUs', 'vCPU-s')
-		},
-		{
 			key: 'memory',
 			icon: 'fa-memory',
 			label: 'Memory',
