@@ -55,6 +55,7 @@ All API calls go through a single proxy: `POST /api/{fnName}`.
 - **Server side**: `src/routes/api/[fn]/+server.js` — reads token from cookies, forwards to `env.API_ENDPOINT` (https://api.deploys.app) with `Authorization: bearer {token}`.
 - **Cache invalidation**: `api.invalidate(fn)` / `api.intervalInvalidate(cb, interval)` for polling.
 - **Error handling**: `api: unauthorized` → reloads page; `api: forbidden` → `error.forbidden`; `api: validate error` → `error.validate[]`; `api: * not found` → `error.notFound`.
+- **Mock mode (offline dev)**: `bun dev:mock` (sets `MOCK_API=1`). Both proxies (`api/[fn]` and `api/registry/[fn]`) short-circuit to static fixtures in `src/lib/server/mock.js`, skipping the token check — no real backend or OAuth sign-in needed. Add/adjust a fixture in `mock.js` (`handlers` map) when adding a new API call; unknown functions log a warning and return an empty `ok` response.
 
 All API types are defined in `src/types/api.d.ts` using TypeScript namespaces (`Api.Profile`, `Api.Response<T>`, `Api.Deployment`, etc.).
 
