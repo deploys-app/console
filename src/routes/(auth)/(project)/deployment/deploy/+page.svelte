@@ -5,6 +5,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
@@ -240,11 +241,6 @@
 		form.envGroups = [...form.envGroups, n]
 	}
 
-	function selectEnvGroupChanged (e) {
-		addEnvGroup(e.target.value)
-		e.target.value = ''
-	}
-
 	function addEnvGroupFromInput () {
 		addEnvGroup(envGroupInput)
 		envGroupInput = ''
@@ -392,16 +388,13 @@
 		{:else}
 			<div class="field">
 				<label for="input-location">Location</label>
-				<div class="select">
-					<select id="input-location" bind:value={form.location} onchange={changeLocation} required>
-						<option value="" selected disabled>Select Location</option>
-						{#each locations as it (it.id)}
-							<option value={it.id}>
-								{it.id}
-							</option>
-						{/each}
-					</select>
-				</div>
+				<Select
+					id="input-location"
+					bind:value={form.location}
+					onchange={changeLocation}
+					required
+					placeholder="Select Location"
+					options={locations.map((it) => ({ value: it.id, label: it.id }))} />
 			</div>
 		{/if}
 
@@ -423,14 +416,15 @@
 			{:else}
 				<div class="field">
 					<label for="input-type">Type</label>
-					<div class="select">
-						<select id="input-type" class="js-type" bind:value={form.type}>
-							<option value="WebService">Web Service</option>
-							<option value="InternalTCPService">Internal TCP Service</option>
-							<option value="Worker">Worker</option>
-							<option value="CronJob">CronJob</option>
-						</select>
-					</div>
+					<Select
+						id="input-type"
+						bind:value={form.type}
+						options={[
+							{ value: 'WebService', label: 'Web Service' },
+							{ value: 'InternalTCPService', label: 'Internal TCP Service' },
+							{ value: 'Worker', label: 'Worker' },
+							{ value: 'CronJob', label: 'CronJob' }
+						]} />
 				</div>
 			{/if}
 
@@ -444,16 +438,12 @@
 		{#if permission.pullSecrets}
 			<div class="field">
 				<label for="input-pull_secret">Pull Secret</label>
-				<div class="select">
-					{#key pullSecrets}
-						<select id="input-pull_secret" bind:value={form.pullSecret}>
-							<option value="">No Pull Secret</option>
-							{#each pullSecrets as it (it.name)}
-								<option value={it.name}>{it.name}</option>
-							{/each}
-						</select>
-					{/key}
-				</div>
+				{#key pullSecrets}
+					<Select
+						id="input-pull_secret"
+						bind:value={form.pullSecret}
+						options={[{ value: '', label: 'No Pull Secret' }, ...pullSecrets.map((it) => ({ value: it.name, label: it.name }))]} />
+				{/key}
 			</div>
 		{:else}
 			<div class="field">
@@ -469,16 +459,12 @@
 			{#if permission.workloadIdentities}
 				<div class="field">
 					<label for="input-workload_identity">Workload Identity</label>
-					<div class="select">
-						{#key workloadIdentities}
-							<select id="input-workload_identity" bind:value={form.workloadIdentity}>
-								<option value="">No Workload Identity</option>
-								{#each workloadIdentities as it (it.name)}
-									<option value={it.name}>{it.name}</option>
-								{/each}
-							</select>
-						{/key}
-					</div>
+					{#key workloadIdentities}
+						<Select
+							id="input-workload_identity"
+							bind:value={form.workloadIdentity}
+							options={[{ value: '', label: 'No Workload Identity' }, ...workloadIdentities.map((it) => ({ value: it.name, label: it.name }))]} />
+					{/key}
 				</div>
 			{:else}
 				<div class="field">
@@ -503,13 +489,14 @@
 		{#if form.type === 'WebService'}
 			<div class="field">
 				<label for="input-protocol">Protocol</label>
-				<div class="select">
-					<select id="input-protocol" bind:value={form.protocol}>
-						<option value="http">http</option>
-						<option value="https">https</option>
-						<option value="h2c">h2c</option>
-					</select>
-				</div>
+				<Select
+					id="input-protocol"
+					bind:value={form.protocol}
+					options={[
+						{ value: 'http', label: 'http' },
+						{ value: 'https', label: 'https' },
+						{ value: 'h2c', label: 'h2c' }
+					]} />
 			</div>
 			<div class="field">
 				<div class="checkbox">
@@ -577,16 +564,12 @@
 				{#if permission.disks}
 					<div class="field">
 						<label for="input-disk_name">Name</label>
-						<div class="select">
-							{#key disks}
-								<select id="input-disk_name" bind:value={form.disk.name}>
-									<option value="">No Disk</option>
-									{#each disks as it (it.name)}
-										<option value={it.name}>{it.name}</option>
-									{/each}
-								</select>
-							{/key}
-						</div>
+						{#key disks}
+							<Select
+								id="input-disk_name"
+								bind:value={form.disk.name}
+								options={[{ value: '', label: 'No Disk' }, ...disks.map((it) => ({ value: it.name, label: it.name }))]} />
+						{/key}
 					</div>
 				{:else}
 					<div class="field">
@@ -621,14 +604,15 @@
 		<div class="grid grid-cols-2 gap-4">
 			<div class="field">
 				<label for="input-ttl_unit">Unit</label>
-				<div class="select">
-					<select id="input-ttl_unit" bind:value={form.ttlUnit}>
-						<option value="0">No auto-delete</option>
-						<option value="60">Minutes</option>
-						<option value="3600">Hours</option>
-						<option value="86400">Days</option>
-					</select>
-				</div>
+				<Select
+					id="input-ttl_unit"
+					bind:value={form.ttlUnit}
+					options={[
+						{ value: '0', label: 'No auto-delete' },
+						{ value: '60', label: 'Minutes' },
+						{ value: '3600', label: 'Hours' },
+						{ value: '86400', label: 'Days' }
+					]} />
 			</div>
 
 			{#if form.ttlUnit !== '0'}
@@ -698,28 +682,27 @@
 
 		<div class="field">
 			<label for="input-cpu-limit">CPU limited</label>
-            <div class="select">
-                <select id="input-cpu-limit" name="cpu" bind:value={form.resources.limits.cpu}>
-                    <option value="0">Cluster Default</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                </select>
-            </div>
-            <small class="helper">
-                Number of vCPUs limited to each container instance. Autoscaling triggers when CPU usage reaches 80% of the limit.
-            </small>
-        </div>
+			<Select
+				id="input-cpu-limit"
+				name="cpu"
+				bind:value={form.resources.limits.cpu}
+				options={[
+					{ value: '0', label: 'Cluster Default' },
+					{ value: '1', label: '1' },
+					{ value: '2', label: '2' },
+					{ value: '4', label: '4' }
+				]} />
+			<small class="helper">
+				Number of vCPUs limited to each container instance. Autoscaling triggers when CPU usage reaches 80% of the limit.
+			</small>
+		</div>
 
 		<div class="field">
 			<label for="input-memory">Memory allocated</label>
-			<div class="select">
-				<select id="input-memory" bind:value={form.resources.requests.memory}>
-					{#each selectedLocation.memoryAllocatable as it, i (i)}
-						<option value={it}>{format.memory(it)}</option>
-					{/each}
-				</select>
-			</div>
+			<Select
+				id="input-memory"
+				bind:value={form.resources.requests.memory}
+				options={selectedLocation.memoryAllocatable.map((it) => ({ value: it, label: format.memory(it) }))} />
 			<small class="helper">
 				Memory to allocate to each container instance.
 			</small>
@@ -734,16 +717,13 @@
 		</div>
 		{#if permission.envGroups}
 			<div class="field flex">
-				<div class="select">
-					{#key envGroups}
-						<select onchange={selectEnvGroupChanged}>
-							<option value="" disabled selected>Select Env Group</option>
-							{#each envGroups.filter((g) => !form.envGroups.includes(g.name)) as it (it.name)}
-								<option value={it.name}>{it.name}</option>
-							{/each}
-						</select>
-					{/key}
-				</div>
+				{#key envGroups}
+					<Select
+						placeholder="Select Env Group"
+						resetOnSelect
+						onchange={(v) => addEnvGroup(String(v))}
+						options={envGroups.filter((g) => !form.envGroups.includes(g.name)).map((it) => ({ value: it.name, label: it.name }))} />
+				{/key}
 			</div>
 		{:else}
 			<div class="field flex gap-3">
@@ -918,12 +898,11 @@
 					</div>
 					<div class="field">
 						<label for="input-sidecar-type-{i}">Type</label>
-						<div class="select">
-							<select id="input-sidecar-type-{i}" bind:value={sidecar.type}>
-								<option value="" disabled>Select Type</option>
-								<option value="cloudSqlProxy">Cloud SQL Proxy</option>
-							</select>
-						</div>
+						<Select
+							id="input-sidecar-type-{i}"
+							bind:value={sidecar.type}
+							placeholder="Select Type"
+							options={[{ value: 'cloudSqlProxy', label: 'Cloud SQL Proxy' }]} />
 					</div>
 					{#if sidecar.type === 'cloudSqlProxy'}
 						<div class="field">

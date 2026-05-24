@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
@@ -72,16 +73,12 @@
 		</div>
 		<div class="field">
 			<label for="input-location">Location</label>
-			<div class="select">
-				<select id="input-location" bind:value={form.location} required>
-					<option value="" selected disabled>Select Location</option>
-					{#each locations as it (it.id)}
-						{#if it.features.workloadIdentity}
-							<option value={it.id}>{it.id}</option>
-						{/if}
-					{/each}
-				</select>
-			</div>
+			<Select
+				id="input-location"
+				bind:value={form.location}
+				required
+				placeholder="Select Location"
+				options={locations.filter((it) => it.features.workloadIdentity).map((it) => ({ value: it.id, label: it.id }))} />
 		</div>
 		<div class="field">
 			<label for="input-gsa">GSA</label>

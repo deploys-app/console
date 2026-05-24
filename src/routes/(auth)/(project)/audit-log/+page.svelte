@@ -7,6 +7,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import OutcomeBadge from '$lib/components/OutcomeBadge.svelte'
+	import Select from '$lib/components/Select.svelte'
 	import * as format from '$lib/format'
 
 	const { data } = $props()
@@ -281,24 +282,21 @@
 		<div class="filter-row">
 			<div class="field">
 				<label class="label" for="filter-resource-type">Resource type</label>
-				<div class="select">
-					<select id="filter-resource-type" bind:value={form.resourceType}>
-						<option value="">All</option>
-						{#each RESOURCE_TYPES as t (t.value)}
-							<option value={t.value}>{t.label}</option>
-						{/each}
-					</select>
-				</div>
+				<Select
+					id="filter-resource-type"
+					bind:value={form.resourceType}
+					options={[{ value: '', label: 'All' }, ...RESOURCE_TYPES.map((t) => ({ value: t.value, label: t.label }))]} />
 			</div>
 			<div class="field">
 				<label class="label" for="filter-outcome">Outcome</label>
-				<div class="select">
-					<select id="filter-outcome" bind:value={form.outcome}>
-						<option value="">All</option>
-						<option value="success">Success</option>
-						<option value="failure">Failure</option>
-					</select>
-				</div>
+				<Select
+					id="filter-outcome"
+					bind:value={form.outcome}
+					options={[
+						{ value: '', label: 'All' },
+						{ value: 'success', label: 'Success' },
+						{ value: 'failure', label: 'Failure' }
+					]} />
 			</div>
 			<div class="field">
 				<span class="label">Date range</span>

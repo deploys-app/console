@@ -37,9 +37,9 @@ test.describe('audit log', () => {
 		await page.goto('/audit-log?project=test-project&resourceType=deployment&actor=user@example.com&outcome=success')
 
 		const main = page.locator('.content-wrapper')
-		await expect(main.locator('#filter-resource-type')).toHaveValue('deployment')
+		await expect(main.locator('#filter-resource-type')).toContainText('Deployment')
 		await expect(main.locator('#filter-actor')).toHaveValue('user@example.com')
-		await expect(main.locator('#filter-outcome')).toHaveValue('success')
+		await expect(main.locator('#filter-outcome')).toContainText('Success')
 		await expect(main.getByText('deployment.deploy')).toBeVisible()
 	})
 })
