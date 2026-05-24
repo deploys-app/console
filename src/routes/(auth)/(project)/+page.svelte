@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
-	import OutcomeBadge from '$lib/components/OutcomeBadge.svelte'
 
 	const { data } = $props()
 
@@ -220,11 +219,11 @@
 		{:else}
 			<ul class="activity-feed">
 				{#each auditLog.items as it (it.id)}
-					<li>
-						<OutcomeBadge outcome={it.outcome} />
+					<li class="activity-item">
+						<span class="activity-dot" class:is-fail={it.outcome === 'failure'}
+							title={it.outcome}></span>
 						<div class="activity-body">
 							<div class="activity-line">
-								<span class="actor">{it.actor.email}</span>
 								<span class="action">{it.action}</span>
 								{#if it.resource.type}
 									<span class="resource">
@@ -232,7 +231,11 @@
 									</span>
 								{/if}
 							</div>
-							<time class="activity-time">{format.datetime(it.createdAt)}</time>
+							<div class="activity-foot">
+								<span class="actor">{it.actor.email}</span>
+								<span class="foot-sep">·</span>
+								<time class="activity-time">{format.datetime(it.createdAt)}</time>
+							</div>
 						</div>
 					</li>
 				{/each}
@@ -386,19 +389,47 @@
 		padding: 0;
 	}
 
-	.activity-feed li {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.625rem;
-		padding: 0.5rem 0;
+	/* Timeline: a continuous rail down the left, a status dot per entry. */
+	.activity-item {
+		position: relative;
+		padding: 0.4rem 0 0.4rem 1.5rem;
 	}
 
-	.activity-feed li + li {
-		border-top: 1px solid hsl(var(--hsl-content) / 0.08);
+	.activity-item::before {
+		content: '';
+		position: absolute;
+		left: 5px;
+		top: 0;
+		bottom: 0;
+		width: 2px;
+		background: hsl(var(--hsl-line));
+	}
+
+	.activity-item:first-child::before {
+		top: 0.85rem;
+	}
+
+	.activity-item:last-child::before {
+		bottom: auto;
+		height: 0.85rem;
+	}
+
+	.activity-dot {
+		position: absolute;
+		left: 0;
+		top: 0.7rem;
+		width: 12px;
+		height: 12px;
+		border-radius: 999px;
+		background: hsl(var(--hsl-positive));
+		border: 2px solid hsl(var(--hsl-base-300));
+	}
+
+	.activity-dot.is-fail {
+		background: hsl(var(--hsl-negative));
 	}
 
 	.activity-body {
-		flex: 1;
 		min-width: 0;
 	}
 
@@ -407,39 +438,43 @@
 		align-items: baseline;
 		flex-wrap: wrap;
 		gap: 0.4rem;
-		font-size: 0.875rem;
 		line-height: 1.3;
 	}
 
-	.actor {
-		color: hsl(var(--hsl-content));
+	.action {
+		font-family: var(--ffml-mono);
+		font-size: 0.8125rem;
 		font-weight: 500;
+		color: hsl(var(--hsl-content));
+	}
+
+	.resource {
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+
+	.resource-name {
+		color: hsl(var(--hsl-content) / 0.55);
+		margin-left: 0.1rem;
+	}
+
+	.activity-foot {
+		display: flex;
+		align-items: baseline;
+		gap: 0.4rem;
+		margin-top: 0.15rem;
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.55);
+	}
+
+	.actor {
 		max-width: 16rem;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
 
-	.action {
-		font-family: var(--font-family-mono, ui-monospace, monospace);
-		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content) / 0.85);
-	}
-
-	.resource {
-		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content) / 0.9);
-	}
-
-	.resource-name {
-		color: hsl(var(--hsl-content) / 0.6);
-		margin-left: 0.1rem;
-	}
-
-	.activity-time {
-		display: block;
-		margin-top: 0.15rem;
-		font-size: 0.75rem;
-		color: hsl(var(--hsl-content) / 0.55);
+	.foot-sep {
+		opacity: 0.5;
 	}
 </style>

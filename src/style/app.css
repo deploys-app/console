@@ -346,6 +346,79 @@
  * Keep the `*` prefix because templates already use it.
  * ------------------------------------------------------------------------- */
 @layer components {
+	/* Page header — title + optional sub/count on the left, actions on the right.
+	 * Shared across list pages so headers line up consistently. */
+	.page-head {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 1.5rem;
+	}
+
+	.page-head .page-sub {
+		margin-top: 0.25rem;
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.55);
+	}
+
+	/* Form section header — a titled divider that groups long forms into
+	 * scannable sections. Use `.is-first` for the leading group (no top rule). */
+	.form-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		margin-top: 0.5rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid hsl(var(--hsl-line));
+	}
+
+	.form-section.is-first {
+		margin-top: 0;
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	.form-section .form-section-title {
+		font-family: var(--ffml-secondary);
+		font-size: 1.0625rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.form-section .form-section-hint {
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+
+	/* Centered empty state for panels (tables use the NoDataRow component). */
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.375rem;
+		padding: 3rem 1rem;
+	}
+
+	.empty-state .empty-icon {
+		font-size: 2rem;
+		color: hsl(var(--hsl-primary) / 0.6);
+		margin-bottom: 0.5rem;
+	}
+
+	.empty-state .empty-title {
+		font-size: 1.0625rem;
+		font-weight: 600;
+	}
+
+	.empty-state .empty-sub {
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+
 	/* Panels (card-like surfaces) — hairline-defined instrument surfaces.
 	 * Structure comes from a 1px line in both themes; shadow is a faint lift. */
 	.panel {

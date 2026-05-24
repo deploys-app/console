@@ -364,6 +364,9 @@
 	<hr>
 
 	<form class="grid gap-4 w-full" onsubmit={save}>
+		<div class="form-section is-first">
+			<span class="form-section-title">General</span>
+		</div>
 		{#if deployment}
 			<div class="field">
 				<label for="input-location-readonly">Location</label>
@@ -551,11 +554,10 @@
 
 		{#if selectedLocation.features.disk}
 			<div class="grid gap-4">
-				<br>
-				<hr>
-				<br>
-
-				<h6><strong>Disk</strong></h6>
+				<div class="form-section">
+					<span class="form-section-title">Disk</span>
+					<span class="form-section-hint">Attach a persistent disk and mount it into the container.</span>
+				</div>
 
 				{#if permission.disks}
 					<div class="field">
@@ -598,11 +600,9 @@
 			</div>
 		{/if}
 
-		<br>
-		<hr>
-		<br>
-
-		<h6><strong>Auto-delete (TTL)</strong></h6>
+		<div class="form-section">
+			<span class="form-section-title">Auto-delete (TTL)</span>
+		</div>
 		<div class="grid grid-cols-2 gap-4">
 			<div class="field">
 				<label for="input-ttl_unit">Unit</label>
@@ -632,11 +632,9 @@
 		{#if ['WebService', 'Worker', 'InternalTCPService'].includes(form.type)}
 			<div>
 				<div class="grid gap-4">
-					<br>
-					<hr>
-					<br>
-
-					<h6><strong>Autoscaling</strong></h6>
+					<div class="form-section">
+						<span class="form-section-title">Autoscaling</span>
+					</div>
 					<div class="grid grid-cols-2 gap-4">
 						<div class="field">
 							<label for="input-min_replicas">Min Replicas</label>
@@ -664,9 +662,10 @@
 			</div>
 		{/if}
 
-		<br>
-		<hr>
-		<br>
+		<div class="form-section">
+			<span class="form-section-title">Resources</span>
+			<span class="form-section-hint">CPU and memory allocated to each container instance.</span>
+		</div>
 
 <!--        <div class="field">-->
 <!--            <label for="input-cpu">CPU allocated</label>-->
@@ -711,15 +710,13 @@
 			</small>
 		</div>
 
-		<br>
-		<hr>
-		<br>
-
-		<h6><strong>Env Groups</strong></h6>
-		<small class="helper">
-			Env groups are project-scoped sets of environment variables that are merged into the deployment.
-			Variables defined here take precedence over those defined in env groups.
-		</small>
+		<div class="form-section">
+			<span class="form-section-title">Env Groups</span>
+			<span class="form-section-hint">
+				Project-scoped sets of environment variables merged into the deployment.
+				Variables defined below take precedence over env groups.
+			</span>
+		</div>
 		{#if permission.envGroups}
 			<div class="field flex">
 				<div class="select">
@@ -770,9 +767,9 @@
 			</table>
 		</div>
 
-		<hr>
-
-		<h6><strong>Environment Variables</strong></h6>
+		<div class="form-section">
+			<span class="form-section-title">Environment Variables</span>
+		</div>
 		<div>
 			<div class="table-container">
 				<table class="table">
@@ -831,9 +828,9 @@
 			{/if}
 		</div>
 
-		<hr>
-
-		<h6><strong>Mount Data</strong></h6>
+		<div class="form-section">
+			<span class="form-section-title">Mount Data</span>
+		</div>
 		<div>
 			<div class="table-container">
 				<table class="table">
@@ -883,9 +880,9 @@
 			</div>
 		</div>
 
-		<hr>
-
-		<h6><strong>Sidecars</strong></h6>
+		<div class="form-section">
+			<span class="form-section-title">Sidecars</span>
+		</div>
 		<div class="grid gap-4">
 			{#each form.sidecars as sidecar, i (i)}
 				<div class="panel is-level-200 grid gap-3">

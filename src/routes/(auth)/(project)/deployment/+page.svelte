@@ -11,18 +11,18 @@
 	const error = $derived(data.error)
 </script>
 
-<h6>Deployments</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button" href="/deployment/deploy?project={project}">
-                Create
-            </a>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Deployments</strong></h4>
+		<p class="page-sub">{deployments.length} {deployments.length === 1 ? 'deployment' : 'deployments'}</p>
 	</div>
-
-	<div class="table-container mt-4">
+	<a class="button is-icon-left" href="/deployment/deploy?project={project}">
+		<i class="fa-solid fa-plus"></i>
+		Deploy
+	</a>
+</div>
+<div class="panel is-level-300">
+	<div class="table-container">
 		<table class="table">
 			<thead>
 			<tr>
@@ -70,7 +70,14 @@
 <!--						<td>{it.createdBy}</td>-->
 					</tr>
 				{/each}
-				<NoDataRow span={6} list={deployments} />
+				{#if !error}
+					<NoDataRow span={6} list={deployments}
+						icon="fa-rocket"
+						message="No deployments yet"
+						hint="Deploy a container image to get started."
+						ctaLabel="Deploy"
+						ctaHref={`/deployment/deploy?project=${project}`} />
+				{/if}
 				<ErrorRow span={6} {error} />
 			</tbody>
 		</table>

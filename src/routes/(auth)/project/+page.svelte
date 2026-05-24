@@ -1,5 +1,4 @@
 <script>
-	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 	import * as modal from '$lib/modal'
@@ -43,52 +42,174 @@
 	}
 </script>
 
-<h6>Projects</h6>
-<br>
-<div class="panel is-level-300">
-	<div class="flex justify-between items-center">
-		<div class="grid grid-flow-col justify-start gap-2 ml-auto">
-			<a class="button" href="/project/create">
-				Create
+<div class="page-head">
+	<div>
+		<h4><strong>Projects</strong></h4>
+		<p class="page-sub">{projects.length} {projects.length === 1 ? 'project' : 'projects'}</p>
+	</div>
+	<a class="button is-icon-left" href="/project/create">
+		<i class="fa-solid fa-plus"></i>
+		New project
+	</a>
+</div>
+
+{#if projects.length}
+	<div class="project-grid">
+		{#each projects as it (it.project)}
+			<div class="project-card">
+				<a class="project-open" href={`/?project=${it.project}`} aria-label={`Open ${it.name}`}>
+					<span class="project-avatar" aria-hidden="true">{(it.name || it.project).slice(0, 1).toUpperCase()}</span>
+					<span class="project-meta">
+						<strong class="project-name">{it.name}</strong>
+						<span class="project-id mono">{it.project}</span>
+					</span>
+					<i class="fa-solid fa-arrow-right project-go"></i>
+				</a>
+				<div class="project-foot">
+					<span class="project-number mono" title="Project number">{it.id}</span>
+					<div class="project-actions">
+						<a href={`/project/create?project=${it.project}`} aria-label="Edit">
+							<div class="icon-button"><i class="fa-solid fa-pen"></i></div>
+						</a>
+						<button class="icon-button" aria-label="Remove" onclick={() => deleteItem(it.project)}>
+							<i class="fa-solid fa-trash-alt"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		{/each}
+
+		<a class="project-card project-create" href="/project/create">
+			<i class="fa-solid fa-plus"></i>
+			<span>New project</span>
+		</a>
+	</div>
+{:else}
+	<div class="panel is-level-300">
+		<div class="empty-state">
+			<i class="fa-solid fa-diagram-project empty-icon"></i>
+			<p class="empty-title">No projects yet</p>
+			<p class="empty-sub">Create your first project to start deploying.</p>
+			<a class="button is-icon-left mt-2" href="/project/create">
+				<i class="fa-solid fa-plus"></i>
+				New project
 			</a>
 		</div>
 	</div>
+{/if}
 
-	<div class="table-container mt-4">
-		<table class="table is-variant-compact">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>ID</th>
-					<th>Number</th>
-					<th class="is-collapse is-align-right"></th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each projects as it (it.project)}
-					<tr>
-						<td>
-							<a href={`/?project=${it.project}`} class="link">
-								<strong>{it.name}</strong>
-							</a>
-						</td>
-						<td>{it.project}</td>
-						<td>{it.id}</td>
-						<td>
-							<a href={`/project/create?project=${it.project}`} aria-label="Edit">
-								<div class="icon-button">
-									<i class="fa-solid fa-pen"></i>
-								</div>
-							</a>
-							<button class="icon-button" aria-label="Remove" onclick={() => deleteItem(it.project)}>
-								<i class="fa-solid fa-trash-alt"></i>
-							</button>
-						</td>
-					</tr>
-				{:else}
-					<NoDataRow span={4} />
-				{/each}
-			</tbody>
-		</table>
-	</div>
-</div>
+<style>
+	.project-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+		gap: 1rem;
+	}
+
+	.project-card {
+		display: flex;
+		flex-direction: column;
+		background-color: hsl(var(--hsl-base-300));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-lg);
+		box-shadow: var(--raised-z1);
+		transition: border-color var(--timing-faster) ease, box-shadow var(--timing-faster) ease, transform var(--timing-faster) ease;
+	}
+
+	.project-card:hover {
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		box-shadow: var(--raised-z3);
+		transform: translateY(-2px);
+	}
+
+	.project-open {
+		display: flex;
+		align-items: center;
+		gap: 0.875rem;
+		padding: 1.125rem 1.25rem;
+	}
+
+	.project-avatar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: var(--radius-md);
+		font-family: var(--ffml-secondary);
+		font-size: 1.125rem;
+		font-weight: 700;
+		color: hsl(var(--hsl-primary));
+		background: hsl(var(--hsl-primary) / 0.12);
+	}
+
+	.project-meta {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		flex: 1;
+	}
+
+	.project-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.project-id {
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.55);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.project-go {
+		color: hsl(var(--hsl-content) / 0.3);
+		transition: color var(--timing-faster) ease, transform var(--timing-faster) ease;
+	}
+
+	.project-card:hover .project-go {
+		color: hsl(var(--hsl-primary));
+		transform: translateX(2px);
+	}
+
+	.project-foot {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.625rem 0.75rem 0.625rem 1.25rem;
+		border-top: 1px solid hsl(var(--hsl-line));
+	}
+
+	.project-number {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.45);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.project-actions {
+		display: flex;
+		gap: 0.25rem;
+		flex-shrink: 0;
+	}
+
+	.project-create {
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		min-height: 8rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		font-weight: 600;
+		border-style: dashed;
+		box-shadow: none;
+	}
+
+	.project-create:hover {
+		color: hsl(var(--hsl-primary));
+		transform: none;
+	}
+</style>
