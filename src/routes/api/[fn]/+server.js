@@ -1,9 +1,16 @@
 import { env } from '$env/dynamic/private'
+import { mockInvoke } from '$lib/server/mock'
 
 const endpoint = env.API_ENDPOINT || 'https://api.deploys.app'
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function POST ({ locals, params, request }) {
+	// dev mock: short-circuit to static fixtures, no token required
+	if (env.MOCK_API) {
+		const args = await request.json().catch(() => ({}))
+		return Response.json(mockInvoke(params.fn ?? '', args))
+	}
+
 	const token = locals.token
 
 	// fast-path to reject unauthorized requests

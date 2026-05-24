@@ -1,9 +1,16 @@
 import { env } from '$env/dynamic/private'
+import { mockInvoke } from '$lib/server/mock'
 
 const endpoint = env.REGISTRY_ENDPOINT || 'https://registry.deploys.app/api'
 
 /** @type {import('./$types').RequestHandler} */
 export async function POST ({ locals, params, request }) {
+	// dev mock: short-circuit to static fixtures, no token required
+	if (env.MOCK_API) {
+		const args = await request.json().catch(() => ({}))
+		return Response.json(mockInvoke(`registry/${params.fn}`, args))
+	}
+
 	const token = locals.token
 
 	// fast-path to reject unauthorized requests
