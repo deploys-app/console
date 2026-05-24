@@ -1,10 +1,14 @@
 <script>
 	import ClipboardJS from 'clipboard'
 	import { onMount } from 'svelte'
+	import api from '$lib/api'
+	import * as format from '$lib/format'
 
 	const { data } = $props()
 
 	const project = $derived(data.project)
+	const items = $derived(data.items)
+	const loadError = $derived(data.error)
 
 	/** @type {HTMLInputElement} */
 	let elFile
@@ -15,9 +19,6 @@
 
 	/** @type {File | null} */
 	let selectedFile = $state(null)
-
-	/** @type {Array<{ name: string, size: number, url: string, uploadedAt: Date }>} */
-	let uploads = $state([])
 
 	onMount(() => {
 		const clip = new ClipboardJS('.copy-url')
@@ -40,13 +41,6 @@
 		if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
 		if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`
 		return `${(bytes / 1024 ** 3).toFixed(2)} GB`
-	}
-
-	/**
-	 * @param {Date} d
-	 */
-	function formatTime (d) {
-		return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 	}
 
 	function onFileChange () {
@@ -99,7 +93,7 @@
 		uploading = true
 		error = ''
 		try {
-			const resp = await fetch(`/api/dropbox?project=${project}`, {
+			const resp = await fetch(`/api/dropbox?project=${project}&filename=${encodeURIComponent(file.name)}`, {
 				method: 'POST',
 				body: file
 			})
@@ -108,14 +102,8 @@
 				error = res?.error?.message ?? `upload failed (${resp.status})`
 				return
 			}
-			const url = res?.result?.downloadUrl ?? ''
-			if (url) {
-				uploads = [
-					{ name: file.name, size: file.size, url, uploadedAt: new Date() },
-					...uploads
-				]
-			}
 			clearFile()
+			await api.invalidate('dropbox.list')
 		} catch (err) {
 			error = err instanceof Error ? err.message : String(err)
 		} finally {
@@ -360,33 +348,42 @@
 		</div>
 	</form>
 
-	{#if uploads.length > 0}
-		<hr>
-		<div>
-			<div class="flex justify-between items-center mb-3">
-				<strong>Recent uploads</strong>
-				<small class="text-content/60">cleared on page reload</small>
-			</div>
+	<hr>
+	<div>
+		<div class="flex justify-between items-center mb-3">
+			<strong>Files</strong>
+			<small class="text-content/60">expires automatically</small>
+		</div>
 
+		{#if loadError}
+			<div class="error-banner">
+				<i class="fa-solid fa-circle-exclamation"></i>
+				<span>{loadError.message || 'Failed to load files. Please try again.'}</span>
+			</div>
+		{:else if items.length === 0}
+			<small class="text-content/60">No files yet. Upload one above to get a shareable download URL.</small>
+		{:else}
 			<div class="uploads">
-				{#each uploads as it (it.url)}
+				{#each items as it (it.downloadUrl)}
 					<div class="upload-item">
 						<span class="upload-icon">
-							<i class="fa-solid fa-circle-check"></i>
+							<i class="fa-solid fa-file"></i>
 						</span>
 						<div class="upload-info">
-							<div class="upload-name">{it.name}</div>
-							<div class="upload-url" title={it.url}>{it.url}</div>
-							<div class="upload-sub">{formatSize(it.size)} · {formatTime(it.uploadedAt)}</div>
+							<div class="upload-name">{it.filename || '(no name)'}</div>
+							<div class="upload-url" title={it.downloadUrl}>{it.downloadUrl}</div>
+							<div class="upload-sub">
+								{formatSize(it.size)} · uploaded {format.datetime(it.createdAt)} · expires {format.datetime(it.expiresAt)}
+							</div>
 						</div>
 						<div class="upload-actions">
 							<button
 								class="icon-button copy-url"
-								class:is-copied={justCopied === it.url}
+								class:is-copied={justCopied === it.downloadUrl}
 								type="button"
-								data-clipboard-text={it.url}
+								data-clipboard-text={it.downloadUrl}
 								aria-label="Copy URL">
-								{#if justCopied === it.url}
+								{#if justCopied === it.downloadUrl}
 									<i class="fa-solid fa-check"></i>
 								{:else}
 									<i class="fa-light fa-copy"></i>
@@ -394,7 +391,7 @@
 							</button>
 							<a
 								class="icon-button"
-								href={it.url}
+								href={it.downloadUrl}
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label="Open URL">
@@ -404,6 +401,6 @@
 					</div>
 				{/each}
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>

@@ -453,4 +453,13 @@ declare namespace Api {
         createdAt: string
         lineItems: InvoiceLineItem[]
     }
+
+    export type DropboxItem = {
+        downloadUrl: string
+        filename: string
+        size: number
+        ttl: number
+        createdAt: string
+        expiresAt: string
+    }
 }
