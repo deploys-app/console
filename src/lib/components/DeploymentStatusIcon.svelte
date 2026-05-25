@@ -98,4 +98,4 @@
 	})
 </script>
 
-<i class={`${iconClass} mx-3`}></i>
+<i class={`${iconClass} fa-fw mx-3`}></i>
