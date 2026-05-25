@@ -8,6 +8,13 @@ const LOCATION_ID = 'gke.cluster-rcf2'
 const DOMAIN_SUFFIX = 'rcf2.deploys.app'
 const USER_EMAIL = 'dev@deploys.app'
 
+// DeploymentStatusIcon fetches statusUrl directly (not via the API proxy) and
+// expects a PodStatus JSON. A data: URI lets a success deployment resolve to the
+// healthy check icon offline without standing up a real pod-status endpoint.
+const HEALTHY_STATUS_URL =
+	'data:application/json,' +
+	encodeURIComponent(JSON.stringify({ count: 1, ready: 1, succeeded: 0, failed: 0 }))
+
 /**
  * @template T
  * @param {T} [result]
@@ -114,7 +121,7 @@ function deployment (project = 'acme') {
 		logUrl: '',
 		eventUrl: '',
 		podsUrl: '',
-		statusUrl: '',
+		statusUrl: HEALTHY_STATUS_URL,
 		address: '203.0.113.10',
 		internalAddress: '10.0.0.10',
 		status: 'success',
@@ -129,6 +136,18 @@ function deployment (project = 'acme') {
 
 const deployments = [
 	deployment('acme'),
+	{
+		...deployment('acme'),
+		name: 'cron-cleanup',
+		type: 'CronJob',
+		schedule: '0 * * * *',
+		port: 0,
+		url: '',
+		internalUrl: '',
+		address: '',
+		status: 'success',
+		action: 'pause'
+	},
 	{
 		...deployment('acme'),
 		name: 'worker',
