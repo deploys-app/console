@@ -4,7 +4,7 @@
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import DangerZone from '$lib/components/DangerZone.svelte'
-	import WafExpressionModal from '$lib/components/WafExpressionModal.svelte'
+	import WafRuleModal from '$lib/components/WafRuleModal.svelte'
 
 	const { data } = $props()
 
@@ -21,11 +21,12 @@
 	 * @property {string} message
 	 */
 
-	const actionOptions = [
-		{ value: 'log', label: 'Log' },
-		{ value: 'allow', label: 'Allow' },
-		{ value: 'block', label: 'Block' }
-	]
+	/** @type {Record<string, string>} */
+	const actionLabels = {
+		log: 'Log',
+		allow: 'Allow',
+		block: 'Block'
+	}
 
 	const DEFAULT_STATUS = 403
 	const DEFAULT_MESSAGE = 'Forbidden'
@@ -122,11 +123,35 @@
 		}
 	}
 
+	/** @type {WafRuleModal} */
+	let ruleModal
+
+	// Open the editor for an existing rule (a copy of its values seeds the draft).
+	/** @param {number} i */
+	function editRule (i) {
+		ruleModal.open(i, form.rules[i])
+	}
+
+	// Open the editor for a brand-new rule (index -1).
 	function addRule () {
-		const taken = form.rules.map((r) => r.id)
-		const r = ruleForm()
-		r.id = genId(taken)
-		form.rules = [...form.rules, r]
+		ruleModal.open(-1)
+	}
+
+	// Apply a saved draft from the modal: append for add (index -1, with a fresh
+	// id) or replace the rule at its index for edit.
+	/**
+	 * @param {number} index
+	 * @param {RuleForm} draft
+	 */
+	function applyRule (index, draft) {
+		if (index === -1) {
+			const taken = form.rules.map((r) => r.id)
+			form.rules = [...form.rules, { ...draft, id: genId(taken) }]
+		} else {
+			const next = [...form.rules]
+			next[index] = { ...draft, id: form.rules[index]?.id ?? draft.id }
+			form.rules = next
+		}
 	}
 
 	/**
@@ -139,23 +164,6 @@
 		const next = [...form.rules]
 		;[next[i], next[j]] = [next[j], next[i]]
 		form.rules = next
-	}
-
-	/** @type {WafExpressionModal} */
-	let expressionModal
-	// Index of the rule whose expression the builder is currently editing.
-	let builderRuleIndex = -1
-
-	/** @param {number} i */
-	function openBuilder (i) {
-		builderRuleIndex = i
-		expressionModal.open(form.rules[i]?.expression ?? '')
-	}
-
-	/** @param {string} expression */
-	function applyExpression (expression) {
-		const rule = form.rules[builderRuleIndex]
-		if (rule) rule.expression = expression
 	}
 
 	/** @param {number} i */
@@ -260,22 +268,8 @@
 				<div>
 					<h6><strong>Rules</strong></h6>
 					<p class="text-content/50 text-sm mt-1">
-						Match on
-						<code class="font-mono">request.method</code>,
-						<code class="font-mono">.path</code>,
-						<code class="font-mono">.host</code>,
-						<code class="font-mono">.query</code>,
-						<code class="font-mono">.uri</code>,
-						<code class="font-mono">.scheme</code>,
-						<code class="font-mono">.user_agent</code>,
-						<code class="font-mono">.referer</code>,
-						<code class="font-mono">.remote_ip</code>,
-						<code class="font-mono">.content_length</code>,
-						<code class="font-mono">.body</code>,
-						<code class="font-mono">.headers[…]</code>,
-						<code class="font-mono">.args[…]</code>,
-						<code class="font-mono">.cookies[…]</code>.
-						Use <strong>Build…</strong> to compose a condition.
+						Rules run top to bottom. Use <strong>Edit</strong> to change a rule’s
+						condition, action, and response.
 					</p>
 				</div>
 				{#if loading}
@@ -291,10 +285,8 @@
 						<tr>
 							<th>ID</th>
 							<th>Description</th>
-							<th>Expression (CEL)</th>
 							<th>Action</th>
-							<th>Response</th>
-							<th class="is-collapse is-align-right">Order</th>
+							<th class="is-collapse is-align-right">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -304,54 +296,23 @@
 									<span class="font-mono text-sm text-content/60">{rule.id}</span>
 								</td>
 								<td>
-									<div class="input">
-										<input bind:value={rule.description} placeholder="Description">
-									</div>
-								</td>
-								<td class="w-full min-w-[20rem]">
-									<div class="grid gap-2">
-										<div class="textarea">
-											<textarea class="font-mono" rows="2" readonly bind:value={rule.expression}
-												placeholder="Use Build… to compose this rule’s condition"></textarea>
-										</div>
-										<div class="flex gap-2 justify-self-start">
-											<button type="button" class="button is-variant-secondary is-size-small"
-												onclick={() => openBuilder(i)}>
-												<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
-												<span>Build…</span>
-											</button>
-											<button type="button" class="button is-variant-tertiary is-size-small"
-												disabled={!rule.expression}
-												onclick={() => { rule.expression = '' }}>
-												<i class="fa-solid fa-eraser mr-2"></i>
-												<span>Clear</span>
-											</button>
-										</div>
-									</div>
-								</td>
-								<td class="min-w-[8rem]">
-									<Select
-										bind:value={rule.action}
-										options={actionOptions} />
-								</td>
-								<td class="min-w-[14rem]">
-									{#if rule.action === 'block'}
-										<div class="grid gap-2">
-											<div class="input">
-												<input type="number" bind:value={rule.status} placeholder="403"
-													aria-label="HTTP status">
-											</div>
-											<div class="input">
-												<input bind:value={rule.message} placeholder="Forbidden"
-													aria-label="Response message">
-											</div>
-										</div>
+									{#if rule.description}
+										{rule.description}
 									{:else}
-										<span class="text-content/40 text-sm">—</span>
+										<span class="text-content/40">—</span>
 									{/if}
 								</td>
 								<td>
+									<span class="action-badge" data-action={rule.action}>
+										{actionLabels[rule.action] ?? rule.action}
+									</span>
+								</td>
+								<td>
 									<div class="flex gap-1 justify-end">
+										<button class="icon-button" type="button" aria-label="Edit rule"
+											onclick={() => editRule(i)}>
+											<i class="fa-solid fa-pencil"></i>
+										</button>
 										<button class="icon-button" type="button" aria-label="Move rule up"
 											disabled={i === 0} onclick={() => moveRule(i, -1)}>
 											<i class="fa-solid fa-chevron-up"></i>
@@ -370,7 +331,7 @@
 						{/each}
 						{#if form.rules.length === 0}
 							<tr>
-								<td colspan="6" class="text-center text-content/50">
+								<td colspan="4" class="text-center text-content/50">
 									No rules yet. Add a rule to start filtering traffic.
 								</td>
 							</tr>
@@ -378,7 +339,7 @@
 					</tbody>
 					<tfoot>
 						<tr>
-							<td colspan="6">
+							<td colspan="4">
 								<button class="button is-variant-secondary flex m-auto" type="button"
 									onclick={addRule}>
 									<i class="fa-solid fa-plus mr-3"></i>
@@ -405,4 +366,28 @@
 	</form>
 </div>
 
-<WafExpressionModal bind:this={expressionModal} oninsert={applyExpression} />
+<WafRuleModal bind:this={ruleModal} onsave={applyRule} />
+
+<style>
+	.action-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.125rem 0.625rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.75);
+		background-color: hsl(var(--hsl-content) / 0.08);
+	}
+
+	.action-badge[data-action='block'] {
+		color: hsl(var(--hsl-negative));
+		background-color: hsl(var(--hsl-negative) / 0.12);
+	}
+
+	.action-badge[data-action='allow'] {
+		color: hsl(var(--hsl-positive));
+		background-color: hsl(var(--hsl-positive) / 0.12);
+	}
+</style>
