@@ -24,14 +24,10 @@
 	let operator = $state('equals')
 	let value = $state('')
 	let values = $state('')
-	let caseInsensitive = $state(false)
-	let urlDecode = $state(false)
-	let negate = $state(false)
 	let combine = $state(/** @type {'and' | 'or' | 'replace'} */ ('and'))
 
 	const fieldMeta = $derived(getField(field))
 	const fieldType = $derived(fieldMeta?.type ?? 'string')
-	const isString = $derived(fieldType === 'string')
 	const needsName = $derived(!!fieldMeta?.hasName)
 	const operators = $derived(operatorsForType(fieldType))
 	const multi = $derived(isMultiOperator(operator))
@@ -49,10 +45,7 @@
 		name,
 		operator,
 		value,
-		values,
-		caseInsensitive,
-		urlDecode,
-		negate
+		values
 	})
 
 	// Live preview of the single condition the builder controls describe.
@@ -72,9 +65,6 @@
 		operator = 'equals'
 		value = ''
 		values = ''
-		caseInsensitive = false
-		urlDecode = false
-		negate = false
 		combine = 'and'
 	}
 
@@ -186,23 +176,6 @@
 				</div>
 			</div>
 		{/if}
-
-		<div class="flex flex-wrap gap-x-6 gap-y-2">
-			{#if isString}
-				<div class="checkbox">
-					<input id="waf-ci" type="checkbox" bind:checked={caseInsensitive}>
-					<label for="waf-ci">Case-insensitive</label>
-				</div>
-				<div class="checkbox">
-					<input id="waf-url" type="checkbox" bind:checked={urlDecode}>
-					<label for="waf-url">URL-decode first</label>
-				</div>
-			{/if}
-			<div class="checkbox">
-				<input id="waf-negate" type="checkbox" bind:checked={negate}>
-				<label for="waf-negate">Negate (NOT)</label>
-			</div>
-		</div>
 
 		{#if expression.trim()}
 			<div class="field">

@@ -146,24 +146,7 @@ export function parseList (raw) {
  * @property {string} operator         operator key
  * @property {string} [value]          single operand (equals/regex/cidr/numeric)
  * @property {string} [values]         raw multi-value text (any-of operators)
- * @property {boolean} [caseInsensitive]
- * @property {boolean} [urlDecode]
- * @property {boolean} [negate]
  */
-
-/**
- * Build the transformed accessor for a string field, applying the urlDecode
- * then lower() pipeline (innermost first).
- * @param {string} accessor
- * @param {ExpressionSpec} spec
- * @param {boolean} applyLower whether lower() should wrap (skipped for regex)
- */
-function transformAccessor (accessor, spec, applyLower) {
-	let e = accessor
-	if (spec.urlDecode) e = `urlDecode(${e})`
-	if (applyLower) e = `lower(${e})`
-	return e
-}
 
 /**
  * Resolve the raw CEL accessor for a spec's field (no transforms applied).
@@ -217,33 +200,26 @@ export function buildExpression (spec) {
 		}
 	} else {
 		// string field
-		const ci = !!spec.caseInsensitive
-		const isRegex = spec.operator === 'matches_regex'
-		// lower() applies when case-insensitive AND not regex (regex uses (?i)).
-		const applyLower = ci && !isRegex
-		const e = transformAccessor(accessor, spec, applyLower)
-		const lc = (/** @type {string} */ s) => (applyLower ? s.toLowerCase() : s)
-
 		if (isMultiOperator(spec.operator)) {
 			const list = parseList(spec.values ?? '')
 			if (list.length === 0) return ''
-			const items = list.map((v) => quote(lc(v))).join(', ')
+			const items = list.map((v) => quote(v)).join(', ')
 			const fn = spec.operator === 'contains_any' ? 'containsAny' : 'hasPrefixAny'
-			snippet = `${fn}(${e}, [${items}])`
-		} else if (isRegex) {
+			snippet = `${fn}(${accessor}, [${items}])`
+		} else if (spec.operator === 'matches_regex') {
 			const pattern = spec.value ?? ''
 			if (pattern === '') return ''
-			snippet = `regexMatch(${e}, ${quote(ci ? `(?i)${pattern}` : pattern)})`
+			snippet = `regexMatch(${accessor}, ${quote(pattern)})`
 		} else {
 			const v = spec.value ?? ''
 			if (v === '') return ''
 			const op = spec.operator === 'not_equals' ? '!=' : '=='
-			snippet = `${e} ${op} ${quote(lc(v))}`
+			snippet = `${accessor} ${op} ${quote(v)}`
 		}
 	}
 
 	if (!snippet) return ''
-	return spec.negate ? `!(${snippet})` : snippet
+	return snippet
 }
 
 /**
