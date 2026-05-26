@@ -23,6 +23,12 @@ const HEALTHY_STATUS_URL =
 const ok = (result = /** @type {T} */ ({})) => ({ ok: true, result })
 
 /**
+ * @param {string} message
+ * @returns {{ ok: false, error: { message: string } }}
+ */
+const err = (message) => ({ ok: false, error: { message } })
+
+/**
  * @template T
  * @param {T[]} items
  */
@@ -69,6 +75,16 @@ const locations = [
 		domainSuffix: DOMAIN_SUFFIX,
 		endpoint: 'https://rcf2.deploys.app',
 		cname: 'rcf2.deploys.app.',
+		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
+		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
+		features: { workloadIdentity: true, disk: {} },
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'gke.cluster-sg1',
+		domainSuffix: 'sg1.deploys.app',
+		endpoint: 'https://sg1.deploys.app',
+		cname: 'sg1.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
 		features: { workloadIdentity: true, disk: {} },
@@ -215,6 +231,37 @@ const routes = [
 		createdBy: USER_EMAIL
 	}
 ]
+
+const wafZone = {
+	project: 'acme',
+	location: LOCATION_ID,
+	description: 'Block admin paths and noisy bots',
+	rules: [
+		{
+			id: 'block-admin',
+			description: 'Block external access to /admin',
+			expression: "request.path.startsWith('/admin')",
+			action: 'block',
+			status: 403,
+			message: 'Forbidden',
+			priority: 10
+		},
+		{
+			id: 'log-bots',
+			description: 'Log suspected bot traffic',
+			expression: "request.headers['user-agent'].contains('bot')",
+			action: 'log',
+			priority: 20
+		}
+	],
+	createdAt: CREATED_AT,
+	createdBy: USER_EMAIL
+}
+
+// Locations (besides the seed LOCATION_ID) that have had a firewall created in
+// this dev session, mapped to their description. Lets create → manage flow work.
+/** @type {Map<string, string>} */
+const wafConfigured = new Map()
 
 const pullSecrets = [
 	{
@@ -610,6 +657,37 @@ const handlers = {
 	'route.list': () => list(routes),
 	'route.createV2': () => ok({}),
 	'route.delete': () => ok({}),
+
+	// The seed location starts configured; every other location is "firewall not
+	// configured yet" (not-found) until created. waf.set and waf.delete update
+	// the in-memory set so the index/create/manage flows are coherent within a
+	// session (set returns ok and the location then resolves on get).
+	'waf.get': (args) => {
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok({ ...wafZone, location: LOCATION_ID })
+		if (wafConfigured.has(location)) {
+			return ok({
+				project: 'acme',
+				location,
+				description: wafConfigured.get(location) ?? '',
+				rules: [],
+				createdAt: CREATED_AT,
+				createdBy: USER_EMAIL
+			})
+		}
+		return err('api: waf zone not found')
+	},
+	'waf.set': (args) => {
+		const location = args?.location
+		if (location && location !== LOCATION_ID) {
+			wafConfigured.set(location, args?.description ?? '')
+		}
+		return ok({})
+	},
+	'waf.delete': (args) => {
+		if (args?.location) wafConfigured.delete(args.location)
+		return ok({})
+	},
 
 	'pullSecret.list': () => list(pullSecrets),
 	'pullSecret.get': (args) => ok({ ...pullSecrets[0], name: args?.name ?? 'dockerhub', location: args?.location ?? LOCATION_ID }),
