@@ -254,14 +254,47 @@ const wafZone = {
 			priority: 20
 		}
 	],
+	status: 'success',
+	action: 'create',
 	createdAt: CREATED_AT,
 	createdBy: USER_EMAIL
 }
 
 // Locations (besides the seed LOCATION_ID) that have had a firewall created in
-// this dev session, mapped to their description. Lets create → manage flow work.
-/** @type {Map<string, string>} */
+// this dev session, mapped to { description, polls }. `polls` counts how many
+// times the zone has been read while pending; the deployer is simulated by
+// flipping the zone from pending → success after the first poll, so the index
+// spinner visibly resolves on its own. Lets create → manage flow work too.
+/** @type {Map<string, { description: string, polls: number }>} */
 const wafConfigured = new Map()
+
+/**
+ * Build a WAF zone for a session-created location. `advance` simulates the
+ * deployer: it's set on waf.list reads (the index poll) so the first list shows
+ * pending/create and the next list — after the page polls — settles to success,
+ * making the spinner resolve on its own. waf.get reads observe the same state
+ * without advancing it.
+ * @param {string} location
+ * @param {boolean} [advance]
+ */
+function wafConfiguredZone (location, advance = false) {
+	const entry = wafConfigured.get(location) ?? { description: '', polls: 0 }
+	const status = entry.polls > 0 ? 'success' : 'pending'
+	if (advance) {
+		entry.polls += 1
+		wafConfigured.set(location, entry)
+	}
+	return {
+		project: 'acme',
+		location,
+		description: entry.description,
+		rules: [],
+		status,
+		action: 'create',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	}
+}
 
 const pullSecrets = [
 	{
@@ -658,29 +691,31 @@ const handlers = {
 	'route.createV2': () => ok({}),
 	'route.delete': () => ok({}),
 
-	// The seed location starts configured; every other location is "firewall not
-	// configured yet" (not-found) until created. waf.set and waf.delete update
-	// the in-memory set so the index/create/manage flows are coherent within a
-	// session (set returns ok and the location then resolves on get).
+	// The seed location starts configured and live; every other location is
+	// "firewall not configured yet" (not-found) until created. A freshly created
+	// location starts as { status: 'pending', action: 'create' } and the
+	// simulated deployer flips it to 'success' after the first read (see
+	// wafConfiguredZone), so the index spinner resolves on its own. waf.set and
+	// waf.delete keep the index/create/manage flows coherent within a session.
+	'waf.list': () => {
+		const items = [{ ...wafZone, location: LOCATION_ID }]
+		for (const location of wafConfigured.keys()) {
+			items.push(wafConfiguredZone(location, true))
+		}
+		return ok({ project: 'acme', items })
+	},
 	'waf.get': (args) => {
 		const location = args?.location ?? LOCATION_ID
 		if (location === LOCATION_ID) return ok({ ...wafZone, location: LOCATION_ID })
 		if (wafConfigured.has(location)) {
-			return ok({
-				project: 'acme',
-				location,
-				description: wafConfigured.get(location) ?? '',
-				rules: [],
-				createdAt: CREATED_AT,
-				createdBy: USER_EMAIL
-			})
+			return ok(wafConfiguredZone(location))
 		}
 		return err('api: waf zone not found')
 	},
 	'waf.set': (args) => {
 		const location = args?.location
 		if (location && location !== LOCATION_ID) {
-			wafConfigured.set(location, args?.description ?? '')
+			wafConfigured.set(location, { description: args?.description ?? '', polls: 0 })
 		}
 		return ok({})
 	},

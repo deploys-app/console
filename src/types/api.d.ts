@@ -484,8 +484,15 @@ declare namespace Api {
         location: string
         description: string
         rules: WafRule[]
+        status: 'pending' | 'success' | 'error'
+        action: 'create' | 'delete'
         createdAt: string
         createdBy: string
+    }
+
+    export type WafZoneList = {
+        project: string
+        items: WafZone[]
     }
 
     export type DropboxItem = {
