@@ -10,6 +10,8 @@ export async function load ({ url, parent, fetch }) {
 		redirect(302, `/waf?project=${project}`)
 	}
 
+	const manageUrl = `/waf/manage?project=${project}&location=${encodeURIComponent(location)}`
+
 	/** @type {Api.Response<Api.WafZone>} */
 	const res = await api.invoke('waf.get', { project, location }, fetch)
 	// A missing zone is the normal "firewall not configured yet" state — render
@@ -24,7 +26,7 @@ export async function load ({ url, parent, fetch }) {
 	if (ruleId) {
 		const found = zone?.rules?.some((r) => r.id === ruleId)
 		if (!found) {
-			redirect(302, `/waf?project=${project}&location=${encodeURIComponent(location)}`)
+			redirect(302, manageUrl)
 		}
 	}
 

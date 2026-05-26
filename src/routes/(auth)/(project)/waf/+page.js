@@ -1,22 +1,25 @@
 import api from '$lib/api'
 
-export async function load ({ url, parent, fetch }) {
+export async function load ({ parent, fetch }) {
 	const { project, locations } = await parent()
 
-	// Preserve the selected location across navigation (e.g. returning from the
-	// edit page) via the URL, falling back to the first location.
-	const location = url.searchParams.get('location') ?? locations[0]?.id ?? ''
-	if (!location) {
-		return { location: '', zone: null, error: null }
-	}
+	// There is no "list zones" endpoint, so we fan out waf.get per location and
+	// collect the ones that resolve. A not-found location simply isn't configured.
+	const results = await Promise.all(
+		locations.map(async (/** @type {Api.Location} */ loc) => {
+			/** @type {Api.Response<Api.WafZone>} */
+			const res = await api.invoke('waf.get', { project, location: loc.id }, fetch)
+			if (!res.ok || !res.result) return null
+			const zone = res.result
+			return {
+				location: zone.location ?? loc.id,
+				description: zone.description ?? '',
+				ruleCount: zone.rules?.length ?? 0
+			}
+		})
+	)
 
-	/** @type {Api.Response<Api.WafZone>} */
-	const res = await api.invoke('waf.get', { project, location }, fetch)
-	// A missing zone is the normal "firewall not configured yet" state — render
-	// an empty list instead of an error screen. Surface anything else.
-	return {
-		location,
-		zone: res.result ?? null,
-		error: res.error?.notFound ? null : res.error
-	}
+	const firewalls = results.filter((it) => it != null)
+
+	return { project, firewalls }
 }

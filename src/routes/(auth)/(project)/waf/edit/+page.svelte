@@ -57,8 +57,8 @@
 		else draft.expression = ''
 	}
 
-	function backToList () {
-		return goto(`/waf?project=${project}&location=${encodeURIComponent(location)}`)
+	function backToManage () {
+		return goto(`/waf/manage?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
 	/** @param {Event} e */
@@ -87,20 +87,23 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			await backToList()
+			await backToManage()
 		} finally {
 			saving = false
 		}
 	}
 
 	function cancel () {
-		backToList()
+		backToManage()
 	}
 </script>
 
 <div class="breadcrumb">
 	<div class="breadcrumb-item">
-		<a href={`/waf?project=${project}&location=${encodeURIComponent(location)}`} class="link"><h6>Firewall</h6></a>
+		<a href={`/waf?project=${project}`} class="link"><h6>Firewall</h6></a>
+	</div>
+	<div class="breadcrumb-item">
+		<a href={`/waf/manage?project=${project}&location=${encodeURIComponent(location)}`} class="link"><h6 class="font-mono">{location}</h6></a>
 	</div>
 	<div class="breadcrumb-item">
 		<h6>{isCreate ? 'Add rule' : 'Edit rule'}</h6>
