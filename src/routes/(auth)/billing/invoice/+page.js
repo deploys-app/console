@@ -5,7 +5,7 @@ export async function load ({ url, fetch }) {
 	const id = url.searchParams.get('id')
 
 	/** @type {Api.Response<Api.Invoice>} */
-	const invoice = await api.invoke('billing.getInvoice', { id }, fetch)
+	const invoice = await api.invoke('billing.getInvoice', { invoiceId: id }, fetch)
 	if (!invoice.ok) {
 		if (invoice.error?.notFound) redirect(302, '/billing')
 		error(500, invoice.error?.message)

@@ -1,0 +1,193 @@
+<script>
+	// Max upload size, mirrors api.MaxTransferSlipSize (10 MiB). The server
+	// enforces this too; checking here gives instant feedback.
+	const MAX_SIZE = 10 * 1024 * 1024
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {() => void} [onuploaded] called after a slip is accepted
+	 */
+
+	/** @type {Props} */
+	const { onuploaded } = $props()
+
+	let invoice = $state(/** @type {?Api.Invoice} */ (null))
+	let isActive = $state(false)
+	let uploading = $state(false)
+	let error = $state('')
+	let selectedFile = $state(/** @type {?File} */ (null))
+	let elFile = $state(/** @type {?HTMLInputElement} */ (null))
+
+	/**
+	 * @param {Api.Invoice} inv
+	 */
+	export function open (inv) {
+		invoice = inv
+		selectedFile = null
+		error = ''
+		if (elFile) elFile.value = ''
+		isActive = true
+	}
+
+	function close () {
+		if (uploading) return
+		isActive = false
+	}
+
+	/**
+	 * Close only when the backdrop itself is clicked, not when a click inside
+	 * the panel bubbles up — otherwise interacting with the form would dismiss
+	 * the modal.
+	 * @param {MouseEvent} e
+	 */
+	function onBackdrop (e) {
+		if (e.target === e.currentTarget) close()
+	}
+
+	/**
+	 * @param {Event} e
+	 */
+	function onFileChange (e) {
+		const input = /** @type {HTMLInputElement} */ (e.currentTarget)
+		const f = input.files?.[0] ?? null
+		error = ''
+		if (f && f.size > MAX_SIZE) {
+			error = 'Slip is too large (max 10 MB).'
+			selectedFile = null
+			input.value = ''
+			return
+		}
+		selectedFile = f
+	}
+
+	async function upload () {
+		if (uploading || !selectedFile || !invoice) return
+		uploading = true
+		error = ''
+		try {
+			const fd = new FormData()
+			fd.append('id', invoice.id)
+			fd.append('slip', selectedFile)
+			const resp = await fetch('/api/billing.uploadTransferSlip', {
+				method: 'POST',
+				body: fd
+			})
+			const res = await resp.json().catch(() => null)
+			if (!resp.ok || !res?.ok) {
+				error = res?.error?.message ?? `Upload failed (${resp.status}).`
+				return
+			}
+			isActive = false
+			onuploaded?.()
+		} catch (err) {
+			error = err instanceof Error ? err.message : String(err)
+		} finally {
+			uploading = false
+		}
+	}
+
+	/**
+	 * @param {number} n
+	 */
+	function fileSize (n) {
+		if (n < 1024) return `${n} B`
+		if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+		return `${(n / 1024 / 1024).toFixed(1)} MB`
+	}
+</script>
+
+<div class="modal" onclick={onBackdrop} class:is-active={isActive} aria-hidden={!isActive}>
+	<div class="modal-panel">
+		<div class="modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
+		<h4><strong>Pay invoice {invoice?.number}</strong></h4>
+		<p class="mt-1 text-content/70">
+			Upload your bank transfer slip as proof of payment. We'll verify it and mark the invoice as paid.
+		</p>
+
+		<input
+			bind:this={elFile}
+			class="hidden-input"
+			type="file"
+			accept="image/*,application/pdf"
+			onchange={onFileChange}
+		>
+
+		<div class="mt-4 grid gap-3">
+			<button type="button" class="button is-variant-secondary is-icon-left" onclick={() => elFile?.click()}>
+				<i class="fa-solid fa-paperclip"></i>
+				Choose file
+			</button>
+
+			{#if selectedFile}
+				<div class="selected-file">
+					<i class="fa-solid fa-file-invoice file-icon"></i>
+					<div class="file-meta">
+						<div class="file-name">{selectedFile.name}</div>
+						<div class="file-size">{fileSize(selectedFile.size)}</div>
+					</div>
+				</div>
+			{/if}
+
+			{#if error}
+				<div class="text-negative">{error}</div>
+			{/if}
+
+			<button
+				class="button is-icon-left"
+				class:is-loading={uploading}
+				disabled={!selectedFile || uploading}
+				onclick={upload}
+			>
+				<i class="fa-solid fa-cloud-arrow-up"></i>
+				Upload slip
+			</button>
+		</div>
+	</div>
+</div>
+
+<style>
+	.modal-panel {
+		width: 100%;
+		max-width: 32rem;
+	}
+
+	.hidden-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.selected-file {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem 1rem;
+		background-color: hsl(var(--hsl-content) / 0.06);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
+		border-radius: 6px;
+	}
+
+	.selected-file .file-icon {
+		font-size: 1.25rem;
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+
+	.selected-file .file-meta {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.selected-file .file-name {
+		font-weight: 600;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.selected-file .file-size {
+		font-size: var(--fs-1);
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+</style>

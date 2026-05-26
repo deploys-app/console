@@ -1,12 +1,40 @@
 <script>
 	import dayjs from 'dayjs'
 	import InvoiceStatusBadge from '$lib/components/InvoiceStatusBadge.svelte'
+	import PayInvoiceModal from '$lib/components/PayInvoiceModal.svelte'
 	import * as format from '$lib/format'
+	import * as modal from '$lib/modal'
+	import api from '$lib/api'
 
 	const { data } = $props()
 
 	const invoice = $derived(data.invoice)
 	const billingAccount = $derived(data.billingAccount)
+
+	let downloading = $state(false)
+	let payModal = $state(/** @type {?ReturnType<typeof PayInvoiceModal>} */ (null))
+
+	function onSlipUploaded () {
+		modal.success({ content: 'Payment slip uploaded. We\'ll verify it and mark the invoice as paid.' })
+	}
+
+	async function downloadPDF () {
+		if (downloading) return
+		downloading = true
+		try {
+			/** @type {Api.Response<Api.InvoiceDownloadResult>} */
+			const resp = await api.invoke('billing.downloadInvoice', { invoiceId: invoice.id }, fetch)
+			if (!resp.ok || !resp.result) {
+				modal.error({ error: resp.error })
+				return
+			}
+			// The dropbox link serves the file as an attachment, so navigating
+			// to it downloads rather than leaves the page.
+			window.location.href = resp.result.downloadUrl
+		} finally {
+			downloading = false
+		}
+	}
 
 	const periodLabel = $derived.by(() => {
 		const s = dayjs(invoice.periodStart)
@@ -100,7 +128,24 @@
 			<h3 class="mb-1"><strong>{invoice.number}</strong></h3>
 			<div class="text-content/70">{periodLabel}</div>
 		</div>
-		<InvoiceStatusBadge status={invoice.status} />
+		<div class="flex items-center gap-3">
+			<InvoiceStatusBadge status={invoice.status} />
+			<button
+				class="button is-variant-secondary is-icon-left"
+				class:is-loading={downloading}
+				disabled={downloading}
+				onclick={downloadPDF}
+			>
+				<i class="fa-solid fa-download"></i>
+				Download PDF
+			</button>
+			{#if invoice.status === 'open'}
+				<button class="button is-icon-left" onclick={() => payModal?.open(invoice)}>
+					<i class="fa-solid fa-receipt"></i>
+					Pay
+				</button>
+			{/if}
+		</div>
 	</div>
 
 	<hr>
@@ -177,3 +222,5 @@
 		</div>
 	</div>
 </div>
+
+<PayInvoiceModal bind:this={payModal} onuploaded={onSlipUploaded} />
