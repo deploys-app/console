@@ -324,15 +324,67 @@ const repositoryManifests = [
 	{ digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', createdAt: CREATED_AT }
 ]
 
-/** @param {string} id */
-function invoice (id) {
-	return {
-		id,
+// Invoices covering every status the UI renders (paid / open / void / draft)
+// plus a foreign-currency + zero-tax case and a partial-period case, so the
+// status badge and detail layout can be exercised offline. period_end is the
+// exclusive first instant of the next period, matching the real backend.
+// NOTE: the real billing.listInvoices hides drafts; this mock lists the draft
+// too so its badge is visible during dev.
+const invoices = [
+	{
+		id: 'inv_mock_9',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0009',
+		currency: 'THB',
+		periodStart: '2026-05-01T00:00:00Z',
+		periodEnd: '2026-06-01T00:00:00Z',
+		subtotal: 1200,
+		taxRate: 0.07,
+		taxAmount: 84,
+		total: 1284,
+		status: 'open',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '2026-06-01T00:00:00Z',
+		paidAt: '',
+		voidedAt: '',
+		createdAt: '2026-06-01T00:00:00Z',
+		lineItems: [
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 600, unit: 'hour', unitPrice: 1.5, amount: 900 },
+			{ sku: 'mem', description: 'GiB-hours', quantity: 600, unit: 'hour', unitPrice: 0.5, amount: 300 }
+		]
+	},
+	{
+		id: 'inv_mock_8',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0008',
+		currency: 'THB',
+		periodStart: '2026-04-01T00:00:00Z',
+		periodEnd: '2026-05-01T00:00:00Z',
+		subtotal: 150,
+		taxRate: 0.07,
+		taxAmount: 10.5,
+		total: 160.5,
+		status: 'draft',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '',
+		paidAt: '',
+		voidedAt: '',
+		createdAt: '2026-05-01T00:00:00Z',
+		lineItems: [
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 100, unit: 'hour', unitPrice: 1.5, amount: 150 }
+		]
+	},
+	{
+		id: 'inv_mock_7',
 		billingAccountId: 'ba_mock_1',
 		number: 'INV-2026-0007',
 		currency: 'THB',
 		periodStart: '2026-04-01T00:00:00Z',
-		periodEnd: '2026-04-30T23:59:59Z',
+		periodEnd: '2026-05-01T00:00:00Z',
 		subtotal: 1500,
 		taxRate: 0.07,
 		taxAmount: 105,
@@ -349,6 +401,95 @@ function invoice (id) {
 			{ sku: 'cpu', description: 'vCPU-hours', quantity: 720, unit: 'hour', unitPrice: 1.5, amount: 1080 },
 			{ sku: 'mem', description: 'GiB-hours', quantity: 720, unit: 'hour', unitPrice: 0.583, amount: 420 }
 		]
+	},
+	{
+		id: 'inv_mock_6',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0006',
+		currency: 'THB',
+		periodStart: '2026-03-01T00:00:00Z',
+		periodEnd: '2026-04-01T00:00:00Z',
+		subtotal: 1080,
+		taxRate: 0.07,
+		taxAmount: 75.6,
+		total: 1155.6,
+		status: 'void',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '2026-04-01T00:00:00Z',
+		paidAt: '',
+		voidedAt: '2026-04-05T00:00:00Z',
+		createdAt: '2026-04-01T00:00:00Z',
+		lineItems: [
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 720, unit: 'hour', unitPrice: 1.5, amount: 1080 }
+		]
+	},
+	{
+		id: 'inv_mock_5',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0005',
+		currency: 'USD',
+		periodStart: '2026-02-01T00:00:00Z',
+		periodEnd: '2026-03-01T00:00:00Z',
+		subtotal: 11.2,
+		taxRate: 0,
+		taxAmount: 0,
+		total: 11.2,
+		status: 'paid',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '2026-03-01T00:00:00Z',
+		paidAt: '2026-03-02T00:00:00Z',
+		voidedAt: '',
+		createdAt: '2026-03-01T00:00:00Z',
+		lineItems: [
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 200, unit: 'hour', unitPrice: 0.04, amount: 8 },
+			{ sku: 'mem', description: 'GiB-hours', quantity: 200, unit: 'hour', unitPrice: 0.016, amount: 3.2 }
+		]
+	},
+	{
+		id: 'inv_mock_4',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0004',
+		currency: 'THB',
+		periodStart: '2026-01-10T00:00:00Z',
+		periodEnd: '2026-01-20T00:00:00Z',
+		subtotal: 75,
+		taxRate: 0.07,
+		taxAmount: 5.25,
+		total: 80.25,
+		status: 'paid',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '2026-01-21T00:00:00Z',
+		paidAt: '2026-01-22T00:00:00Z',
+		voidedAt: '',
+		createdAt: '2026-01-21T00:00:00Z',
+		lineItems: [
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 50, unit: 'hour', unitPrice: 1.5, amount: 75 }
+		]
+	}
+]
+
+/** @param {(typeof invoices)[number]} inv */
+function invoiceListItem (inv) {
+	return {
+		id: inv.id,
+		number: inv.number,
+		currency: inv.currency,
+		periodStart: inv.periodStart,
+		periodEnd: inv.periodEnd,
+		subtotal: inv.subtotal,
+		taxAmount: inv.taxAmount,
+		total: inv.total,
+		status: inv.status,
+		issuedAt: inv.issuedAt,
+		paidAt: inv.paidAt,
+		voidedAt: inv.voidedAt,
+		createdAt: inv.createdAt
 	}
 }
 
@@ -406,24 +547,21 @@ const handlers = {
 			]
 		}
 	}),
-	'billing.listInvoices': () => list([
-		{
-			id: 'inv_mock_7',
-			number: 'INV-2026-0007',
-			currency: 'THB',
-			periodStart: '2026-04-01T00:00:00Z',
-			periodEnd: '2026-04-30T23:59:59Z',
-			subtotal: 1500,
-			taxAmount: 105,
-			total: 1605,
-			status: 'paid',
-			issuedAt: '2026-05-01T00:00:00Z',
-			paidAt: '2026-05-03T00:00:00Z',
-			voidedAt: '',
-			createdAt: '2026-05-01T00:00:00Z'
-		}
-	]),
-	'billing.getInvoice': (args) => ok(invoice(args?.id ?? 'inv_mock_7')),
+	'billing.listInvoices': () => list(invoices.map(invoiceListItem)),
+	'billing.getInvoice': (args) => ok(invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]),
+	'billing.downloadInvoice': (args) => {
+		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
+		return ok({
+			downloadUrl: `https://dropbox.deploys.app/files/mock-${inv.id}.pdf`,
+			expiresAt: '2026-06-02T00:00:00Z'
+		})
+	},
+	// Multipart upload: the proxy can't JSON-parse the body in mock mode, so
+	// args is empty here — just acknowledge the upload.
+	'billing.uploadTransferSlip': () => ok({
+		downloadUrl: 'https://dropbox.deploys.app/files/mock-slip.jpg',
+		expiresAt: '2026-06-02T00:00:00Z'
+	}),
 
 	'auditLog.list': (args) => list(auditLogItems.slice(0, args?.limit ?? auditLogItems.length)),
 
