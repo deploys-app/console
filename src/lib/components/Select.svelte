@@ -14,6 +14,7 @@
 	 * @property {string} [placeholder]
 	 * @property {boolean} [required]
 	 * @property {boolean} [disabled]
+	 * @property {boolean} [editable] free-text combobox mode: a typed value is allowed alongside picking an option
 	 * @property {string} [id]
 	 * @property {string} [name]
 	 * @property {(value: string | number) => void} [onchange]
@@ -28,6 +29,7 @@
 		placeholder = '',
 		required = false,
 		disabled = false,
+		editable = false,
 		id,
 		name,
 		onchange,
@@ -42,10 +44,22 @@
 	let open = $state(false)
 	let activeIndex = $state(-1)
 
-	/** @type {HTMLButtonElement} */
-	let triggerEl
+	/** @type {HTMLButtonElement | undefined} */
+	let triggerEl = $state()
+	/** @type {HTMLInputElement | undefined} */
+	let inputEl = $state()
 	/** @type {HTMLDivElement | undefined} */
 	let listEl = $state()
+
+	// Editable mode filters the visible options by case-insensitive substring of
+	// the typed value. Non-editable mode always shows the full list.
+	const visibleOptions = $derived(
+		editable && value !== '' && value != null
+			? options.filter(
+				(o) => o.separator || (o.label ?? '').toLowerCase().includes(String(value).toLowerCase())
+			)
+			: options
+	)
 
 	let typeahead = ''
 	/** @type {ReturnType<typeof setTimeout> | undefined} */
@@ -59,7 +73,7 @@
 
 	/** @param {number} i */
 	function isSelectable (i) {
-		const o = options[i]
+		const o = visibleOptions[i]
 		return !!o && !o.separator && !o.disabled
 	}
 
@@ -69,7 +83,8 @@
 		const v = opt.value ?? ''
 		value = v
 		close()
-		triggerEl?.focus()
+		if (editable) inputEl?.focus()
+		else triggerEl?.focus()
 		onchange?.(v)
 		if (resetOnSelect) value = ''
 	}
@@ -77,7 +92,7 @@
 	function openMenu () {
 		if (disabled) return
 		open = true
-		const sel = options.findIndex((o) => !o.separator && (o.value ?? '') === value)
+		const sel = visibleOptions.findIndex((o) => !o.separator && (o.value ?? '') === value)
 		activeIndex = sel >= 0 && isSelectable(sel) ? sel : firstSelectable()
 	}
 
@@ -87,22 +102,22 @@
 	}
 
 	function firstSelectable () {
-		for (let i = 0; i < options.length; i++) if (isSelectable(i)) return i
+		for (let i = 0; i < visibleOptions.length; i++) if (isSelectable(i)) return i
 		return -1
 	}
 
 	function lastSelectable () {
-		for (let i = options.length - 1; i >= 0; i--) if (isSelectable(i)) return i
+		for (let i = visibleOptions.length - 1; i >= 0; i--) if (isSelectable(i)) return i
 		return -1
 	}
 
 	/** @param {number} dir */
 	function moveActive (dir) {
 		let i = activeIndex
-		for (let step = 0; step < options.length; step++) {
+		for (let step = 0; step < visibleOptions.length; step++) {
 			i += dir
-			if (i < 0) i = options.length - 1
-			if (i >= options.length) i = 0
+			if (i < 0) i = visibleOptions.length - 1
+			if (i >= visibleOptions.length) i = 0
 			if (isSelectable(i)) {
 				activeIndex = i
 				return
@@ -115,7 +130,7 @@
 		clearTimeout(typeaheadTimer)
 		typeahead += char.toLowerCase()
 		typeaheadTimer = setTimeout(() => { typeahead = '' }, 500)
-		const match = options.findIndex(
+		const match = visibleOptions.findIndex(
 			(o, i) => isSelectable(i) && (o.label ?? '').toLowerCase().startsWith(typeahead)
 		)
 		if (match >= 0) activeIndex = match
@@ -141,12 +156,12 @@
 			break
 		case 'Enter':
 			e.preventDefault()
-			if (open && activeIndex >= 0) commit(options[activeIndex])
+			if (open && activeIndex >= 0) commit(visibleOptions[activeIndex])
 			else openMenu()
 			break
 		case ' ':
 			e.preventDefault()
-			if (open && activeIndex >= 0) commit(options[activeIndex])
+			if (open && activeIndex >= 0) commit(visibleOptions[activeIndex])
 			else openMenu()
 			break
 		case 'Escape':
@@ -161,6 +176,48 @@
 				typeaheadSearch(e.key)
 			}
 		}
+	}
+
+	// Keydown handler for the editable (free-text) trigger input. Printable keys
+	// fall through to edit the input; only navigation/commit keys are handled.
+	/** @param {KeyboardEvent} e */
+	function onInputKeydown (e) {
+		if (disabled) return
+		switch (e.key) {
+		case 'ArrowDown':
+			e.preventDefault()
+			open ? moveActive(1) : openMenu()
+			break
+		case 'ArrowUp':
+			e.preventDefault()
+			open ? moveActive(-1) : openMenu()
+			break
+		case 'Enter':
+			// Commit the active option if one is highlighted; otherwise keep the
+			// typed text as-is and just close the menu.
+			if (open && activeIndex >= 0) {
+				e.preventDefault()
+				commit(visibleOptions[activeIndex])
+			} else if (open) {
+				close()
+			}
+			break
+		case 'Escape':
+			if (open) { e.preventDefault(); close() }
+			break
+		case 'Tab':
+			if (open) close()
+			break
+		}
+	}
+
+	// While typing in editable mode keep the menu open and reset the active
+	// option to the first match of the freshly filtered list.
+	function onInput () {
+		if (disabled) return
+		if (!open) open = true
+		activeIndex = firstSelectable()
+		onchange?.(value)
 	}
 
 	/** @type {(node: HTMLElement, handler: () => void) => { destroy(): void }} */
@@ -184,26 +241,53 @@
 </script>
 
 <div class="select-box {className}" class:is-disabled={disabled} use:clickOutside={close}>
-	<button
-		bind:this={triggerEl}
-		{id}
-		type="button"
-		class="select-trigger"
-		role="combobox"
-		aria-haspopup="listbox"
-		aria-expanded={open}
-		aria-controls={listboxId}
-		aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
-		{disabled}
-		onclick={() => (open ? close() : openMenu())}
-		onkeydown={onKeydown}>
-		<span class="select-value" class:is-placeholder={!hasSelection}>{displayLabel}</span>
-		<i class="fa-solid fa-chevron-down select-chevron" class:is-open={open}></i>
-	</button>
+	{#if editable}
+		<div class="select-trigger select-trigger-editable" class:is-open={open}>
+			<input
+				bind:this={inputEl}
+				bind:value
+				{id}
+				type="text"
+				class="select-input"
+				role="combobox"
+				autocomplete="off"
+				aria-autocomplete="list"
+				aria-haspopup="listbox"
+				aria-expanded={open}
+				aria-controls={listboxId}
+				aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
+				{placeholder}
+				{disabled}
+				oninput={onInput}
+				onkeydown={onInputKeydown}
+				onclick={openMenu}>
+			<!-- Decorative; the input above handles keyboard interaction. -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<i class="fa-solid fa-chevron-down select-chevron" class:is-open={open}
+				onmousedown={(e) => { e.preventDefault(); open ? close() : openMenu(); inputEl?.focus() }}></i>
+		</div>
+	{:else}
+		<button
+			bind:this={triggerEl}
+			{id}
+			type="button"
+			class="select-trigger"
+			role="combobox"
+			aria-haspopup="listbox"
+			aria-expanded={open}
+			aria-controls={listboxId}
+			aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
+			{disabled}
+			onclick={() => (open ? close() : openMenu())}
+			onkeydown={onKeydown}>
+			<span class="select-value" class:is-placeholder={!hasSelection}>{displayLabel}</span>
+			<i class="fa-solid fa-chevron-down select-chevron" class:is-open={open}></i>
+		</button>
+	{/if}
 
 	{#if open}
 		<div bind:this={listEl} id={listboxId} class="select-menu" role="listbox" tabindex="-1">
-			{#each options as opt, i (i)}
+			{#each visibleOptions as opt, i (i)}
 				{#if opt.separator}
 					<div class="select-sep" role="separator"></div>
 				{:else}
@@ -233,20 +317,26 @@
 		</div>
 	{/if}
 
-	<!-- Hidden mirror keeps native form constraint validation (`required`) working. -->
-	<select
-		class="select-validity"
-		bind:value
-		{name}
-		{required}
-		{disabled}
-		tabindex="-1"
-		aria-hidden="true">
-		{#if placeholder}<option value="">{placeholder}</option>{/if}
-		{#each options as opt, i (i)}
-			{#if !opt.separator}<option value={opt.value ?? ''}>{opt.label}</option>{/if}
-		{/each}
-	</select>
+	{#if !editable}
+		<!-- Hidden mirror keeps native form constraint validation (`required`) working. -->
+		<select
+			class="select-validity"
+			bind:value
+			{name}
+			{required}
+			{disabled}
+			tabindex="-1"
+			aria-hidden="true">
+			{#if placeholder}<option value="">{placeholder}</option>{/if}
+			{#each options as opt, i (i)}
+				{#if !opt.separator}<option value={opt.value ?? ''}>{opt.label}</option>{/if}
+			{/each}
+		</select>
+	{:else}
+		<!-- Editable mode allows free-text values, so a fixed-option mirror would
+			 wrongly constrain validity. Use a plain hidden input instead. -->
+		<input type="hidden" {name} {value}>
+	{/if}
 </div>
 
 <style>
@@ -298,6 +388,48 @@
 		cursor: not-allowed;
 		background-color: hsl(var(--hsl-content) / 0.05);
 		color: hsl(var(--hsl-content) / 0.6);
+	}
+
+	/* Editable mode: the wrapper carries the trigger look; the input inside is
+	 * transparent/borderless so the closed control matches a normal dropdown. */
+	.select-trigger-editable {
+		cursor: text;
+	}
+
+	.select-trigger-editable:hover {
+		border-color: hsl(var(--hsl-primary) / 0.45);
+	}
+
+	.select-trigger-editable:focus-within {
+		outline: 0;
+		border-color: hsl(var(--hsl-primary));
+		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.16);
+	}
+
+	.select-input {
+		flex: 1;
+		min-width: 0;
+		appearance: none;
+		padding: 0;
+		margin: 0;
+		border: 0;
+		background: transparent;
+		font: inherit;
+		font-size: 0.875rem;
+		color: inherit;
+		outline: 0;
+	}
+
+	.select-input::placeholder {
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.select-input:disabled {
+		cursor: not-allowed;
+	}
+
+	.select-trigger-editable .select-chevron {
+		cursor: pointer;
 	}
 
 	.select-value {

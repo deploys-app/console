@@ -179,15 +179,9 @@
 			{:else if useCombobox}
 				<div class="field">
 					<label for="waf-value">Value</label>
-					<div class="input">
-						<input id="waf-value" class="font-mono" bind:value
-							list="waf-value-suggestions" placeholder="e.g. GET">
-					</div>
-					<datalist id="waf-value-suggestions">
-						{#each fieldMeta?.suggestions ?? [] as s (s)}
-							<option value={s}></option>
-						{/each}
-					</datalist>
+					<Select id="waf-value" editable bind:value
+						options={(fieldMeta?.suggestions ?? []).map((s) => ({ value: s, label: s }))}
+						placeholder="e.g. GET" />
 				</div>
 			{:else}
 				<div class="field">
