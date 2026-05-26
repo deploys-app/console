@@ -1,5 +1,6 @@
 <script>
 	import Select from '$lib/components/Select.svelte'
+	import TagInput from '$lib/components/TagInput.svelte'
 	import {
 		fields,
 		getField,
@@ -23,7 +24,9 @@
 	let name = $state('')
 	let operator = $state('equals')
 	let value = $state('')
-	let values = $state('')
+	/** @type {string[]} */
+	let valuesList = $state([])
+	let tls = $state(true)
 	let combine = $state(/** @type {'and' | 'or' | 'replace'} */ ('and'))
 
 	const fieldMeta = $derived(getField(field))
@@ -31,6 +34,11 @@
 	const needsName = $derived(!!fieldMeta?.hasName)
 	const operators = $derived(operatorsForType(fieldType))
 	const multi = $derived(isMultiOperator(operator))
+	const isTls = $derived(fieldType === 'tls')
+	// Free-text combobox (datalist) for equals/not_equals on suggestion-backed fields.
+	const useCombobox = $derived(
+		!!fieldMeta?.suggestions && (operator === 'equals' || operator === 'not_equals')
+	)
 
 	const fieldOptions = fields.map((f) => ({ value: f.value, label: f.label }))
 	const operatorOptions = $derived(operators.map((o) => ({ value: o.value, label: o.label })))
@@ -45,16 +53,22 @@
 		name,
 		operator,
 		value,
-		values
+		// `buildExpression`/`parseList` consume the raw multi-value text contract;
+		// feed the chips joined by newlines so the output format is unchanged.
+		values: valuesList.join('\n'),
+		tls
 	})
 
 	// Live preview of the single condition the builder controls describe.
 	const preview = $derived(buildExpression(spec))
-	const canAdd = $derived(preview !== '')
+	// A TLS condition is always complete; otherwise rely on a non-empty preview.
+	const canAdd = $derived(isTls || preview !== '')
 
 	// Keep the operator valid when the field type changes (e.g. switching from a
 	// string field to Remote IP must not leave "contains any of" selected).
+	// Guard against an empty operator list (the `'tls'` field has none).
 	$effect(() => {
+		if (operators.length === 0) return
 		const valid = operators.some((o) => o.value === operator)
 		if (!valid) operator = operators[0]?.value ?? ''
 	})
@@ -64,7 +78,8 @@
 		name = ''
 		operator = 'equals'
 		value = ''
-		values = ''
+		valuesList = []
+		tls = true
 		combine = 'and'
 	}
 
@@ -98,7 +113,6 @@
 		<code class="font-mono">.referer</code>,
 		<code class="font-mono">.remote_ip</code>,
 		<code class="font-mono">.content_length</code>,
-		<code class="font-mono">.body</code>,
 		<code class="font-mono">.headers[…]</code>,
 		<code class="font-mono">.args[…]</code>,
 		<code class="font-mono">.cookies[…]</code>.
@@ -140,41 +154,62 @@
 			{/if}
 		</div>
 
-		<div class="grid gap-4 sm:grid-cols-2">
+		{#if isTls}
 			<div class="field">
-				<label for="waf-operator">Operator</label>
-				<Select id="waf-operator" bind:value={operator} options={operatorOptions} />
-			</div>
-		</div>
-
-		{#if multi}
-			<div class="field">
-				<label for="waf-values">Values</label>
-				<div class="textarea">
-					<textarea id="waf-values" rows="4" bind:value={values}
-						placeholder="One value per line (commas also accepted)"></textarea>
-				</div>
+				<label class="checkbox" for="waf-tls">
+					<input id="waf-tls" type="checkbox" bind:checked={tls}>
+					<span>TLS</span>
+				</label>
+				<p class="helper">When on, the request must be served over HTTPS.</p>
 			</div>
 		{:else}
-			<div class="field">
-				<label for="waf-value">
-					{#if fieldType === 'numeric'}Number
-					{:else if fieldType === 'ip' && operator === 'in_cidr'}CIDR
-					{:else if operator === 'matches_regex'}Pattern
-					{:else}Value{/if}
-				</label>
-				<div class="input">
-					<input id="waf-value" class="font-mono" bind:value
-						inputmode={fieldType === 'numeric' ? 'numeric' : undefined}
-						placeholder={fieldType === 'numeric'
-							? 'e.g. 1048576'
-							: fieldType === 'ip' && operator === 'in_cidr'
-								? 'e.g. 10.0.0.0/8'
-								: operator === 'matches_regex'
-									? 'e.g. ^/api/v[0-9]+/'
-									: 'Value'}>
+			<div class="grid gap-4 sm:grid-cols-2">
+				<div class="field">
+					<label for="waf-operator">Operator</label>
+					<Select id="waf-operator" bind:value={operator} options={operatorOptions} />
 				</div>
 			</div>
+
+			{#if multi}
+				<div class="field">
+					<label for="waf-values">Values</label>
+					<TagInput id="waf-values" bind:tags={valuesList}
+						placeholder="Type a value, press Enter to add" />
+				</div>
+			{:else if useCombobox}
+				<div class="field">
+					<label for="waf-value">Value</label>
+					<div class="input">
+						<input id="waf-value" class="font-mono" bind:value
+							list="waf-value-suggestions" placeholder="e.g. GET">
+					</div>
+					<datalist id="waf-value-suggestions">
+						{#each fieldMeta?.suggestions ?? [] as s (s)}
+							<option value={s}></option>
+						{/each}
+					</datalist>
+				</div>
+			{:else}
+				<div class="field">
+					<label for="waf-value">
+						{#if fieldType === 'numeric'}Number
+						{:else if fieldType === 'ip' && operator === 'in_cidr'}CIDR
+						{:else if operator === 'matches_regex'}Pattern
+						{:else}Value{/if}
+					</label>
+					<div class="input">
+						<input id="waf-value" class="font-mono" bind:value
+							inputmode={fieldType === 'numeric' ? 'numeric' : undefined}
+							placeholder={fieldType === 'numeric'
+								? 'e.g. 1048576'
+								: fieldType === 'ip' && operator === 'in_cidr'
+									? 'e.g. 10.0.0.0/8'
+									: operator === 'matches_regex'
+										? 'e.g. ^/api/v[0-9]+/'
+										: 'Value'}>
+					</div>
+				</div>
+			{/if}
 		{/if}
 
 		{#if expression.trim()}

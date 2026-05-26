@@ -27,7 +27,7 @@ function quote (v) {
 }
 
 /**
- * @typedef {'string' | 'ip' | 'numeric'} FieldType
+ * @typedef {'string' | 'ip' | 'numeric' | 'tls'} FieldType
  */
 
 /**
@@ -38,21 +38,21 @@ function quote (v) {
  * @property {boolean} [hasName]    true → field needs an extra name input (header/arg/cookie)
  * @property {string} [accessor]    fixed CEL accessor (fields without a name)
  * @property {string} [accessorMap] CEL map accessor template, `<name>` replaced (fields with a name)
+ * @property {string[]} [suggestions] free-text combobox suggestions (datalist) for equals/not_equals
  */
 
 /** @type {FieldMeta[]} */
 export const fields = [
-	{ value: 'method', label: 'Method', type: 'string', accessor: 'request.method' },
+	{ value: 'method', label: 'Method', type: 'string', accessor: 'request.method', suggestions: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] },
 	{ value: 'path', label: 'Path', type: 'string', accessor: 'request.path' },
 	{ value: 'host', label: 'Host', type: 'string', accessor: 'request.host' },
 	{ value: 'query', label: 'Query string', type: 'string', accessor: 'request.query' },
 	{ value: 'uri', label: 'URI', type: 'string', accessor: 'request.uri' },
-	{ value: 'scheme', label: 'Scheme', type: 'string', accessor: 'request.scheme' },
+	{ value: 'scheme', label: 'Scheme', type: 'tls', accessor: 'request.scheme' },
 	{ value: 'user_agent', label: 'User-Agent', type: 'string', accessor: 'request.user_agent' },
 	{ value: 'referer', label: 'Referer', type: 'string', accessor: 'request.referer' },
 	{ value: 'remote_ip', label: 'Remote IP', type: 'ip', accessor: 'request.remote_ip' },
 	{ value: 'content_length', label: 'Content-Length', type: 'numeric', accessor: 'request.content_length' },
-	{ value: 'body', label: 'Body', type: 'string', accessor: 'request.body' },
 	{ value: 'header', label: 'Header', type: 'string', hasName: true, accessorMap: 'request.headers["<name>"]' },
 	{ value: 'arg', label: 'Query arg', type: 'string', hasName: true, accessorMap: 'request.args["<name>"]' },
 	{ value: 'cookie', label: 'Cookie', type: 'string', hasName: true, accessorMap: 'request.cookies["<name>"]' }
@@ -117,6 +117,7 @@ export function operatorsForType (type) {
 	switch (type) {
 	case 'ip': return ipOperators
 	case 'numeric': return numericOperators
+	case 'tls': return []
 	default: return stringOperators
 	}
 }
@@ -146,6 +147,7 @@ export function parseList (raw) {
  * @property {string} operator         operator key
  * @property {string} [value]          single operand (equals/regex/cidr/numeric)
  * @property {string} [values]         raw multi-value text (any-of operators)
+ * @property {boolean} [tls]           TLS on/off for a `'tls'` field (https vs http)
  */
 
 /**
@@ -183,7 +185,10 @@ export function buildExpression (spec) {
 	/** @type {string} */
 	let snippet
 
-	if (f.type === 'numeric') {
+	if (f.type === 'tls') {
+		// TLS on/off toggle — ignore the operator. ON → https, OFF → http.
+		snippet = `${accessor} == ${quote(spec.tls === false ? 'http' : 'https')}`
+	} else if (f.type === 'numeric') {
 		const op = numericOps[spec.operator]
 		const raw = (spec.value ?? '').trim()
 		if (!op || raw === '' || !/^-?\d+$/.test(raw)) return ''
