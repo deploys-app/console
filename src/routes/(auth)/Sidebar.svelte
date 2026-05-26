@@ -14,6 +14,7 @@
 	const project = $derived($page.url.searchParams.get('project'))
 	const projectName = $derived(projects.find((p) => p.project === project)?.name || project)
 
+	/** @type {{ id: string, title: string, icon: string, link: string, preview?: boolean }[]} */
 	const projectMenuList = [
 		{
 			id: 'dashboard',
@@ -43,7 +44,8 @@
 			id: 'waf',
 			title: 'Firewall',
 			icon: 'fa-shield-halved',
-			link: '/waf'
+			link: '/waf',
+			preview: true
 		},
 		{
 			id: 'workload-identity',
@@ -178,6 +180,25 @@
 		font-size: 0.9375rem;
 	}
 
+	.sidebar-menus .menu-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	/* Marks a feature that's still in preview. */
+	.preview-badge {
+		padding: 0.0625rem 0.375rem;
+		font-size: 0.625rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		line-height: 1.4;
+		border-radius: 9999px;
+		color: hsl(var(--hsl-primary));
+		background-color: hsl(var(--hsl-primary) / 0.12);
+	}
+
 	.section-caption {
 		font-size: 0.6875rem;
 		letter-spacing: 0.12em;
@@ -281,7 +302,10 @@
 									<span class="menu-icon">
 										<i class="fa-solid {menu.icon}"></i>
 									</span>
-									<span>{menu.title}</span>
+									<span class="menu-label">
+										{menu.title}
+										{#if menu.preview}<span class="preview-badge">Preview</span>{/if}
+									</span>
 								</div>
 							</a>
 						</li>
