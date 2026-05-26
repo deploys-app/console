@@ -11,11 +11,12 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {string} expression  bindable CEL expression composed so far
+	 * @property {string} expression    bindable CEL expression composed so far
+	 * @property {boolean} [showPreview] render the built-in readonly CEL preview + Clear (default true)
 	 */
 
 	/** @type {Props} */
-	let { expression = $bindable('') } = $props()
+	let { expression = $bindable(''), showPreview = true } = $props()
 
 	// --- embedded condition-builder spec (component-local form state) ---
 	let field = $state('path')
@@ -87,7 +88,9 @@
 		resetBuilder()
 	}
 
-	function clearExpression () {
+	// Exported so a parent that hides the built-in preview can still wire up a
+	// shared Clear control of its own.
+	export function clearExpression () {
 		expression = ''
 	}
 </script>
@@ -111,21 +114,23 @@
 		<code class="font-mono">.cookies[…]</code>.
 	</p>
 
-	<div class="field">
-		<label for="rule-expression">Expression (CEL)</label>
-		<div class="textarea">
-			<textarea id="rule-expression" class="font-mono" rows="2" readonly bind:value={expression}
-				placeholder="Use the builder below to compose this rule’s condition"></textarea>
+	{#if showPreview}
+		<div class="field">
+			<label for="rule-expression">Expression (CEL)</label>
+			<div class="textarea">
+				<textarea id="rule-expression" class="font-mono" rows="2" readonly bind:value={expression}
+					placeholder="Use the builder below to compose this rule’s condition"></textarea>
+			</div>
+			<div class="flex gap-2 justify-self-start mt-2">
+				<button type="button" class="button is-variant-tertiary is-size-small"
+					disabled={!expression}
+					onclick={clearExpression}>
+					<i class="fa-solid fa-eraser mr-2"></i>
+					<span>Clear</span>
+				</button>
+			</div>
 		</div>
-		<div class="flex gap-2 justify-self-start mt-2">
-			<button type="button" class="button is-variant-tertiary is-size-small"
-				disabled={!expression}
-				onclick={clearExpression}>
-				<i class="fa-solid fa-eraser mr-2"></i>
-				<span>Clear</span>
-			</button>
-		</div>
-	</div>
+	{/if}
 
 	<div class="builder grid gap-4">
 		<div class="grid gap-4 sm:grid-cols-2">
