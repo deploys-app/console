@@ -1,232 +1,142 @@
 <script>
 	import { untrack } from 'svelte'
+	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import DangerZone from '$lib/components/DangerZone.svelte'
-	import WafRuleModal from '$lib/components/WafRuleModal.svelte'
+	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 
 	const { data } = $props()
 
 	const project = $derived(data.project)
 	const locations = $derived(data.locations)
 
-	/**
-	 * @typedef {Object} RuleForm
-	 * @property {string} id
-	 * @property {string} description
-	 * @property {string} expression
-	 * @property {'log' | 'allow' | 'block'} action
-	 * @property {number | null} status
-	 * @property {string} message
-	 */
-
-	/** @type {Record<string, string>} */
-	const actionLabels = {
-		log: 'Log',
-		allow: 'Allow',
-		block: 'Block'
-	}
-
-	const DEFAULT_STATUS = 403
-	const DEFAULT_MESSAGE = 'Forbidden'
-
-	/**
-	 * @param {Api.WafRule} [rule]
-	 * @returns {RuleForm}
-	 */
-	function ruleForm (rule) {
-		return {
-			id: rule?.id ?? '',
-			description: rule?.description ?? '',
-			expression: rule?.expression ?? '',
-			action: rule?.action ?? 'log',
-			status: rule?.status ?? DEFAULT_STATUS,
-			message: rule?.message ?? DEFAULT_MESSAGE
-		}
-	}
-
-	// Rule ids are auto-generated and stable for the life of a rule (they appear
-	// in parapet's logs/metrics as rule_id), so they must survive reordering.
-	/**
-	 * @param {string[]} taken
-	 * @returns {string}
-	 */
-	function genId (taken) {
-		let id
-		do {
-			id = 'rule-' + Math.random().toString(36).slice(2, 8)
-		} while (taken.includes(id))
-		return id
-	}
-
-	// Map API rules to form rows: order by priority (lower runs first) so the
-	// visible order is the execution order, and give every row a unique id.
-	/**
-	 * @param {Api.WafRule[]} [apiRules]
-	 * @returns {RuleForm[]}
-	 */
-	function normalizeRules (apiRules) {
-		const sorted = [...(apiRules ?? [])].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
-		/** @type {string[]} */
-		const taken = []
-		return sorted.map((r) => {
-			const f = ruleForm(r)
-			if (!f.id || taken.includes(f.id)) f.id = genId(taken)
-			taken.push(f.id)
-			return f
-		})
-	}
-
-	// The whole zone is one editable form, seeded from the initial load. The
-	// selected location and its zone are component state so the selector can swap
-	// zones in place without a full navigation.
-	const form = $state(untrack(() => ({
-		location: data.location ?? '',
-		description: data.zone?.description ?? '',
-		rules: normalizeRules(data.zone?.rules)
-	})))
-
-	// True once the current location has a saved zone (enables the delete action).
+	// The list reflects SERVER state for the selected location. Changing the
+	// location navigates (updating the URL + reloading the loader), which
+	// re-seeds this local working copy.
+	let location = $state(untrack(() => data.location ?? ''))
+	let description = $state(untrack(() => data.zone?.description ?? ''))
+	let rules = $state(untrack(() => normalizeRules(data.zone?.rules)))
 	let hasZone = $state(untrack(() => !!data.zone))
-	let loading = $state(false)
-	let saving = $state(false)
 
-	/** @param {Api.WafZone | null} zone */
-	function applyZone (zone) {
-		form.description = zone?.description ?? ''
-		form.rules = normalizeRules(zone?.rules)
+	let loadedLocation = untrack(() => data.location ?? '')
+
+	// Re-seed local state whenever the loader returns a different location/zone
+	// (after navigation). Track only `data` so optimistic in-place edits aren't
+	// clobbered.
+	$effect(() => {
+		const next = data
+		untrack(() => {
+			if (next.location !== loadedLocation) {
+				loadedLocation = next.location ?? ''
+				location = next.location ?? ''
+				description = next.zone?.description ?? ''
+				rules = normalizeRules(next.zone?.rules)
+				hasZone = !!next.zone
+			}
+		})
+	})
+
+	let savingDescription = $state(false)
+
+	/** @param {string | number} loc */
+	function selectLocation (loc) {
+		// Reflect the selection in the URL so the loader fetches the zone and the
+		// context survives navigating to the edit page and back.
+		goto(`?project=${project}&location=${encodeURIComponent(loc)}`, { keepFocus: true, noScroll: true })
+	}
+
+	async function reloadZone () {
+		/** @type {Api.Response<Api.WafZone>} */
+		const resp = await api.invoke('waf.get', { project, location }, fetch)
+		if (!resp.ok) {
+			if (resp.error?.notFound) {
+				description = ''
+				rules = []
+				hasZone = false
+				return
+			}
+			modal.error({ error: resp.error })
+			return
+		}
+		const zone = resp.result ?? null
+		description = zone?.description ?? ''
+		rules = normalizeRules(zone?.rules)
 		hasZone = !!zone
 	}
 
-	async function loadZone () {
-		if (!form.location) {
-			applyZone(null)
-			return
+	// Persist the whole zone (priority follows row order). On error, surface it
+	// and reload from the server so the UI matches reality.
+	/** @param {import('$lib/waf/rules').RuleForm[]} nextRules */
+	async function persistZone (nextRules) {
+		const resp = await api.invoke('waf.set', {
+			project,
+			location,
+			description,
+			rules: toApiRules(nextRules)
+		}, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			await reloadZone()
+			return false
 		}
-		loading = true
-		try {
-			/** @type {Api.Response<Api.WafZone>} */
-			const resp = await api.invoke('waf.get', { project, location: form.location }, fetch)
-			if (!resp.ok) {
-				// Not-found is the unconfigured state — start with an empty editor.
-				if (resp.error?.notFound) {
-					applyZone(null)
-					return
-				}
-				modal.error({ error: resp.error })
-				return
-			}
-			applyZone(resp.result ?? null)
-		} finally {
-			loading = false
-		}
-	}
-
-	/** @type {WafRuleModal} */
-	let ruleModal
-
-	// Open the editor for an existing rule (a copy of its values seeds the draft).
-	/** @param {number} i */
-	function editRule (i) {
-		ruleModal.open(i, form.rules[i])
-	}
-
-	// Open the editor for a brand-new rule (index -1).
-	function addRule () {
-		ruleModal.open(-1)
-	}
-
-	// Apply a saved draft from the modal: append for add (index -1, with a fresh
-	// id) or replace the rule at its index for edit.
-	/**
-	 * @param {number} index
-	 * @param {RuleForm} draft
-	 */
-	function applyRule (index, draft) {
-		if (index === -1) {
-			const taken = form.rules.map((r) => r.id)
-			form.rules = [...form.rules, { ...draft, id: genId(taken) }]
-		} else {
-			const next = [...form.rules]
-			next[index] = { ...draft, id: form.rules[index]?.id ?? draft.id }
-			form.rules = next
-		}
+		hasZone = true
+		return true
 	}
 
 	/**
 	 * @param {number} i
 	 * @param {-1 | 1} dir
 	 */
-	function moveRule (i, dir) {
+	async function moveRule (i, dir) {
 		const j = i + dir
-		if (j < 0 || j >= form.rules.length) return
-		const next = [...form.rules]
+		if (j < 0 || j >= rules.length) return
+		const next = [...rules]
 		;[next[i], next[j]] = [next[j], next[i]]
-		form.rules = next
+		rules = next
+		await persistZone(next)
 	}
 
 	/** @param {number} i */
-	function removeRule (i) {
-		form.rules = form.rules.filter((_, k) => k !== i)
+	async function removeRule (i) {
+		const next = rules.filter((_, k) => k !== i)
+		rules = next
+		await persistZone(next)
 	}
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
-		e.preventDefault()
+	/** @param {import('$lib/waf/rules').RuleForm} rule */
+	function editRule (rule) {
+		goto(`/waf/edit?project=${project}&location=${encodeURIComponent(location)}&rule=${encodeURIComponent(rule.id)}`)
+	}
 
-		if (saving || !form.location) {
-			return
-		}
+	function addRule () {
+		goto(`/waf/edit?project=${project}&location=${encodeURIComponent(location)}`)
+	}
 
-		saving = true
+	async function saveDescription () {
+		if (savingDescription) return
+		savingDescription = true
 		try {
-			const rules = form.rules.map((r, i) => ({
-				id: r.id,
-				description: r.description,
-				expression: r.expression,
-				action: r.action,
-				// Priority follows row order — the top rule runs first.
-				priority: i,
-				// status + message only apply when blocking.
-				...(r.action === 'block'
-					? {
-						status: Number(r.status) || DEFAULT_STATUS,
-						message: r.message || DEFAULT_MESSAGE
-					}
-					: {})
-			}))
-
-			const resp = await api.invoke('waf.set', {
-				project,
-				location: form.location,
-				description: form.description,
-				rules
-			}, fetch)
-			if (!resp.ok) {
-				modal.error({ error: resp.error })
-				return
-			}
-			modal.success({ content: 'Firewall saved.' })
-			await loadZone()
+			await persistZone(rules)
 		} finally {
-			saving = false
+			savingDescription = false
 		}
 	}
 
 	function deleteZone () {
 		modal.confirm({
-			title: `Disable the firewall in ${form.location}? All rules will be removed.`,
+			title: `Disable the firewall in ${location}? All rules will be removed.`,
 			yes: 'Disable',
 			callback: async () => {
-				const resp = await api.invoke('waf.delete', { project, location: form.location }, fetch)
+				const resp = await api.invoke('waf.delete', { project, location }, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
 					return
 				}
-				applyZone(null)
+				description = ''
+				rules = []
+				hasZone = false
 			}
 		})
 	}
@@ -240,23 +150,29 @@
 </div>
 
 <div class="panel is-level-300 grid gap-6">
-	<form class="grid gap-4 w-full" onsubmit={save}>
+	<div class="grid gap-4 w-full">
 		<div class="field">
 			<label for="input-location">Location</label>
 			<Select
 				id="input-location"
-				bind:value={form.location}
-				onchange={loadZone}
+				value={location}
+				onchange={selectLocation}
 				required
 				placeholder="Select Location"
 				options={locations.map((it) => ({ value: it.id, label: it.id }))} />
 		</div>
 
-		{#if form.location}
+		{#if location}
 			<div class="field">
 				<label for="input-description">Description</label>
 				<div class="input">
-					<input id="input-description" bind:value={form.description} placeholder="Optional description">
+					<input id="input-description" bind:value={description} placeholder="Optional description">
+				</div>
+				<div class="flex justify-self-start mt-2">
+					<button type="button" class="button is-variant-secondary is-size-small"
+						class:is-loading={savingDescription} onclick={saveDescription}>
+						Save
+					</button>
 				</div>
 			</div>
 
@@ -272,11 +188,6 @@
 						condition, action, and response.
 					</p>
 				</div>
-				{#if loading}
-					<span class="text-content/50 text-sm">
-						<i class="fa-solid fa-spinner-third fa-spin"></i> Loading…
-					</span>
-				{/if}
 			</div>
 
 			<div class="table-container">
@@ -290,7 +201,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.rules as rule, i (rule.id)}
+						{#each rules as rule, i (rule.id)}
 							<tr>
 								<td>
 									<span class="font-mono text-sm text-content/60">{rule.id}</span>
@@ -310,7 +221,7 @@
 								<td>
 									<div class="flex gap-1 justify-end">
 										<button class="icon-button" type="button" aria-label="Edit rule"
-											onclick={() => editRule(i)}>
+											onclick={() => editRule(rule)}>
 											<i class="fa-solid fa-pencil"></i>
 										</button>
 										<button class="icon-button" type="button" aria-label="Move rule up"
@@ -318,7 +229,7 @@
 											<i class="fa-solid fa-chevron-up"></i>
 										</button>
 										<button class="icon-button" type="button" aria-label="Move rule down"
-											disabled={i === form.rules.length - 1} onclick={() => moveRule(i, 1)}>
+											disabled={i === rules.length - 1} onclick={() => moveRule(i, 1)}>
 											<i class="fa-solid fa-chevron-down"></i>
 										</button>
 										<button class="icon-button" type="button" aria-label="Remove rule"
@@ -329,7 +240,7 @@
 								</td>
 							</tr>
 						{/each}
-						{#if form.rules.length === 0}
+						{#if rules.length === 0}
 							<tr>
 								<td colspan="4" class="text-center text-content/50">
 									No rules yet. Add a rule to start filtering traffic.
@@ -351,22 +262,14 @@
 				</table>
 			</div>
 
-			<hr>
-
-			<div class="flex gap-4">
-				<button class="button" class:is-loading={saving}>Save</button>
-			</div>
-
 			{#if hasZone}
 				<DangerZone description="Disable the firewall in this location and permanently remove all of its rules.">
 					<button class="button is-variant-negative" type="button" onclick={deleteZone}>Disable firewall</button>
 				</DangerZone>
 			{/if}
 		{/if}
-	</form>
+	</div>
 </div>
-
-<WafRuleModal bind:this={ruleModal} onsave={applyRule} />
 
 <style>
 	.action-badge {
