@@ -240,3 +240,339 @@ export function combineExpression (existing, snippet, mode) {
 	if (mode === 'or') return `${e} || ${snippet}`
 	return `${e} && ${snippet}`
 }
+
+/**
+ * @typedef {'and' | 'or'} Combinator
+ */
+
+/**
+ * @typedef {Object} ExpressionGroup
+ * @property {Combinator} combinator
+ * @property {ExpressionSpec[]} conditions
+ */
+
+/**
+ * Build a flat group of conditions joined by a single boolean operator. This is
+ * the multi-condition counterpart to `buildExpression` and the exact string
+ * `parseExpression` is the inverse of.
+ * @param {Combinator} combinator
+ * @param {ExpressionSpec[]} conditions
+ * @returns {string}
+ */
+export function buildGroup (combinator, conditions) {
+	return (conditions ?? [])
+		.map(buildExpression)
+		.filter(Boolean)
+		.join(combinator === 'or' ? ' || ' : ' && ')
+}
+
+/**
+ * Un-escape the inner contents of a CEL double-quoted string literal. Exact
+ * inverse of `celString` (reverses `\\ \" \n \r \t`).
+ * @param {string} inner  contents between the surrounding quotes
+ * @returns {string}
+ */
+function unescapeCelString (inner) {
+	let out = ''
+	for (let i = 0; i < inner.length; i++) {
+		const c = inner[i]
+		if (c !== '\\') {
+			out += c
+			continue
+		}
+		const next = inner[i + 1]
+		switch (next) {
+		case '\\': out += '\\'; break
+		case '"': out += '"'; break
+		case 'n': out += '\n'; break
+		case 'r': out += '\r'; break
+		case 't': out += '\t'; break
+		default: out += next ?? ''
+		}
+		i++
+	}
+	return out
+}
+
+/**
+ * Match a single double-quoted CEL string literal at the START of `s`. Returns
+ * the decoded value and the index just past the closing quote, or `null` if `s`
+ * doesn't begin with a well-formed literal. Honours `\"`/`\\` escapes.
+ * @param {string} s
+ * @returns {{ value: string, end: number } | null}
+ */
+function matchStringLiteral (s) {
+	if (s[0] !== '"') return null
+	let i = 1
+	let inner = ''
+	while (i < s.length) {
+		const c = s[i]
+		if (c === '\\') {
+			// Keep the escape sequence verbatim for un-escaping below.
+			if (i + 1 >= s.length) return null
+			inner += c + s[i + 1]
+			i += 2
+			continue
+		}
+		if (c === '"') {
+			return { value: unescapeCelString(inner), end: i + 1 }
+		}
+		inner += c
+		i++
+	}
+	return null
+}
+
+/**
+ * Split a CEL expression into its top-level conjuncts, respecting string
+ * literals, `[...]` brackets, and `(...)` parens. Only splits on ` && ` / ` || `
+ * found at depth 0 outside strings.
+ *
+ * Returns `{ parts, op }` where `op` is the single boolean operator seen
+ * (`'and'`, `'or'`, or `null` for a single part). Returns `null` when BOTH `&&`
+ * and `||` appear at the top level (a "complex" expression).
+ * @param {string} s
+ * @returns {{ parts: string[], op: Combinator | null } | null}
+ */
+function splitTopLevel (s) {
+	/** @type {string[]} */
+	const parts = []
+	/** @type {Combinator | null} */
+	let op = null
+	let depth = 0
+	let start = 0
+	let i = 0
+	while (i < s.length) {
+		const c = s[i]
+		if (c === '"') {
+			const m = matchStringLiteral(s.slice(i))
+			if (!m) return null // unterminated string → not representable
+			i += m.end
+			continue
+		}
+		if (c === '[' || c === '(') {
+			depth++
+			i++
+			continue
+		}
+		if (c === ']' || c === ')') {
+			depth--
+			if (depth < 0) return null
+			i++
+			continue
+		}
+		if (depth === 0 && (c === '&' || c === '|')) {
+			// Only a delimiter when it's exactly ` && ` / ` || ` (surrounded by
+			// single spaces, matching the generator's output).
+			const two = s.slice(i, i + 2)
+			if ((two === '&&' || two === '||') && s[i - 1] === ' ' && s[i + 2] === ' ') {
+				const here = two === '&&' ? 'and' : 'or'
+				if (op && op !== here) return null // mixed && / || → complex
+				op = here
+				parts.push(s.slice(start, i - 1))
+				i += 3
+				start = i
+				continue
+			}
+		}
+		i++
+	}
+	if (depth !== 0) return null
+	parts.push(s.slice(start))
+	return { parts, op }
+}
+
+/** Map a fixed CEL accessor back to its field key. */
+const fieldByAccessor = Object.fromEntries(
+	fields.filter((f) => f.accessor).map((f) => [f.accessor, f.value])
+)
+
+/** Map a named-map field's `request.xxx[` prefix back to its field key. */
+const nameFieldByPrefix = Object.fromEntries(
+	fields
+		.filter((f) => f.hasName && f.accessorMap)
+		.map((f) => [(f.accessorMap ?? '').split('["<name>"]')[0], f.value])
+)
+
+/**
+ * Parse a single accessor at the START of `s` (a fixed `request.x` accessor or a
+ * named `request.headers["name"]` form). Returns the resolved field key, the
+ * optional decoded name, and the index just past the accessor — or `null`.
+ * @param {string} s
+ * @returns {{ field: string, name?: string, end: number } | null}
+ */
+function matchAccessor (s) {
+	// Named map accessor: `request.headers["..."]` etc. Try these first since the
+	// fixed-accessor table has no overlap with the map prefixes.
+	for (const prefix of Object.keys(nameFieldByPrefix)) {
+		if (!s.startsWith(prefix + '["')) continue
+		const lit = matchStringLiteral(s.slice(prefix.length + 1))
+		if (!lit) return null
+		const afterName = prefix.length + 1 + lit.end
+		if (s[afterName] !== ']') return null
+		return { field: nameFieldByPrefix[prefix], name: lit.value, end: afterName + 1 }
+	}
+	// Fixed accessors — pick the longest matching one so e.g. `request.host`
+	// isn't shadowed by a shorter prefix (none currently overlap, but be safe).
+	/** @type {string | null} */
+	let best = null
+	for (const accessor of Object.keys(fieldByAccessor)) {
+		if (s.startsWith(accessor) && (!best || accessor.length > best.length)) best = accessor
+	}
+	if (!best) return null
+	// The accessor must be followed by a boundary (space, operator, or end) so a
+	// fixed accessor isn't matched as a prefix of something longer.
+	const next = s[best.length]
+	if (next !== undefined && next !== ' ' && next !== ')' && next !== ',') return null
+	return { field: fieldByAccessor[best], end: best.length }
+}
+
+/**
+ * Parse the bracketed, comma-separated quoted list at the START of `s`
+ * (`["a", "b"]` exactly as the generator emits). Returns the decoded items and
+ * the consumed length, or `null` when malformed.
+ * @param {string} s
+ * @returns {{ items: string[], end: number } | null}
+ */
+function matchList (s) {
+	if (s[0] !== '[') return null
+	let i = 1
+	/** @type {string[]} */
+	const items = []
+	// Empty list is never emitted (buildExpression returns '' for it).
+	while (true) {
+		const lit = matchStringLiteral(s.slice(i))
+		if (!lit) return null
+		items.push(lit.value)
+		i += lit.end
+		if (s[i] === ']') return items.length ? { items, end: i + 1 } : null
+		if (s.slice(i, i + 2) !== ', ') return null
+		i += 2
+	}
+}
+
+/**
+ * Parse exactly one CEL condition (a single conjunct) back into an
+ * `ExpressionSpec`. Strict: only forms `buildExpression` can emit are accepted.
+ * Returns `null` for anything else.
+ * @param {string} part
+ * @returns {ExpressionSpec | null}
+ */
+function parseCondition (part) {
+	const s = part.trim()
+	if (!s) return null
+
+	// Function-call forms: containsAny / hasPrefixAny / regexMatch / ipInCidr.
+	const fnMatch = /^(containsAny|hasPrefixAny|regexMatch|ipInCidr)\(/.exec(s)
+	if (fnMatch) {
+		const fn = fnMatch[1]
+		const acc = matchAccessor(s.slice(fn.length + 1))
+		if (!acc) return null
+		let i = fn.length + 1 + acc.end
+		if (s.slice(i, i + 2) !== ', ') return null
+		i += 2
+		if (fn === 'containsAny' || fn === 'hasPrefixAny') {
+			const list = matchList(s.slice(i))
+			if (!list) return null
+			i += list.end
+			if (s.slice(i) !== ')') return null
+			return {
+				field: acc.field,
+				...(acc.name !== undefined ? { name: acc.name } : {}),
+				operator: fn === 'containsAny' ? 'contains_any' : 'starts_with_any',
+				values: list.items.join('\n')
+			}
+		}
+		// regexMatch / ipInCidr take a single string operand.
+		const lit = matchStringLiteral(s.slice(i))
+		if (!lit) return null
+		i += lit.end
+		if (s.slice(i) !== ')') return null
+		if (fn === 'regexMatch') {
+			return {
+				field: acc.field,
+				...(acc.name !== undefined ? { name: acc.name } : {}),
+				operator: 'matches_regex',
+				value: lit.value
+			}
+		}
+		// ipInCidr — accessor must be the remote_ip field.
+		if (acc.field !== 'remote_ip') return null
+		return { field: 'remote_ip', operator: 'in_cidr', value: lit.value }
+	}
+
+	// Infix forms: `<accessor> <op> <operand>`.
+	const acc = matchAccessor(s)
+	if (!acc) return null
+	let rest = s.slice(acc.end)
+	const field = getField(acc.field)
+	if (!field) return null
+
+	if (field.type === 'numeric') {
+		// `request.content_length <op> <int>` — op ∈ ==,!=,<,>,<=,>=.
+		const m = /^ (==|!=|<=|>=|<|>) (-?\d+)$/.exec(rest)
+		if (!m) return null
+		const opKey = Object.keys(numericOps).find((k) => numericOps[k] === m[1])
+		if (!opKey) return null
+		return { field: acc.field, operator: opKey, value: m[2] }
+	}
+
+	if (field.type === 'tls') {
+		// `request.scheme == "https"` (TLS on) / `"http"` (TLS off).
+		if (!rest.startsWith(' == ')) return null
+		const lit = matchStringLiteral(rest.slice(4))
+		if (!lit || lit.end !== rest.length - 4) return null
+		if (lit.value === 'https') return { field: 'scheme', operator: 'equals', tls: true }
+		if (lit.value === 'http') return { field: 'scheme', operator: 'equals', tls: false }
+		return null
+	}
+
+	if (field.type === 'ip') {
+		// Only `request.remote_ip == "ip"` reaches here (in_cidr is a fn above).
+		if (!rest.startsWith(' == ')) return null
+		const lit = matchStringLiteral(rest.slice(4))
+		if (!lit || lit.end !== rest.length - 4) return null
+		return { field: 'remote_ip', operator: 'ip_equals', value: lit.value }
+	}
+
+	// string field: `<acc> == "v"` / `<acc> != "v"`.
+	const opMatch = /^ (==|!=) /.exec(rest)
+	if (!opMatch) return null
+	rest = rest.slice(opMatch[0].length)
+	const lit = matchStringLiteral(rest)
+	if (!lit || lit.end !== rest.length) return null
+	return {
+		field: acc.field,
+		...(acc.name !== undefined ? { name: acc.name } : {}),
+		operator: opMatch[1] === '!=' ? 'not_equals' : 'equals',
+		value: lit.value
+	}
+}
+
+/**
+ * Conservative inverse of `buildGroup`/`buildExpression`. Parses a CEL string
+ * into a flat group of structured conditions joined by a single boolean
+ * operator, or returns `null` when the string is not EXACTLY representable by
+ * the visual builder (mixed `&&`/`||`, grouping, unknown functions, wrappers,
+ * malformed input). A false "complex" is acceptable; a wrong parse is not.
+ *
+ * @param {string} cel
+ * @returns {ExpressionGroup | null}
+ */
+export function parseExpression (cel) {
+	const trimmed = String(cel ?? '').trim()
+	if (trimmed === '') return { combinator: 'and', conditions: [] }
+
+	const split = splitTopLevel(trimmed)
+	if (!split) return null
+
+	/** @type {ExpressionSpec[]} */
+	const conditions = []
+	for (const part of split.parts) {
+		const spec = parseCondition(part)
+		if (!spec) return null
+		conditions.push(spec)
+	}
+
+	return { combinator: split.op ?? 'and', conditions }
+}

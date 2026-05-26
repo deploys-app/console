@@ -5,6 +5,7 @@
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
+	import { parseExpression } from '$lib/waf/expression'
 	import {
 		DEFAULT_STATUS,
 		DEFAULT_MESSAGE,
@@ -44,16 +45,31 @@
 
 	let saving = $state(false)
 
+	// The Visual builder can only represent a flat list of conditions joined by a
+	// single AND/OR. Anything else (mixed &&/||, grouping, unknown functions,
+	// `.startsWith`/etc, partial input) is "complex" and must be edited as raw.
+	const canUseVisual = $derived(parseExpression(draft.expression) !== null)
+
 	// Expression editing mode — Visual (condition builder) or Expression (raw
 	// CEL textarea). Both edit the same `draft.expression` string, so switching
-	// preserves whatever is there.
-	let mode = $state(/** @type {'visual' | 'raw'} */ ('visual'))
+	// preserves whatever is there. Start in Visual only when the seed expression
+	// is representable; otherwise open straight into raw/Expression mode.
+	let mode = $state(/** @type {'visual' | 'raw'} */ (
+		untrack(() => (parseExpression(draft.expression) !== null ? 'visual' : 'raw'))
+	))
+
+	// If we're in Visual but the expression becomes non-representable, fall back
+	// to raw so the disabled Visual tab can't show stale rows. (Visual edits stay
+	// representable, so this only fires for raw edits made while still on Visual.)
+	$effect(() => {
+		if (mode === 'visual' && !canUseVisual) mode = 'raw'
+	})
 
 	/** @type {{ clearExpression: () => void } | undefined} */
 	let builder = $state()
 
 	function clearExpression () {
-		if (builder) builder.clearExpression()
+		if (mode === 'visual' && builder) builder.clearExpression()
 		else draft.expression = ''
 	}
 
@@ -139,32 +155,41 @@
 						Compose the condition visually, or switch to Expression to edit the raw CEL directly.
 					</p>
 				</div>
-				<div class="flex items-center gap-2">
-					<div class="tabs is-variant-underline" role="tablist">
-						<button type="button" class="tab-button" class:is-active={mode === 'visual'}
-							role="tab" aria-selected={mode === 'visual'}
-							onclick={() => (mode = 'visual')}>
-							<i class="fa-solid fa-sliders mr-2"></i>
-							<span>Visual</span>
-						</button>
-						<button type="button" class="tab-button" class:is-active={mode === 'raw'}
-							role="tab" aria-selected={mode === 'raw'}
-							onclick={() => (mode = 'raw')}>
-							<i class="fa-solid fa-code mr-2"></i>
-							<span>Expression</span>
+				<div class="flex flex-col items-end gap-1">
+					<div class="flex items-center gap-2">
+						<div class="tabs is-variant-underline" role="tablist">
+							<button type="button" class="tab-button" class:is-active={mode === 'visual'}
+								role="tab" aria-selected={mode === 'visual'}
+								disabled={!canUseVisual}
+								title={canUseVisual ? undefined : 'This expression can’t be shown in the visual editor'}
+								onclick={() => { if (canUseVisual) mode = 'visual' }}>
+								<i class="fa-solid fa-sliders mr-2"></i>
+								<span>Visual</span>
+							</button>
+							<button type="button" class="tab-button" class:is-active={mode === 'raw'}
+								role="tab" aria-selected={mode === 'raw'}
+								onclick={() => (mode = 'raw')}>
+								<i class="fa-solid fa-code mr-2"></i>
+								<span>Expression</span>
+							</button>
+						</div>
+						<button type="button" class="button is-variant-tertiary is-size-small"
+							disabled={!draft.expression}
+							onclick={clearExpression}>
+							<i class="fa-solid fa-eraser mr-2"></i>
+							<span>Clear</span>
 						</button>
 					</div>
-					<button type="button" class="button is-variant-tertiary is-size-small"
-						disabled={!draft.expression}
-						onclick={clearExpression}>
-						<i class="fa-solid fa-eraser mr-2"></i>
-						<span>Clear</span>
-					</button>
+					{#if !canUseVisual}
+						<p class="text-content/50 text-xs text-right max-w-xs">
+							This expression can’t be shown in the visual editor — edit it as raw CEL.
+						</p>
+					{/if}
 				</div>
 			</div>
 
 			{#if mode === 'visual'}
-				<WafConditionBuilder bind:this={builder} bind:expression={draft.expression} showPreview={false} />
+				<WafConditionBuilder bind:this={builder} bind:expression={draft.expression} />
 			{:else}
 				<p class="text-content/60 text-sm">
 					Match on

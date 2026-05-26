@@ -1,102 +1,75 @@
 <script>
-	import Select from '$lib/components/Select.svelte'
-	import TagInput from '$lib/components/TagInput.svelte'
-	import {
-		fields,
-		getField,
-		operatorsForType,
-		isMultiOperator,
-		buildExpression,
-		combineExpression
-	} from '$lib/waf/expression'
+	import { untrack } from 'svelte'
+	import WafConditionRow from '$lib/components/WafConditionRow.svelte'
+	import { buildGroup, parseExpression } from '$lib/waf/expression'
+
+	/**
+	 * @typedef {import('$lib/waf/expression').ExpressionSpec} ExpressionSpec
+	 * @typedef {import('$lib/waf/expression').Combinator} Combinator
+	 */
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {string} expression    bindable CEL expression composed so far
-	 * @property {boolean} [showPreview] render the built-in readonly CEL preview + Clear (default true)
+	 * @property {string} expression  bindable CEL expression — kept in two-way sync with the rows
 	 */
 
 	/** @type {Props} */
-	let { expression = $bindable(''), showPreview = true } = $props()
+	let { expression = $bindable('') } = $props()
 
-	// --- embedded condition-builder spec (component-local form state) ---
-	let field = $state('path')
-	let name = $state('')
-	let operator = $state('equals')
-	let value = $state('')
-	/** @type {string[]} */
-	let valuesList = $state([])
-	let tls = $state(true)
-	let combine = $state(/** @type {'and' | 'or' | 'replace'} */ ('and'))
+	/** A fresh blank condition row. */
+	function blankCondition () {
+		return /** @type {ExpressionSpec} */ ({ field: 'path', operator: 'equals', value: '' })
+	}
 
-	const fieldMeta = $derived(getField(field))
-	const fieldType = $derived(fieldMeta?.type ?? 'string')
-	const needsName = $derived(!!fieldMeta?.hasName)
-	const operators = $derived(operatorsForType(fieldType))
-	const multi = $derived(isMultiOperator(operator))
-	const isTls = $derived(fieldType === 'tls')
-	// Free-text combobox (datalist) for equals/not_equals on suggestion-backed fields.
-	const useCombobox = $derived(
-		!!fieldMeta?.suggestions && (operator === 'equals' || operator === 'not_equals')
-	)
+	// Seed the rows + combinator from the incoming expression. A non-parseable
+	// expression should never reach the visual builder (the page gates on
+	// `canUseVisual`), but fall back to empty if it does.
+	const seed = untrack(() => parseExpression(expression)) ?? { combinator: 'and', conditions: [] }
 
-	const fieldOptions = fields.map((f) => ({ value: f.value, label: f.label }))
-	const operatorOptions = $derived(operators.map((o) => ({ value: o.value, label: o.label })))
-	const combineOptions = [
-		{ value: 'and', label: 'AND — both must match' },
-		{ value: 'or', label: 'OR — either matches' },
-		{ value: 'replace', label: 'Replace existing' }
-	]
+	/** @type {ExpressionSpec[]} */
+	let conditions = $state(seed.conditions)
+	/** @type {Combinator} */
+	let combinator = $state(seed.combinator)
 
-	const spec = $derived({
-		field,
-		name,
-		operator,
-		value,
-		// `buildExpression`/`parseList` consume the raw multi-value text contract;
-		// feed the chips joined by newlines so the output format is unchanged.
-		values: valuesList.join('\n'),
-		tls
-	})
+	// The CEL string this builder's current rows generate.
+	const generated = $derived(buildGroup(combinator, conditions))
 
-	// Live preview of the single condition the builder controls describe.
-	const preview = $derived(buildExpression(spec))
-	// A TLS condition is always complete; otherwise rely on a non-empty preview.
-	const canAdd = $derived(isTls || preview !== '')
-
-	// Keep the operator valid when the field type changes (e.g. switching from a
-	// string field to Remote IP must not leave "contains any of" selected).
-	// Guard against an empty operator list (the `'tls'` field has none).
+	// Two-way sync, guarded against feedback loops.
+	//
+	// Outward: whenever the rows/combinator produce a CEL string that differs
+	// from the bound `expression`, write it back.
 	$effect(() => {
-		if (operators.length === 0) return
-		const valid = operators.some((o) => o.value === operator)
-		if (!valid) operator = operators[0]?.value ?? ''
+		const next = generated
+		if (next !== untrack(() => expression)) expression = next
 	})
 
-	function resetBuilder () {
-		field = 'path'
-		name = ''
-		operator = 'equals'
-		value = ''
-		valuesList = []
-		tls = true
-		combine = 'and'
-	}
+	// Inward: when the external `expression` changes to something parseable that
+	// no longer matches what the rows currently generate (e.g. the user edited
+	// raw CEL then switched to Visual), reseed the rows. Only reseed on a real
+	// difference so typing in a row doesn't clobber itself.
+	$effect(() => {
+		const expr = expression
+		const current = untrack(() => generated)
+		if (expr === current) return
+		const parsed = parseExpression(expr)
+		if (!parsed) return // not representable — leave rows as-is (page keeps raw)
+		conditions = parsed.conditions
+		combinator = parsed.combinator
+	})
 
-	// Apply the builder's condition to the expression. When the expression
-	// already has a value we honour the AND/OR/Replace choice; otherwise we
-	// just set it.
 	function addCondition () {
-		if (!canAdd) return
-		const mode = expression.trim() ? combine : 'replace'
-		expression = combineExpression(expression, preview, mode)
-		resetBuilder()
+		conditions = [...conditions, blankCondition()]
 	}
 
-	// Exported so a parent that hides the built-in preview can still wire up a
-	// shared Clear control of its own.
+	/** @param {number} i */
+	function removeCondition (i) {
+		conditions = conditions.filter((_, idx) => idx !== i)
+	}
+
+	// Reset to an empty expression (wired to the page's Clear control).
 	export function clearExpression () {
-		expression = ''
+		conditions = []
+		combinator = 'and'
 	}
 </script>
 
@@ -118,146 +91,53 @@
 		<code class="font-mono">.cookies[…]</code>.
 	</p>
 
-	{#if showPreview}
-		<div class="field">
-			<label for="rule-expression">Expression (CEL)</label>
-			<div class="textarea">
-				<textarea id="rule-expression" class="font-mono" rows="2" readonly bind:value={expression}
-					placeholder="Use the builder below to compose this rule’s condition"></textarea>
-			</div>
-			<div class="flex gap-2 justify-self-start mt-2">
-				<button type="button" class="button is-variant-tertiary is-size-small"
-					disabled={!expression}
-					onclick={clearExpression}>
-					<i class="fa-solid fa-eraser mr-2"></i>
-					<span>Clear</span>
+	{#if conditions.length >= 2}
+		<div class="flex items-center gap-3">
+			<span class="text-content/70 text-sm">Match when</span>
+			<div class="tabs is-variant-underline" role="tablist" aria-label="Combine conditions">
+				<button type="button" class="tab-button" class:is-active={combinator === 'and'}
+					role="tab" aria-selected={combinator === 'and'}
+					onclick={() => (combinator = 'and')}>
+					<span>ALL (AND)</span>
+				</button>
+				<button type="button" class="tab-button" class:is-active={combinator === 'or'}
+					role="tab" aria-selected={combinator === 'or'}
+					onclick={() => (combinator = 'or')}>
+					<span>ANY (OR)</span>
 				</button>
 			</div>
+			<span class="text-content/50 text-sm">of the conditions match</span>
 		</div>
 	{/if}
 
-	<div class="builder grid gap-4">
-		<div class="grid gap-4 sm:grid-cols-2">
-			<div class="field">
-				<label for="waf-field">Field</label>
-				<Select id="waf-field" bind:value={field} options={fieldOptions} />
-			</div>
-
-			{#if needsName}
-				<div class="field">
-					<label for="waf-name">Name</label>
-					<div class="input">
-						<input id="waf-name" bind:value={name}
-							placeholder={field === 'header' ? 'e.g. user-agent' : field === 'cookie' ? 'e.g. session' : 'e.g. token'}>
-					</div>
+	{#if conditions.length === 0}
+		<p class="text-content/50 text-sm">No conditions yet. Add one to start matching requests.</p>
+	{:else}
+		<div class="grid gap-3">
+			{#each conditions as condition, i (i)}
+				<div class="grid gap-2">
+					{#if i > 0}
+						<div class="joiner text-content/50 text-xs font-mono">
+							{combinator === 'or' ? 'OR' : 'AND'}
+						</div>
+					{/if}
+					<WafConditionRow bind:condition={conditions[i]} onremove={() => removeCondition(i)} />
 				</div>
-			{/if}
+			{/each}
 		</div>
+	{/if}
 
-		{#if isTls}
-			<div class="field">
-				<label class="checkbox" for="waf-tls">
-					<input id="waf-tls" type="checkbox" bind:checked={tls}>
-					<span>TLS</span>
-				</label>
-				<p class="helper">When on, the request must be served over HTTPS.</p>
-			</div>
-		{:else}
-			<div class="grid gap-4 sm:grid-cols-2">
-				<div class="field">
-					<label for="waf-operator">Operator</label>
-					<Select id="waf-operator" bind:value={operator} options={operatorOptions} />
-				</div>
-			</div>
-
-			{#if multi}
-				<div class="field">
-					<label for="waf-values">Values</label>
-					<TagInput id="waf-values" bind:tags={valuesList}
-						placeholder="Type a value, press Enter to add" />
-				</div>
-			{:else if useCombobox}
-				<div class="field">
-					<label for="waf-value">Value</label>
-					<Select id="waf-value" editable bind:value
-						options={(fieldMeta?.suggestions ?? []).map((s) => ({ value: s, label: s }))}
-						placeholder="e.g. GET" />
-				</div>
-			{:else}
-				<div class="field">
-					<label for="waf-value">
-						{#if fieldType === 'numeric'}Number
-						{:else if fieldType === 'ip' && operator === 'in_cidr'}CIDR
-						{:else if operator === 'matches_regex'}Pattern
-						{:else}Value{/if}
-					</label>
-					<div class="input">
-						<input id="waf-value" class="font-mono" bind:value
-							inputmode={fieldType === 'numeric' ? 'numeric' : undefined}
-							placeholder={fieldType === 'numeric'
-								? 'e.g. 1048576'
-								: fieldType === 'ip' && operator === 'in_cidr'
-									? 'e.g. 10.0.0.0/8'
-									: operator === 'matches_regex'
-										? 'e.g. ^/api/v[0-9]+/'
-										: 'Value'}>
-					</div>
-				</div>
-			{/if}
-		{/if}
-
-		{#if expression.trim()}
-			<div class="field">
-				<label for="waf-combine">Combine with existing expression</label>
-				<Select id="waf-combine" bind:value={combine} options={combineOptions} />
-			</div>
-		{/if}
-
-		<div class="field">
-			<label for="waf-preview">Condition preview</label>
-			<div class="preview font-mono" id="waf-preview">
-				{#if canAdd}
-					{preview}
-				{:else}
-					<span class="text-content/40">Fill in the controls above to generate a condition…</span>
-				{/if}
-			</div>
-		</div>
-
-		<div class="flex justify-end">
-			<button type="button" class="button is-variant-secondary" disabled={!canAdd} onclick={addCondition}>
-				<i class="fa-solid fa-plus mr-2"></i>
-				<span>{expression.trim() && combine !== 'replace' ? 'Add condition' : 'Set condition'}</span>
-			</button>
-		</div>
+	<div class="flex justify-start">
+		<button type="button" class="button is-variant-secondary is-size-small" onclick={addCondition}>
+			<i class="fa-solid fa-plus mr-2"></i>
+			<span>Add condition</span>
+		</button>
 	</div>
 </div>
 
 <style>
-	.preview {
-		padding: 0.75rem;
-		border-radius: var(--radius-md);
-		background-color: hsl(var(--hsl-base-400) / 0.2);
-		border: 1px solid hsl(var(--hsl-line));
-		font-size: 0.8125rem;
-		line-height: 1.5;
-		word-break: break-all;
-		white-space: pre-wrap;
-		min-height: 2.75rem;
-	}
-
-	:root:not(.dark) .preview {
-		background-color: hsl(var(--hsl-base-100));
-	}
-
-	.builder {
-		padding: 1rem;
-		border-radius: var(--radius-md);
-		border: 1px solid hsl(var(--hsl-line));
-		background-color: hsl(var(--hsl-base-400) / 0.12);
-	}
-
-	:root:not(.dark) .builder {
-		background-color: hsl(var(--hsl-base-100) / 0.6);
+	.joiner {
+		padding-left: 0.25rem;
+		letter-spacing: 0.05em;
 	}
 </style>

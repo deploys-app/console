@@ -903,6 +903,12 @@
 		color: hsl(var(--hsl-content));
 	}
 
+	.tabs .tab-button:disabled,
+	.tabs > button:disabled {
+		color: hsl(var(--hsl-content) / 0.35);
+		cursor: not-allowed;
+	}
+
 	.tabs.is-variant-underline .tab-button::after,
 	.tabs.is-variant-underline > a::after,
 	.tabs.is-variant-underline > button::after {
