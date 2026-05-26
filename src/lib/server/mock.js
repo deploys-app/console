@@ -216,6 +216,32 @@ const routes = [
 	}
 ]
 
+const wafZone = {
+	project: 'acme',
+	location: LOCATION_ID,
+	description: 'Block admin paths and noisy bots',
+	rules: [
+		{
+			id: 'block-admin',
+			description: 'Block external access to /admin',
+			expression: "request.path.startsWith('/admin')",
+			action: 'block',
+			status: 403,
+			message: 'Forbidden',
+			priority: 10
+		},
+		{
+			id: 'log-bots',
+			description: 'Log suspected bot traffic',
+			expression: "request.headers['user-agent'].contains('bot')",
+			action: 'log',
+			priority: 20
+		}
+	],
+	createdAt: CREATED_AT,
+	createdBy: USER_EMAIL
+}
+
 const pullSecrets = [
 	{
 		name: 'dockerhub',
@@ -610,6 +636,10 @@ const handlers = {
 	'route.list': () => list(routes),
 	'route.createV2': () => ok({}),
 	'route.delete': () => ok({}),
+
+	'waf.get': (args) => ok({ ...wafZone, location: args?.location ?? LOCATION_ID }),
+	'waf.set': () => ok({}),
+	'waf.delete': () => ok({}),
 
 	'pullSecret.list': () => list(pullSecrets),
 	'pullSecret.get': (args) => ok({ ...pullSecrets[0], name: args?.name ?? 'dockerhub', location: args?.location ?? LOCATION_ID }),

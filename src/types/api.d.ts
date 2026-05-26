@@ -465,6 +465,29 @@ declare namespace Api {
         expiresAt: string
     }
 
+    export type WafAction = 'log' | 'allow' | 'block'
+
+    export type WafRule = {
+        id: string
+        description: string
+        expression: string
+        action: WafAction
+        // status + message are only meaningful when action === 'block'
+        // (status defaults to 403, message to "Forbidden").
+        status?: number
+        message?: string
+        priority: number
+    }
+
+    export type WafZone = {
+        project: string
+        location: string
+        description: string
+        rules: WafRule[]
+        createdAt: string
+        createdBy: string
+    }
+
     export type DropboxItem = {
         downloadUrl: string
         filename: string

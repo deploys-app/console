@@ -40,6 +40,12 @@
 			link: '/route'
 		},
 		{
+			id: 'waf',
+			title: 'Firewall',
+			icon: 'fa-shield-halved',
+			link: '/waf'
+		},
+		{
 			id: 'workload-identity',
 			title: 'Workload Identities',
 			icon: 'fa-network-wired',
