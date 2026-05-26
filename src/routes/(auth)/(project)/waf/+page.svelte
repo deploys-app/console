@@ -4,6 +4,7 @@
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import WafExpressionModal from '$lib/components/WafExpressionModal.svelte'
 
 	const { data } = $props()
 
@@ -93,6 +94,23 @@
 
 	function addRule () {
 		form.rules = [...form.rules, ruleForm()]
+	}
+
+	/** @type {WafExpressionModal} */
+	let expressionModal
+	// Index of the rule whose expression the builder is currently editing.
+	let builderRuleIndex = -1
+
+	/** @param {number} i */
+	function openBuilder (i) {
+		builderRuleIndex = i
+		expressionModal.open(form.rules[i]?.expression ?? '')
+	}
+
+	/** @param {string} expression */
+	function applyExpression (expression) {
+		const rule = form.rules[builderRuleIndex]
+		if (rule) rule.expression = expression
 	}
 
 	/** @param {number} i */
@@ -193,7 +211,27 @@
 			<br>
 
 			<div class="flex items-center justify-between">
-				<h6><strong>Rules</strong></h6>
+				<div>
+					<h6><strong>Rules</strong></h6>
+					<p class="text-content/50 text-sm mt-1">
+						Match on
+						<code class="font-mono">request.method</code>,
+						<code class="font-mono">.path</code>,
+						<code class="font-mono">.host</code>,
+						<code class="font-mono">.query</code>,
+						<code class="font-mono">.uri</code>,
+						<code class="font-mono">.scheme</code>,
+						<code class="font-mono">.user_agent</code>,
+						<code class="font-mono">.referer</code>,
+						<code class="font-mono">.remote_ip</code>,
+						<code class="font-mono">.content_length</code>,
+						<code class="font-mono">.body</code>,
+						<code class="font-mono">.headers[…]</code>,
+						<code class="font-mono">.args[…]</code>,
+						<code class="font-mono">.cookies[…]</code>.
+						Use <strong>Build…</strong> to compose a condition.
+					</p>
+				</div>
 				{#if loading}
 					<span class="text-content/50 text-sm">
 						<i class="fa-solid fa-spinner-third fa-spin"></i> Loading…
@@ -228,9 +266,16 @@
 									</div>
 								</td>
 								<td class="w-full min-w-[20rem]">
-									<div class="input">
-										<input class="font-mono" bind:value={rule.expression}
-											placeholder="e.g. request.path.startsWith('/admin')">
+									<div class="grid gap-2">
+										<div class="textarea">
+											<textarea class="font-mono" rows="2" bind:value={rule.expression}
+												placeholder="e.g. hasPrefixAny(request.path, [&quot;/admin&quot;])"></textarea>
+										</div>
+										<button type="button" class="button is-variant-secondary is-size-small justify-self-start"
+											onclick={() => openBuilder(i)}>
+											<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+											<span>Build…</span>
+										</button>
 									</div>
 								</td>
 								<td class="min-w-[8rem]">
@@ -303,3 +348,5 @@
 		{/if}
 	</form>
 </div>
+
+<WafExpressionModal bind:this={expressionModal} oninsert={applyExpression} />
