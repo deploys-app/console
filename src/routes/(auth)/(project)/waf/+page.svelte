@@ -19,7 +19,6 @@
 	 * @property {'log' | 'allow' | 'block'} action
 	 * @property {number | null} status
 	 * @property {string} message
-	 * @property {number | null} priority
 	 */
 
 	const actionOptions = [
@@ -42,9 +41,40 @@
 			expression: rule?.expression ?? '',
 			action: rule?.action ?? 'log',
 			status: rule?.status ?? DEFAULT_STATUS,
-			message: rule?.message ?? DEFAULT_MESSAGE,
-			priority: rule?.priority ?? null
+			message: rule?.message ?? DEFAULT_MESSAGE
 		}
+	}
+
+	// Rule ids are auto-generated and stable for the life of a rule (they appear
+	// in parapet's logs/metrics as rule_id), so they must survive reordering.
+	/**
+	 * @param {string[]} taken
+	 * @returns {string}
+	 */
+	function genId (taken) {
+		let id
+		do {
+			id = 'rule-' + Math.random().toString(36).slice(2, 8)
+		} while (taken.includes(id))
+		return id
+	}
+
+	// Map API rules to form rows: order by priority (lower runs first) so the
+	// visible order is the execution order, and give every row a unique id.
+	/**
+	 * @param {Api.WafRule[]} [apiRules]
+	 * @returns {RuleForm[]}
+	 */
+	function normalizeRules (apiRules) {
+		const sorted = [...(apiRules ?? [])].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+		/** @type {string[]} */
+		const taken = []
+		return sorted.map((r) => {
+			const f = ruleForm(r)
+			if (!f.id || taken.includes(f.id)) f.id = genId(taken)
+			taken.push(f.id)
+			return f
+		})
 	}
 
 	// The whole zone is one editable form, seeded from the initial load. The
@@ -53,7 +83,7 @@
 	const form = $state(untrack(() => ({
 		location: data.location ?? '',
 		description: data.zone?.description ?? '',
-		rules: (data.zone?.rules ?? []).map(ruleForm)
+		rules: normalizeRules(data.zone?.rules)
 	})))
 
 	// True once the current location has a saved zone (enables the delete action).
@@ -64,7 +94,7 @@
 	/** @param {Api.WafZone | null} zone */
 	function applyZone (zone) {
 		form.description = zone?.description ?? ''
-		form.rules = (zone?.rules ?? []).map(ruleForm)
+		form.rules = normalizeRules(zone?.rules)
 		hasZone = !!zone
 	}
 
@@ -93,7 +123,22 @@
 	}
 
 	function addRule () {
-		form.rules = [...form.rules, ruleForm()]
+		const taken = form.rules.map((r) => r.id)
+		const r = ruleForm()
+		r.id = genId(taken)
+		form.rules = [...form.rules, r]
+	}
+
+	/**
+	 * @param {number} i
+	 * @param {-1 | 1} dir
+	 */
+	function moveRule (i, dir) {
+		const j = i + dir
+		if (j < 0 || j >= form.rules.length) return
+		const next = [...form.rules]
+		;[next[i], next[j]] = [next[j], next[i]]
+		form.rules = next
 	}
 
 	/** @type {WafExpressionModal} */
@@ -130,12 +175,13 @@
 
 		saving = true
 		try {
-			const rules = form.rules.map((r) => ({
+			const rules = form.rules.map((r, i) => ({
 				id: r.id,
 				description: r.description,
 				expression: r.expression,
 				action: r.action,
-				priority: Number(r.priority) || 0,
+				// Priority follows row order — the top rule runs first.
+				priority: i,
 				// status + message only apply when blocking.
 				...(r.action === 'block'
 					? {
@@ -247,18 +293,15 @@
 							<th>Description</th>
 							<th>Expression (CEL)</th>
 							<th>Action</th>
-							<th>Priority</th>
 							<th>Response</th>
-							<th class="is-collapse is-align-right"></th>
+							<th class="is-collapse is-align-right">Order</th>
 						</tr>
 					</thead>
 					<tbody>
-						{#each form.rules as rule, i (i)}
+						{#each form.rules as rule, i (rule.id)}
 							<tr>
 								<td>
-									<div class="input">
-										<input bind:value={rule.id} placeholder="id">
-									</div>
+									<span class="font-mono text-sm text-content/60">{rule.id}</span>
 								</td>
 								<td>
 									<div class="input">
@@ -268,25 +311,28 @@
 								<td class="w-full min-w-[20rem]">
 									<div class="grid gap-2">
 										<div class="textarea">
-											<textarea class="font-mono" rows="2" bind:value={rule.expression}
-												placeholder="e.g. hasPrefixAny(request.path, [&quot;/admin&quot;])"></textarea>
+											<textarea class="font-mono" rows="2" readonly bind:value={rule.expression}
+												placeholder="Use Build… to compose this rule’s condition"></textarea>
 										</div>
-										<button type="button" class="button is-variant-secondary is-size-small justify-self-start"
-											onclick={() => openBuilder(i)}>
-											<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
-											<span>Build…</span>
-										</button>
+										<div class="flex gap-2 justify-self-start">
+											<button type="button" class="button is-variant-secondary is-size-small"
+												onclick={() => openBuilder(i)}>
+												<i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+												<span>Build…</span>
+											</button>
+											<button type="button" class="button is-variant-tertiary is-size-small"
+												disabled={!rule.expression}
+												onclick={() => { rule.expression = '' }}>
+												<i class="fa-solid fa-eraser mr-2"></i>
+												<span>Clear</span>
+											</button>
+										</div>
 									</div>
 								</td>
 								<td class="min-w-[8rem]">
 									<Select
 										bind:value={rule.action}
 										options={actionOptions} />
-								</td>
-								<td class="min-w-[6rem]">
-									<div class="input">
-										<input type="number" bind:value={rule.priority} placeholder="0">
-									</div>
 								</td>
 								<td class="min-w-[14rem]">
 									{#if rule.action === 'block'}
@@ -305,16 +351,26 @@
 									{/if}
 								</td>
 								<td>
-									<button class="icon-button" type="button" aria-label="Remove rule"
-										onclick={() => removeRule(i)}>
-										<i class="fa-solid fa-trash-alt"></i>
-									</button>
+									<div class="flex gap-1 justify-end">
+										<button class="icon-button" type="button" aria-label="Move rule up"
+											disabled={i === 0} onclick={() => moveRule(i, -1)}>
+											<i class="fa-solid fa-chevron-up"></i>
+										</button>
+										<button class="icon-button" type="button" aria-label="Move rule down"
+											disabled={i === form.rules.length - 1} onclick={() => moveRule(i, 1)}>
+											<i class="fa-solid fa-chevron-down"></i>
+										</button>
+										<button class="icon-button" type="button" aria-label="Remove rule"
+											onclick={() => removeRule(i)}>
+											<i class="fa-solid fa-trash-alt"></i>
+										</button>
+									</div>
 								</td>
 							</tr>
 						{/each}
 						{#if form.rules.length === 0}
 							<tr>
-								<td colspan="7" class="text-center text-content/50">
+								<td colspan="6" class="text-center text-content/50">
 									No rules yet. Add a rule to start filtering traffic.
 								</td>
 							</tr>
@@ -322,7 +378,7 @@
 					</tbody>
 					<tfoot>
 						<tr>
-							<td colspan="7">
+							<td colspan="6">
 								<button class="button is-variant-secondary flex m-auto" type="button"
 									onclick={addRule}>
 									<i class="fa-solid fa-plus mr-3"></i>
