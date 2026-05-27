@@ -51,6 +51,10 @@
 				<td>
 					{#if index > 0}
 						<button class="button is-variant-secondary is-size-small" type="button" onclick={() => rollback(it.revision)}>Rollback</button>
+					{:else}
+						<!-- Reserve the button's height so the current revision's row
+						     matches the height of rows that have a Rollback button. -->
+						<button class="button is-variant-secondary is-size-small invisible" type="button" tabindex="-1" aria-hidden="true">Rollback</button>
 					{/if}
 				</td>
 			</tr>
