@@ -17,6 +17,8 @@
 	let isActive = $state(false)
 	let search = $state('')
 	let elSearch = $state(/** @type {?HTMLInputElement} */ (null))
+	let highlighted = $state(0)
+	const rowEls = $state(/** @type {HTMLElement[]} */ ([]))
 
 	const filtered = $derived.by(() => {
 		const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
@@ -25,6 +27,11 @@
 			const haystack = `${it.name} ${it.project}`.toLowerCase()
 			return tokens.every((t) => haystack.includes(t))
 		})
+	})
+
+	// Keep the keyboard-highlighted row scrolled into view as it moves.
+	$effect(() => {
+		rowEls[highlighted]?.scrollIntoView({ block: 'nearest' })
 	})
 
 	/**
@@ -46,6 +53,7 @@
 
 	export async function open () {
 		search = ''
+		highlighted = 0
 		isActive = true
 		await tick()
 		elSearch?.focus()
@@ -66,11 +74,19 @@
 	}
 
 	/**
+	 * Arrow Up/Down move the highlighted row; Enter selects it.
 	 * @param {KeyboardEvent} e
 	 */
 	function onSearchKeydown (e) {
-		if (e.key === 'Enter' && filtered.length) {
-			setProject(filtered[0].project)
+		if (!filtered.length) return
+		if (e.key === 'ArrowDown') {
+			e.preventDefault()
+			highlighted = Math.min(highlighted + 1, filtered.length - 1)
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault()
+			highlighted = Math.max(highlighted - 1, 0)
+		} else if (e.key === 'Enter') {
+			setProject(filtered[highlighted].project)
 		}
 	}
 </script>
@@ -86,6 +102,7 @@
 				bind:this={elSearch}
 				bind:value={search}
 				onkeydown={onSearchKeydown}
+				oninput={() => highlighted = 0}
 				type="text"
 				placeholder="Search projects…"
 				autocomplete="off"
@@ -102,8 +119,8 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each filtered as it (it.project)}
-					<tr>
+					{#each filtered as it, i (it.project)}
+					<tr bind:this={rowEls[i]} class:is-highlighted={i === highlighted} onmouseenter={() => highlighted = i}>
 						<td>
 							{#if project === it.project}
 								<i class="fas fa-check text-primary text-xl"></i>
@@ -136,6 +153,10 @@
 	.table td {
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
+	}
+
+	.table tbody tr.is-highlighted td {
+		background-color: hsl(var(--hsl-primary) / 0.1);
 	}
 
 	.modal-panel {
