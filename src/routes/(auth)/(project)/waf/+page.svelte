@@ -134,20 +134,24 @@
 						</td>
 						<td>{fw.rules?.length ?? 0}</td>
 						<td>
-							{#if metrics[fw.location]?.loading}
-								<span class="text-content/30"><i class="fa-solid fa-spinner-third fa-spin"></i></span>
-							{:else if (metrics[fw.location]?.total ?? 0) > 0}
-								<a class="matches-link flex items-center gap-3"
-									href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`}
-									title={`${metrics[fw.location].total.toLocaleString()} matches in the last 24h — view metrics`}>
-									<span class="font-mono text-sm tabular-nums">
-										{format.count(metrics[fw.location].total)}
-									</span>
-									<Sparkline points={metrics[fw.location].points} {from} {to} />
-								</a>
-							{:else}
-								<span class="text-content/40">—</span>
-							{/if}
+							<!-- Reserve the loaded size in every state so the row/column keeps
+							     its dimensions while the async sparkline fills in (no layout shift). -->
+							<div class="matches-cell">
+								{#if metrics[fw.location]?.loading}
+									<span class="text-content/30"><i class="fa-solid fa-spinner-third fa-spin"></i></span>
+								{:else if (metrics[fw.location]?.total ?? 0) > 0}
+									<a class="matches-link flex items-center gap-3"
+										href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`}
+										title={`${metrics[fw.location].total.toLocaleString()} matches in the last 24h — view metrics`}>
+										<span class="font-mono text-sm tabular-nums">
+											{format.count(metrics[fw.location].total)}
+										</span>
+										<Sparkline points={metrics[fw.location].points} {from} {to} />
+									</a>
+								{:else}
+									<span class="text-content/40">—</span>
+								{/if}
+							</div>
 						</td>
 						<td>
 							<div class="flex gap-1 justify-end">
@@ -174,6 +178,16 @@
 </div>
 
 <style>
+	/* Hold a fixed box across the loading / loaded / empty states: min-height
+	   matches the Sparkline's height (28px) and min-width its count + chart, so
+	   the row doesn't grow taller or the column wider when the chart loads. */
+	.matches-cell {
+		display: flex;
+		align-items: center;
+		min-height: 28px;
+		min-width: 10rem;
+	}
+
 	/* The matches total + sparkline doubles as a shortcut into the metrics view. */
 	.matches-link {
 		width: fit-content;

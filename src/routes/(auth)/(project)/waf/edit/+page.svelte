@@ -117,6 +117,21 @@
 	function cancel () {
 		backToManage()
 	}
+
+	// Enter inside a text field (the method value combobox, the plain value input,
+	// description/status/message) must not implicitly submit the rule — in the
+	// value widgets it means "pick/add this value", elsewhere nothing. Saving is
+	// deliberate, via the Save button. Enter still works on the button itself
+	// (a <button>, not an <input>) and in the raw-CEL <textarea>.
+	/** @param {HTMLFormElement} node */
+	function blockEnterSubmit (node) {
+		/** @param {KeyboardEvent} e */
+		function onKeydown (e) {
+			if (e.key === 'Enter' && e.target instanceof HTMLInputElement) e.preventDefault()
+		}
+		node.addEventListener('keydown', onKeydown)
+		return { destroy: () => node.removeEventListener('keydown', onKeydown) }
+	}
 </script>
 
 <div class="breadcrumb">
@@ -142,7 +157,7 @@
 
 	<hr>
 
-	<form class="grid gap-6 w-full" onsubmit={save}>
+	<form class="grid gap-6 w-full" onsubmit={save} use:blockEnterSubmit>
 		<div class="field">
 			<label for="rule-description">Description</label>
 			<div class="input">
