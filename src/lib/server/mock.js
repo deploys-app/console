@@ -48,6 +48,23 @@ function metricLine (name, base) {
 	return [{ name, points }]
 }
 
+/**
+ * dailyMetricLine builds a single daily series — one [unixSeconds, value] point
+ * per day at midnight for the trailing 30 days — for the daily usage charts.
+ * @param {string} name
+ * @param {number} base
+ */
+function dailyMetricLine (name, base) {
+	const day = 86400
+	const now = Math.floor(Date.now() / 1000)
+	const today = now - (now % day)
+	const points = Array.from({ length: 30 }, (_, i) => {
+		const wobble = Math.sin(i / 4) * base * 0.3
+		return [today - (29 - i) * day, Math.max(0, Math.round(base + wobble))]
+	})
+	return [{ name, points }]
+}
+
 const projects = [
 	{
 		id: 'prj_mock_acme',
@@ -821,6 +838,14 @@ const handlers = {
 	'serviceAccount.deleteKey': () => ok({}),
 
 	'dropbox.list': () => list(dropboxItems),
+	'dropbox.metrics': () => ok({
+		egress: dailyMetricLine('egress', 52428800),
+		storage: dailyMetricLine('storage', 268435456)
+	}),
+	'registry.metrics': () => ok({
+		egress: dailyMetricLine('egress', 104857600),
+		storage: dailyMetricLine('storage', 1073741824)
+	}),
 
 	'registry/list': () => list(repositories),
 	'registry/get': (args) => ok({ ...repositories[0], name: args?.repository ?? repositories[0].name }),

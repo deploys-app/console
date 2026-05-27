@@ -283,12 +283,6 @@
 	}
 </style>
 
-<div class="page-head">
-	<div>
-		<h4><strong>Dropbox</strong></h4>
-		<p class="page-sub">Upload and share files</p>
-	</div>
-</div>
 <div class="panel is-level-300 grid gap-4">
 	<div>
 		<p class="mb-0.5">Upload a file and get a shareable download URL.</p>
