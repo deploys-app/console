@@ -243,6 +243,9 @@
 <div class="select-box {className}" class:is-disabled={disabled} use:clickOutside={close}>
 	{#if editable}
 		<div class="select-trigger select-trigger-editable" class:is-open={open}>
+			<!-- A combobox, not a real text field — suppress browser and
+			     password-manager autofill (1Password / LastPass / Bitwarden /
+			     Dashlane), which ignore autocomplete="off". -->
 			<input
 				bind:this={inputEl}
 				bind:value
@@ -251,6 +254,10 @@
 				class="select-input"
 				role="combobox"
 				autocomplete="off"
+				data-1p-ignore
+				data-lpignore="true"
+				data-bwignore
+				data-form-type="other"
 				aria-autocomplete="list"
 				aria-haspopup="listbox"
 				aria-expanded={open}
