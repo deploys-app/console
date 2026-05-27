@@ -1,7 +1,9 @@
 <script>
+	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	/**
 	 * @typedef {Object} Props
@@ -13,6 +15,16 @@
 
 	const project = $derived($page.url.searchParams.get('project'))
 	let isActive = $state(false)
+	let search = $state('')
+	let elSearch = $state(/** @type {?HTMLInputElement} */ (null))
+
+	const filtered = $derived.by(() => {
+		const q = search.trim().toLowerCase()
+		if (!q) return projects
+		return projects.filter((it) =>
+			it.name.toLowerCase().includes(q) || it.project.toLowerCase().includes(q)
+		)
+	})
 
 	/**
 	 * @param {string} sid
@@ -31,19 +43,53 @@
 		goto(`/?${q.toString()}`)
 	}
 
-	export function open () {
+	export async function open () {
+		search = ''
 		isActive = true
+		await tick()
+		elSearch?.focus()
 	}
 
 	function close () {
 		isActive = false
 	}
+
+	/**
+	 * Close only when the backdrop itself is clicked, not when a click inside
+	 * the panel bubbles up — otherwise interacting with the search would dismiss
+	 * the modal.
+	 * @param {MouseEvent} e
+	 */
+	function onBackdrop (e) {
+		if (e.target === e.currentTarget) close()
+	}
+
+	/**
+	 * @param {KeyboardEvent} e
+	 */
+	function onSearchKeydown (e) {
+		if (e.key === 'Enter' && filtered.length) {
+			setProject(filtered[0].project)
+		}
+	}
 </script>
 
-<div class="modal" onclick={close} class:is-active={isActive} aria-hidden="true">
+<div class="modal" onclick={onBackdrop} class:is-active={isActive} aria-hidden={!isActive}>
 	<div class="modal-panel">
 		<div class="modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
 		<h4>Projects</h4>
+
+		<div class="input -has-icon-left mt-4">
+			<span class="icon -is-left"><i class="fa-solid fa-magnifying-glass"></i></span>
+			<input
+				bind:this={elSearch}
+				bind:value={search}
+				onkeydown={onSearchKeydown}
+				type="text"
+				placeholder="Search projects…"
+				autocomplete="off"
+			>
+		</div>
 
 		<div class="table-container mt-4">
 			<table class="table is-variant-compact" style="--table-data-font-size: var(--fs-2)">
@@ -55,7 +101,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each projects as it (it.project)}
+					{#each filtered as it (it.project)}
 					<tr>
 						<td>
 							{#if project === it.project}
@@ -73,6 +119,7 @@
 						<td>{it.project}</td>
 					</tr>
 					{/each}
+					<NoDataRow span={3} list={filtered} icon="fa-magnifying-glass" message="No projects match your search" />
 				</tbody>
 			</table>
 		</div>
