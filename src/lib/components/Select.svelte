@@ -199,10 +199,11 @@
 			open ? moveActive(-1) : openMenu()
 			break
 		case 'Enter':
-			// Commit the active option if one is highlighted; otherwise keep the
-			// typed text as-is and just close the menu.
+			// Enter inside the combobox must never submit the surrounding form:
+			// commit the highlighted option if any, otherwise just close the menu
+			// and keep the typed text.
+			e.preventDefault()
 			if (open && activeIndex >= 0) {
-				e.preventDefault()
 				commit(visibleOptions[activeIndex])
 			} else if (open) {
 				close()
