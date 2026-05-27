@@ -85,6 +85,8 @@
 		<code class="font-mono">.user_agent</code>,
 		<code class="font-mono">.referer</code>,
 		<code class="font-mono">.remote_ip</code>,
+		<code class="font-mono">.country</code>,
+		<code class="font-mono">.asn</code>,
 		<code class="font-mono">.content_length</code>,
 		<code class="font-mono">.headers[…]</code>,
 		<code class="font-mono">.args[…]</code>,

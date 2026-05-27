@@ -202,6 +202,8 @@
 					<code class="font-mono">.user_agent</code>,
 					<code class="font-mono">.referer</code>,
 					<code class="font-mono">.remote_ip</code>,
+					<code class="font-mono">.country</code>,
+					<code class="font-mono">.asn</code>,
 					<code class="font-mono">.content_length</code>,
 					<code class="font-mono">.body</code>,
 					<code class="font-mono">.headers[…]</code>,
@@ -212,7 +214,7 @@
 					<label for="rule-expression-raw">Expression (CEL)</label>
 					<div class="textarea">
 						<textarea id="rule-expression-raw" class="font-mono" rows="5" bind:value={draft.expression}
-							placeholder="e.g. hasPrefixAny(request.path, [&quot;/admin&quot;]) && request.method == &quot;POST&quot;"></textarea>
+							placeholder="e.g. request.path.startsWith(&quot;/admin&quot;) && request.method == &quot;POST&quot;"></textarea>
 					</div>
 				</div>
 			{/if}

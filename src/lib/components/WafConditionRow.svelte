@@ -96,7 +96,11 @@
 				<div class="field">
 					<label for="waf-values">Values</label>
 					<TagInput id="waf-values" bind:tags={valuesList}
-						placeholder="Type a value, press Enter to add" />
+						placeholder={fieldType === 'country'
+							? 'e.g. TH, press Enter to add'
+							: fieldType === 'asn'
+								? 'e.g. 13335, press Enter to add'
+								: 'Type a value, press Enter to add'} />
 				</div>
 			{:else if useCombobox}
 				<div class="field">
@@ -108,21 +112,29 @@
 			{:else}
 				<div class="field">
 					<label for="waf-value">
-						{#if fieldType === 'numeric'}Number
+						{#if fieldType === 'numeric' || fieldType === 'asn'}Number
 						{:else if fieldType === 'ip' && condition.operator === 'in_cidr'}CIDR
 						{:else if condition.operator === 'matches_regex'}Pattern
 						{:else}Value{/if}
 					</label>
 					<div class="input">
 						<input id="waf-value" class="font-mono" bind:value={condition.value}
-							inputmode={fieldType === 'numeric' ? 'numeric' : undefined}
-							placeholder={fieldType === 'numeric'
-								? 'e.g. 1048576'
-								: fieldType === 'ip' && condition.operator === 'in_cidr'
-									? 'e.g. 10.0.0.0/8'
-									: condition.operator === 'matches_regex'
-										? 'e.g. ^/api/v[0-9]+/'
-										: 'Value'}>
+							inputmode={fieldType === 'numeric' || fieldType === 'asn' ? 'numeric' : undefined}
+							placeholder={fieldType === 'asn'
+								? 'e.g. 13335'
+								: fieldType === 'numeric'
+									? 'e.g. 1048576'
+									: fieldType === 'country'
+										? 'e.g. TH'
+										: fieldType === 'ip' && condition.operator === 'in_cidr'
+											? 'e.g. 10.0.0.0/8'
+											: condition.operator === 'matches_regex'
+												? 'e.g. ^/api/v[0-9]+/'
+												: condition.operator === 'starts_with' || condition.operator === 'not_starts_with'
+													? 'e.g. /admin'
+													: condition.operator === 'ends_with' || condition.operator === 'not_ends_with'
+														? 'e.g. .php'
+														: 'Value'}>
 					</div>
 				</div>
 			{/if}

@@ -1,8 +1,9 @@
 // WAF expression builder. Generates a single CEL condition from a structured
-// spec, using ONLY the portable parapet helper functions (containsAny,
-// hasPrefixAny, regexMatch, ipInCidr, lower, urlDecode) — never the
-// `.startsWith`/`.contains`/`.matches` string methods, which aren't guaranteed
-// across parapet's Go + Rust engines.
+// spec. "Contains any of" uses parapet's containsAny list helper so a whole list
+// matches in one call; the prefix/suffix operators use the standard CEL string
+// methods `startsWith` / `endsWith` (with a leading `!` for the negated "not …"
+// variants), `regexMatch` covers regex, and `ipInCidr` covers CIDR. Other
+// available transforms are lower / upper / urlDecode.
 //
 // This module is a pure, side-effect-free helper so it can be unit-tested and
 // the modal UI stays thin.
@@ -27,7 +28,7 @@ function quote (v) {
 }
 
 /**
- * @typedef {'string' | 'ip' | 'numeric' | 'tls'} FieldType
+ * @typedef {'string' | 'ip' | 'numeric' | 'tls' | 'country' | 'asn'} FieldType
  */
 
 /**
@@ -52,6 +53,8 @@ export const fields = [
 	{ value: 'user_agent', label: 'User-Agent', type: 'string', accessor: 'request.user_agent' },
 	{ value: 'referer', label: 'Referer', type: 'string', accessor: 'request.referer' },
 	{ value: 'remote_ip', label: 'Remote IP', type: 'ip', accessor: 'request.remote_ip' },
+	{ value: 'country', label: 'Country', type: 'country', accessor: 'request.country' },
+	{ value: 'asn', label: 'ASN', type: 'asn', accessor: 'request.asn' },
 	{ value: 'content_length', label: 'Content-Length', type: 'numeric', accessor: 'request.content_length' },
 	{ value: 'header', label: 'Header', type: 'string', hasName: true, accessorMap: 'request.headers["<name>"]' },
 	{ value: 'arg', label: 'Query arg', type: 'string', hasName: true, accessorMap: 'request.args["<name>"]' },
@@ -77,15 +80,51 @@ export function getField (value) {
 const stringOperators = [
 	{ value: 'equals', label: 'equals' },
 	{ value: 'not_equals', label: 'not equals' },
+	{ value: 'in_list', label: 'is in', multi: true },
+	{ value: 'not_in_list', label: 'is not in', multi: true },
 	{ value: 'contains_any', label: 'contains any of', multi: true },
-	{ value: 'starts_with_any', label: 'starts with any of', multi: true },
+	{ value: 'starts_with', label: 'starts with' },
+	{ value: 'not_starts_with', label: 'not starts with' },
+	{ value: 'ends_with', label: 'ends with' },
+	{ value: 'not_ends_with', label: 'not ends with' },
 	{ value: 'matches_regex', label: 'matches regex' }
 ]
+
+/**
+ * String operators backed by a standard CEL string method. `negate` wraps the
+ * call in a leading `!`. Single source of truth for both the generator and the
+ * inverse parser (`operatorByMethod`).
+ * @type {Record<string, { method: 'startsWith' | 'endsWith', negate: boolean }>}
+ */
+const methodOperators = {
+	starts_with: { method: 'startsWith', negate: false },
+	not_starts_with: { method: 'startsWith', negate: true },
+	ends_with: { method: 'endsWith', negate: false },
+	not_ends_with: { method: 'endsWith', negate: true }
+}
+
+/** Reverse of `methodOperators`, keyed `"<method>:<negate>"`. */
+const operatorByMethod = Object.fromEntries(
+	Object.entries(methodOperators).map(([op, m]) => [`${m.method}:${m.negate}`, op])
+)
 
 /** @type {OperatorMeta[]} */
 const ipOperators = [
 	{ value: 'in_cidr', label: 'in CIDR' },
 	{ value: 'ip_equals', label: 'equals' }
+]
+
+/**
+ * Operators for fields matched by exact value or list membership (country code,
+ * ASN). `in_list` / `not_in_list` build a CEL `in […]` membership; the field
+ * type decides whether operands are quoted (country) or raw ints (asn).
+ * @type {OperatorMeta[]}
+ */
+const membershipOperators = [
+	{ value: 'equals', label: 'equals' },
+	{ value: 'not_equals', label: 'not equals' },
+	{ value: 'in_list', label: 'is in', multi: true },
+	{ value: 'not_in_list', label: 'is not in', multi: true }
 ]
 
 /** @type {OperatorMeta[]} */
@@ -117,6 +156,8 @@ export function operatorsForType (type) {
 	switch (type) {
 	case 'ip': return ipOperators
 	case 'numeric': return numericOperators
+	case 'country': return membershipOperators
+	case 'asn': return membershipOperators
 	case 'tls': return []
 	default: return stringOperators
 	}
@@ -124,7 +165,7 @@ export function operatorsForType (type) {
 
 /** @param {string} op */
 export function isMultiOperator (op) {
-	return op === 'contains_any' || op === 'starts_with_any'
+	return op === 'contains_any' || op === 'in_list' || op === 'not_in_list'
 }
 
 /**
@@ -203,14 +244,55 @@ export function buildExpression (spec) {
 		} else {
 			return ''
 		}
+	} else if (f.type === 'country') {
+		// Country code (ISO 3166-1 alpha-2). Membership uses CEL's `in` operator
+		// over a string list; "is not any of" negates the whole `in` with `!(…)`.
+		if (spec.operator === 'in_list' || spec.operator === 'not_in_list') {
+			const list = parseList(spec.values ?? '')
+			if (list.length === 0) return ''
+			const items = list.map((v) => quote(v)).join(', ')
+			const inExpr = `${accessor} in [${items}]`
+			snippet = spec.operator === 'not_in_list' ? `!(${inExpr})` : inExpr
+		} else {
+			const v = (spec.value ?? '').trim()
+			if (v === '') return ''
+			const op = spec.operator === 'not_equals' ? '!=' : '=='
+			snippet = `${accessor} ${op} ${quote(v)}`
+		}
+	} else if (f.type === 'asn') {
+		// Autonomous system number — integer operands (unquoted). Membership uses
+		// CEL's `in` operator; "is not in" negates the whole `in` with `!(…)`.
+		if (spec.operator === 'in_list' || spec.operator === 'not_in_list') {
+			const list = parseList(spec.values ?? '').filter((v) => /^\d+$/.test(v))
+			if (list.length === 0) return ''
+			const inExpr = `${accessor} in [${list.join(', ')}]`
+			snippet = spec.operator === 'not_in_list' ? `!(${inExpr})` : inExpr
+		} else {
+			const raw = (spec.value ?? '').trim()
+			if (!/^\d+$/.test(raw)) return ''
+			const op = spec.operator === 'not_equals' ? '!=' : '=='
+			snippet = `${accessor} ${op} ${raw}`
+		}
 	} else {
 		// string field
 		if (isMultiOperator(spec.operator)) {
 			const list = parseList(spec.values ?? '')
 			if (list.length === 0) return ''
 			const items = list.map((v) => quote(v)).join(', ')
-			const fn = spec.operator === 'contains_any' ? 'containsAny' : 'hasPrefixAny'
-			snippet = `${fn}(${accessor}, [${items}])`
+			if (spec.operator === 'contains_any') {
+				snippet = `containsAny(${accessor}, [${items}])`
+			} else {
+				// in_list / not_in_list — CEL `in` membership over a string list.
+				const inExpr = `${accessor} in [${items}]`
+				snippet = spec.operator === 'not_in_list' ? `!(${inExpr})` : inExpr
+			}
+		} else if (methodOperators[spec.operator]) {
+			// Prefix/suffix match via the standard CEL string method, negated with
+			// a leading `!` for the "not …" variants.
+			const v = spec.value ?? ''
+			if (v === '') return ''
+			const { method, negate } = methodOperators[spec.operator]
+			snippet = `${negate ? '!' : ''}${accessor}.${method}(${quote(v)})`
 		} else if (spec.operator === 'matches_regex') {
 			const pattern = spec.value ?? ''
 			if (pattern === '') return ''
@@ -420,10 +502,11 @@ function matchAccessor (s) {
 		if (s.startsWith(accessor) && (!best || accessor.length > best.length)) best = accessor
 	}
 	if (!best) return null
-	// The accessor must be followed by a boundary (space, operator, or end) so a
-	// fixed accessor isn't matched as a prefix of something longer.
+	// The accessor must be followed by a boundary (space, operator, `.` method
+	// call, or end) so a fixed accessor isn't matched as a prefix of something
+	// longer.
 	const next = s[best.length]
-	if (next !== undefined && next !== ' ' && next !== ')' && next !== ',') return null
+	if (next !== undefined && next !== ' ' && next !== ')' && next !== ',' && next !== '.') return null
 	return { field: fieldByAccessor[best], end: best.length }
 }
 
@@ -452,6 +535,67 @@ function matchList (s) {
 }
 
 /**
+ * Parse the bracketed, comma-separated integer list at the START of `s`
+ * (`[13335, 16509]` exactly as the generator emits). Returns the items (as
+ * strings) and the consumed length, or `null` when malformed.
+ * @param {string} s
+ * @returns {{ items: string[], end: number } | null}
+ */
+function matchIntList (s) {
+	if (s[0] !== '[') return null
+	let i = 1
+	/** @type {string[]} */
+	const items = []
+	// Empty list is never emitted (buildExpression returns '' for it).
+	while (true) {
+		const m = /^\d+/.exec(s.slice(i))
+		if (!m) return null
+		items.push(m[0])
+		i += m[0].length
+		if (s[i] === ']') return items.length ? { items, end: i + 1 } : null
+		if (s.slice(i, i + 2) !== ', ') return null
+		i += 2
+	}
+}
+
+/**
+ * Parse the `<accessor>.startsWith("v")` / `.endsWith("v")` method forms — each
+ * optionally negated with a leading `!` (the "not …" operators). String fields
+ * only. Returns the spec or `null`.
+ * @param {string} s
+ * @returns {ExpressionSpec | null}
+ */
+function parseMethodCall (s) {
+	let negate = false
+	let body = s
+	if (body.startsWith('!')) {
+		negate = true
+		body = body.slice(1)
+	}
+	const acc = matchAccessor(body)
+	if (!acc) return null
+	const field = getField(acc.field)
+	if (!field || field.type !== 'string') return null
+	const rest = body.slice(acc.end)
+	/** @type {'startsWith' | 'endsWith' | null} */
+	let method = null
+	if (rest.startsWith('.startsWith(')) method = 'startsWith'
+	else if (rest.startsWith('.endsWith(')) method = 'endsWith'
+	if (!method) return null
+	const inner = rest.slice(method.length + 2) // ".<method>(" → '.' + method + '('
+	const lit = matchStringLiteral(inner)
+	if (!lit || inner.slice(lit.end) !== ')') return null
+	const operator = operatorByMethod[`${method}:${negate}`]
+	if (!operator) return null
+	return {
+		field: acc.field,
+		...(acc.name !== undefined ? { name: acc.name } : {}),
+		operator,
+		value: lit.value
+	}
+}
+
+/**
  * Parse exactly one CEL condition (a single conjunct) back into an
  * `ExpressionSpec`. Strict: only forms `buildExpression` can emit are accepted.
  * Returns `null` for anything else.
@@ -462,8 +606,20 @@ function parseCondition (part) {
 	const s = part.trim()
 	if (!s) return null
 
-	// Function-call forms: containsAny / hasPrefixAny / regexMatch / ipInCidr.
-	const fnMatch = /^(containsAny|hasPrefixAny|regexMatch|ipInCidr)\(/.exec(s)
+	// Method-call forms: `<accessor>.startsWith("v")` / `.endsWith("v")`, each
+	// optionally negated with a leading `!`.
+	const method = parseMethodCall(s)
+	if (method) return method
+
+	// Negated membership: `!(<accessor> in [...])` → `not_in_list`.
+	if (s.startsWith('!(') && s.endsWith(')')) {
+		const inner = parseCondition(s.slice(2, -1))
+		if (inner && inner.operator === 'in_list') return { ...inner, operator: 'not_in_list' }
+		return null
+	}
+
+	// Function-call forms: containsAny / regexMatch / ipInCidr.
+	const fnMatch = /^(containsAny|regexMatch|ipInCidr)\(/.exec(s)
 	if (fnMatch) {
 		const fn = fnMatch[1]
 		const acc = matchAccessor(s.slice(fn.length + 1))
@@ -471,7 +627,7 @@ function parseCondition (part) {
 		let i = fn.length + 1 + acc.end
 		if (s.slice(i, i + 2) !== ', ') return null
 		i += 2
-		if (fn === 'containsAny' || fn === 'hasPrefixAny') {
+		if (fn === 'containsAny') {
 			const list = matchList(s.slice(i))
 			if (!list) return null
 			i += list.end
@@ -479,7 +635,7 @@ function parseCondition (part) {
 			return {
 				field: acc.field,
 				...(acc.name !== undefined ? { name: acc.name } : {}),
-				operator: fn === 'containsAny' ? 'contains_any' : 'starts_with_any',
+				operator: 'contains_any',
 				values: list.items.join('\n')
 			}
 		}
@@ -517,6 +673,32 @@ function parseCondition (part) {
 		return { field: acc.field, operator: opKey, value: m[2] }
 	}
 
+	if (field.type === 'country') {
+		// `request.country in ["..", ".."]` (membership) or `== "X"` / `!= "X"`.
+		if (rest.startsWith(' in ')) {
+			const list = matchList(rest.slice(4))
+			if (!list || 4 + list.end !== rest.length) return null
+			return { field: acc.field, operator: 'in_list', values: list.items.join('\n') }
+		}
+		const m = /^ (==|!=) /.exec(rest)
+		if (!m) return null
+		const lit = matchStringLiteral(rest.slice(m[0].length))
+		if (!lit || lit.end !== rest.length - m[0].length) return null
+		return { field: acc.field, operator: m[1] === '!=' ? 'not_equals' : 'equals', value: lit.value }
+	}
+
+	if (field.type === 'asn') {
+		// `request.asn in [13335, 16509]` (membership) or `== 13335` / `!= 13335`.
+		if (rest.startsWith(' in ')) {
+			const list = matchIntList(rest.slice(4))
+			if (!list || 4 + list.end !== rest.length) return null
+			return { field: acc.field, operator: 'in_list', values: list.items.join('\n') }
+		}
+		const m = /^ (==|!=) (\d+)$/.exec(rest)
+		if (!m) return null
+		return { field: acc.field, operator: m[1] === '!=' ? 'not_equals' : 'equals', value: m[2] }
+	}
+
 	if (field.type === 'tls') {
 		// `request.scheme == "https"` (TLS on) / `"http"` (TLS off).
 		if (!rest.startsWith(' == ')) return null
@@ -535,7 +717,17 @@ function parseCondition (part) {
 		return { field: 'remote_ip', operator: 'ip_equals', value: lit.value }
 	}
 
-	// string field: `<acc> == "v"` / `<acc> != "v"`.
+	// string field: `<acc> in ["a", "b"]` membership, or `== "v"` / `!= "v"`.
+	if (rest.startsWith(' in ')) {
+		const list = matchList(rest.slice(4))
+		if (!list || 4 + list.end !== rest.length) return null
+		return {
+			field: acc.field,
+			...(acc.name !== undefined ? { name: acc.name } : {}),
+			operator: 'in_list',
+			values: list.items.join('\n')
+		}
+	}
 	const opMatch = /^ (==|!=) /.exec(rest)
 	if (!opMatch) return null
 	rest = rest.slice(opMatch[0].length)
