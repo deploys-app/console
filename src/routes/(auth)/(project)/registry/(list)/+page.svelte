@@ -51,8 +51,7 @@
 {/if}
 
 <div class="panel is-level-300">
-	<p>registry.deploys.app/{project}/{'{repository}'}:{'{tag}'}</p>
-	<div class="table-container mt-4">
+	<div class="table-container">
 		<table class="table is-variant-compact">
 			<thead>
 				<tr>
