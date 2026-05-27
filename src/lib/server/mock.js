@@ -252,6 +252,13 @@ const wafZone = {
 			expression: "request.headers['user-agent'].contains('bot')",
 			action: 'log',
 			priority: 20
+		},
+		{
+			id: 'allow-office',
+			description: 'Always allow the office egress IP',
+			expression: "request.ip == '203.0.113.7'",
+			action: 'allow',
+			priority: 30
 		}
 	],
 	status: 'success',
@@ -260,25 +267,30 @@ const wafZone = {
 	createdBy: USER_EMAIL
 }
 
-// Synthetic 24h match metrics for the seed zone, so the firewall index sparkline
-// + total have something to draw. Scatters per-minute counts across the window
-// per (rule, action), mirroring waf.metrics' shape (sparse buckets, grand total).
-function wafMetrics () {
+/** @type {Record<string, number>} */
+const wafRangeSeconds = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
+
+// Synthetic match metrics for the seed zone, so the firewall index sparkline +
+// total and the metrics page have something to draw. Scatters counts across the
+// requested window per (rule, action), mirroring waf.metrics' shape (sparse
+// buckets, grand total).
+/** @param {string} [timeRange] */
+function wafMetrics (timeRange) {
 	const now = Math.floor(Date.now() / 1000)
-	const minute = 60
+	const windowSeconds = wafRangeSeconds[timeRange ?? '1d'] ?? wafRangeSeconds['1d']
 
 	/**
 	 * @param {string} ruleId
 	 * @param {Api.WafAction} action
-	 * @param {number} buckets  // how many active minutes
-	 * @param {number} scale    // max count per minute
+	 * @param {number} buckets  // how many active samples
+	 * @param {number} scale    // max count per sample
 	 */
 	const makeSeries = (ruleId, action, buckets, scale) => {
 		/** @type {[number, number][]} */
 		const points = []
 		let total = 0
 		for (let i = 0; i < buckets; i++) {
-			const ts = now - Math.floor(Math.random() * 24 * 60) * minute
+			const ts = now - Math.floor(Math.random() * windowSeconds)
 			const v = 1 + Math.floor(Math.random() * scale)
 			points.push([ts, v])
 			total += v
@@ -288,8 +300,9 @@ function wafMetrics () {
 	}
 
 	const series = [
-		makeSeries('block-admin', 'block', 36, 6),
-		makeSeries('log-bots', 'log', 80, 3)
+		makeSeries('block-admin', 'block', 60, 6),
+		makeSeries('log-bots', 'log', 90, 3),
+		makeSeries('allow-office', 'allow', 24, 2)
 	]
 	const total = series.reduce((acc, s) => acc + s.total, 0)
 	return { series, total }
@@ -758,7 +771,7 @@ const handlers = {
 		// Seed zone has activity; session-created zones read empty (shows the "—"
 		// no-traffic state on the index).
 		const location = args?.location ?? LOCATION_ID
-		if (location === LOCATION_ID) return ok(wafMetrics())
+		if (location === LOCATION_ID) return ok(wafMetrics(args?.timeRange))
 		return ok({ series: [], total: 0 })
 	},
 	'waf.delete': (args) => {
