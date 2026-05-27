@@ -108,6 +108,7 @@ declare namespace Api {
         features: {
             workloadIdentity?: boolean
             disk?: Record<string, never>
+            waf?: Record<string, never>
         }
         createdAt: string
     }

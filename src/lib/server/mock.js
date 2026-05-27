@@ -77,7 +77,7 @@ const locations = [
 		cname: 'rcf2.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {} },
 		createdAt: CREATED_AT
 	},
 	{
@@ -87,7 +87,7 @@ const locations = [
 		cname: 'sg1.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {} },
 		createdAt: CREATED_AT
 	}
 ]
