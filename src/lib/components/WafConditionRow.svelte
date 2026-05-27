@@ -161,7 +161,7 @@
 	</div>
 
 	{#if removable}
-		<button type="button" class="row-remove button is-variant-tertiary is-icon-left is-size-small"
+		<button type="button" class="row-remove button is-variant-tertiary is-size-small"
 			aria-label="Remove condition" onclick={onremove}>
 			<i class="fa-solid fa-trash-can"></i>
 		</button>
