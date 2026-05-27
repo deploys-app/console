@@ -28,17 +28,18 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<h3>
+<div class="page-head">
+	<div class="min-w-0">
+		<h4 class="flex flex-wrap items-center gap-y-2 min-w-0">
 			<StatusIcon status={disk.status} />
-			<strong>Disk: {disk.name}</strong>
-		</h3>
+			<strong class="min-w-0 wrap-anywhere">{disk.name}</strong>
+		</h4>
+		<p class="page-sub">Persistent disk in <span class="font-mono">{disk.location}</span></p>
 	</div>
+</div>
 
-	<hr>
-
-	<div class="tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
+<div class="panel is-level-300 grid gap-6">
+	<div class="tabs is-variant-underline w-full flex-col lg:flex-row">
 		<a class="tab-button"
 			class:is-active={$page.url.pathname === '/disk/metrics'}
 			href={`/disk/metrics?project=${project}&location=${disk.location}&name=${disk.name}`}>

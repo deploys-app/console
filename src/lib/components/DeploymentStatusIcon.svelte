@@ -144,4 +144,4 @@
 	})
 </script>
 
-<i bind:this={el} class={`${iconClass} fa-fw mx-3`}></i>
+<i bind:this={el} class={`${iconClass} fa-fw mr-3`}></i>

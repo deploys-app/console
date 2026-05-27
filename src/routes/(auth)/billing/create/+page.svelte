@@ -68,13 +68,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<div class="flex items-center">
-			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Account information</strong></h3>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>{#if billingAccount}Edit billing account{:else}Create billing account{/if}</strong></h4>
+		<p class="page-sub">Contact and tax details used on your invoices.</p>
 	</div>
-	<hr>
+</div>
+
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-name">Account name</label>

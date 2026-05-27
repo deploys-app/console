@@ -44,6 +44,12 @@
 	let open = $state(false)
 	let activeIndex = $state(-1)
 
+	// Safari/iOS ignore autocomplete="off" and contact-autofill an editable text
+	// field. Keeping it readonly until focus means the field isn't an autofill
+	// target when the browser evaluates it; we drop readonly on focus so typing
+	// works, and re-arm on blur for the next focus.
+	let autofillGuard = $state(true)
+
 	/** @type {HTMLButtonElement | undefined} */
 	let triggerEl = $state()
 	/** @type {HTMLInputElement | undefined} */
@@ -193,10 +199,11 @@
 			open ? moveActive(-1) : openMenu()
 			break
 		case 'Enter':
-			// Commit the active option if one is highlighted; otherwise keep the
-			// typed text as-is and just close the menu.
+			// Enter inside the combobox must never submit the surrounding form:
+			// commit the highlighted option if any, otherwise just close the menu
+			// and keep the typed text.
+			e.preventDefault()
 			if (open && activeIndex >= 0) {
-				e.preventDefault()
 				commit(visibleOptions[activeIndex])
 			} else if (open) {
 				close()
@@ -243,6 +250,10 @@
 <div class="select-box {className}" class:is-disabled={disabled} use:clickOutside={close}>
 	{#if editable}
 		<div class="select-trigger select-trigger-editable" class:is-open={open}>
+			<!-- A combobox, not a real text field — suppress browser and
+			     password-manager autofill (1Password / LastPass / Bitwarden /
+			     Dashlane). Safari/iOS ignore autocomplete="off", so the input is
+			     also kept readonly until focus (see autofillGuard). -->
 			<input
 				bind:this={inputEl}
 				bind:value
@@ -251,6 +262,11 @@
 				class="select-input"
 				role="combobox"
 				autocomplete="off"
+				data-1p-ignore
+				data-lpignore="true"
+				data-bwignore
+				data-form-type="other"
+				readonly={autofillGuard}
 				aria-autocomplete="list"
 				aria-haspopup="listbox"
 				aria-expanded={open}
@@ -258,6 +274,8 @@
 				aria-activedescendant={open && activeIndex >= 0 ? optionId(activeIndex) : undefined}
 				{placeholder}
 				{disabled}
+				onfocus={() => { autofillGuard = false }}
+				onblur={() => { autofillGuard = true }}
 				oninput={onInput}
 				onkeydown={onInputKeydown}
 				onclick={openMenu}>

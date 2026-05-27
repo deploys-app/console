@@ -43,13 +43,9 @@
 				{#each roles as it (it.role)}
 					<tr>
 						<td>
-							{#if roleCanUpdate(it.role)}
-								<a href="/role/create?project={project}&role={it.role}" class="link">
-									<strong>{it.role}</strong>
-								</a>
-							{:else}
+							<a href="/role/detail?project={project}&role={it.role}" class="link">
 								<strong>{it.role}</strong>
-							{/if}
+							</a>
 						</td>
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>
@@ -61,6 +57,10 @@
 										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
+							{:else}
+								<!-- Reserve the icon-button's footprint so rows without an
+								     edit action keep the same height as the others. -->
+								<div class="w-8 h-8" aria-hidden="true"></div>
 							{/if}
 						</td>
 					</tr>

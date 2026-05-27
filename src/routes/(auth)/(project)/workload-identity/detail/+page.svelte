@@ -47,12 +47,16 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 justify-items-start gap-3">
-		<h3><strong>Workload Identity: {workloadIdentity.name}</strong></h3>
+
+<div class="page-head">
+	<div>
+		<h4><strong>Workload identity</strong></h4>
+		<p class="page-sub">Maps this workload to a Google service account for GCP access.</p>
 	</div>
-	<hr>
-	<div class="content grid gap-4 w-full">
+</div>
+
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid gap-4 w-full">
 		<div class="field">
 			<label for="input-gsa">GSA</label>
 			<div class="input">

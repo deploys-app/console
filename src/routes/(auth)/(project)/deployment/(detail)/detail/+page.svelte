@@ -262,10 +262,6 @@
 	</table>
 </div>
 
-<DangerZone description="Permanently delete this deployment. All running instances will be stopped and removed.">
-	<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-</DangerZone>
-
 <h6><strong>Env Groups</strong></h6>
 <div class="table-container">
 	<table class="table is-variant-compact" style="--table-data-border-color: none">
@@ -344,5 +340,9 @@
 		</tbody>
 	</table>
 </div>
+
+<DangerZone description="Permanently delete this deployment. All running instances will be stopped and removed.">
+	<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+</DangerZone>
 
 <EnvGroupModal bind:this={envGroupModal} />

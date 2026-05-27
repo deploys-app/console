@@ -35,11 +35,13 @@ test.describe('env groups', () => {
 		await page.goto('/env-group/create?project=test-project&name=shared-config')
 
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByRole('heading', { name: 'Update env group "shared-config"' })).toBeVisible()
+		await expect(main.getByRole('heading', { name: 'Edit env group' })).toBeVisible()
 		await expect(main.getByRole('textbox', { name: 'Name', exact: true })).toHaveValue('shared-config')
 		await expect(main.locator('input[placeholder="Variable name"]').nth(0)).toHaveValue('LOG_LEVEL')
 		await expect(main.locator('input[placeholder="Value"]').nth(0)).toHaveValue('info')
 		await expect(main.getByRole('button', { name: 'Update' })).toBeVisible()
-		await expect(main.getByRole('button', { name: 'Delete' })).toBeVisible()
+		// Deletion now lives on the env-group detail page, not the edit form.
+		await expect(main.getByRole('button', { name: 'Delete' })).toHaveCount(0)
+		await expect(main.getByRole('link', { name: 'shared-config' })).toHaveAttribute('href', /\/env-group\/detail\?/)
 	})
 })

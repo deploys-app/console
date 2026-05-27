@@ -364,16 +364,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 justify-items-start gap-3">
-		{#if deployment}
-			<h5><strong>Deploy New Revision</strong></h5>
-		{:else}
-			<h5><strong>Deploy New Deployment</strong></h5>
-		{/if}
+<div class="page-head">
+	<div>
+		<h4><strong>{#if deployment}Deploy new revision{:else}Create deployment{/if}</strong></h4>
+		<p class="page-sub">Configure and roll out a container workload.</p>
 	</div>
-	<hr>
+</div>
 
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="form-section is-first">
 			<h6 class="form-section-title">General</h6>

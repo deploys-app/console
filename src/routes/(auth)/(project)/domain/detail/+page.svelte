@@ -215,21 +215,23 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<h3 class="flex flex-wrap items-center gap-y-2 min-w-0">
+
+<div class="page-head">
+	<div class="min-w-0">
+		<h4 class="flex flex-wrap items-center gap-y-2 min-w-0">
 			<StatusIcon status={headerStatus} />
-			<strong class="min-w-0 wrap-anywhere">Domain: {domain.domain}</strong>
+			<strong>Domain</strong>
 			{#if hasDnsErrors}
 				<i class="fa-solid fa-triangle-exclamation text-warning ml-3"
 					title="DNS verification is failing. See details below."></i>
 			{/if}
-		</h3>
+		</h4>
+		<p class="page-sub font-mono min-w-0 wrap-anywhere">{domain.domain}</p>
 	</div>
+</div>
 
-	<hr>
-
-	<div class="content grid gap-4 w-full">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid gap-4 w-full">
 		<div class="field">
 			<label for="input-gsa">Domain</label>
 			<div class="input">

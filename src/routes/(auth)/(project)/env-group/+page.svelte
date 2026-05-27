@@ -36,7 +36,7 @@
 				{#each envGroups as it (it.name)}
 					<tr>
 						<td>
-							<a class="link" href="/env-group/create?project={project}&name={it.name}">
+							<a class="link" href="/env-group/detail?project={project}&name={it.name}">
 								<strong>{it.name}</strong>
 							</a>
 						</td>

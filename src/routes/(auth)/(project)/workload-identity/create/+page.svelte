@@ -57,13 +57,14 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<div class="flex items-center">
-			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Create</strong></h3>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Create workload identity</strong></h4>
+		<p class="page-sub">Map a workload to a Google service account for GCP access.</p>
 	</div>
-	<hr>
+</div>
+
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-name">Name</label>

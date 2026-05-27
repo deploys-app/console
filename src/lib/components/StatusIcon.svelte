@@ -19,4 +19,4 @@
 	const iconClass = $derived(iconClassByStatus[status] || 'fa-solid fa-minus text-content/40')
 </script>
 
-<i class={`${iconClass} mx-3`}></i>
+<i class={`${iconClass} mr-3`}></i>

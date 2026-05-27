@@ -79,16 +79,15 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<h3 class="mr-6 mb-4 xl:mb-0">
-			<strong>{serviceAccount.name}</strong>
-		</h3>
+<div class="page-head">
+	<div>
+		<h4><strong>Service account</strong></h4>
+		<p class="page-sub">Programmatic identity and its API keys.</p>
 	</div>
+</div>
 
-	<hr>
-
-	<div class="content grid gap-4 w-full">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid gap-4 w-full">
 		<div class="field">
 			<label for="input-email">Email</label>
 			<div class="input">
