@@ -105,7 +105,7 @@
 				{#each firewalls as fw (fw.location)}
 					<tr>
 						<td>
-							<a href={`/waf/manage?project=${project}&location=${encodeURIComponent(fw.location)}`} class="link font-mono">{fw.location}</a>
+							<a href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`} class="link font-mono">{fw.location}</a>
 						</td>
 						<td>
 							{#if fw.status === 'pending'}
@@ -151,11 +151,6 @@
 						</td>
 						<td>
 							<div class="flex gap-1 justify-end">
-								<a class="button is-variant-tertiary is-size-small is-icon-left"
-									href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`}>
-									<i class="fa-solid fa-chart-simple"></i>
-									Metrics
-								</a>
 								<a class="button is-variant-secondary is-size-small"
 									href={`/waf/manage?project=${project}&location=${encodeURIComponent(fw.location)}`}>
 									Manage
