@@ -1,9 +1,8 @@
 <script>
 	import { page } from '$app/stores'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import LineChart from '$lib/components/LineChart.svelte'
 	import { onMount } from 'svelte'
-	import Highcharts from 'highcharts'
-	import * as hc from '$lib/hc'
 	import api from '$lib/api'
 
 	const { data } = $props()
@@ -123,8 +122,6 @@
 			report = report
 				? { ...report, list: [], chart: { categories: [], series: [] } }
 				: report
-			chart?.destroy()
-			chart = null
 			return
 		}
 
@@ -144,57 +141,23 @@
 				filter.projectSids = report.projectSids ?? []
 				bootstrapped = true
 			}
-			initChart()
 		} finally {
 			loading = false
 		}
 	}
 
-	/** @type {HTMLElement} */
-	let chartEl
-	let chart = null
+	// Adapt the report's {categories, series:[{name, data:[]}]} shape onto the
+	// LineChart's category x-axis: each project becomes a smoothed line, x is the
+	// category index, y the cost.
+	const chartCategories = $derived(report?.chart?.categories ?? [])
+	const chartSeries = $derived((report?.chart?.series ?? []).map((/** @type {{name:string, data:number[]}} */ s) => ({
+		name: s.name,
+		points: (s.data ?? []).map((y, i) => ({ x: i, y: +y }))
+	})))
 
-	function initChart () {
-		chart?.destroy()
-		if (!chartEl) return
-		chart = Highcharts.chart(chartEl, {
-			chart: {
-				type: 'spline',
-				backgroundColor: 'transparent',
-				scrollablePlotArea: {
-					minWidth: 600,
-					scrollPositionX: 1
-				}
-			},
-			title: { text: '' },
-			xAxis: {
-				categories: report.chart.categories
-			},
-			yAxis: {
-				title: { text: 'Cost (THB)' }
-			},
-			tooltip: { valueSuffix: ' THB', valueDecimals: 2 },
-			plotOptions: {
-				spline: {
-					lineWidth: 1,
-					states: { hover: { lineWidth: 3 } },
-					marker: { enabled: false }
-				}
-			},
-			series: report.chart.series,
-			responsive: {
-				rules: [{
-					condition: { maxWidth: 500 },
-					chartOptions: {
-						legend: {
-							layout: 'horizontal',
-							align: 'center',
-							verticalAlign: 'bottom'
-						}
-					}
-				}]
-			}
-		})
+	/** @param {number} v axis label — whole THB, no decimals */
+	function axisMoney (v) {
+		return v.toLocaleString(undefined, { maximumFractionDigits: 0 })
 	}
 
 	/** @param {string} v */
@@ -204,9 +167,7 @@
 	}
 
 	onMount(() => {
-		hc.init()
 		fetchReport()
-		return () => { chart?.destroy() }
 	})
 </script>
 
@@ -324,9 +285,18 @@
 				<i class="fa-solid fa-filter-list text-content/40"></i>
 				<p>No projects selected.</p>
 			</div>
+		{:else}
+			<LineChart
+				series={chartSeries}
+				xType="category"
+				categories={chartCategories}
+				smooth
+				legend
+				height={300}
+				formatY={axisMoney}
+				formatValue={money}
+				valueSuffix=" THB" />
 		{/if}
-		<div bind:this={chartEl} class="chart-container"
-			class:is-hidden={!report || filter.projectSids.length === 0}></div>
 	</div>
 
 	<div class="panel is-level-300">
@@ -586,14 +556,6 @@
 		font-size: 0.9375rem;
 		font-weight: 600;
 		color: hsl(var(--hsl-content) / 0.7);
-	}
-
-	.chart-container {
-		min-height: 18rem;
-	}
-
-	.chart-container.is-hidden {
-		display: none;
 	}
 
 	.chart-loading {
