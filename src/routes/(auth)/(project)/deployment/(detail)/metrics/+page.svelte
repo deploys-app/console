@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores'
+	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
@@ -26,8 +27,11 @@
 
 	const reloadInterval = 60 * 1000 // 1m
 
+	const validRanges = new Set(rangeOptions.filter((o) => o.value).map((o) => o.value))
+	const initialRange = $page.url.searchParams.get('range')
+
 	const filter = $state({
-		range: $page.url.searchParams.get('range') || '1hagg'
+		range: initialRange && validRanges.has(initialRange) ? initialRange : '1hagg'
 	})
 
 	let cpu = $state([])
@@ -83,6 +87,14 @@
 		}
 	}
 
+	// Mirror the selected range into the URL so a refresh restores the same window.
+	function selectRange () {
+		const u = new URL($page.url)
+		u.searchParams.set('range', filter.range)
+		replaceState(u, {})
+		fetchMetrics(true)
+	}
+
 	onMount(() => {
 		fetchMetrics()
 
@@ -98,7 +110,7 @@
 	<Select
 		bind:value={filter.range}
 		options={rangeOptions}
-		onchange={() => fetchMetrics(true)} />
+		onchange={selectRange} />
 </div>
 
 <div class="grid gap-4 mt-4 lg:grid-cols-2">
