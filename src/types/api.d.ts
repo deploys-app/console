@@ -519,4 +519,14 @@ declare namespace Api {
         createdAt: string
         expiresAt: string
     }
+
+    export type UsageMetricsLine = {
+        name: string
+        points: [number, number][]
+    }
+
+    export type UsageMetricsResult = {
+        egress: UsageMetricsLine[]
+        storage: UsageMetricsLine[]
+    }
 }
