@@ -24,6 +24,10 @@
 	 * @property {string} [id]          id for the inner input (label association)
 	 * @property {string} [placeholder]
 	 * @property {string} [emptyText]   shown when no option matches the query
+	 * @property {boolean} [allowCustom] offer the typed text as a new value when it
+	 *                                   isn't one of `options` (e.g. an HTTP method
+	 *                                   outside the known set). Off for closed sets
+	 *                                   like country codes.
 	 */
 
 	/** @type {Props} */
@@ -34,7 +38,8 @@
 		tags = $bindable([]),
 		id,
 		placeholder = 'Search',
-		emptyText = 'No matches'
+		emptyText = 'No matches',
+		allowCustom = false
 	} = $props()
 
 	/** Resting/chip label for a stored value (falls back to the bare value). */
@@ -79,6 +84,18 @@
 		if (activeIndex > matches.length - 1) activeIndex = matches.length > 0 ? 0 : -1
 	})
 
+	// Creatable: offer the trimmed query as a new value when it isn't already an
+	// option or (multi) an existing tag. Empty when `allowCustom` is off.
+	const customValue = $derived.by(() => {
+		if (!allowCustom) return ''
+		const v = effectiveQuery.trim()
+		if (!v) return ''
+		const lower = v.toLowerCase()
+		if (options.some((o) => o.value.toLowerCase() === lower || o.label.toLowerCase() === lower)) return ''
+		if (multi && tags.some((t) => t.toLowerCase() === lower)) return ''
+		return v
+	})
+
 	// Single mode: keep the resting text in sync when `value` changes from outside
 	// (the builder keys rows by index, so a row can be reused for a different
 	// condition). Skip while the menu is open so it never clobbers live typing.
@@ -100,6 +117,22 @@
 		} else {
 			value = o.value
 			query = labelOf(o.value)
+			close()
+		}
+	}
+
+	// Commit the typed text as a brand-new value (creatable mode).
+	function commitCustom () {
+		const v = effectiveQuery.trim()
+		if (!v) return
+		if (multi) {
+			if (!tags.includes(v)) tags = [...tags, v]
+			query = ''
+			activeIndex = 0
+			inputEl?.focus()
+		} else {
+			value = v
+			query = labelOf(v)
 			close()
 		}
 	}
@@ -156,6 +189,9 @@
 			if (open && activeIndex >= 0 && matches[activeIndex]) {
 				e.preventDefault()
 				commit(matches[activeIndex])
+			} else if (open && customValue) {
+				e.preventDefault()
+				commitCustom()
 			}
 			break
 		case 'Escape':
@@ -248,9 +284,21 @@
 						<i class="fa-solid fa-check os-check"></i>
 					{/if}
 				</div>
-			{:else}
-				<div class="os-empty">{emptyText}</div>
 			{/each}
+			{#if customValue}
+				<div
+					role="option"
+					tabindex="-1"
+					aria-selected="false"
+					class="os-option os-custom"
+					onmousedown={(e) => { e.preventDefault(); commitCustom() }}>
+					<span class="truncate">Add “<span class="font-mono">{customValue}</span>”</span>
+					<i class="fa-solid fa-plus os-add"></i>
+				</div>
+			{/if}
+			{#if matches.length === 0 && !customValue}
+				<div class="os-empty">{emptyText}</div>
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -381,6 +429,16 @@
 	.os-check {
 		flex-shrink: 0;
 		font-size: 0.75rem;
+		color: hsl(var(--hsl-primary));
+	}
+
+	.os-custom {
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+
+	.os-add {
+		flex-shrink: 0;
+		font-size: 0.6875rem;
 		color: hsl(var(--hsl-primary));
 	}
 

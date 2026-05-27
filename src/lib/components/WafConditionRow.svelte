@@ -111,8 +111,9 @@
 			{:else if isMethod && multi}
 				<div class="field">
 					<label for="waf-values">Methods</label>
-					<OptionSelect multi options={suggestionOptions} bind:tags={valuesList}
-						id="waf-values" placeholder="Select methods" emptyText="No matching method" />
+					<OptionSelect multi allowCustom options={suggestionOptions} bind:tags={valuesList}
+						id="waf-values" placeholder="Select or type a method" emptyText="No matching method" />
+					<p class="helper">Pick from the list or type a custom method (e.g. PURGE), then Enter.</p>
 				</div>
 			{:else if multi}
 				<div class="field">
