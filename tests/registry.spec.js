@@ -26,14 +26,15 @@ test.describe('registry', () => {
 		await setMocks({
 			'__registry/getProjectStorage': {
 				ok: true,
-				result: { size: 1024 * 1024 * 10 } // 10 MiB
+				result: { size: 1024 ** 3 * 10 } // 10 GiB
 			}
 		})
 
 		await page.goto('/registry?project=test-project')
 
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText(/Total Storage:/)).toBeVisible()
+		await expect(main.getByText('Total storage')).toBeVisible()
+		await expect(main.getByText('10 GiB')).toBeVisible()
 	})
 
 	test('empty state when no repositories', async ({ page }) => {
