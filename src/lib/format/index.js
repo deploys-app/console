@@ -45,6 +45,17 @@ export function storage (v) {
 	return (v / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
 }
 
+const compactNumber = new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 })
+
+/**
+ * Compact count, e.g. 950, 1.2K, 3.4M. Used for hit/match totals.
+ * @param {number} v
+ * @returns {string}
+ */
+export function count (v) {
+	return compactNumber.format(v ?? 0)
+}
+
 /**
  * @param {string | undefined | null} v
  * @returns {string}
