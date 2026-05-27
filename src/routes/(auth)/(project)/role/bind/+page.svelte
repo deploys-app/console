@@ -13,8 +13,12 @@
 
 	const project = $derived(data.project)
 
+	// allUsers / allAuthenticatedUsers are valid principals alongside a normal
+	// email. The editable Select has no native pattern, so validate on submit.
+	const EMAIL_RE = /^(allUsers|allAuthenticatedUsers|[^@\s]+@[^@\s]+\.[^@\s]+)$/
+
 	const form = $state(untrack(() => ({
-		email,
+		email: email ?? '',
 		roles: selected
 	})))
 
@@ -39,6 +43,12 @@
 		e.preventDefault()
 
 		if (saving) {
+			return
+		}
+
+		form.email = (form.email ?? '').trim()
+		if (!EMAIL_RE.test(form.email)) {
+			modal.error({ error: 'Enter a valid email address, or use allUsers / allAuthenticatedUsers.' })
 			return
 		}
 
@@ -96,16 +106,21 @@
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-email">Email</label>
-			<div class="input">
-				<input id="input-email" type="text" placeholder="Email / allUsers / allAuthenticatedUsers"
-					bind:value={form.email} readonly={!!email} required
-					list="email-suggestions"
-					pattern="^(allUsers|allAuthenticatedUsers|[^@\s]+@[^@\s]+\.[^@\s]+)$">
-			</div>
-			<datalist id="email-suggestions">
-				<option value="allUsers"></option>
-				<option value="allAuthenticatedUsers"></option>
-			</datalist>
+			{#if email}
+				<div class="input">
+					<input id="input-email" value={form.email} readonly>
+				</div>
+			{:else}
+				<Select
+					id="input-email"
+					editable
+					bind:value={form.email}
+					placeholder="Email / allUsers / allAuthenticatedUsers"
+					options={[
+						{ value: 'allUsers', label: 'allUsers' },
+						{ value: 'allAuthenticatedUsers', label: 'allAuthenticatedUsers' }
+					]} />
+			{/if}
 		</div>
 		<div class="field">
 			<label for="input-role">Role</label>
