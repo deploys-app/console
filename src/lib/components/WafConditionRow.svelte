@@ -1,10 +1,11 @@
 <script>
 	import Select from '$lib/components/Select.svelte'
 	import TagInput from '$lib/components/TagInput.svelte'
+	import CountrySelect from '$lib/components/CountrySelect.svelte'
 	import {
 		fields,
 		getField,
-		operatorsForType,
+		operatorsForField,
 		isMultiOperator,
 		parseList
 	} from '$lib/waf/expression'
@@ -26,7 +27,7 @@
 	const fieldMeta = $derived(getField(condition.field))
 	const fieldType = $derived(fieldMeta?.type ?? 'string')
 	const needsName = $derived(!!fieldMeta?.hasName)
-	const operators = $derived(operatorsForType(fieldType))
+	const operators = $derived(operatorsForField(fieldMeta))
 	const multi = $derived(isMultiOperator(condition.operator))
 	const isTls = $derived(fieldType === 'tls')
 	// Free-text combobox (datalist) for equals/not_equals on suggestion-backed fields.
@@ -92,15 +93,22 @@
 				</div>
 			</div>
 
-			{#if multi}
+			{#if fieldType === 'country'}
+				<div class="field">
+					<label for="waf-value">{multi ? 'Countries' : 'Country'}</label>
+					{#if multi}
+						<CountrySelect multi bind:tags={valuesList} id="waf-value" />
+					{:else}
+						<CountrySelect bind:value={condition.value} id="waf-value" />
+					{/if}
+				</div>
+			{:else if multi}
 				<div class="field">
 					<label for="waf-values">Values</label>
 					<TagInput id="waf-values" bind:tags={valuesList}
-						placeholder={fieldType === 'country'
-							? 'e.g. TH, press Enter to add'
-							: fieldType === 'asn'
-								? 'e.g. 13335, press Enter to add'
-								: 'Type a value, press Enter to add'} />
+						placeholder={fieldType === 'asn'
+							? 'e.g. 13335, press Enter to add'
+							: 'Type a value, press Enter to add'} />
 				</div>
 			{:else if useCombobox}
 				<div class="field">
@@ -124,17 +132,15 @@
 								? 'e.g. 13335'
 								: fieldType === 'numeric'
 									? 'e.g. 1048576'
-									: fieldType === 'country'
-										? 'e.g. TH'
-										: fieldType === 'ip' && condition.operator === 'in_cidr'
-											? 'e.g. 10.0.0.0/8'
-											: condition.operator === 'matches_regex'
-												? 'e.g. ^/api/v[0-9]+/'
-												: condition.operator === 'starts_with' || condition.operator === 'not_starts_with'
-													? 'e.g. /admin'
-													: condition.operator === 'ends_with' || condition.operator === 'not_ends_with'
-														? 'e.g. .php'
-														: 'Value'}>
+									: fieldType === 'ip' && condition.operator === 'in_cidr'
+										? 'e.g. 10.0.0.0/8'
+										: condition.operator === 'matches_regex'
+											? 'e.g. ^/api/v[0-9]+/'
+											: condition.operator === 'starts_with' || condition.operator === 'not_starts_with'
+												? 'e.g. /admin'
+												: condition.operator === 'ends_with' || condition.operator === 'not_ends_with'
+													? 'e.g. .php'
+													: 'Value'}>
 					</div>
 				</div>
 			{/if}

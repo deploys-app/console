@@ -163,6 +163,20 @@ export function operatorsForType (type) {
 	}
 }
 
+/**
+ * Operators available for a specific field. Same as `operatorsForType` for most
+ * fields, but the HTTP method is a closed set of tokens (GET/POST/…), so only
+ * exact-match and list membership make sense — prefix/suffix/regex/contains are
+ * not offered.
+ * @param {FieldMeta | undefined} field
+ * @returns {OperatorMeta[]}
+ */
+export function operatorsForField (field) {
+	if (!field) return stringOperators
+	if (field.value === 'method') return membershipOperators
+	return operatorsForType(field.type)
+}
+
 /** @param {string} op */
 export function isMultiOperator (op) {
 	return op === 'contains_any' || op === 'in_list' || op === 'not_in_list'

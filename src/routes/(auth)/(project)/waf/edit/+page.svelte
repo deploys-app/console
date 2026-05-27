@@ -45,6 +45,11 @@
 
 	let saving = $state(false)
 
+	// A rule must actually match something before it can be saved. The expression
+	// is only non-empty once at least one complete condition exists (the visual
+	// builder drops incomplete rows), so this gates Save on a configured rule.
+	const hasCondition = $derived(!!draft.expression.trim())
+
 	// The Visual builder can only represent a flat list of conditions joined by a
 	// single AND/OR. Anything else (mixed &&/||, grouping, unknown functions,
 	// `.startsWith`/etc, partial input) is "complex" and must be edited as raw.
@@ -80,7 +85,7 @@
 	/** @param {Event} e */
 	async function save (e) {
 		e.preventDefault()
-		if (saving) return
+		if (saving || !hasCondition) return
 
 		saving = true
 		try {
@@ -257,9 +262,13 @@
 
 		<hr>
 
-		<div class="flex gap-3">
-			<button class="button" class:is-loading={saving}>Save</button>
+		<div class="flex items-center gap-3">
+			<button class="button" class:is-loading={saving} disabled={saving || !hasCondition}
+				title={hasCondition ? undefined : 'Add at least one condition before saving'}>Save</button>
 			<button type="button" class="button is-variant-secondary" onclick={cancel}>Cancel</button>
+			{#if !hasCondition}
+				<p class="text-content/50 text-sm">Configure at least one condition to save this rule.</p>
+			{/if}
 		</div>
 	</form>
 </div>
