@@ -101,9 +101,11 @@
 		onchange={() => fetchMetrics(true)} />
 </div>
 
-<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
-<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
-{#if deployment.type === 'WebService'}
-	<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
-{/if}
-<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
+<div class="grid gap-4 mt-4 lg:grid-cols-2">
+	<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
+	<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
+	{#if deployment.type === 'WebService'}
+		<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
+	{/if}
+	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
+</div>

@@ -24,7 +24,6 @@
         "eslint-plugin-svelte": "^3.17.1",
         "global": "^4.4.0",
         "gravatar-url": "^4.0.2",
-        "highcharts": "=11.4.8",
         "js-cookie": "^3.0.5",
         "svelte": "^5.55.7",
         "svelte-check": "^4.4.8",
@@ -536,8 +535,6 @@
     "gravatar-url": ["gravatar-url@4.0.2", "", { "dependencies": { "md5-hex": "^4.0.0", "type-fest": "^1.0.2" } }, "sha512-2xF6Pv7fowoe6iKOShXD7FiH8CtTfLU38ba0Xh82mf5/rqqoOCulhAne3R2nPwRI9/jNKogXhDfqRoWS95ryGg=="],
 
     "hasown": ["hasown@2.0.0", "", { "dependencies": { "function-bind": "^1.1.2" } }, "sha512-vUptKVTpIJhcczKBbgnS+RtcuYMB8+oNzPK2/Hp3hanz8JmpATdmmgLgSaadVREkDm+e2giHwY3ZRkyjSIDDFA=="],
-
-    "highcharts": ["highcharts@11.4.8", "", {}, "sha512-5Tke9LuzZszC4osaFisxLIcw7xgNGz4Sy3Jc9pRMV+ydm6sYqsPYdU8ELOgpzGNrbrRNDRBtveoR5xS3SzneEA=="],
 
     "ignore": ["ignore@7.0.5", "", {}, "sha512-Hs59xBNfUIunMFgWAbGX5cq6893IbWg4KnrjbYwX3tx0ztorVgTDA6B2sxf8ejHJ4wz8BqGUMYlnzNBer5NvGg=="],
 

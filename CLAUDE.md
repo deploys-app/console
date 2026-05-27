@@ -103,8 +103,13 @@ Two complementary patterns:
 
 The codebase uses **JavaScript with JSDoc** type annotations (not TypeScript `.ts` files), checked via `svelte-check` against `jsconfig.json`. Keep new files in `.js`/`.svelte` with JSDoc types.
 
-## Dependencies
+## Charts
 
-### highcharts — pinned to 11.4.8
+Charts are rendered in-house as plain SVG — there is no charting dependency (Highcharts was removed). The pieces live under `src/lib/charts/` and `src/lib/components/`:
 
-Our Highcharts license covers **version 11 only**. Do not upgrade to 12+; using a major version outside the licensed range would put us out of compliance. The version is pinned with `=11.4.8` in `package.json`, and `ncu` runs should exclude it (`ncu --reject highcharts`).
+- **`src/lib/charts/util.js`** — pure helpers shared by the chart components: `niceScale` (round axis ticks), `formatBytes` (binary Ki/Mi/Gi), `formatNumber`, `linePath`/`areaPath` (straight + Catmull-Rom spline), and the `palette` of token-based colors.
+- **`LineChart.svelte`** — responsive SVG line/area engine with a time **or** category x-axis, crosshair + floating tooltip, optional legend, and a draw-in animation. Used by `Chart.svelte` (metric panels) and the billing report.
+- **`Chart.svelte`** — titled metric panel wrapping `LineChart`; takes the platform metric shape (`{prefix, lines:[{name, points:[[unixSec, val]]}], dashStyle?, color?}`).
+- **`WafActivityChart.svelte`** — stacked-column engine for WAF activity (per-action segments over time).
+
+**Colors must stay CSS-var strings applied via inline `style`** (`style:fill`, `style:stroke`, `style:stop-color`) — never SVG presentation attributes, which don't evaluate `var()`. Done this way, charts recolor instantly on theme toggle with no re-render. Keep new chart code dependency-free and on these primitives.

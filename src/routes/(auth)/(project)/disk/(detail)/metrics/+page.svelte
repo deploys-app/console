@@ -77,4 +77,6 @@
 		onchange={() => fetchMetrics(true)} />
 </div>
 
-<Chart title="Disk (bytes)" unit="bytes" series={chart} />
+<div class="grid gap-4 mt-4">
+	<Chart title="Disk (bytes)" unit="bytes" series={chart} />
+</div>

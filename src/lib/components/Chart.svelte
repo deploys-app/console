@@ -1,140 +1,114 @@
 <script>
-	import { onMount } from 'svelte'
-	import Highcharts from 'highcharts'
-	import * as hc from '$lib/hc'
-	import { browser } from '$app/environment'
-
-	/** @typedef {Object} Series */
-	/** @property {string} prefix */
-	/** @property {Array} lines */
-	/** @property {string?} dashStyle */
-	/** @property {string?} color */
+	import LineChart from '$lib/components/LineChart.svelte'
+	import { formatBytes, formatNumber } from '$lib/charts/util'
 
 	/**
+	 * Metric time-series panel: a titled card wrapping {@link LineChart}. Accepts
+	 * the platform's metric shape — a set of named series, each carrying one or
+	 * more lines of `[unixSeconds, value]` points — and flattens it for drawing.
+	 *
+	 * @typedef {Object} Line
+	 * @property {string} name
+	 * @property {[number, number][]} points   [unixSeconds, value]
+	 *
+	 * @typedef {Object} Series
+	 * @property {string} prefix
+	 * @property {Line[]} lines
+	 * @property {string} [dashStyle]   any value → rendered dashed (e.g. limits)
+	 * @property {string} [color]       'red' maps to the danger token
+	 *
 	 * @typedef {Object} Props
 	 * @property {string} title
-	 * @property {string} unit
+	 * @property {string} unit          'bytes' formats Ki/Mi/Gi; else plain number
 	 * @property {Series[]} series
 	 * @property {'line' | 'spline'} [type]
-	 * @property {string} [range]
+	 * @property {string} [range]       e.g. '1h', '6hagg' — sizes the time window
 	 */
 
 	/** @type {Props} */
-	const {
-		title,
-		unit,
-		series,
-		type = 'line',
-		range = ''
-	} = $props()
+	const { title, unit, series, type = 'line', range = '' } = $props()
 
-	/** @type {HTMLDivElement} */
-	let el
-
-	/** @type {import('highcharts').Chart | undefined} */
-	let chart = $state.raw(undefined)
-
-	onMount(() => {
-		hc.init()
-
-		chart = Highcharts.chart(el, {
-			title: {
-				text: title
-			},
-			xAxis: {
-				type: 'datetime',
-				showEmpty: true
-			},
-			yAxis: {
-				min: 0,
-				showEmpty: true,
-				labels: {
-					formatter () {
-						return formatter(this.value)
-					}
-				}
-			},
-			series: []
-		})
-
-		return () => {
-			chart?.destroy()
-		}
-	})
-
-
-	function update (name, lines, dashStyle, color) {
-		if (!browser || !chart) return
-		const c = chart
-		if (!lines) lines = []
-
-		lines.forEach((l) => {
-			const lineName = name + ' ' + l.name
-			const data = l.points.map((pt) => [pt[0] * 1000, +pt[1]])
-
-			const s = c.series?.find((it) => it.name === lineName)
-			// already exists, update
-			if (s) {
-				s.setData(data, false)
-				return
-			}
-
-			c.addSeries({
-				type,
-				name: lineName,
-				marker: {
-					enabled: false
-				},
-				data,
-				dashStyle,
-				color
-			}, false)
-		})
+	/** @param {string} [c] */
+	function resolveColor (c) {
+		if (!c) return undefined
+		if (c === 'red') return 'hsl(var(--hsl-negative))'
+		return c
 	}
 
-	function clear () {
-		[...chart?.series ?? []].forEach((x) => x.remove(false))
-	}
-
-	const kib = 1024
-	const mib = 1024 * kib
-	const gib = 1024 * mib
-
-	function formatter (v) {
-		if (unit === 'bytes') {
-			if (v > gib) {
-				return Highcharts.numberFormat(v / gib, 2) + 'Gi'
-			} else if (v > mib) {
-				return Highcharts.numberFormat(v / mib, 2) + 'Mi'
-			}
-			return Highcharts.numberFormat(v / kib, 2) + 'Ki'
-		}
-		return v
-	}
-
-	/** @param {string} r */
-	function rangeToMs (r) {
+	/** Turn the range token ('6hagg', '1d', …) into a window length in ms. */
+	function rangeToMs (/** @type {string} */ r) {
 		if (!r) return null
 		const base = r.replace('agg', '')
 		const num = parseInt(base)
-		const unit = base.slice(String(num).length)
-		const multiplier = unit === 'h' ? 60 * 60 * 1000 : 24 * 60 * 60 * 1000
-		return num * multiplier
+		if (!num) return null
+		const u = base.slice(String(num).length)
+		const mult = u === 'h' ? 3600_000 : 86_400_000
+		return num * mult
 	}
 
-	$effect(() => {
-		if (!chart) return
-		const ms = rangeToMs(range)
-		if (ms) {
-			const now = Date.now()
-			chart.xAxis[0].setExtremes(now - ms, now, false)
+	const fmtY = $derived(unit === 'bytes' ? formatBytes : formatNumber)
+
+	// Flatten {prefix, lines[]} into one drawable line each. A single-line series
+	// keeps the bare prefix ("Usage"); multi-line series disambiguate with the
+	// line's own name ("Usage · web"). The first solid line gets the area fill so
+	// the panel reads as one primary trend with reference lines layered over it.
+	const flat = $derived.by(() => {
+		let areaUsed = false
+		/** @type {import('$lib/charts/util').LineSeries[]} */
+		const out = []
+		for (const s of series ?? []) {
+			const lines = s.lines ?? []
+			for (const l of lines) {
+				const dashed = !!s.dashStyle
+				const area = !dashed && !areaUsed
+				if (area) areaUsed = true
+				out.push({
+					name: lines.length > 1 ? `${s.prefix} · ${l.name}` : s.prefix,
+					color: resolveColor(s.color),
+					dashed,
+					area,
+					points: (l.points ?? []).map(([ts, v]) => ({ x: ts * 1000, y: +v }))
+				})
+			}
 		}
-		if (series?.length === 0) clear()
-		series?.forEach((s) => {
-			update(s.prefix, s.lines, s.dashStyle, s.color)
-		})
-		chart?.redraw()
+		return out
+	})
+
+	// Anchor the visible window to the newest sample so it tracks live polling.
+	const lastTs = $derived.by(() => {
+		let m = 0
+		for (const s of series ?? []) {
+			for (const l of (s.lines ?? [])) {
+				for (const p of (l.points ?? [])) m = Math.max(m, p[0] * 1000)
+			}
+		}
+		return m || Date.now()
+	})
+
+	const xDomain = $derived.by(() => {
+		const ms = rangeToMs(range)
+		return ms ? /** @type {[number, number]} */ ([lastTs - ms, lastTs]) : null
 	})
 </script>
 
-<div bind:this={el}></div>
+<div class="panel is-level-300 metric-card">
+	<h6 class="metric-title"><strong>{title}</strong></h6>
+	<LineChart
+		series={flat}
+		xType="time"
+		{xDomain}
+		smooth={type === 'spline'}
+		formatY={fmtY}
+		legend />
+</div>
+
+<style>
+	.metric-card {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.metric-title {
+		color: hsl(var(--hsl-content) / 0.85);
+	}
+</style>
