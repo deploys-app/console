@@ -61,6 +61,16 @@
 		const valid = operators.some((o) => o.value === condition.operator)
 		if (!valid) condition.operator = operators[0]?.value ?? ''
 	})
+
+	// A value entered for one field rarely makes sense for another (an IP under a
+	// numeric field, a country code under a path), so clear it when the user picks
+	// a different field. Wired to the Select's onchange so it only fires on a real
+	// user selection — programmatic reseeds (raw CEL → Visual) keep their values.
+	function onFieldChange () {
+		condition.value = ''
+		condition.values = ''
+		valuesList = []
+	}
 </script>
 
 <div class="row">
@@ -68,7 +78,7 @@
 		<div class="grid gap-3 sm:grid-cols-2">
 			<div class="field">
 				<label for="waf-field">Field</label>
-				<Select id="waf-field" bind:value={condition.field} options={fieldOptions} />
+				<Select id="waf-field" bind:value={condition.field} options={fieldOptions} onchange={onFieldChange} />
 			</div>
 
 			{#if needsName}
