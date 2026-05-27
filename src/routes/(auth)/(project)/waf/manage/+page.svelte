@@ -148,9 +148,9 @@
 
 <div class="page-head">
 	<div>
-		<h4><strong>Firewall</strong></h4>
+		<h4><strong>Firewall rules</strong></h4>
 		<p class="page-sub">
-			Web application firewall rules in <span class="font-mono">{location}</span>
+			Rules that filter incoming traffic in <span class="font-mono">{location}</span>
 		</p>
 	</div>
 	<a class="button is-variant-secondary is-icon-left"

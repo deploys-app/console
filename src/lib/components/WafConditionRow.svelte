@@ -2,6 +2,7 @@
 	import Select from '$lib/components/Select.svelte'
 	import TagInput from '$lib/components/TagInput.svelte'
 	import CountrySelect from '$lib/components/CountrySelect.svelte'
+	import OptionSelect from '$lib/components/OptionSelect.svelte'
 	import {
 		fields,
 		getField,
@@ -30,6 +31,11 @@
 	const operators = $derived(operatorsForField(fieldMeta))
 	const multi = $derived(isMultiOperator(condition.operator))
 	const isTls = $derived(fieldType === 'tls')
+	// A closed-set string field (the HTTP method) picks from its suggestions via a
+	// dropdown rather than free text — single value as a combobox, list membership
+	// as a multi-select (mirrors the country picker).
+	const isMethod = $derived(fieldMeta?.value === 'method')
+	const suggestionOptions = $derived((fieldMeta?.suggestions ?? []).map((s) => ({ value: s, label: s })))
 	// Free-text combobox (datalist) for equals/not_equals on suggestion-backed fields.
 	const useCombobox = $derived(
 		!!fieldMeta?.suggestions &&
@@ -101,6 +107,13 @@
 					{:else}
 						<CountrySelect bind:value={condition.value} id="waf-value" />
 					{/if}
+				</div>
+			{:else if isMethod && multi}
+				<div class="field">
+					<label for="waf-values">Methods</label>
+					<OptionSelect multi allowCustom options={suggestionOptions} bind:tags={valuesList}
+						id="waf-values" placeholder="Select or type a method" emptyText="No matching method" />
+					<p class="helper">Pick from the list or type a custom method (e.g. PURGE), then Enter.</p>
 				</div>
 			{:else if multi}
 				<div class="field">
