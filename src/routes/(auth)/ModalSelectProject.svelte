@@ -63,6 +63,15 @@
 	function onBackdrop (e) {
 		if (e.target === e.currentTarget) close()
 	}
+
+	/**
+	 * @param {KeyboardEvent} e
+	 */
+	function onSearchKeydown (e) {
+		if (e.key === 'Enter' && filtered.length) {
+			setProject(filtered[0].project)
+		}
+	}
 </script>
 
 <div class="modal" onclick={onBackdrop} class:is-active={isActive} aria-hidden={!isActive}>
@@ -75,6 +84,7 @@
 			<input
 				bind:this={elSearch}
 				bind:value={search}
+				onkeydown={onSearchKeydown}
 				type="text"
 				placeholder="Search projects…"
 				autocomplete="off"
