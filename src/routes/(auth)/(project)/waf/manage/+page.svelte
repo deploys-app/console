@@ -129,7 +129,10 @@
 		<a href={`/waf?project=${project}`} class="link"><h6>Firewall</h6></a>
 	</div>
 	<div class="breadcrumb-item">
-		<h6 class="font-mono">{location}</h6>
+		<a href={`/waf/metrics?project=${project}&location=${encodeURIComponent(location)}`} class="link"><h6 class="font-mono">{location}</h6></a>
+	</div>
+	<div class="breadcrumb-item">
+		<h6>Manage</h6>
 	</div>
 </div>
 

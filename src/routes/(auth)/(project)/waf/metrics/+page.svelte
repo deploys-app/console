@@ -193,10 +193,7 @@
 		<a href={`/waf?project=${project}`} class="link"><h6>Firewall</h6></a>
 	</div>
 	<div class="breadcrumb-item">
-		<a href={managePath} class="link"><h6 class="font-mono">{location}</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<h6>Metrics</h6>
+		<h6 class="font-mono">{location}</h6>
 	</div>
 </div>
 
