@@ -1,11 +1,34 @@
 <script>
+	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 	import * as modal from '$lib/modal'
+	import ModalSelectProject from '../ModalSelectProject.svelte'
 
 	const { data } = $props()
 
 	const projects = $derived(data.projects)
+
+	/** @type {?ModalSelectProject} */
+	let projectModal = $state(null)
+
+	// Press "/" anywhere on the page (unless typing in a field) to open the
+	// project search modal.
+	/** @param {KeyboardEvent} e */
+	function onKeydown (e) {
+		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
+		const el = e.target
+		if (el instanceof HTMLElement && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) {
+			return
+		}
+		e.preventDefault()
+		projectModal?.open()
+	}
+
+	onMount(() => {
+		window.addEventListener('keydown', onKeydown)
+		return () => window.removeEventListener('keydown', onKeydown)
+	})
 
 	/**
 	 * @param {string} project
@@ -47,10 +70,17 @@
 		<h4><strong>Projects</strong></h4>
 		<p class="page-sub">{projects.length} {projects.length === 1 ? 'project' : 'projects'}</p>
 	</div>
-	<a class="button is-icon-left" href="/project/create">
-		<i class="fa-solid fa-plus"></i>
-		New project
-	</a>
+	<div class="flex items-center gap-3 flex-wrap">
+		<button type="button" class="project-search" onclick={() => projectModal?.open()}>
+			<i class="fa-solid fa-magnifying-glass"></i>
+			<span>Search projects</span>
+			<kbd>/</kbd>
+		</button>
+		<a class="button is-icon-left" href="/project/create">
+			<i class="fa-solid fa-plus"></i>
+			New project
+		</a>
+	</div>
 </div>
 
 {#if projects.length}
@@ -97,6 +127,8 @@
 		</div>
 	</div>
 {/if}
+
+<ModalSelectProject bind:this={projectModal} {projects} />
 
 <style>
 	.project-grid {
@@ -211,5 +243,46 @@
 	.project-create:hover {
 		color: hsl(var(--hsl-primary));
 		transform: none;
+	}
+
+	/* Search affordance that also advertises the "/" shortcut. */
+	.project-search {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		background-color: hsl(var(--hsl-base-100));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-md);
+		cursor: pointer;
+		transition: border-color var(--timing-faster) ease, color var(--timing-faster) ease;
+	}
+
+	.project-search:hover {
+		border-color: hsl(var(--hsl-primary) / 0.45);
+		color: hsl(var(--hsl-content) / 0.85);
+	}
+
+	.project-search kbd {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		padding: 0 0.35rem;
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.7);
+		background-color: hsl(var(--hsl-base-300));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: 0.3rem;
+	}
+
+	@media (max-width: 640px) {
+		.project-search span {
+			display: none;
+		}
 	}
 </style>
