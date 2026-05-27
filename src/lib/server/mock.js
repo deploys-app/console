@@ -260,6 +260,41 @@ const wafZone = {
 	createdBy: USER_EMAIL
 }
 
+// Synthetic 24h match metrics for the seed zone, so the firewall index sparkline
+// + total have something to draw. Scatters per-minute counts across the window
+// per (rule, action), mirroring waf.metrics' shape (sparse buckets, grand total).
+function wafMetrics () {
+	const now = Math.floor(Date.now() / 1000)
+	const minute = 60
+
+	/**
+	 * @param {string} ruleId
+	 * @param {Api.WafAction} action
+	 * @param {number} buckets  // how many active minutes
+	 * @param {number} scale    // max count per minute
+	 */
+	const makeSeries = (ruleId, action, buckets, scale) => {
+		/** @type {[number, number][]} */
+		const points = []
+		let total = 0
+		for (let i = 0; i < buckets; i++) {
+			const ts = now - Math.floor(Math.random() * 24 * 60) * minute
+			const v = 1 + Math.floor(Math.random() * scale)
+			points.push([ts, v])
+			total += v
+		}
+		points.sort((a, b) => a[0] - b[0])
+		return { ruleId, action, total, points }
+	}
+
+	const series = [
+		makeSeries('block-admin', 'block', 36, 6),
+		makeSeries('log-bots', 'log', 80, 3)
+	]
+	const total = series.reduce((acc, s) => acc + s.total, 0)
+	return { series, total }
+}
+
 // Locations (besides the seed LOCATION_ID) that have had a firewall created in
 // this dev session, mapped to { description, polls }. `polls` counts how many
 // times the zone has been read while pending; the deployer is simulated by
@@ -718,6 +753,13 @@ const handlers = {
 			wafConfigured.set(location, { description: args?.description ?? '', polls: 0 })
 		}
 		return ok({})
+	},
+	'waf.metrics': (args) => {
+		// Seed zone has activity; session-created zones read empty (shows the "—"
+		// no-traffic state on the index).
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok(wafMetrics())
+		return ok({ series: [], total: 0 })
 	},
 	'waf.delete': (args) => {
 		if (args?.location) wafConfigured.delete(args.location)

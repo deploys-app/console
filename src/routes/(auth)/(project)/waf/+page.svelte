@@ -1,8 +1,10 @@
 <script>
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import Sparkline from '$lib/components/Sparkline.svelte'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import * as format from '$lib/format'
 
 	const { data } = $props()
 
@@ -19,6 +21,58 @@
 		if (!hasPending) return
 		await api.invalidate('waf.list')
 	}, 3000))
+
+	// Last 24h of match activity per location, shown as an inline sparkline +
+	// total. Fetched client-side (one waf.metrics per zone, in parallel) so the
+	// table renders immediately and the charts fill in.
+	/**
+	 * @typedef {Object} Metrics
+	 * @property {boolean} loading
+	 * @property {number} total
+	 * @property {[number, number][]} points
+	 */
+	/** @type {Record<string, Metrics>} */
+	const metrics = $state({})
+
+	// Fixed 24h x-domain so bars sit at the right time-of-day even when the zone
+	// only has a few active minutes.
+	const to = Math.floor(Date.now() / 1000)
+	const from = to - 24 * 60 * 60
+
+	onMount(() => {
+		Promise.all(firewalls.map(async (/** @type {Api.WafZone} */ fw) => {
+			metrics[fw.location] = { loading: true, total: 0, points: [] }
+
+			/** @type {Api.Response<Api.WafMetricsResult>} */
+			const res = await api.invoke('waf.metrics',
+				{ project, location: fw.location, timeRange: '1d' }, fetch)
+
+			metrics[fw.location] = {
+				loading: false,
+				total: res.result?.total ?? 0,
+				points: aggregate(res.result?.series ?? [])
+			}
+		}))
+	})
+
+	// Collapse the per-(rule, action) series into one total-matches line: sum
+	// every series' value at each timestamp, then sort by time.
+	/**
+	 * @param {Api.WafMetricsSeries[]} series
+	 * @returns {[number, number][]}
+	 */
+	function aggregate (series) {
+		/** @type {Record<number, number>} */
+		const byTs = {}
+		for (const s of series) {
+			for (const [ts, v] of s.points ?? []) {
+				byTs[ts] = (byTs[ts] ?? 0) + v
+			}
+		}
+		return Object.entries(byTs)
+			.map(([ts, v]) => /** @type {[number, number]} */ ([Number(ts), v]))
+			.sort((a, b) => a[0] - b[0])
+	}
 </script>
 
 <div class="page-head">
@@ -43,6 +97,7 @@
 					<th>Status</th>
 					<th>Description</th>
 					<th>Rules</th>
+					<th>Matches (24h)</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
@@ -79,6 +134,20 @@
 						</td>
 						<td>{fw.rules?.length ?? 0}</td>
 						<td>
+							{#if metrics[fw.location]?.loading}
+								<span class="text-content/30"><i class="fa-solid fa-spinner-third fa-spin"></i></span>
+							{:else if (metrics[fw.location]?.total ?? 0) > 0}
+								<div class="flex items-center gap-3">
+									<span class="font-mono text-sm tabular-nums" title={`${metrics[fw.location].total.toLocaleString()} matches in the last 24h`}>
+										{format.count(metrics[fw.location].total)}
+									</span>
+									<Sparkline points={metrics[fw.location].points} {from} {to} />
+								</div>
+							{:else}
+								<span class="text-content/40">—</span>
+							{/if}
+						</td>
+						<td>
 							<div class="flex gap-1 justify-end">
 								<a class="button is-variant-secondary is-size-small"
 									href={`/waf/manage?project=${project}&location=${encodeURIComponent(fw.location)}`}>
@@ -89,14 +158,14 @@
 					</tr>
 				{/each}
 				<NoDataRow
-					span={5}
+					span={6}
 					list={firewalls}
 					icon="fa-shield-halved"
 					message="No firewalls yet"
 					hint="Create a firewall to start filtering traffic in a location."
 					ctaLabel="Create firewall"
 					ctaHref={`/waf/create?project=${project}`} />
-				<ErrorRow span={5} {error} />
+				<ErrorRow span={6} {error} />
 			</tbody>
 		</table>
 	</div>

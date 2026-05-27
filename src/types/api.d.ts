@@ -495,6 +495,21 @@ declare namespace Api {
         items: WafZone[]
     }
 
+    export type WafMetricsTimeRange = '1h' | '6h' | '12h' | '1d' | '7d' | '30d'
+
+    export type WafMetricsSeries = {
+        ruleId: string
+        action: WafAction
+        total: number
+        // [unixSeconds, count], time-ordered
+        points: [number, number][]
+    }
+
+    export type WafMetricsResult = {
+        series: WafMetricsSeries[]
+        total: number
+    }
+
     export type DropboxItem = {
         downloadUrl: string
         filename: string
