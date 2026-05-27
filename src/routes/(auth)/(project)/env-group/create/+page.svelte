@@ -3,7 +3,6 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
-	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
 
@@ -30,26 +29,6 @@
 		envText = form.env
 			.map(({ k, v }) => `${k}=${v}`)
 			.join('\n')
-	}
-
-	function deleteItem () {
-		if (!envGroup) return
-
-		modal.confirm({
-			title: `Delete "${envGroup.name}"?`,
-			yes: 'Delete',
-			callback: async () => {
-				const resp = await api.invoke('envGroup.delete', {
-					project,
-					name: envGroup.name
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				await goto(`/env-group?project=${project}`)
-			}
-		})
 	}
 
 	let saving = $state(false)
@@ -98,7 +77,7 @@
 	</div>
 	{#if envGroup}
 		<div class="breadcrumb-item">
-			<h6>{envGroup.name}</h6>
+			<a href={`/env-group/detail?project=${project}&name=${encodeURIComponent(envGroup.name)}`} class="link"><h6>{envGroup.name}</h6></a>
 		</div>
 		<div class="breadcrumb-item">
 			<h6>Update</h6>
@@ -112,19 +91,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-4">
-	<div class="grid grid-cols-1 gap-3">
-		<h3><strong>
-			{#if envGroup}
-				Update env group "{envGroup.name}"
-			{:else}
-				Create new env group
-			{/if}
-		</strong></h3>
+<div class="page-head">
+	<div>
+		<h4><strong>{#if envGroup}Edit env group{:else}Create env group{/if}</strong></h4>
+		<p class="page-sub">A reusable set of environment variables for deployments.</p>
 	</div>
+</div>
 
-	<hr>
-
+<div class="panel is-level-300 grid gap-4">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-name">Name</label>
@@ -203,10 +177,5 @@
 				{#if envGroup}Update{:else}Create{/if}
 			</button>
 		</div>
-		{#if envGroup}
-			<DangerZone description="Permanently delete this env group. Deployments referencing it may fail to start.">
-				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-			</DangerZone>
-		{/if}
 	</form>
 </div>

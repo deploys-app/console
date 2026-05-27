@@ -66,21 +66,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<div class="flex items-center">
-			<h3 class="mr-6 mb-4 xl:mb-0"><strong>
-				{#if id}
-					Update service account "{serviceAccount.sid}"
-				{:else}
-					Create service account
-				{/if}
-			</strong></h3>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>{#if id}Edit service account{:else}Create service account{/if}</strong></h4>
+		<p class="page-sub">Programmatic identity for API and automation access.</p>
 	</div>
+</div>
 
-	<hr>
-
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		{#if id}
 			<div class="field">

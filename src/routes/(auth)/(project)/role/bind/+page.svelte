@@ -64,25 +64,40 @@
 	<div class="breadcrumb-item">
 		<a href={`/role/users?project=${project}`} class="link"><h6>Users</h6></a>
 	</div>
-	<div class="breadcrumb-item">
-		<h6>Add</h6>
-	</div>
+	{#if email}
+		<div class="breadcrumb-item min-w-0">
+			<h6 class="min-w-0 wrap-anywhere">{email}</h6>
+		</div>
+		<div class="breadcrumb-item">
+			<h6>Update</h6>
+		</div>
+	{:else}
+		<div class="breadcrumb-item">
+			<h6>Add</h6>
+		</div>
+	{/if}
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<div class="flex items-center">
-			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Add member to "{project}" project</strong></h3>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>{#if email}Edit member{:else}Add member{/if}</strong></h4>
+		<p class="page-sub">
+			{#if email}
+				Change the roles assigned to this member.
+			{:else}
+				Grant a user or group roles in <span class="font-mono">{project}</span>.
+			{/if}
+		</p>
 	</div>
+</div>
 
-	<hr>
-
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
+			<label for="input-email">Email</label>
 			<div class="input">
-				<input type="text" placeholder="Email / allUsers / allAuthenticatedUsers"
+				<input id="input-email" type="text" placeholder="Email / allUsers / allAuthenticatedUsers"
 					bind:value={form.email} readonly={!!email} required
 					list="email-suggestions"
 					pattern="^(allUsers|allAuthenticatedUsers|[^@\s]+@[^@\s]+\.[^@\s]+)$">
@@ -93,7 +108,9 @@
 			</datalist>
 		</div>
 		<div class="field">
+			<label for="input-role">Role</label>
 			<Select
+				id="input-role"
 				placeholder="Select Role"
 				resetOnSelect
 				onchange={(v) => addRole(String(v))}

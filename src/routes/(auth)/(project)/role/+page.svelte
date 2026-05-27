@@ -43,13 +43,9 @@
 				{#each roles as it (it.role)}
 					<tr>
 						<td>
-							{#if roleCanUpdate(it.role)}
-								<a href="/role/create?project={project}&role={it.role}" class="link">
-									<strong>{it.role}</strong>
-								</a>
-							{:else}
+							<a href="/role/detail?project={project}&role={it.role}" class="link">
 								<strong>{it.role}</strong>
-							{/if}
+							</a>
 						</td>
 						<td>{it.name}</td>
 						<td>{format.datetime(it.createdAt)}</td>

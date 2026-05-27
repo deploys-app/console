@@ -68,17 +68,14 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 justify-items-start gap-3">
-		{#if project}
-			<h5><strong>Update Project: {project.name}</strong></h5>
-		{:else}
-			<h5><strong>Create Project</strong></h5>
-		{/if}
+<div class="page-head">
+	<div>
+		<h4><strong>{#if project}Edit project{:else}Create project{/if}</strong></h4>
+		<p class="page-sub">Your project's identity and billing account.</p>
 	</div>
+</div>
 
-	<hr>
-
+<div class="panel is-level-300 grid gap-6">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-project">ID</label>

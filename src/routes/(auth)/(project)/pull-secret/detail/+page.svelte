@@ -43,14 +43,16 @@
 </div>
 
 <br>
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<h3><strong>Pull secret "{pullSecret.name}"</strong></h3>
+
+<div class="page-head">
+	<div>
+		<h4><strong>Pull secret</strong></h4>
+		<p class="page-sub">Registry credentials used to pull private images.</p>
 	</div>
+</div>
 
-	<hr>
-
-	<div class="content grid gap-4 w-full">
+<div class="panel is-level-300 grid gap-6">
+	<div class="grid gap-4 w-full">
 		<div class="field">
 			<label for="input-name">Name</label>
 			<div class="input">

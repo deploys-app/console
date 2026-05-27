@@ -57,72 +57,30 @@
 	}
 </script>
 
-<div class="grid grid-cols-1 gap-3">
-	<div class="grid gap-3 grid-flow-row xl:grid-flow-col">
-		<h3 class="flex flex-wrap items-start mr-6 mb-4 xl:mb-0">
-			<div>
-				<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} type={deployment.type} />
-			</div>
-			<div>
-				{deployment.name}
-				<div class="image text-base mt-1 break-all">{deployment.image}</div>
-			</div>
-		</h3>
-		<div class="flex items-center flex-wrap">
-			<a class="button xl:ml-auto mr-6 mb-4 xl:mb-0"
-				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-				Deploy New Revision
-			</a>
-			{#if canPause}
-				<div>
-					<button class="button is-variant-secondary xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={pause}>
-						<i class="fa-solid fa-pause"></i>&nbsp;&nbsp;Pause
-					</button>
-				</div>
-			{/if}
-			{#if canResume}
-				<div>
-					<button class="button is-variant-secondary xl:ml-auto mr-6 mb-4 xl:mb-0" type="button" onclick={resume}>
-						<i class="fa-solid fa-play"></i>&nbsp;&nbsp;Resume
-					</button>
-				</div>
-			{/if}
-		</div>
+<div class="page-head">
+	<div class="min-w-0">
+		<h4 class="flex flex-wrap items-center gap-y-2 min-w-0">
+			<DeploymentStatusIcon action={deployment.action} status={deployment.status} url={deployment.statusUrl} type={deployment.type} />
+			<strong class="min-w-0 wrap-anywhere">{deployment.name}</strong>
+		</h4>
+		<p class="page-sub font-mono min-w-0 wrap-anywhere">{deployment.image}</p>
+	</div>
+	<div class="flex items-center gap-3 flex-wrap">
+		<a class="button"
+			href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+			Deploy New Revision
+		</a>
+		{#if canPause}
+			<button class="button is-variant-secondary is-icon-left" type="button" onclick={pause}>
+				<i class="fa-solid fa-pause"></i>
+				Pause
+			</button>
+		{/if}
+		{#if canResume}
+			<button class="button is-variant-secondary is-icon-left" type="button" onclick={resume}>
+				<i class="fa-solid fa-play"></i>
+				Resume
+			</button>
+		{/if}
 	</div>
 </div>
-
-<hr>
-
-<div class="tabs is-variant-underline xl:mb-0 w-full flex-col lg:flex-row">
-	<a class="tab-button"
-		class:is-active={$page.url.pathname === '/deployment/metrics'}
-		href={`/deployment/metrics?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-		Metric
-	</a>
-	<a class="tab-button"
-		class:is-active={$page.url.pathname === '/deployment/detail'}
-		href={`/deployment/detail?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-		Details
-	</a>
-	<a class="tab-button"
-		class:is-active={$page.url.pathname === '/deployment/revision'}
-		href={`/deployment/revision?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-		Revision
-	</a>
-	<a class="tab-button"
-		class:is-active={$page.url.pathname === '/deployment/logs'}
-		href={`/deployment/logs?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-		Logs
-	</a>
-	<a class="tab-button"
-		class:is-active={$page.url.pathname === '/deployment/events'}
-		href={`/deployment/events?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-		Events
-	</a>
-</div>
-
-<style>
-	.image {
-		color: hsla(220, 10%, 47%, 0.95);
-	}
-</style>

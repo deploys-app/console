@@ -4,7 +4,6 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
-	import DangerZone from '$lib/components/DangerZone.svelte'
 	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
@@ -18,23 +17,6 @@
 		name: role?.name ?? '',
 		permissions: role?.permissions ?? []
 	})))
-
-	function deleteItem () {
-		if (!role) return
-
-		modal.confirm({
-			title: `Delete ${role.role} and its users?`,
-			yes: 'Delete',
-			callback: async () => {
-				const resp = await api.invoke('role.delete', { project, role: role.role }, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				goto(`/role?project=${project}`)
-			}
-		})
-	}
 
 	/**
 	 * @param {string} permission
@@ -88,7 +70,7 @@
 	</div>
 	{#if role}
 		<div class="breadcrumb-item">
-			<h6>{role.role}</h6>
+			<a href={`/role/detail?project=${project}&role=${encodeURIComponent(role.role)}`} class="link"><h6>{role.role}</h6></a>
 		</div>
 		<div class="breadcrumb-item">
 			<h6>Update</h6>
@@ -102,19 +84,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-4">
-	<div class="grid grid-cols-1 gap-3">
-		<h3><strong>
-			{#if role}
-				Update role "{form.role}"
-			{:else}
-				Create new role
-			{/if}
-		</strong></h3>
+<div class="page-head">
+	<div>
+		<h4><strong>{#if role}Edit role{:else}Create role{/if}</strong></h4>
+		<p class="page-sub">A named set of permissions you can assign to members.</p>
 	</div>
+</div>
 
-	<hr>
-
+<div class="panel is-level-300 grid gap-4">
 	<form class="grid gap-4 w-full" onsubmit={save}>
 		<div class="field">
 			<label for="input-role">Role ID</label>
@@ -179,10 +156,5 @@
 				{#if role}Update{:else}Create{/if}
 			</button>
 		</div>
-		{#if role}
-			<DangerZone description="Permanently delete this role. Members assigned only this role will lose their access.">
-				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
-			</DangerZone>
-		{/if}
 	</form>
 </div>

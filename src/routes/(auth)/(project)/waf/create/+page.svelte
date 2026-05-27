@@ -55,15 +55,14 @@
 
 <br>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid grid-cols-1 gap-3">
-		<div class="flex items-center">
-			<h3 class="mr-6 mb-4 xl:mb-0"><strong>Create firewall</strong></h3>
-		</div>
+<div class="page-head">
+	<div>
+		<h4><strong>Create firewall</strong></h4>
 		<p class="page-sub">Enable the web application firewall in a location.</p>
 	</div>
-	<hr>
+</div>
 
+<div class="panel is-level-300 grid gap-6">
 	{#if locations.length === 0}
 		<p class="text-content/60">
 			Every location already has a firewall configured. Manage an existing one
