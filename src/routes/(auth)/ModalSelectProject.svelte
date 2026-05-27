@@ -61,6 +61,9 @@
 
 	function close () {
 		isActive = false
+		// Release focus so a page-level shortcut (e.g. "/") can reopen the modal,
+		// and the search field isn't left focused while hidden.
+		elSearch?.blur()
 	}
 
 	/**
@@ -78,6 +81,10 @@
 	 * @param {KeyboardEvent} e
 	 */
 	function onSearchKeydown (e) {
+		if (e.key === 'Escape') {
+			close()
+			return
+		}
 		if (!filtered.length) return
 		if (e.key === 'ArrowDown') {
 			e.preventDefault()
