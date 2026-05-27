@@ -28,7 +28,7 @@ function quote (v) {
 }
 
 /**
- * @typedef {'string' | 'ip' | 'numeric' | 'tls' | 'country'} FieldType
+ * @typedef {'string' | 'ip' | 'numeric' | 'tls' | 'country' | 'asn'} FieldType
  */
 
 /**
@@ -54,7 +54,7 @@ export const fields = [
 	{ value: 'referer', label: 'Referer', type: 'string', accessor: 'request.referer' },
 	{ value: 'remote_ip', label: 'Remote IP', type: 'ip', accessor: 'request.remote_ip' },
 	{ value: 'country', label: 'Country', type: 'country', accessor: 'request.country' },
-	{ value: 'asn', label: 'ASN', type: 'numeric', accessor: 'request.asn' },
+	{ value: 'asn', label: 'ASN', type: 'asn', accessor: 'request.asn' },
 	{ value: 'content_length', label: 'Content-Length', type: 'numeric', accessor: 'request.content_length' },
 	{ value: 'header', label: 'Header', type: 'string', hasName: true, accessorMap: 'request.headers["<name>"]' },
 	{ value: 'arg', label: 'Query arg', type: 'string', hasName: true, accessorMap: 'request.args["<name>"]' },
@@ -80,6 +80,8 @@ export function getField (value) {
 const stringOperators = [
 	{ value: 'equals', label: 'equals' },
 	{ value: 'not_equals', label: 'not equals' },
+	{ value: 'in_list', label: 'is in', multi: true },
+	{ value: 'not_in_list', label: 'is not in', multi: true },
 	{ value: 'contains_any', label: 'contains any of', multi: true },
 	{ value: 'starts_with', label: 'starts with' },
 	{ value: 'not_starts_with', label: 'not starts with' },
@@ -112,12 +114,17 @@ const ipOperators = [
 	{ value: 'ip_equals', label: 'equals' }
 ]
 
-/** @type {OperatorMeta[]} */
-const countryOperators = [
+/**
+ * Operators for fields matched by exact value or list membership (country code,
+ * ASN). `in_list` / `not_in_list` build a CEL `in […]` membership; the field
+ * type decides whether operands are quoted (country) or raw ints (asn).
+ * @type {OperatorMeta[]}
+ */
+const membershipOperators = [
 	{ value: 'equals', label: 'equals' },
 	{ value: 'not_equals', label: 'not equals' },
-	{ value: 'in_list', label: 'is any of', multi: true },
-	{ value: 'not_in_list', label: 'is not any of', multi: true }
+	{ value: 'in_list', label: 'is in', multi: true },
+	{ value: 'not_in_list', label: 'is not in', multi: true }
 ]
 
 /** @type {OperatorMeta[]} */
@@ -149,7 +156,8 @@ export function operatorsForType (type) {
 	switch (type) {
 	case 'ip': return ipOperators
 	case 'numeric': return numericOperators
-	case 'country': return countryOperators
+	case 'country': return membershipOperators
+	case 'asn': return membershipOperators
 	case 'tls': return []
 	default: return stringOperators
 	}
@@ -251,13 +259,33 @@ export function buildExpression (spec) {
 			const op = spec.operator === 'not_equals' ? '!=' : '=='
 			snippet = `${accessor} ${op} ${quote(v)}`
 		}
+	} else if (f.type === 'asn') {
+		// Autonomous system number — integer operands (unquoted). Membership uses
+		// CEL's `in` operator; "is not in" negates the whole `in` with `!(…)`.
+		if (spec.operator === 'in_list' || spec.operator === 'not_in_list') {
+			const list = parseList(spec.values ?? '').filter((v) => /^\d+$/.test(v))
+			if (list.length === 0) return ''
+			const inExpr = `${accessor} in [${list.join(', ')}]`
+			snippet = spec.operator === 'not_in_list' ? `!(${inExpr})` : inExpr
+		} else {
+			const raw = (spec.value ?? '').trim()
+			if (!/^\d+$/.test(raw)) return ''
+			const op = spec.operator === 'not_equals' ? '!=' : '=='
+			snippet = `${accessor} ${op} ${raw}`
+		}
 	} else {
 		// string field
 		if (isMultiOperator(spec.operator)) {
 			const list = parseList(spec.values ?? '')
 			if (list.length === 0) return ''
 			const items = list.map((v) => quote(v)).join(', ')
-			snippet = `containsAny(${accessor}, [${items}])`
+			if (spec.operator === 'contains_any') {
+				snippet = `containsAny(${accessor}, [${items}])`
+			} else {
+				// in_list / not_in_list — CEL `in` membership over a string list.
+				const inExpr = `${accessor} in [${items}]`
+				snippet = spec.operator === 'not_in_list' ? `!(${inExpr})` : inExpr
+			}
 		} else if (methodOperators[spec.operator]) {
 			// Prefix/suffix match via the standard CEL string method, negated with
 			// a leading `!` for the "not …" variants.
@@ -507,6 +535,30 @@ function matchList (s) {
 }
 
 /**
+ * Parse the bracketed, comma-separated integer list at the START of `s`
+ * (`[13335, 16509]` exactly as the generator emits). Returns the items (as
+ * strings) and the consumed length, or `null` when malformed.
+ * @param {string} s
+ * @returns {{ items: string[], end: number } | null}
+ */
+function matchIntList (s) {
+	if (s[0] !== '[') return null
+	let i = 1
+	/** @type {string[]} */
+	const items = []
+	// Empty list is never emitted (buildExpression returns '' for it).
+	while (true) {
+		const m = /^\d+/.exec(s.slice(i))
+		if (!m) return null
+		items.push(m[0])
+		i += m[0].length
+		if (s[i] === ']') return items.length ? { items, end: i + 1 } : null
+		if (s.slice(i, i + 2) !== ', ') return null
+		i += 2
+	}
+}
+
+/**
  * Parse the `<accessor>.startsWith("v")` / `.endsWith("v")` method forms — each
  * optionally negated with a leading `!` (the "not …" operators). String fields
  * only. Returns the spec or `null`.
@@ -635,6 +687,18 @@ function parseCondition (part) {
 		return { field: acc.field, operator: m[1] === '!=' ? 'not_equals' : 'equals', value: lit.value }
 	}
 
+	if (field.type === 'asn') {
+		// `request.asn in [13335, 16509]` (membership) or `== 13335` / `!= 13335`.
+		if (rest.startsWith(' in ')) {
+			const list = matchIntList(rest.slice(4))
+			if (!list || 4 + list.end !== rest.length) return null
+			return { field: acc.field, operator: 'in_list', values: list.items.join('\n') }
+		}
+		const m = /^ (==|!=) (\d+)$/.exec(rest)
+		if (!m) return null
+		return { field: acc.field, operator: m[1] === '!=' ? 'not_equals' : 'equals', value: m[2] }
+	}
+
 	if (field.type === 'tls') {
 		// `request.scheme == "https"` (TLS on) / `"http"` (TLS off).
 		if (!rest.startsWith(' == ')) return null
@@ -653,7 +717,17 @@ function parseCondition (part) {
 		return { field: 'remote_ip', operator: 'ip_equals', value: lit.value }
 	}
 
-	// string field: `<acc> == "v"` / `<acc> != "v"`.
+	// string field: `<acc> in ["a", "b"]` membership, or `== "v"` / `!= "v"`.
+	if (rest.startsWith(' in ')) {
+		const list = matchList(rest.slice(4))
+		if (!list || 4 + list.end !== rest.length) return null
+		return {
+			field: acc.field,
+			...(acc.name !== undefined ? { name: acc.name } : {}),
+			operator: 'in_list',
+			values: list.items.join('\n')
+		}
+	}
 	const opMatch = /^ (==|!=) /.exec(rest)
 	if (!opMatch) return null
 	rest = rest.slice(opMatch[0].length)
