@@ -171,6 +171,21 @@
 		}
 		hover = best
 	}
+
+	// Touch: capture the pointer on press so a horizontal drag keeps reading
+	// points even when the finger strays outside the SVG, and reveal the nearest
+	// point on a plain tap. `touch-action: pan-y` leaves vertical page scroll to
+	// the browser, which fires pointercancel and clears the readout on a scroll.
+	/** @param {PointerEvent} e */
+	function onDown (e) {
+		if (e.pointerType !== 'mouse') svgEl?.setPointerCapture?.(e.pointerId)
+		onMove(e)
+	}
+
+	/** @param {PointerEvent} e */
+	function onUp (e) {
+		if (e.pointerType !== 'mouse') hover = null
+	}
 </script>
 
 <div class="chart" style:height={`${height}px`} use:track>
@@ -182,7 +197,10 @@
 			{height}
 			viewBox={`0 0 ${width} ${height}`}
 			role="img"
+			onpointerdown={onDown}
 			onpointermove={onMove}
+			onpointerup={onUp}
+			onpointercancel={() => (hover = null)}
 			onpointerleave={() => (hover = null)}>
 			<defs>
 				{#each drawn as d, i (d.name)}
@@ -274,7 +292,8 @@
 	.surface {
 		display: block;
 		overflow: visible;
-		touch-action: none;
+		/* let the page scroll vertically; horizontal drags read the chart */
+		touch-action: pan-y;
 	}
 
 	.grid {
