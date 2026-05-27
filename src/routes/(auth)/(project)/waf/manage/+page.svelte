@@ -137,7 +137,10 @@
 		<a href={`/waf?project=${project}`} class="link"><h6>Firewall</h6></a>
 	</div>
 	<div class="breadcrumb-item">
-		<h6 class="font-mono">{location}</h6>
+		<a href={`/waf/metrics?project=${project}&location=${encodeURIComponent(location)}`} class="link"><h6 class="font-mono">{location}</h6></a>
+	</div>
+	<div class="breadcrumb-item">
+		<h6>Manage</h6>
 	</div>
 </div>
 
@@ -150,6 +153,11 @@
 			Web application firewall rules in <span class="font-mono">{location}</span>
 		</p>
 	</div>
+	<a class="button is-variant-secondary is-icon-left"
+		href={`/waf/metrics?project=${project}&location=${encodeURIComponent(location)}`}>
+		<i class="fa-solid fa-chart-simple"></i>
+		View metrics
+	</a>
 </div>
 
 <div class="panel is-level-300 grid gap-6">

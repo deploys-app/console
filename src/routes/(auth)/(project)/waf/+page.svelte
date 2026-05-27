@@ -105,7 +105,7 @@
 				{#each firewalls as fw (fw.location)}
 					<tr>
 						<td>
-							<a href={`/waf/manage?project=${project}&location=${encodeURIComponent(fw.location)}`} class="link font-mono">{fw.location}</a>
+							<a href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`} class="link font-mono">{fw.location}</a>
 						</td>
 						<td>
 							{#if fw.status === 'pending'}
@@ -137,12 +137,14 @@
 							{#if metrics[fw.location]?.loading}
 								<span class="text-content/30"><i class="fa-solid fa-spinner-third fa-spin"></i></span>
 							{:else if (metrics[fw.location]?.total ?? 0) > 0}
-								<div class="flex items-center gap-3">
-									<span class="font-mono text-sm tabular-nums" title={`${metrics[fw.location].total.toLocaleString()} matches in the last 24h`}>
+								<a class="matches-link flex items-center gap-3"
+									href={`/waf/metrics?project=${project}&location=${encodeURIComponent(fw.location)}`}
+									title={`${metrics[fw.location].total.toLocaleString()} matches in the last 24h — view metrics`}>
+									<span class="font-mono text-sm tabular-nums">
 										{format.count(metrics[fw.location].total)}
 									</span>
 									<Sparkline points={metrics[fw.location].points} {from} {to} />
-								</div>
+								</a>
 							{:else}
 								<span class="text-content/40">—</span>
 							{/if}
@@ -170,3 +172,17 @@
 		</table>
 	</div>
 </div>
+
+<style>
+	/* The matches total + sparkline doubles as a shortcut into the metrics view. */
+	.matches-link {
+		width: fit-content;
+		color: inherit;
+		border-radius: 0.375rem;
+		transition: color var(--timing-fastest) ease;
+	}
+
+	.matches-link:hover {
+		color: hsl(var(--hsl-primary));
+	}
+</style>
