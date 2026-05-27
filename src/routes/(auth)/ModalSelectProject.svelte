@@ -19,11 +19,12 @@
 	let elSearch = $state(/** @type {?HTMLInputElement} */ (null))
 
 	const filtered = $derived.by(() => {
-		const q = search.trim().toLowerCase()
-		if (!q) return projects
-		return projects.filter((it) =>
-			it.name.toLowerCase().includes(q) || it.project.toLowerCase().includes(q)
-		)
+		const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
+		if (!tokens.length) return projects
+		return projects.filter((it) => {
+			const haystack = `${it.name} ${it.project}`.toLowerCase()
+			return tokens.every((t) => haystack.includes(t))
+		})
 	})
 
 	/**
