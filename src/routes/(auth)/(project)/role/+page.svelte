@@ -57,6 +57,10 @@
 										<i class="fa-solid fa-pen"></i>
 									</div>
 								</a>
+							{:else}
+								<!-- Reserve the icon-button's footprint so rows without an
+								     edit action keep the same height as the others. -->
+								<div class="w-8 h-8" aria-hidden="true"></div>
 							{/if}
 						</td>
 					</tr>
