@@ -28,8 +28,15 @@
 	/** @type {Api.PodStatus | null} */
 	let podStatus = $state(null)
 
-	/** @type {string} */
-	let iconClass = $state('')
+	/** @type {?HTMLElement} */
+	let el = $state(null)
+	let visible = $state(false)
+	let hasBeenVisible = $state(false)
+
+	// Pod readiness only changes the icon for a running (non-paused) success
+	// deployment; every other state is resolved from props alone, so there's no
+	// reason to hit statusUrl for it.
+	const needsPodStatus = $derived(status === 'success' && action !== 'pause')
 
 	/**
 	 * @returns {string}
@@ -44,7 +51,12 @@
 		}
 
 		if (!podStatus) {
-			return 'fa-solid fa-spin fa-spinner text-content/40'
+			// Readiness not loaded yet. Only spin while the row is on-screen;
+			// off-screen rows show a static placeholder so a long list doesn't
+			// animate hundreds of spinners at once.
+			return (visible || hasBeenVisible)
+				? 'fa-solid fa-spin fa-spinner text-content/40'
+				: 'fa-solid fa-spinner text-content/30'
 		}
 		if (type === 'CronJob' && podStatus.count === podStatus.succeeded + podStatus.ready) {
 			return 'fa-solid fa-check-circle text-positive/80'
@@ -55,17 +67,22 @@
 		return 'fa-solid fa-exclamation-triangle text-warning'
 	}
 
-	let fetchPodStatusTimeout
+	const iconClass = $derived(getIconClass())
+
+	let timer
 	let destroyed = false
 
-	async function fetchPodStatus () {
+	function clearTimer () {
+		if (timer) {
+			clearTimeout(timer)
+			timer = null
+		}
+	}
+
+	async function poll () {
+		clearTimer()
 		if (destroyed) {
 			return
-		}
-
-		if (fetchPodStatusTimeout) {
-			clearTimeout(fetchPodStatusTimeout)
-			fetchPodStatusTimeout = null
 		}
 
 		try {
@@ -78,24 +95,53 @@
 		} catch (err) {
 			console.error(err)
 		} finally {
-			fetchPodStatusTimeout = setTimeout(fetchPodStatus, 10000)
+			// The row may have scrolled out of view while the request was in
+			// flight — only keep polling rows that still need it, and jitter the
+			// interval so many rows don't re-fetch in lockstep.
+			if (!destroyed && visible && needsPodStatus) {
+				timer = setTimeout(poll, 10000 + Math.random() * 3000)
+			}
 		}
 	}
 
+	// Drop stale readiness if the deployment we're pointing at changes.
+	$effect(() => {
+		url
+		podStatus = null
+	})
+
+	// Track viewport visibility so only on-screen rows fetch their status. The
+	// margin starts polling slightly before a row scrolls into view.
+	$effect(() => {
+		if (!browser || !el) {
+			return
+		}
+		const io = new IntersectionObserver((entries) => {
+			visible = entries[entries.length - 1].isIntersecting
+			if (visible) {
+				hasBeenVisible = true
+			}
+		}, { rootMargin: '300px' })
+		io.observe(el)
+		return () => io.disconnect()
+	})
+
+	// Poll only while the row is visible and its icon depends on pod status.
+	// Toggling visibility (or changing the target) restarts/stops the loop.
+	$effect(() => {
+		const active = browser && visible && needsPodStatus
+		url
+		clearTimer()
+		if (active) {
+			poll()
+		}
+		return clearTimer
+	})
+
 	onDestroy(() => {
 		destroyed = true
-		fetchPodStatusTimeout && clearTimeout(fetchPodStatusTimeout)
-	})
-	$effect(() => {
-		status
-		url
-		action
-		browser && fetchPodStatus()
-	})
-	$effect(() => {
-		podStatus
-		iconClass = getIconClass()
+		clearTimer()
 	})
 </script>
 
-<i class={`${iconClass} fa-fw mx-3`}></i>
+<i bind:this={el} class={`${iconClass} fa-fw mx-3`}></i>
