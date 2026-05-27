@@ -83,10 +83,18 @@
 	}
 
 	/** @param {number} i */
-	async function removeRule (i) {
-		const next = rules.filter((_, k) => k !== i)
-		rules = next
-		await persistZone(next)
+	function removeRule (i) {
+		const rule = rules[i]
+		if (!rule) return
+		modal.confirm({
+			title: `Delete rule ${rule.id}?`,
+			yes: 'Delete',
+			callback: async () => {
+				const next = rules.filter((_, k) => k !== i)
+				rules = next
+				await persistZone(next)
+			}
+		})
 	}
 
 	/** @param {import('$lib/waf/rules').RuleForm} rule */
