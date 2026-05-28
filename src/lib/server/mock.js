@@ -151,7 +151,10 @@ function deployment (project = 'acme') {
 		sidecars: [],
 		url: 'https://web.acme.rcf2.deploys.app',
 		internalUrl: 'http://web.acme.svc.cluster.local',
-		logUrl: '',
+		// Wired to src/routes/api/mock-logs/+server.js, which streams synthetic
+		// SSE only when MOCK_API is set. The token query param is there so the
+		// page's `${logUrl}&type=text&raw=1` concatenation produces valid URLs.
+		logUrl: '/api/mock-logs?t=mock',
 		eventUrl: '',
 		podsUrl: '',
 		statusUrl: HEALTHY_STATUS_URL,
