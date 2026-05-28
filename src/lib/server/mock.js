@@ -241,7 +241,7 @@ const routes = [
 		location: LOCATION_ID,
 		domain: 'acme.example.com',
 		path: '/',
-		target: 'web',
+		target: 'deployment://web',
 		deployment: 'web',
 		config: {},
 		createdAt: CREATED_AT,
@@ -753,6 +753,12 @@ const handlers = {
 	'domain.purgeCache': () => ok({}),
 
 	'route.list': () => list(routes),
+	'route.get': (args) => ok({
+		...routes[0],
+		location: args?.location ?? routes[0].location,
+		domain: args?.domain ?? routes[0].domain,
+		path: args?.path ?? routes[0].path
+	}),
 	'route.createV2': () => ok({}),
 	'route.delete': () => ok({}),
 
