@@ -13,6 +13,11 @@
 	const profile = $derived(data.profile)
 	const projects = $derived(data.projects ?? [])
 
+	// The global search palette is project-scoped — only enabled when a
+	// `?project=` is selected. On `/project` (the project picker page) the page
+	// itself owns the `/` shortcut for its own ModalSelectProject.
+	const hasProject = $derived(!!$page.url.searchParams.get('project'))
+
 	let showSidebar = $state(false)
 	$effect(() => {
 		$page
@@ -42,6 +47,7 @@
 	 */
 	function onWindowKeydown (e) {
 		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
+		if (!hasProject) return
 		const el = /** @type {?HTMLElement} */ (e.target)
 		const tag = el?.tagName
 		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return
@@ -55,7 +61,7 @@
 <div class="app-layout"
 	class:is-shown-sidebar={showSidebar}>
 	<div class="navbar-wrapper">
-		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} openSearch={() => searchModal?.open()} />
+		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} openSearch={hasProject ? () => searchModal?.open() : undefined} />
 	</div>
 
 	<div class="sidebar-wrapper z-[2]">

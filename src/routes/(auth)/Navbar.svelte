@@ -9,7 +9,7 @@
 	 * @typedef {Object} Props
 	 * @property {Api.Profile | null} [profile]
 	 * @property {() => void} toggleSidebar
-	 * @property {() => void} openSearch
+	 * @property {() => void} [openSearch]
 	 */
 
 	/** @type {Props} */
@@ -79,11 +79,13 @@
 		<i class="fa-light fa-bars"></i>
 	</div>
 
-	<button type="button" class="search-trigger" onclick={openSearch} aria-label="Search">
-		<i class="fa-solid fa-magnifying-glass"></i>
-		<span class="search-text">Search…</span>
-		<kbd>/</kbd>
-	</button>
+	{#if openSearch}
+		<button type="button" class="search-trigger" onclick={openSearch} aria-label="Search">
+			<i class="fa-solid fa-magnifying-glass"></i>
+			<span class="search-text">Search…</span>
+			<kbd>/</kbd>
+		</button>
+	{/if}
 
 	<div class="flex items-center gap-2 ml-auto">
 		<div class="theme-toggle" role="group" aria-label="Theme">
