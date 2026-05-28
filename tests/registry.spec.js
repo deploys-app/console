@@ -7,10 +7,6 @@ test.describe('registry', () => {
 			'__registry/list': {
 				ok: true,
 				result: { items: [sampleRepository, { ...sampleRepository, name: 'api' }] }
-			},
-			'__registry/getProjectStorage': {
-				ok: true,
-				result: { size: 99999 }
 			}
 		})
 
@@ -20,21 +16,6 @@ test.describe('registry', () => {
 		await expect(main.getByRole('heading', { name: 'Registry' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'web' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'api' })).toBeVisible()
-	})
-
-	test('shows total storage from getProjectStorage', async ({ page }) => {
-		await setMocks({
-			'__registry/getProjectStorage': {
-				ok: true,
-				result: { size: 1024 ** 3 * 10 } // 10 GiB
-			}
-		})
-
-		await page.goto('/registry?project=test-project')
-
-		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('Total storage')).toBeVisible()
-		await expect(main.getByText('10 GiB')).toBeVisible()
 	})
 
 	test('empty state when no repositories', async ({ page }) => {
