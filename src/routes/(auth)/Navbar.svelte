@@ -181,10 +181,13 @@
 		border-radius: var(--radius-sm);
 	}
 
-	/* On narrow screens collapse to just the icon. */
+	/* On narrow screens collapse to a square icon-only button. */
 	@media (max-width: 640px) {
 		.search-trigger {
 			min-width: 0;
+			width: 2.25rem;
+			padding: 0;
+			justify-content: center;
 		}
 
 		.search-text,
