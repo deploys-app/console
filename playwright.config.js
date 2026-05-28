@@ -51,7 +51,6 @@ export default defineConfig({
 				PORT: String(PORT),
 				HOST: '127.0.0.1',
 				API_ENDPOINT: `http://localhost:${MOCK_PORT}`,
-				REGISTRY_ENDPOINT: `http://localhost:${MOCK_PORT}/__registry`,
 				AUTH_ENDPOINT: `http://localhost:${MOCK_PORT}/__auth`,
 				PUBLIC_API_ENDPOINT: `http://localhost:${MOCK_PORT}`,
 				OAUTH2_CLIENT_ID: 'test-client',

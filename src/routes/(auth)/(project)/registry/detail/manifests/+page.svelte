@@ -16,12 +16,12 @@
 			title: `Delete manifest "${format.shortDigest(digest)}"?`,
 			yes: 'Delete',
 			callback: async () => {
-				const resp = await api.invoke('registry/deleteManifest', { project, repository: data.id, digest }, fetch)
+				const resp = await api.invoke('registry.deleteManifest', { project, repository: data.id, digest }, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
 					return
 				}
-				await api.invalidate('registry/getManifests')
+				await api.invalidate('registry.getManifests')
 			}
 		})
 	}

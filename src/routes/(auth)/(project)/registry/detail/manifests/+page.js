@@ -4,7 +4,7 @@ export async function load ({ parent, fetch }) {
 	const { project, id } = await parent()
 
 	/** @type {Api.Response<Api.RepositoryManifestResult>} */
-	const res = await api.invoke('registry/getManifests', {
+	const res = await api.invoke('registry.getManifests', {
 		project,
 		repository: id
 	}, fetch)

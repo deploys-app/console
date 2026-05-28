@@ -15,12 +15,12 @@
 			title: `Delete "${name}"?`,
 			yes: 'Delete',
 			callback: async () => {
-				const resp = await api.invoke('registry/delete', { project, repository: name }, fetch)
+				const resp = await api.invoke('registry.delete', { project, repository: name }, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
 					return
 				}
-				await api.invalidate('registry/list')
+				await api.invalidate('registry.list')
 			}
 		})
 	}

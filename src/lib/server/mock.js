@@ -847,14 +847,14 @@ const handlers = {
 		storage: dailyMetricLine('storage', 1073741824)
 	}),
 
-	'registry/list': () => list(repositories),
-	'registry/get': (args) => ok({ ...repositories[0], name: args?.repository ?? repositories[0].name }),
-	'registry/getProjectStorage': () => ok({ size: 276480000, updatedAt: CREATED_AT }),
-	'registry/getTags': (args) => ok({ name: args?.repository ?? repositories[0].name, items: repositoryTags }),
-	'registry/getManifests': (args) => ok({ name: args?.repository ?? repositories[0].name, items: repositoryManifests }),
-	'registry/delete': () => ok({}),
-	'registry/deleteManifest': () => ok({}),
-	'registry/untag': () => ok({})
+	'registry.list': () => list(repositories),
+	'registry.get': (args) => ok({ ...repositories[0], name: args?.repository ?? repositories[0].name }),
+	'registry.getProjectStorage': () => ok({ size: 276480000, updatedAt: CREATED_AT }),
+	'registry.getTags': (args) => ok({ name: args?.repository ?? repositories[0].name, items: repositoryTags }),
+	'registry.getManifests': (args) => ok({ name: args?.repository ?? repositories[0].name, items: repositoryManifests }),
+	'registry.delete': () => ok({}),
+	'registry.deleteManifest': () => ok({}),
+	'registry.untag': () => ok({})
 }
 
 /**
