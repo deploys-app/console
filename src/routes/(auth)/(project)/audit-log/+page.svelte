@@ -4,16 +4,20 @@
 	import { goto } from '$app/navigation'
 	import { DatePicker } from '@svelte-plugins/datepicker'
 	import dayjs from 'dayjs'
+	import api from '$lib/api'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import OutcomeBadge from '$lib/components/OutcomeBadge.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import * as format from '$lib/format'
 
+	// Must match the LIMIT used by +page.js so a "full" first page implies more
+	// rows are available on the server.
+	const PAGE_SIZE = 50
+
 	const { data } = $props()
 
 	const project = $derived(data.project)
-	const items = $derived(data.items)
 	const error = $derived(data.error)
 
 	const RESOURCE_TYPES = [
@@ -46,6 +50,94 @@
 
 	let isDatePickerOpen = $state(false)
 	let applying = $state(false)
+
+	// Infinite-scroll state. `data.items` from the loader is just the first
+	// page; we mirror it locally so we can append on scroll, and re-sync it
+	// whenever the loader runs again (filter / project change).
+	/** @type {Api.AuditLogItem[]} */
+	let items = $state([])
+	let hasMore = $state(false)
+	let loadingMore = $state(false)
+	let loadMoreError = $state('')
+	// Cursor for the next page: the `createdAt` of the oldest item currently
+	// loaded. We pass it as `before` on the next request. The backend uses a
+	// strict less-than, so the boundary item is not duplicated. Two rows with
+	// the same microsecond timestamp could be missed, which is acceptable for
+	// audit logs (very low chance of collision).
+	let cursor = $state('')
+	// Token bumped on every re-sync so an in-flight loadMore from the previous
+	// filter can be discarded.
+	let loadToken = 0
+
+	$effect(() => {
+		// Depending on `data.items` causes this to re-run on every loader update
+		// (URL/filter change).
+		const fresh = data.items
+		loadToken += 1
+		items = fresh
+		hasMore = fresh.length >= PAGE_SIZE
+		cursor = fresh.length ? fresh[fresh.length - 1].createdAt : ''
+		loadMoreError = ''
+		loadingMore = false
+	})
+
+	/** @type {HTMLElement | null} */
+	let sentinel = $state(null)
+	$effect(() => {
+		if (!sentinel) return
+		const io = new IntersectionObserver((entries) => {
+			if (entries[0].isIntersecting) loadMore()
+		}, { rootMargin: '300px' })
+		io.observe(sentinel)
+		return () => io.disconnect()
+	})
+
+	/**
+	 * @param {string} v
+	 * @returns {string | undefined}
+	 */
+	function toRFC3339 (v) {
+		if (!v) return undefined
+		const d = new Date(v)
+		if (isNaN(d.getTime())) return undefined
+		return d.toISOString()
+	}
+
+	async function loadMore () {
+		if (loadingMore || !hasMore || !cursor) return
+		const token = loadToken
+		loadingMore = true
+		loadMoreError = ''
+		try {
+			/** @type {Api.Response<Api.List<Api.AuditLogItem>>} */
+			const res = await api.invoke('auditLog.list', {
+				project,
+				resourceType: data.filters.resourceType,
+				actor: data.filters.actor,
+				outcome: data.filters.outcome,
+				after: toRFC3339(data.filters.after),
+				before: cursor,
+				limit: PAGE_SIZE
+			}, fetch)
+			if (token !== loadToken) return // filters changed; discard
+			if (res.error) {
+				loadMoreError = res.error.message || 'Failed to load more'
+				return
+			}
+			const next = res.result?.items ?? []
+			items = [...items, ...next]
+			hasMore = next.length >= PAGE_SIZE
+			if (next.length > 0) {
+				cursor = next[next.length - 1].createdAt
+			}
+		} catch (e) {
+			if (token === loadToken) {
+				loadMoreError = e instanceof Error ? e.message : 'Failed to load more'
+			}
+		} finally {
+			if (token === loadToken) loadingMore = false
+		}
+	}
 
 	const dateRangeLabel = $derived.by(() => {
 		const s = form.startDate ? dayjs(form.startDate).format('YYYY-MM-DD') : ''
@@ -269,12 +361,32 @@
 		color: hsl(var(--hsl-content) / 0.7);
 		vertical-align: middle;
 	}
+
+	.loadmore-row > td {
+		padding: 0;
+	}
+
+	.loadmore-sentinel {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 1rem 0.75rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		font-size: 0.875rem;
+	}
+
+	.loadmore-error {
+		color: hsl(var(--hsl-negative));
+	}
 </style>
 
 <div class="page-head">
 	<div>
 		<h4><strong>Audit Logs</strong></h4>
-		<p class="page-sub">{items.length} {items.length === 1 ? 'event' : 'events'}</p>
+		<p class="page-sub">
+			{items.length} {items.length === 1 ? 'event' : 'events'}{hasMore ? '+' : ''}
+		</p>
 	</div>
 </div>
 <div class="panel is-level-300">
@@ -389,6 +501,22 @@
 				{/each}
 				<NoDataRow span={6} list={items} />
 				<ErrorRow span={6} {error} />
+				{#if hasMore || loadingMore || loadMoreError}
+					<tr class="loadmore-row">
+						<td colspan="6">
+							<div bind:this={sentinel} class="loadmore-sentinel">
+								{#if loadingMore}
+									<i class="fa-solid fa-circle-notch fa-spin"></i>
+									<span>Loading more…</span>
+								{:else if loadMoreError}
+									<span class="loadmore-error">{loadMoreError}</span>
+									<button type="button" class="button is-variant-tertiary is-size-small"
+										onclick={loadMore}>Retry</button>
+								{/if}
+							</div>
+						</td>
+					</tr>
+				{/if}
 			</tbody>
 		</table>
 	</div>
