@@ -308,7 +308,7 @@
 					isRange
 					isMultipane
 					showPresets
-					align="left"
+					align="right"
 					includeFont={false}
 				>
 					<button type="button" class="date-range-trigger" onclick={toggleDatePicker}>
