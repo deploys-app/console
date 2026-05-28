@@ -4,7 +4,7 @@ import { sampleRepository } from './fixtures/mocks.js'
 test.describe('registry', () => {
 	test('lists repositories', async ({ page }) => {
 		await setMocks({
-			'__registry/list': {
+			'registry.list': {
 				ok: true,
 				result: { items: [sampleRepository, { ...sampleRepository, name: 'api' }] }
 			}
@@ -26,7 +26,7 @@ test.describe('registry', () => {
 
 	test('shows error row when registry list fails', async ({ page }) => {
 		await setMocks({
-			'__registry/list': {
+			'registry.list': {
 				ok: false,
 				error: { message: 'api: forbidden' }
 			}

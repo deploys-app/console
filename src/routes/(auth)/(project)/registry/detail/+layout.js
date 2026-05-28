@@ -6,7 +6,7 @@ export async function load ({ url, parent, fetch }) {
 	const id = url.searchParams.get('repository')
 
 	/** @type {Api.Response<Api.Repository>} */
-	const repository = await api.invoke('registry/get', {
+	const repository = await api.invoke('registry.get', {
 		project,
 		repository: id
 	}, fetch)

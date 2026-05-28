@@ -23,12 +23,12 @@
 			title: `Untag "${tag}"?`,
 			yes: 'Untag',
 			callback: async () => {
-				const resp = await api.invoke('registry/untag', { project, repository: data.id, tag }, fetch)
+				const resp = await api.invoke('registry.untag', { project, repository: data.id, tag }, fetch)
 				if (!resp.ok) {
 					modal.error({ error: resp.error })
 					return
 				}
-				await api.invalidate('registry/getTags')
+				await api.invalidate('registry.getTags')
 			}
 		})
 	}

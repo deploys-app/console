@@ -112,11 +112,11 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
-		'/__registry/list': {
+		'/registry.list': {
 			ok: true,
 			result: { items: [] }
 		},
-		'/__registry/getProjectStorage': {
+		'/registry.getProjectStorage': {
 			ok: true,
 			result: { size: 0 }
 		},

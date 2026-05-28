@@ -4,7 +4,7 @@ export async function load ({ parent, fetch }) {
 	const { project, id } = await parent()
 
 	/** @type {Api.Response<Api.RepositoryTagResult>} */
-	const res = await api.invoke('registry/getTags', {
+	const res = await api.invoke('registry.getTags', {
 		project,
 		repository: id
 	}, fetch)
