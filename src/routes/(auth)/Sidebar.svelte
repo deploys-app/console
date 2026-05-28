@@ -227,6 +227,9 @@
 		</div>
 		<div class="flex justify-between items-center flex-col">
 			<div class="social flex justify-end items-center gap-2 w-full px-4">
+				<a href="https://docs.deploys.app" target="_blank" rel="external" class="flex justify-center items-center rounded w-8 h-8" aria-label="Read the docs">
+					<i class="fa-solid fa-book-open"></i>
+				</a>
 				<a href="https://github.com/deploys-app" target="_blank" rel="external" class="flex justify-center items-center rounded w-8 h-8" aria-label="Go to GitHub">
 					<i class="fa-brands fa-github"></i>
 				</a>
