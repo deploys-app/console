@@ -76,7 +76,7 @@
 </div>
 
 <ModalSelectProject bind:this={projectModal} {projects} />
-<SearchModal bind:this={searchModal} />
+<SearchModal bind:this={searchModal} {projects} />
 
 <style>
 	:root {

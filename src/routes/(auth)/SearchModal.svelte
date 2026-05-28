@@ -2,7 +2,15 @@
 	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { navEntries, fetchResourceEntries, filterEntries } from '$lib/search'
+	import { navEntries, projectEntries, fetchResourceEntries, filterEntries } from '$lib/search'
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {Api.Project[]} [projects]
+	 */
+
+	/** @type {Props} */
+	const { projects = [] } = $props()
 
 	const project = $derived($page.url.searchParams.get('project'))
 
@@ -16,10 +24,15 @@
 	let loadedProject = $state(/** @type {?string} */ (null))
 	let resources = $state(/** @type {import('$lib/search').SearchEntry[]} */ ([]))
 
-	const allEntries = $derived(project ? [...navEntries(project), ...resources] : [])
+	// Project entries are first so typing a project name highlights the switch
+	// row before any nav/resource match (intent: "I'm trying to switch project").
+	const allEntries = $derived(project
+		? [...projectEntries(projects, project, $page), ...navEntries(project), ...resources]
+		: [])
 
-	// Empty query → just the nav sections (showing every resource would be a wall
-	// of rows); once the user types, search across nav + fetched resources.
+	// Empty query → just the nav sections (showing every resource — or every
+	// project — would be a wall of rows); typing surfaces projects + nav + fetched
+	// resources together.
 	const base = $derived(search.trim() ? allEntries : (project ? navEntries(project) : []))
 	const filtered = $derived(filterEntries(base, search))
 
@@ -122,7 +135,7 @@
 				onkeydown={onSearchKeydown}
 				oninput={() => highlighted = 0}
 				type="text"
-				placeholder="Search deployments, domains, routes, settings…"
+				placeholder="Search projects, deployments, domains, routes…"
 				autocomplete="off"
 			>
 		</div>

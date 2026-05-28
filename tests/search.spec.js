@@ -1,5 +1,5 @@
 import { test, expect, setMocks } from './helpers.js'
-import { sampleDeployment } from './fixtures/mocks.js'
+import { defaultProject, sampleDeployment } from './fixtures/mocks.js'
 
 test.describe('global search palette', () => {
 	test('"/" opens the palette on a project page and shows the nav sections', async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe('global search palette', () => {
 		const dialog = page.locator('.modal.is-active')
 		await expect(dialog).toBeVisible()
 		// The global palette — not the project picker.
-		await expect(dialog.getByPlaceholder(/Search deployments, domains/)).toBeFocused()
+		await expect(dialog.getByPlaceholder(/Search projects, deployments/)).toBeFocused()
 		// Empty query → "Go to" nav sections only.
 		await expect(dialog.getByText('Go to', { exact: false })).toBeVisible()
 		await expect(dialog.getByRole('link', { name: 'Deployments' })).toBeVisible()
@@ -33,7 +33,7 @@ test.describe('global search palette', () => {
 		const dialog = page.locator('.modal.is-active')
 		await expect(dialog).toBeVisible()
 
-		await dialog.getByPlaceholder(/Search deployments, domains/).fill('web')
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('web')
 		// The resource row from deployment.list, with its location as sublabel.
 		const webRow = dialog.getByRole('link', { name: /web/ }).first()
 		await expect(webRow).toBeVisible()
@@ -73,7 +73,32 @@ test.describe('global search palette', () => {
 		await expect(page.locator('.modal.is-active').getByPlaceholder(/Search projects/)).toBeFocused()
 		// The global palette's placeholder must not appear in any open modal
 		// (its element is always in the DOM, just hidden via `.is-active`).
-		await expect(page.locator('.modal.is-active').getByPlaceholder(/Search deployments, domains/)).toHaveCount(0)
+		await expect(page.locator('.modal.is-active').getByPlaceholder(/Search projects, deployments/)).toHaveCount(0)
+	})
+
+	test('typing a project name surfaces it as a "Switch project" row and Enter switches', async ({ page }) => {
+		const otherProject = { ...defaultProject, id: '2', project: 'staging', name: 'Staging' }
+		await setMocks({
+			'project.list': { ok: true, result: { items: [defaultProject, otherProject] } }
+		})
+
+		await page.goto('/deployment?project=test-project')
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('staging')
+		// The other project shows up under "Switch project" — the current project
+		// is intentionally excluded.
+		await expect(dialog.getByText('Switch project', { exact: false })).toBeVisible()
+		const switchRow = dialog.locator('.result').filter({ hasText: 'Staging' }).first()
+		await expect(switchRow).toBeVisible()
+		// Current project should NOT appear (filtered out at source).
+		await expect(dialog.locator('.result').filter({ hasText: 'Test Project' })).toHaveCount(0)
+
+		await switchRow.click()
+		await expect(page).toHaveURL(/[?&]project=staging\b/)
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
 	})
 
 	test('navbar search trigger is hidden when no project is selected', async ({ page }) => {

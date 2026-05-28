@@ -151,6 +151,38 @@ const resourceSources = [
 ]
 
 /**
+ * Project-switch entries. Mirrors {@link ../routes/(auth)/ModalSelectProject.svelte}'s
+ * `setProject` URL shape: keep the current query params, swap `project=`, and
+ * honour `data.overrideRedirect` so switching from a detail page lands on the
+ * section's list in the new project instead of a stale deep link.
+ *
+ * The current project is excluded — switching to where you already are is a
+ * no-op and would just be visual noise in the palette.
+ *
+ * @param {Api.Project[]} projects
+ * @param {string} currentProject
+ * @param {{ url: { search: string }, data: { overrideRedirect?: string } }} page
+ * @returns {SearchEntry[]}
+ */
+export function projectEntries (projects, currentProject, page) {
+	const overrideRedirect = page.data?.overrideRedirect || ''
+	return projects
+		.filter((p) => p.project !== currentProject)
+		.map((p) => {
+			const q = new URLSearchParams(page.url.search)
+			q.set('project', p.project)
+			return /** @type {SearchEntry} */ ({
+				id: `project:${p.project}`,
+				group: 'Switch project',
+				icon: 'fa-folder-open',
+				label: p.name,
+				sublabel: p.project,
+				href: `${overrideRedirect}?${q.toString()}`
+			})
+		})
+}
+
+/**
  * Navigation entries — the sidebar sections, jumpable by name. Always available
  * (no fetch) so the palette is useful the instant it opens.
  *
