@@ -433,26 +433,34 @@ const serviceAccounts = [
 	}
 ]
 
-const auditLogItems = [
-	{
-		id: 1042,
-		resource: { type: 'Deployment', id: 'web', name: 'web', locationId: LOCATION_ID },
-		actor: { email: USER_EMAIL, type: 'User' },
-		action: 'deployment.deploy',
-		outcome: 'success',
-		detail: 'Deployed revision 7',
-		createdAt: CREATED_AT
-	},
-	{
-		id: 1041,
-		resource: { type: 'Domain', id: 'acme.example.com', name: 'acme.example.com', locationId: LOCATION_ID },
-		actor: { email: USER_EMAIL, type: 'User' },
-		action: 'domain.create',
-		outcome: 'success',
-		detail: 'Added domain acme.example.com',
-		createdAt: CREATED_AT
+// Synthesize enough rows to exercise the infinite-scroll cursor offline. The
+// real backend orders `id desc`; we mirror that here so the array is already in
+// the order the API would return.
+const auditLogItems = (() => {
+	const samples = [
+		{ resource: { type: 'Deployment', id: 'web', name: 'web' }, action: 'deployment.deploy', detail: 'Deployed revision' },
+		{ resource: { type: 'Domain', id: 'acme.example.com', name: 'acme.example.com' }, action: 'domain.create', detail: 'Added domain' },
+		{ resource: { type: 'Disk', id: 'data', name: 'data' }, action: 'disk.create', detail: 'Created disk' },
+		{ resource: { type: 'Role', id: 'admin', name: 'admin' }, action: 'role.update', detail: 'Updated role' },
+		{ resource: { type: 'PullSecret', id: 'ghcr', name: 'ghcr' }, action: 'pullSecret.create', detail: 'Added pull secret' },
+		{ resource: { type: 'EnvGroup', id: 'web-env', name: 'web-env' }, action: 'envGroup.update', detail: 'Updated env group' }
+	]
+	const t0 = new Date(CREATED_AT).getTime()
+	const items = []
+	for (let i = 0; i < 137; i++) {
+		const s = samples[i % samples.length]
+		items.push({
+			id: 1042 - i,
+			resource: { ...s.resource, locationId: LOCATION_ID },
+			actor: { email: USER_EMAIL, type: 'User' },
+			action: s.action,
+			outcome: i % 11 === 0 ? 'failure' : 'success',
+			detail: `${s.detail} (#${1042 - i})`,
+			createdAt: new Date(t0 - i * 60_000).toISOString()
+		})
 	}
-]
+	return items
+})()
 
 const repositories = [
 	{ name: 'acme/web', size: 184320000, createdAt: CREATED_AT },
@@ -708,7 +716,21 @@ const handlers = {
 		expiresAt: '2026-06-02T00:00:00Z'
 	}),
 
-	'auditLog.list': (args) => list(auditLogItems.slice(0, args?.limit ?? auditLogItems.length)),
+	'auditLog.list': (args) => {
+		let arr = auditLogItems
+		if (args?.before) {
+			const cutoff = new Date(args.before).getTime()
+			arr = arr.filter((it) => new Date(it.createdAt).getTime() < cutoff)
+		}
+		if (args?.after) {
+			const lo = new Date(args.after).getTime()
+			arr = arr.filter((it) => new Date(it.createdAt).getTime() >= lo)
+		}
+		if (args?.resourceType) arr = arr.filter((it) => it.resource.type.toLowerCase() === String(args.resourceType).toLowerCase())
+		if (args?.actor) arr = arr.filter((it) => it.actor.email === args.actor)
+		if (args?.outcome) arr = arr.filter((it) => it.outcome === args.outcome)
+		return list(arr.slice(0, args?.limit ?? arr.length))
+	},
 
 	'location.list': () => list(locations),
 	'location.get': (args) => ok(locations.find((l) => l.id === args?.location) ?? locations[0]),
