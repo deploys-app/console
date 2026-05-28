@@ -9,10 +9,11 @@
 	 * @typedef {Object} Props
 	 * @property {Api.Profile | null} [profile]
 	 * @property {() => void} toggleSidebar
+	 * @property {() => void} [openSearch]
 	 */
 
 	/** @type {Props} */
-	const { profile = null, toggleSidebar } = $props()
+	const { profile = null, toggleSidebar, openSearch } = $props()
 
 	let active = $state(false)
 
@@ -78,6 +79,14 @@
 		<i class="fa-light fa-bars"></i>
 	</div>
 
+	{#if openSearch}
+		<button type="button" class="search-trigger" onclick={openSearch} aria-label="Search">
+			<i class="fa-solid fa-magnifying-glass"></i>
+			<span class="search-text">Search…</span>
+			<kbd>/</kbd>
+		</button>
+	{/if}
+
 	<div class="flex items-center gap-2 ml-auto">
 		<div class="theme-toggle" role="group" aria-label="Theme">
 			<span class="theme-knob" style="transform: translateX({themeIndex * 2}rem)"></span>
@@ -127,6 +136,63 @@
 </nav>
 
 <style>
+	.search-trigger {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		height: 2.25rem;
+		margin-left: 0.75rem;
+		padding: 0 0.5rem 0 0.75rem;
+		min-width: 16rem;
+		background-color: hsl(var(--hsl-base-200));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-md);
+		color: hsl(var(--hsl-content) / 0.5);
+		font-size: var(--fs-2);
+		cursor: pointer;
+		transition: border-color var(--timing-faster) ease, background-color var(--timing-faster) ease;
+	}
+
+	.search-trigger:hover {
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		background-color: hsl(var(--hsl-primary) / 0.06);
+	}
+
+	.search-trigger:focus-visible {
+		outline: 2px solid hsl(var(--hsl-primary));
+		outline-offset: 2px;
+	}
+
+	.search-text {
+		margin-right: auto;
+	}
+
+	.search-trigger kbd {
+		display: inline-block;
+		min-width: 1.25rem;
+		padding: 0.0625rem 0.375rem;
+		text-align: center;
+		font-family: inherit;
+		font-size: 0.75rem;
+		line-height: 1.4;
+		color: hsl(var(--hsl-content) / 0.7);
+		background-color: hsl(var(--hsl-base-300));
+		border: 1px solid hsl(var(--hsl-line));
+		border-radius: var(--radius-sm);
+	}
+
+	/* On narrow screens collapse to just the icon. */
+	@media (max-width: 640px) {
+		.search-trigger {
+			min-width: 0;
+		}
+
+		.search-text,
+		.search-trigger kbd {
+			display: none;
+		}
+	}
+
 	.theme-toggle {
 		position: relative;
 		display: inline-flex;

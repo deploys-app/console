@@ -6,11 +6,17 @@
 	import Navbar from './Navbar.svelte'
 	import Sidebar from './Sidebar.svelte'
 	import ModalSelectProject from './ModalSelectProject.svelte'
+	import SearchModal from './SearchModal.svelte'
 
 	const { data, children } = $props()
 
 	const profile = $derived(data.profile)
 	const projects = $derived(data.projects ?? [])
+
+	// The global search palette is project-scoped — only enabled when a
+	// `?project=` is selected. On `/project` (the project picker page) the page
+	// itself owns the `/` shortcut for its own ModalSelectProject.
+	const hasProject = $derived(!!$page.url.searchParams.get('project'))
 
 	let showSidebar = $state(false)
 	$effect(() => {
@@ -21,6 +27,9 @@
 	/** @type {?ModalSelectProject} */
 	let projectModal = $state(null)
 
+	/** @type {?SearchModal} */
+	let searchModal = $state(null)
+
 	onMount(() => {
 		api.setOnUnauth(() => {
 			location.reload()
@@ -30,12 +39,29 @@
 	function hideSidebar () {
 		showSidebar = false
 	}
+
+	/**
+	 * Open the search palette on "/", unless the user is typing into a field
+	 * (including the palette's own input, so "/" types normally once it's open).
+	 * @param {KeyboardEvent} e
+	 */
+	function onWindowKeydown (e) {
+		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
+		if (!hasProject) return
+		const el = /** @type {?HTMLElement} */ (e.target)
+		const tag = el?.tagName
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return
+		e.preventDefault()
+		searchModal?.open()
+	}
 </script>
+
+<svelte:window onkeydown={onWindowKeydown} />
 
 <div class="app-layout"
 	class:is-shown-sidebar={showSidebar}>
 	<div class="navbar-wrapper">
-		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} />
+		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} openSearch={hasProject ? () => searchModal?.open() : undefined} />
 	</div>
 
 	<div class="sidebar-wrapper z-[2]">
@@ -50,6 +76,7 @@
 </div>
 
 <ModalSelectProject bind:this={projectModal} {projects} />
+<SearchModal bind:this={searchModal} {projects} />
 
 <style>
 	:root {
