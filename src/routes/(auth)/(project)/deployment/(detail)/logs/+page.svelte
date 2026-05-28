@@ -417,8 +417,11 @@
 	.log-surface {
 		position: relative;
 		flex: 1;
-		min-height: 32rem;
-		max-height: calc(100dvh - 18rem);
+		/* min-height is intentionally modest so the shell collapses gracefully on
+		   short viewports; the max-height accounts for the navbar, breadcrumb,
+		   masthead, tabs row, rail, and panel padding above + below. */
+		min-height: 14rem;
+		max-height: calc(100dvh - 31rem);
 		overflow-y: auto;
 		overflow-x: hidden;
 		isolation: isolate;

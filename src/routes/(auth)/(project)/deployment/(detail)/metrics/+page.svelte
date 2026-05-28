@@ -247,14 +247,17 @@
 
 	.metric-grid {
 		display: grid;
-		grid-template-columns: 1fr;
+		/* `minmax(0, 1fr)` rather than `1fr` so each cell can shrink below the
+		   chart's intrinsic min-content width — without this the SVG holds the
+		   column open and the grid overflows horizontally as the window narrows. */
+		grid-template-columns: minmax(0, 1fr);
 		gap: 1rem;
 		margin-top: 1rem;
 	}
 
 	@media (min-width: 1024px) {
 		.metric-grid {
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		}
 	}
 </style>

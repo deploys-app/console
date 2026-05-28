@@ -116,8 +116,8 @@
 	.rev-list {
 		position: relative;
 		flex: 1;
-		min-height: 16rem;
-		max-height: calc(100dvh - 18rem);
+		min-height: 12rem;
+		max-height: calc(100dvh - 31rem);
 		overflow-y: auto;
 		overflow-x: hidden;
 		list-style: none;

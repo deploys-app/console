@@ -196,8 +196,8 @@
 	.events-surface {
 		position: relative;
 		flex: 1;
-		min-height: 20rem;
-		max-height: calc(100dvh - 18rem);
+		min-height: 14rem;
+		max-height: calc(100dvh - 31rem);
 		overflow-y: auto;
 		overflow-x: hidden;
 		background:

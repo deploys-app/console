@@ -10,9 +10,9 @@
 	const deployment = $derived(data.deployment)
 
 	const tabs = [
-		{ label: 'Metric', path: '/deployment/metrics' },
+		{ label: 'Metrics', path: '/deployment/metrics' },
 		{ label: 'Details', path: '/deployment/detail' },
-		{ label: 'Revision', path: '/deployment/revision' },
+		{ label: 'Revisions', path: '/deployment/revision' },
 		{ label: 'Logs', path: '/deployment/logs' },
 		{ label: 'Events', path: '/deployment/events' }
 	]
