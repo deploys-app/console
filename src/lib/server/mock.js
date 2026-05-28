@@ -149,13 +149,17 @@ function deployment (project = 'acme') {
 			limits: { cpu: '500m', memory: '512Mi' }
 		},
 		sidecars: [],
-		url: 'https://web.acme.rcf2.deploys.app',
-		internalUrl: 'http://web.acme.svc.cluster.local',
+		// Hostnames only — both the Detail and Deployment pages prepend the
+		// scheme themselves.
+		url: 'web.acme.rcf2.deploys.app',
+		internalUrl: 'web.acme.svc.cluster.local',
 		// Wired to src/routes/api/mock-logs/+server.js, which streams synthetic
 		// SSE only when MOCK_API is set. The token query param is there so the
 		// page's `${logUrl}&type=text&raw=1` concatenation produces valid URLs.
 		logUrl: '/api/mock-logs?t=mock',
-		eventUrl: '',
+		// Mock pod-event feed (src/routes/api/mock-events/+server.js), so the
+		// deployment Events tab is exercisable offline too.
+		eventUrl: '/api/mock-events?t=mock',
 		podsUrl: '',
 		statusUrl: HEALTHY_STATUS_URL,
 		address: '203.0.113.10',

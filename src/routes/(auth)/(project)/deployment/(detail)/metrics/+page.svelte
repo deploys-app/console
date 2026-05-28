@@ -4,30 +4,31 @@
 	import api from '$lib/api'
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
-	import Select from '$lib/components/Select.svelte'
 
 	const { data } = $props()
 
-	const rangeOptions = [
-		{ value: '1h', label: '1 Hour' },
-		{ value: '6h', label: '6 Hours' },
-		{ value: '12h', label: '12 Hours' },
-		{ value: '1d', label: '1 Day' },
-		{ separator: true },
-		{ value: '1hagg', label: '1 Hour (Aggregate)' },
-		{ value: '6hagg', label: '6 Hours (Aggregate)' },
-		{ value: '12hagg', label: '12 Hours (Aggregate)' },
-		{ value: '1dagg', label: '1 Day (Aggregate)' },
-		{ value: '2dagg', label: '2 Days (Aggregate)' },
-		{ value: '7dagg', label: '7 Days (Aggregate)' },
-		{ value: '30dagg', label: '30 Days (Aggregate)' }
+	// Two-row pill bar: top row is the rolling-window options, bottom row is
+	// the aggregate (longer) windows. Aggregate options are tagged so we can
+	// style them distinctly.
+	const RANGES = [
+		{ value: '1h', label: '1h', group: 'live' },
+		{ value: '6h', label: '6h', group: 'live' },
+		{ value: '12h', label: '12h', group: 'live' },
+		{ value: '1d', label: '1d', group: 'live' },
+		{ value: '1hagg', label: '1h', group: 'agg' },
+		{ value: '6hagg', label: '6h', group: 'agg' },
+		{ value: '12hagg', label: '12h', group: 'agg' },
+		{ value: '1dagg', label: '1d', group: 'agg' },
+		{ value: '2dagg', label: '2d', group: 'agg' },
+		{ value: '7dagg', label: '7d', group: 'agg' },
+		{ value: '30dagg', label: '30d', group: 'agg' }
 	]
 
 	const deployment = $derived(data.deployment)
 
-	const reloadInterval = 60 * 1000 // 1m
+	const RELOAD_INTERVAL_MS = 60_000
 
-	const validRanges = new Set(rangeOptions.filter((o) => o.value).map((o) => o.value))
+	const validRanges = new Set(RANGES.map((o) => o.value))
 	const initialRange = $page.url.searchParams.get('range')
 
 	const filter = $state({
@@ -40,10 +41,14 @@
 	let egress = $state([])
 
 	let reloadTimeout
+	let lastFetchAt = $state(0)
+	let now = $state(Date.now())
+	let fetching = $state(false)
 
-	async function fetchMetrics (clear = false) {
+	async function fetchMetrics (clearFirst = false) {
 		reloadTimeout && clearTimeout(reloadTimeout)
 		reloadTimeout = null
+		fetching = true
 
 		try {
 			const resp = await api.invoke('deployment.metrics', {
@@ -52,11 +57,9 @@
 				name: deployment.name,
 				timeRange: filter.range
 			}, fetch)
-			if (!resp.ok) {
-				return
-			}
+			if (!resp.ok) return
 
-			if (clear) {
+			if (clearFirst) {
 				cpu = []
 				memory = []
 				request = []
@@ -74,46 +77,239 @@
 				{ prefix: 'Limit', lines: resp.result.memoryLimit ?? [], dashStyle: 'LongDash', color: 'red' }
 			]
 			if (deployment.type === 'WebService') {
-				request = [
-					{ prefix: 'Requests', lines: resp.result.requests ?? [] }
-				]
+				request = [{ prefix: 'Requests', lines: resp.result.requests ?? [] }]
 			}
-			egress = [
-				{ prefix: 'Egress', lines: resp.result.egress ?? [] }
-			]
+			egress = [{ prefix: 'Egress', lines: resp.result.egress ?? [] }]
+			lastFetchAt = Date.now()
 		} finally {
+			fetching = false
 			reloadTimeout && clearTimeout(reloadTimeout)
-			reloadTimeout = setTimeout(fetchMetrics, reloadInterval)
+			reloadTimeout = setTimeout(fetchMetrics, RELOAD_INTERVAL_MS)
 		}
 	}
 
-	// Mirror the selected range into the URL so a refresh restores the same window.
-	function selectRange () {
+	/** @param {string} value */
+	function setRange (value) {
+		if (value === filter.range) return
+		filter.range = value
 		const u = new URL($page.url)
-		u.searchParams.set('range', filter.range)
+		u.searchParams.set('range', value)
 		replaceState(u, {})
 		fetchMetrics(true)
 	}
 
 	onMount(() => {
 		fetchMetrics()
-
+		const ticker = setInterval(() => { now = Date.now() }, 1000)
 		return () => {
 			reloadTimeout && clearTimeout(reloadTimeout)
+			clearInterval(ticker)
 		}
 	})
+
+	/** @param {number} t */
+	function relTime (t) {
+		if (!t) return '—'
+		const diff = Math.max(0, now - t)
+		if (diff < 60_000) return `${Math.floor(diff / 1000)}s ago`
+		if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`
+		return `${Math.floor(diff / 3_600_000)}h ago`
+	}
 </script>
 
-<h6><strong>Metric</strong></h6>
+<style>
+	.metric-rail {
+		display: flex;
+		align-items: center;
+		gap: 1.25rem;
+		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		background: linear-gradient(180deg,
+			hsl(var(--hsl-base-200)) 0%,
+			hsl(var(--hsl-base-100)) 100%);
+		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border-radius: 10px;
+		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
+		font-family: var(--ffml-mono);
+		font-feature-settings: 'tnum' 1;
+		flex-wrap: wrap;
+	}
 
-<div class="w-60 max-w-full">
-	<Select
-		bind:value={filter.range}
-		options={rangeOptions}
-		onchange={selectRange} />
-</div>
+	.metric-rail__brand {
+		font-weight: 700;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: hsl(var(--hsl-content));
+		font-size: 0.6875rem;
+	}
 
-<div class="grid gap-4 mt-4 lg:grid-cols-2">
+	.metric-rail__stats {
+		display: flex;
+		align-items: center;
+		gap: 1.1rem;
+		padding-left: 0.5rem;
+		border-left: 1px solid hsl(var(--hsl-content) / 0.08);
+	}
+
+	.stat {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		color: hsl(var(--hsl-content) / 0.5);
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		font-size: 0.625rem;
+		font-weight: 600;
+	}
+
+	.stat__value {
+		color: hsl(var(--hsl-content));
+		font-variant-numeric: tabular-nums;
+		font-weight: 700;
+		font-size: 0.75rem;
+	}
+
+	.stat__unit { color: hsl(var(--hsl-content) / 0.32); font-size: 0.625rem; }
+
+	.stat-dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: hsl(var(--hsl-positive));
+		animation: live-pulse 1.8s ease-out infinite;
+	}
+
+	.stat-dot[data-state='fetching'] {
+		background: hsl(var(--hsl-primary));
+		animation: dim-blink 0.8s ease-in-out infinite;
+	}
+
+	@keyframes live-pulse {
+		0%, 100% { box-shadow: 0 0 0 0 hsl(var(--hsl-positive) / 0.55); }
+		60%      { box-shadow: 0 0 0 6px hsl(var(--hsl-positive) / 0); }
+	}
+	@keyframes dim-blink {
+		0%, 100% { opacity: 0.5; }
+		50%      { opacity: 1; }
+	}
+
+	.metric-rail__ranges {
+		margin-left: auto;
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+	}
+
+	.range-group {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.range-group__label {
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		font-size: 0.5625rem;
+		color: hsl(var(--hsl-content) / 0.4);
+		font-weight: 700;
+		margin-right: 0.25rem;
+	}
+
+	.range-pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 0 0.55rem;
+		height: 1.55rem;
+		min-width: 1.7rem;
+		justify-content: center;
+		background: transparent;
+		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border-radius: 5px;
+		color: hsl(var(--hsl-content) / 0.7);
+		font-family: var(--ffml-mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		cursor: pointer;
+		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.range-pill:hover {
+		background: hsl(var(--hsl-content) / 0.05);
+		color: hsl(var(--hsl-content));
+		border-color: hsl(var(--hsl-content) / 0.15);
+	}
+
+	.range-pill[data-active='true'] {
+		background: hsl(var(--hsl-primary) / 0.1);
+		color: hsl(var(--hsl-primary));
+		border-color: hsl(var(--hsl-primary) / 0.45);
+	}
+
+	.range-pill[data-group='agg']::before {
+		content: 'Σ';
+		font-size: 0.625rem;
+		margin-right: 0.3rem;
+		color: currentColor;
+		opacity: 0.6;
+	}
+
+	.metric-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		margin-top: 1rem;
+	}
+
+	@media (min-width: 1024px) {
+		.metric-grid {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+</style>
+
+<header class="metric-rail">
+	<span class="metric-rail__brand">Metrics</span>
+
+	<div class="metric-rail__stats">
+		<span class="stat" title={fetching ? 'fetching…' : 'auto-refresh active'}>
+			<span class="stat-dot" data-state={fetching ? 'fetching' : 'live'}></span>
+			<span class="stat__value">AUTO</span>
+			<span class="stat__unit">· {RELOAD_INTERVAL_MS / 1000}s</span>
+		</span>
+		<span class="stat">
+			<span class="stat__value">{relTime(lastFetchAt)}</span>
+			<span class="stat__unit">last sync</span>
+		</span>
+	</div>
+
+	<div class="metric-rail__ranges" role="group" aria-label="time range">
+		<span class="range-group">
+			<span class="range-group__label">Live</span>
+			{#each RANGES.filter((r) => r.group === 'live') as r (r.value)}
+				<button type="button" class="range-pill"
+					data-active={filter.range === r.value}
+					data-group="live"
+					onclick={() => setRange(r.value)}>
+					{r.label}
+				</button>
+			{/each}
+		</span>
+		<span class="range-group">
+			<span class="range-group__label">Agg</span>
+			{#each RANGES.filter((r) => r.group === 'agg') as r (r.value)}
+				<button type="button" class="range-pill"
+					data-active={filter.range === r.value}
+					data-group="agg"
+					onclick={() => setRange(r.value)}>
+					{r.label}
+				</button>
+			{/each}
+		</span>
+	</div>
+</header>
+
+<div class="metric-grid">
 	<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
 	<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
 	{#if deployment.type === 'WebService'}
