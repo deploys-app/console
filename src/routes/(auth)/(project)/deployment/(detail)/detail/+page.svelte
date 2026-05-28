@@ -90,6 +90,7 @@
 	}
 
 	.rail__brand {
+		margin: 0;
 		font-weight: 600;
 		color: var(--rail-fg);
 		font-size: 0.9rem;
@@ -316,14 +317,27 @@
 		overflow-wrap: anywhere;
 	}
 
+	/* Empty state — matches the look of the project's NoDataRow component so
+	   "no env groups" / "no mounts" reads the same as any other empty list. */
 	.empty {
-		padding: 0.85rem 1rem;
-		font-family: var(--ffml-primary);
-		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content) / 0.5);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 		text-align: center;
-		border: 1px dashed hsl(var(--hsl-content) / 0.12);
-		border-radius: 6px;
+		gap: 0.3rem;
+		padding: 2.5rem 1rem;
+	}
+
+	.empty__icon {
+		font-size: 1.5rem;
+		color: hsl(var(--hsl-content) / 0.3);
+		margin-bottom: 0.35rem;
+	}
+
+	.empty__msg {
+		font-weight: 600;
+		color: hsl(var(--hsl-content) / 0.75);
 	}
 
 	/* sidecar list inside a spec value */
@@ -381,7 +395,7 @@
 <!-- ─── DETAILS shell ─── -->
 <div class="shell">
 	<header class="rail">
-		<span class="rail__brand">Details</span>
+		<h6 class="rail__brand">Details</h6>
 		<div class="rail__stats">
 			<span class="stat">
 				<span class="stat__unit">Revision</span>
@@ -664,7 +678,7 @@
 <!-- ─── ENV GROUPS shell ─── -->
 <div class="shell">
 	<header class="rail">
-		<span class="rail__brand">Env Groups</span>
+		<h6 class="rail__brand">Env Groups</h6>
 		<div class="rail__stats">
 			<span class="stat">
 				<span class="stat__value">{(deployment.envGroups || []).length}</span>
@@ -678,13 +692,16 @@
 				<div class="chips">
 					{#each deployment.envGroups as name (name)}
 						<button type="button" class="chip" onclick={() => viewEnvGroup(name)}>
-							<i class="fa-solid fa-layer-group"></i>
+							<i class="fa-solid fa-layer-group" aria-hidden="true"></i>
 							{name}
 						</button>
 					{/each}
 				</div>
 			{:else}
-				<div class="empty">No env groups attached.</div>
+				<div class="empty">
+					<i class="fa-solid fa-inbox empty__icon" aria-hidden="true"></i>
+					<span class="empty__msg">Nothing here yet</span>
+				</div>
 			{/if}
 		</section>
 	</div>
@@ -693,7 +710,7 @@
 <!-- ─── ENV VARS shell ─── -->
 <div class="shell">
 	<header class="rail">
-		<span class="rail__brand">Env Vars</span>
+		<h6 class="rail__brand">Env Vars</h6>
 		<div class="rail__stats">
 			<span class="stat">
 				<span class="stat__value">{envEntries.length}</span>
@@ -723,7 +740,10 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="empty">no environment variables</div>
+				<div class="empty">
+					<i class="fa-solid fa-inbox empty__icon" aria-hidden="true"></i>
+					<span class="empty__msg">Nothing here yet</span>
+				</div>
 			{/if}
 		</section>
 	</div>
@@ -732,7 +752,7 @@
 <!-- ─── MOUNT DATA shell ─── -->
 <div class="shell">
 	<header class="rail">
-		<span class="rail__brand">Mount Data</span>
+		<h6 class="rail__brand">Mount Data</h6>
 		<div class="rail__stats">
 			<span class="stat">
 				<span class="stat__value">{mountEntries.length}</span>
@@ -752,7 +772,10 @@
 					{/each}
 				</div>
 			{:else}
-				<div class="empty">no mounted data</div>
+				<div class="empty">
+					<i class="fa-solid fa-inbox empty__icon" aria-hidden="true"></i>
+					<span class="empty__msg">Nothing here yet</span>
+				</div>
 			{/if}
 		</section>
 	</div>

@@ -59,7 +59,8 @@ test.describe('deployment detail — sidecars', () => {
 
 		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
 
-		await expect(page.getByRole('cell', { name: 'Sidecars' })).toHaveCount(0)
+		// No "Sidecars" spec row should render at all when the deployment has none.
+		await expect(page.locator('.spec').filter({ hasText: 'Sidecars' })).toHaveCount(0)
 	})
 
 	test('renders each configured sidecar', async ({ page }) => {
@@ -85,7 +86,8 @@ test.describe('deployment detail — sidecars', () => {
 
 		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
 
-		const row = page.getByRole('row').filter({ hasText: 'Sidecars' })
+		// Sidecars render in a `.spec` row (label + value list), not a table row.
+		const row = page.locator('.spec').filter({ hasText: 'Sidecars' })
 		await expect(row).toBeVisible()
 		await expect(row.getByText('my-project:us-central1:my-db')).toBeVisible()
 		await expect(row.getByText(':3306')).toBeVisible()

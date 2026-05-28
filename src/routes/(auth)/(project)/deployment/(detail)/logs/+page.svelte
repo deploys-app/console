@@ -217,7 +217,8 @@
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.4rem;
-		margin-right: 0.25rem;
+		margin: 0 0.25rem 0 0;
+		font-weight: 400;
 	}
 
 	.log-rail__brand-name {
@@ -678,11 +679,11 @@
 
 <div class="log-shell">
 	<header class="log-rail">
-		<div class="log-rail__brand">
+		<h6 class="log-rail__brand">
 			<span class="log-rail__brand-name">Logs</span>
 			<span class="log-rail__brand-slash">/</span>
 			<span class="log-rail__deployment">{deployment.name}</span>
-		</div>
+		</h6>
 
 		<div class="log-rail__stats">
 			<span class="stat" title={statusLabel.toLowerCase()}>

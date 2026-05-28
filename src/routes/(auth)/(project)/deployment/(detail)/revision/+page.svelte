@@ -84,6 +84,7 @@
 	}
 
 	.rev-rail__brand {
+		margin: 0;
 		font-weight: 600;
 		color: var(--rail-fg);
 		font-size: 0.9rem;
@@ -280,7 +281,7 @@
 
 <div class="rev-shell">
 	<header class="rev-rail">
-		<span class="rev-rail__brand">Revisions</span>
+		<h6 class="rev-rail__brand">Revisions</h6>
 
 		<div class="rev-rail__stats">
 			<span class="stat" title="total revisions tracked">

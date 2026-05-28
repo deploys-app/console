@@ -135,6 +135,7 @@
 	}
 
 	.metric-rail__brand {
+		margin: 0;
 		font-weight: 600;
 		color: hsl(var(--hsl-content));
 		font-size: 0.9rem;
@@ -263,7 +264,7 @@
 </style>
 
 <header class="metric-rail">
-	<span class="metric-rail__brand">Metrics</span>
+	<h6 class="metric-rail__brand">Metrics</h6>
 
 	<div class="metric-rail__stats">
 		<span class="stat" title={fetching ? 'fetching…' : 'auto-refresh active'}>

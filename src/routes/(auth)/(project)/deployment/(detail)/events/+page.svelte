@@ -107,6 +107,7 @@
 	}
 
 	.events-rail__brand {
+		margin: 0;
 		font-weight: 600;
 		color: var(--rail-fg);
 		font-size: 0.9rem;
@@ -401,7 +402,7 @@
 
 <div class="events-shell">
 	<header class="events-rail">
-		<span class="events-rail__brand">Events</span>
+		<h6 class="events-rail__brand">Events</h6>
 
 		<div class="events-rail__stats">
 			<span class="stat" title={lastFetchOk ? 'auto-refreshing' : 'connecting'}>
