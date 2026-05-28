@@ -1,9 +1,7 @@
 <script>
-	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
-	import Select from '$lib/components/Select.svelte'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 
 	const { data } = $props()
@@ -11,9 +9,12 @@
 	const project = $derived(data.project)
 	const route = $derived(data.route)
 
-	// Known target schemes (mirrors api.RouteTargetPrefix). Only deployment +
-	// redirect are creatable in-console; the rest are parsed so an existing
-	// route round-trips unchanged even though they aren't offered in the picker.
+	const params = $derived(`project=${project}` +
+		`&location=${encodeURIComponent(route.location)}` +
+		`&domain=${encodeURIComponent(route.domain)}` +
+		`&path=${encodeURIComponent(route.path)}`)
+
+	// Known target schemes (mirrors api.RouteTargetPrefix).
 	const targetPrefixes = ['deployment://', 'redirect://', 'ipfs://', 'ipns://', 'dnslink://']
 
 	/** @param {string | undefined} target */
@@ -24,144 +25,17 @@
 		return { prefix: 'deployment://', value: target ?? '' }
 	}
 
-	/** @param {Api.Route} r */
-	function buildForm (r) {
-		const { prefix, value } = splitTarget(r?.target)
-		const cfg = r?.config ?? {}
-		return {
-			targetPrefix: prefix,
-			targetValue: value,
-			// Basic-auth and forward-auth are mutually exclusive, so a single
-			// three-way selector matches the backend constraint.
-			auth: cfg.basicAuth ? 'basic' : cfg.forwardAuth ? 'forward' : 'none',
-			basicAuth: {
-				user: cfg.basicAuth?.user ?? '',
-				password: cfg.basicAuth?.password ?? ''
-			},
-			forwardAuth: {
-				target: cfg.forwardAuth?.target ?? '',
-				requestHeaders: (cfg.forwardAuth?.authRequestHeaders ?? []).join('\n'),
-				responseHeaders: (cfg.forwardAuth?.authResponseHeaders ?? []).join('\n')
-			}
-		}
-	}
+	const parsed = $derived(splitTarget(route.target))
+	const typeLabel = $derived(
+		{ 'deployment://': 'Deployment', 'redirect://': 'Redirect' }[parsed.prefix] ?? parsed.prefix
+	)
 
-	/** @param {Api.Route} r */
-	const routeKey = (r) => `${r?.location}|${r?.domain}|${r?.path}`
-
-	let form = $state(untrack(() => buildForm(data.route)))
-	let seededKey = untrack(() => routeKey(data.route))
-
-	// Re-seed when the loader returns a different route (e.g. after a save
-	// invalidates route.get) so the form reflects server state in place.
-	$effect(() => {
-		const r = data.route
-		untrack(() => {
-			const key = routeKey(r)
-			if (key !== seededKey) {
-				seededKey = key
-				form = buildForm(r)
-				if (form.targetPrefix === 'deployment://') fetchDeployments()
-			}
-		})
+	const authSummary = $derived.by(() => {
+		const cfg = route.config ?? {}
+		if (cfg.basicAuth) return `Basic Auth (user: ${cfg.basicAuth.user})`
+		if (cfg.forwardAuth) return `Forward Auth (${cfg.forwardAuth.target})`
+		return 'None'
 	})
-
-	// The type picker offers deployment + redirect; if the saved route uses
-	// another scheme, surface it so it stays selected and round-trips.
-	const typeOptions = $derived.by(() => {
-		const base = [
-			{ value: 'deployment://', label: 'Deployment' },
-			{ value: 'redirect://', label: 'Redirect' }
-		]
-		if (!base.some((o) => o.value === form.targetPrefix)) {
-			base.unshift({ value: form.targetPrefix, label: form.targetPrefix })
-		}
-		return base
-	})
-
-	const targetPlaceholder = $derived({
-		'redirect://': 'https://example.com'
-	}[form.targetPrefix] || '')
-
-	/** @type {string[]} */
-	let deployments = $state([])
-
-	async function fetchDeployments () {
-		deployments = []
-		const resp = await api.invoke('deployment.list', { project }, fetch)
-		if (!resp.ok) {
-			modal.error({ error: resp.error })
-			return
-		}
-		const list = resp.result?.items ?? []
-		deployments = list
-			.filter((/** @type {Api.Deployment} */ x) => x.location === route.location)
-			.filter((/** @type {Api.Deployment} */ x) => x.type === 'WebService')
-			.filter((/** @type {Api.Deployment} */ x) => x.ttl === 0)
-			.map((/** @type {Api.Deployment} */ x) => x.name)
-	}
-
-	$effect(() => {
-		// Initial load: populate the deployment picker when the route targets one.
-		if (untrack(() => form.targetPrefix) === 'deployment://') {
-			untrack(() => { if (deployments.length === 0) fetchDeployments() })
-		}
-	})
-
-	function onTypeChange () {
-		// Switching type invalidates the previous value.
-		form.targetValue = ''
-		if (form.targetPrefix === 'deployment://') fetchDeployments()
-	}
-
-	/** @param {string} s */
-	function splitLines (s) {
-		return s.split('\n').map((x) => x.trim()).filter((x) => x !== '')
-	}
-
-	let saving = $state(false)
-
-	/** @param {SubmitEvent} e */
-	async function save (e) {
-		e.preventDefault()
-		if (saving) return
-
-		saving = true
-		try {
-			const config = {
-				basicAuth: form.auth === 'basic'
-					? { user: form.basicAuth.user, password: form.basicAuth.password }
-					: null,
-				forwardAuth: form.auth === 'forward'
-					? {
-						target: form.forwardAuth.target,
-						authRequestHeaders: splitLines(form.forwardAuth.requestHeaders),
-						authResponseHeaders: splitLines(form.forwardAuth.responseHeaders)
-					}
-					: null
-			}
-
-			// route.createV2 upserts on (location, domain, path), so re-submitting
-			// the same identity edits the existing route.
-			const resp = await api.invoke('route.createV2', {
-				project,
-				location: route.location,
-				domain: route.domain,
-				path: route.path,
-				target: `${form.targetPrefix}${form.targetValue}`,
-				config
-			}, fetch)
-			if (!resp.ok) {
-				modal.error({ error: resp.error })
-				return
-			}
-			await api.invalidate('route.get')
-			await api.invalidate('route.list')
-			modal.success({ content: 'Route saved.' })
-		} finally {
-			saving = false
-		}
-	}
 
 	function deleteRoute () {
 		modal.confirm({
@@ -199,136 +73,69 @@
 <div class="page-head">
 	<div>
 		<h4><strong>Route detail</strong></h4>
-		<p class="page-sub">Edit where this route forwards traffic and how it's protected.</p>
+		<p class="page-sub">Where this route forwards traffic and how it's protected.</p>
 	</div>
-	<a class="button is-variant-secondary is-icon-left"
-		href={`https://${route.domain}${route.path}`}
-		target="_blank"
-		rel="noreferrer">
-		<i class="fa-solid fa-arrow-up-right-from-square"></i>
-		Visit
-	</a>
+	<div class="flex gap-3">
+		<a class="button is-variant-secondary is-icon-left"
+			href={`https://${route.domain}${route.path}`}
+			target="_blank"
+			rel="noreferrer">
+			<i class="fa-solid fa-arrow-up-right-from-square"></i>
+			Visit
+		</a>
+		<a class="button is-icon-left" href={`/route/edit?${params}`}>
+			<i class="fa-solid fa-pencil"></i>
+			Edit
+		</a>
+	</div>
 </div>
 
 <div class="panel is-level-300 grid gap-6">
-	<form class="grid gap-4 w-full" onsubmit={save}>
+	<div class="grid gap-4 w-full">
 		<div class="field">
-			<label for="input-location">Location</label>
+			<label for="view-location">Location</label>
 			<div class="input">
-				<input id="input-location" class="font-mono" value={route.location} readonly>
+				<input id="view-location" class="font-mono" value={route.location} readonly>
 			</div>
 		</div>
 
 		<div class="field">
-			<label for="input-domain">Domain</label>
+			<label for="view-domain">Domain</label>
 			<div class="input">
-				<input id="input-domain" class="font-mono" value={route.domain} readonly>
+				<input id="view-domain" class="font-mono" value={route.domain} readonly>
 			</div>
 		</div>
 
 		<div class="field">
-			<label for="input-path">Path</label>
+			<label for="view-path">Path</label>
 			<div class="input">
-				<input id="input-path" class="font-mono" value={route.path} readonly>
+				<input id="view-path" class="font-mono" value={route.path} readonly>
 			</div>
 		</div>
 
 		<div class="field">
-			<label for="input-target_prefix">Type</label>
-			<Select
-				id="input-target_prefix"
-				bind:value={form.targetPrefix}
-				onchange={onTypeChange}
-				required
-				placeholder="Select Type"
-				options={typeOptions} />
-		</div>
-
-		{#if form.targetPrefix === 'deployment://'}
-			<div class="field">
-				<label for="input-target_deployment">Deployment</label>
-				<Select
-					id="input-target_deployment"
-					bind:value={form.targetValue}
-					required
-					placeholder="Select Deployment"
-					options={deployments.map((it) => ({ value: it, label: it }))} />
+			<label for="view-type">Type</label>
+			<div class="input">
+				<input id="view-type" value={typeLabel} readonly>
 			</div>
-		{:else}
-			<div class="field">
-				<label for="input-target_value">Value</label>
-				<div class="input">
-					<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
-				</div>
-			</div>
-		{/if}
-
-		<div class="field mt-3">
-			<h6><strong>Authentication</strong></h6>
 		</div>
 
 		<div class="field">
-			<label for="input-auth">Protect with</label>
-			<Select
-				id="input-auth"
-				bind:value={form.auth}
-				placeholder="Select"
-				options={[
-					{ value: 'none', label: 'None' },
-					{ value: 'basic', label: 'Basic Auth' },
-					{ value: 'forward', label: 'Forward Auth' }
-				]} />
+			<label for="view-target">Destination</label>
+			<div class="input">
+				<input id="view-target" class="font-mono" value={parsed.value} readonly>
+			</div>
 		</div>
 
-		{#if form.auth === 'basic'}
-			<div class="field">
-				<label for="input-basic_auth_user">User</label>
-				<div class="input">
-					<input id="input-basic_auth_user" bind:value={form.basicAuth.user} required>
-				</div>
+		<div class="field">
+			<label for="view-auth">Authentication</label>
+			<div class="input">
+				<input id="view-auth" value={authSummary} readonly>
 			</div>
+		</div>
 
-			<div class="field">
-				<label for="input-basic_auth_password">Password</label>
-				<div class="input">
-					<input id="input-basic_auth_password" type="password" bind:value={form.basicAuth.password} required>
-				</div>
-			</div>
-		{:else if form.auth === 'forward'}
-			<div class="field">
-				<label for="input-forward_auth_target">Target</label>
-				<div class="input">
-					<input id="input-forward_auth_target" bind:value={form.forwardAuth.target} placeholder="https://auth.example.com/verify" required>
-				</div>
-			</div>
-
-			<div class="field">
-				<label for="input-forward_auth_request_headers">Request headers</label>
-				<div class="textarea">
-					<textarea id="input-forward_auth_request_headers" rows="3"
-						bind:value={form.forwardAuth.requestHeaders}
-						placeholder="One header name per line"></textarea>
-				</div>
-				<p class="text-content/50 text-sm mt-1">Headers forwarded from the original request to the auth server.</p>
-			</div>
-
-			<div class="field">
-				<label for="input-forward_auth_response_headers">Response headers</label>
-				<div class="textarea">
-					<textarea id="input-forward_auth_response_headers" rows="3"
-						bind:value={form.forwardAuth.responseHeaders}
-						placeholder="One header name per line"></textarea>
-				</div>
-				<p class="text-content/50 text-sm mt-1">Headers copied from the auth response onto the upstream request.</p>
-			</div>
-		{/if}
-
-		<hr>
-
-		<button class="button mr-auto" class:is-loading={saving}>Save</button>
-	</form>
-
-	<DangerZone description="Delete this route. Traffic to this domain path stops being forwarded.">
-		<button class="button is-variant-negative" type="button" onclick={deleteRoute}>Delete route</button>
-	</DangerZone>
+		<DangerZone description="Delete this route. Traffic to this domain path stops being forwarded.">
+			<button class="button is-variant-negative" type="button" onclick={deleteRoute}>Delete route</button>
+		</DangerZone>
+	</div>
 </div>
