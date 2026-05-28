@@ -199,6 +199,10 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
+		/* Let the pills inside wrap when the group itself can't fit on one
+		   line — the agg row has 7 options + a label, which is too wide for
+		   iPhone-class viewports. */
+		flex-wrap: wrap;
 	}
 
 	.range-group__label {
