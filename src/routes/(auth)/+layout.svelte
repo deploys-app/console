@@ -6,6 +6,7 @@
 	import Navbar from './Navbar.svelte'
 	import Sidebar from './Sidebar.svelte'
 	import ModalSelectProject from './ModalSelectProject.svelte'
+	import SearchModal from './SearchModal.svelte'
 
 	const { data, children } = $props()
 
@@ -21,6 +22,9 @@
 	/** @type {?ModalSelectProject} */
 	let projectModal = $state(null)
 
+	/** @type {?SearchModal} */
+	let searchModal = $state(null)
+
 	onMount(() => {
 		api.setOnUnauth(() => {
 			location.reload()
@@ -30,12 +34,28 @@
 	function hideSidebar () {
 		showSidebar = false
 	}
+
+	/**
+	 * Open the search palette on "/", unless the user is typing into a field
+	 * (including the palette's own input, so "/" types normally once it's open).
+	 * @param {KeyboardEvent} e
+	 */
+	function onWindowKeydown (e) {
+		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
+		const el = /** @type {?HTMLElement} */ (e.target)
+		const tag = el?.tagName
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return
+		e.preventDefault()
+		searchModal?.open()
+	}
 </script>
+
+<svelte:window onkeydown={onWindowKeydown} />
 
 <div class="app-layout"
 	class:is-shown-sidebar={showSidebar}>
 	<div class="navbar-wrapper">
-		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} />
+		<Navbar {profile} toggleSidebar={() => showSidebar = !showSidebar} openSearch={() => searchModal?.open()} />
 	</div>
 
 	<div class="sidebar-wrapper z-[2]">
@@ -50,6 +70,7 @@
 </div>
 
 <ModalSelectProject bind:this={projectModal} {projects} />
+<SearchModal bind:this={searchModal} />
 
 <style>
 	:root {
