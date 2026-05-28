@@ -89,58 +89,53 @@
 		border: 1px solid var(--rail-divider);
 		border-radius: 10px;
 		overflow: hidden;
-		font-family: var(--ffml-mono);
 		font-feature-settings: 'tnum' 1, 'ss02' 1;
 	}
 
 	.events-rail {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
 		border-bottom: 1px solid var(--rail-divider);
 		background: linear-gradient(180deg,
 			hsl(var(--hsl-base-200)) 0%,
 			hsl(var(--hsl-base-100)) 100%);
 		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
+		font-family: var(--ffml-primary);
 		flex-wrap: wrap;
 	}
 
 	.events-rail__brand {
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
+		font-weight: 600;
 		color: var(--rail-fg);
-		font-size: 0.6875rem;
+		font-size: 0.9rem;
 	}
 
 	.events-rail__stats {
 		display: flex;
 		align-items: center;
-		gap: 1.1rem;
-		padding-left: 0.5rem;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
 		border-left: 1px solid var(--rail-divider);
+		flex-wrap: wrap;
 	}
 
 	.stat {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
+		align-items: baseline;
+		gap: 0.35rem;
 		color: var(--rail-fg-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		font-size: 0.625rem;
-		font-weight: 600;
+		font-size: 0.8125rem;
 	}
 
 	.stat__value {
 		color: var(--rail-fg);
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	.stat__unit { color: var(--rail-fg-dim); font-size: 0.625rem; }
+	.stat__unit { color: var(--rail-fg-muted); }
 
 	.stat-dot {
 		position: relative;
@@ -175,17 +170,14 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
-		font-size: 0.625rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		font-size: 0.8125rem;
 		color: var(--rail-fg-muted);
-		font-weight: 600;
 	}
 
 	.stat-count::before {
 		content: '';
-		width: 0.3rem;
-		height: 0.3rem;
+		width: 0.4rem;
+		height: 0.4rem;
 		border-radius: 50%;
 		background: currentColor;
 	}
@@ -196,7 +188,7 @@
 
 	.stat-count__num {
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
+		font-weight: 600;
 		color: var(--rail-fg);
 	}
 
@@ -284,16 +276,14 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
-		padding: 0 0.45rem;
-		height: 1.1rem;
+		padding: 0.1rem 0.5rem;
 		align-self: center;
-		border-radius: 3px;
+		border-radius: 4px;
 		background: hsl(var(--hsl-content) / 0.06);
-		color: hsl(var(--hsl-content) / 0.6);
-		font-size: 0.625rem;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		text-transform: uppercase;
+		color: hsl(var(--hsl-content) / 0.7);
+		font-family: var(--ffml-primary);
+		font-size: 0.6875rem;
+		font-weight: 600;
 		white-space: nowrap;
 	}
 
@@ -416,7 +406,7 @@
 		<div class="events-rail__stats">
 			<span class="stat" title={lastFetchOk ? 'auto-refreshing' : 'connecting'}>
 				<span class="stat-dot" data-state={lastFetchOk ? 'live' : 'cold'}></span>
-				<span class="stat__value">{lastFetchOk ? 'POLLING' : 'CONNECTING'}</span>
+				<span class="stat__value">{lastFetchOk ? 'Polling' : 'Connecting'}</span>
 				<span class="stat__unit">· {POLL_INTERVAL_MS / 1000}s</span>
 			</span>
 

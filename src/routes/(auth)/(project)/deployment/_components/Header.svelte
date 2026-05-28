@@ -30,10 +30,21 @@
 	)
 
 	const statusLabel = $derived.by(() => {
-		if (deployment.action === 'pause') return 'PAUSED'
-		if (deployment.action === 'delete') return 'DELETING'
-		return deployment.status.toUpperCase()
+		if (deployment.action === 'pause') return 'Paused'
+		if (deployment.action === 'delete') return 'Deleting'
+		if (deployment.status === 'pending') return 'Pending'
+		if (deployment.status === 'error') return 'Error'
+		if (deployment.status === 'cancelled') return 'Cancelled'
+		return 'Success'
 	})
+
+	// The DeploymentStatusIcon next to the name already carries the visual
+	// signal for a healthy running deployment. Only surface the status pill
+	// in the meta row when it tells you something the icon can't (paused,
+	// deleting, pending, error). Keeps the common running case clean.
+	const showStatusPill = $derived(
+		deployment.action !== 'deploy' || deployment.status !== 'success'
+	)
 
 	function pause () {
 		modal.confirm({
@@ -148,22 +159,21 @@
 		flex-wrap: wrap;
 	}
 
-	/* compact secondary pill matching the rail aesthetic */
+	/* Action pill — sans, matches project's button family in spirit but with
+	   a slightly tighter footprint for the masthead. */
 	.mast-btn {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.45rem;
 		background: transparent;
-		border: 1px solid hsl(var(--hsl-content) / 0.12);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
 		padding: 0 0.85rem;
 		height: 2rem;
-		color: hsl(var(--hsl-content) / 0.85);
-		font-family: var(--ffml-mono);
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
+		color: hsl(var(--hsl-content));
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 500;
 		cursor: pointer;
 		text-decoration: none;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -183,7 +193,8 @@
 		border-color: hsl(var(--hsl-primary) / 0.92);
 	}
 
-	/* meta strip — small caps key/value chips */
+	/* Meta strip — sans, normal case. Labels are dim, values pop. Mono is
+	   reserved for the location id which is a machine identifier. */
 	.masthead__meta {
 		display: flex;
 		align-items: center;
@@ -196,27 +207,49 @@
 	.meta {
 		display: inline-flex;
 		align-items: baseline;
-		gap: 0.4rem;
-		font-family: var(--ffml-mono);
+		gap: 0.35rem;
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
 		min-width: 0;
 	}
 
 	.meta__label {
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.14em;
-		color: hsl(var(--hsl-content) / 0.4);
+		color: hsl(var(--hsl-content) / 0.5);
 	}
 
 	.meta__value {
-		font-size: 0.8125rem;
-		font-weight: 600;
 		color: hsl(var(--hsl-content));
+		font-weight: 500;
 		font-variant-numeric: tabular-nums;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.meta__value.is-mono {
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+	}
+
+	.status-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.1rem 0.55rem;
+		border-radius: 999px;
+		font-family: var(--ffml-primary);
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.status-pill[data-tone='warn'] {
+		background: hsl(var(--hsl-warning) / 0.12);
+		color: hsl(var(--hsl-warning));
+	}
+
+	.status-pill[data-tone='negative'] {
+		background: hsl(var(--hsl-negative) / 0.12);
+		color: hsl(var(--hsl-negative));
 	}
 
 	.meta__dot {
@@ -287,22 +320,23 @@
 	</div>
 
 	<div class="masthead__meta">
-		<span class="meta">
-			<span class="meta__dot" data-tone={statusTone}></span>
-			<span class="meta__label">Status</span>
-			<span class="meta__value">{statusLabel}</span>
-		</span>
-		<span class="meta__divider"></span>
+		{#if showStatusPill}
+			<span class="status-pill" data-tone={statusTone}>
+				<span class="meta__dot" data-tone={statusTone}></span>
+				{statusLabel}
+			</span>
+			<span class="meta__divider"></span>
+		{/if}
 		<span class="meta">
 			<span class="meta__label">Type</span>
 			<span class="meta__value">
-				{format.deploymentType(deployment.type)}{deployment.internal ? ' · INTERNAL' : ''}
+				{format.deploymentType(deployment.type)}{deployment.internal ? ' · Internal' : ''}
 			</span>
 		</span>
 		<span class="meta__divider"></span>
 		<span class="meta">
 			<span class="meta__label">Location</span>
-			<span class="meta__value">{deployment.location}</span>
+			<span class="meta__value is-mono">{deployment.location}</span>
 		</span>
 		<span class="meta__divider"></span>
 		<span class="meta">

@@ -121,54 +121,48 @@
 	.metric-rail {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
 		background: linear-gradient(180deg,
 			hsl(var(--hsl-base-200)) 0%,
 			hsl(var(--hsl-base-100)) 100%);
 		border: 1px solid hsl(var(--hsl-content) / 0.08);
 		border-radius: 10px;
 		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
-		font-family: var(--ffml-mono);
+		font-family: var(--ffml-primary);
 		font-feature-settings: 'tnum' 1;
 		flex-wrap: wrap;
 	}
 
 	.metric-rail__brand {
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
+		font-weight: 600;
 		color: hsl(var(--hsl-content));
-		font-size: 0.6875rem;
+		font-size: 0.9rem;
 	}
 
 	.metric-rail__stats {
 		display: flex;
 		align-items: center;
-		gap: 1.1rem;
-		padding-left: 0.5rem;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
 		border-left: 1px solid hsl(var(--hsl-content) / 0.08);
 	}
 
 	.stat {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
-		color: hsl(var(--hsl-content) / 0.5);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		font-size: 0.625rem;
-		font-weight: 600;
+		align-items: baseline;
+		gap: 0.35rem;
+		color: hsl(var(--hsl-content) / 0.55);
+		font-size: 0.8125rem;
 	}
 
 	.stat__value {
 		color: hsl(var(--hsl-content));
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	.stat__unit { color: hsl(var(--hsl-content) / 0.32); font-size: 0.625rem; }
+	.stat__unit { color: hsl(var(--hsl-content) / 0.5); }
 
 	.stat-dot {
 		width: 0.5rem;
@@ -207,29 +201,26 @@
 	}
 
 	.range-group__label {
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		font-size: 0.5625rem;
-		color: hsl(var(--hsl-content) / 0.4);
-		font-weight: 700;
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.5);
+		font-weight: 500;
 		margin-right: 0.25rem;
 	}
 
 	.range-pill {
 		display: inline-flex;
 		align-items: center;
-		padding: 0 0.55rem;
-		height: 1.55rem;
-		min-width: 1.7rem;
+		padding: 0 0.6rem;
+		height: 1.6rem;
+		min-width: 1.8rem;
 		justify-content: center;
 		background: transparent;
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 5px;
-		color: hsl(var(--hsl-content) / 0.7);
-		font-family: var(--ffml-mono);
-		font-size: 0.6875rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
+		border: 1px solid hsl(var(--hsl-content) / 0.1);
+		border-radius: 6px;
+		color: hsl(var(--hsl-content) / 0.75);
+		font-family: var(--ffml-primary);
+		font-size: 0.75rem;
+		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 	}
@@ -274,12 +265,12 @@
 	<div class="metric-rail__stats">
 		<span class="stat" title={fetching ? 'fetching…' : 'auto-refresh active'}>
 			<span class="stat-dot" data-state={fetching ? 'fetching' : 'live'}></span>
-			<span class="stat__value">AUTO</span>
-			<span class="stat__unit">· {RELOAD_INTERVAL_MS / 1000}s</span>
+			<span class="stat__value">Auto</span>
+			<span class="stat__unit">· every {RELOAD_INTERVAL_MS / 1000}s</span>
 		</span>
 		<span class="stat">
-			<span class="stat__value">{relTime(lastFetchAt)}</span>
 			<span class="stat__unit">last sync</span>
+			<span class="stat__value">{relTime(lastFetchAt)}</span>
 		</span>
 	</div>
 

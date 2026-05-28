@@ -52,26 +52,8 @@
 		})
 	}
 
-	// Deterministic hue for env group chips, hashed from the name so the
-	// same group keeps the same colour as the user navigates around.
-	const CHIP_HUES = [355, 28, 48, 142, 175, 205, 260, 312]
-	/** @param {string} s */
-	function chipHue (s) {
-		let h = 0
-		for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
-		return CHIP_HUES[Math.abs(h) % CHIP_HUES.length]
-	}
-
 	const envEntries = $derived(Object.entries(deployment.env || {}))
 	const mountEntries = $derived(Object.entries(deployment.mountData || {}))
-
-	const statusTone = $derived(
-		deployment.status === 'success'
-			? 'positive'
-			: deployment.status === 'pending'
-				? 'warn'
-				: 'negative'
-	)
 </script>
 
 <style>
@@ -96,30 +78,28 @@
 	.rail {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
 		border-bottom: 1px solid var(--rail-divider);
 		background: linear-gradient(180deg,
 			hsl(var(--hsl-base-200)) 0%,
 			hsl(var(--hsl-base-100)) 100%);
 		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
-		font-family: var(--ffml-mono);
+		font-family: var(--ffml-primary);
 		flex-wrap: wrap;
 	}
 
 	.rail__brand {
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
+		font-weight: 600;
 		color: var(--rail-fg);
-		font-size: 0.6875rem;
+		font-size: 0.9rem;
 	}
 
 	.rail__stats {
 		display: flex;
 		align-items: center;
-		gap: 1.1rem;
-		padding-left: 0.5rem;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
 		border-left: 1px solid var(--rail-divider);
 	}
 
@@ -127,42 +107,19 @@
 
 	.stat {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
+		align-items: baseline;
+		gap: 0.35rem;
 		color: var(--rail-fg-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		font-size: 0.625rem;
-		font-weight: 600;
+		font-size: 0.8125rem;
 	}
 
 	.stat__value {
 		color: var(--rail-fg);
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	.stat__unit { color: var(--rail-fg-dim); font-size: 0.625rem; }
-
-	.stat-dot {
-		width: 0.5rem;
-		height: 0.5rem;
-		border-radius: 50%;
-		flex-shrink: 0;
-		background: hsl(var(--hsl-content) / 0.4);
-	}
-	.stat-dot[data-tone='positive'] {
-		background: hsl(var(--hsl-positive));
-		animation: live-pulse 1.8s ease-out infinite;
-	}
-	.stat-dot[data-tone='warn'] { background: hsl(var(--hsl-warning)); }
-	.stat-dot[data-tone='negative'] { background: hsl(var(--hsl-negative)); }
-
-	@keyframes live-pulse {
-		0%, 100% { box-shadow: 0 0 0 0 hsl(var(--hsl-positive) / 0.55); }
-		60%      { box-shadow: 0 0 0 6px hsl(var(--hsl-positive) / 0); }
-	}
+	.stat__unit { color: var(--rail-fg-muted); }
 
 	/* ─── spec body ─── */
 	.body {
@@ -184,12 +141,10 @@
 	}
 
 	.section__title {
-		font-family: var(--ffml-mono);
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.18em;
-		font-size: 0.6875rem;
-		color: hsl(var(--hsl-content) / 0.7);
+		font-family: var(--ffml-primary);
+		font-weight: 600;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content));
 	}
 
 	.section__rule {
@@ -221,12 +176,10 @@
 	}
 
 	.spec__label {
-		font-family: var(--ffml-mono);
-		font-size: 0.625rem;
-		font-weight: 700;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: hsl(var(--hsl-content) / 0.45);
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 400;
+		color: hsl(var(--hsl-content) / 0.6);
 	}
 
 	.spec__value {
@@ -272,15 +225,13 @@
 
 	.spec__inline-tag {
 		display: inline-block;
-		font-family: var(--ffml-mono);
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		padding: 0.1rem 0.35rem;
-		border-radius: 3px;
-		background: hsl(var(--hsl-content) / 0.08);
-		color: hsl(var(--hsl-content) / 0.6);
+		font-family: var(--ffml-primary);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
+		background: hsl(var(--hsl-content) / 0.06);
+		color: hsl(var(--hsl-content) / 0.7);
 		margin-left: 0.35rem;
 	}
 
@@ -297,39 +248,27 @@
 	.chip {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.4rem;
-		padding: 0.2rem 0.55rem;
+		gap: 0.45rem;
+		padding: 0.2rem 0.6rem;
 		border-radius: 4px;
-		background: hsl(var(--chip-h), 60%, 50%, 0.13);
-		color: hsl(var(--chip-h), 65%, 38%);
-		font-family: var(--ffml-mono);
-		font-size: 0.75rem;
-		font-weight: 600;
-		border: 1px solid hsl(var(--chip-h), 60%, 50%, 0.22);
+		background: hsl(var(--hsl-primary) / 0.1);
+		color: hsl(var(--hsl-primary));
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 500;
+		border: 1px solid hsl(var(--hsl-primary) / 0.22);
 		cursor: pointer;
 		transition: background 0.15s ease, border-color 0.15s ease;
 	}
 
-	.chip::before {
-		content: '';
-		width: 0.35rem;
-		height: 0.35rem;
-		border-radius: 50%;
-		background: hsl(var(--chip-h), 65%, 50%);
-	}
-
 	.chip:hover {
-		background: hsl(var(--chip-h), 60%, 50%, 0.2);
-		border-color: hsl(var(--chip-h), 60%, 50%, 0.4);
+		background: hsl(var(--hsl-primary) / 0.16);
+		border-color: hsl(var(--hsl-primary) / 0.42);
 	}
 
-	:global(.dark) .chip {
-		color: hsl(var(--chip-h), 75%, 75%);
-		background: hsl(var(--chip-h), 65%, 60%, 0.15);
-		border-color: hsl(var(--chip-h), 65%, 60%, 0.28);
-	}
-	:global(.dark) .chip::before {
-		background: hsl(var(--chip-h), 70%, 65%);
+	.chip i {
+		font-size: 0.7rem;
+		opacity: 0.75;
 	}
 
 	/* ─── env / mount key-value table ─── */
@@ -379,13 +318,11 @@
 
 	.empty {
 		padding: 0.85rem 1rem;
-		font-family: var(--ffml-mono);
-		font-size: 0.75rem;
-		color: hsl(var(--hsl-content) / 0.4);
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.5);
 		text-align: center;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		border: 1px dashed hsl(var(--hsl-content) / 0.1);
+		border: 1px dashed hsl(var(--hsl-content) / 0.12);
 		border-radius: 6px;
 	}
 
@@ -407,12 +344,11 @@
 
 	.sidecars__label {
 		display: inline-block;
-		font-size: 0.625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		padding: 0.1rem 0.35rem;
-		border-radius: 3px;
+		font-family: var(--ffml-primary);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		padding: 0.1rem 0.4rem;
+		border-radius: 4px;
 		background: hsl(var(--hsl-primary) / 0.12);
 		color: hsl(var(--hsl-primary));
 		margin-right: 0.35rem;
@@ -423,16 +359,14 @@
 		align-items: center;
 		gap: 0.4rem;
 		background: transparent;
-		border: 1px solid hsl(var(--hsl-content) / 0.12);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
-		padding: 0 0.65rem;
-		height: 1.65rem;
-		color: hsl(var(--hsl-content) / 0.7);
-		font-family: var(--ffml-mono);
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		padding: 0 0.75rem;
+		height: 1.75rem;
+		color: hsl(var(--hsl-content));
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 	}
@@ -450,12 +384,8 @@
 		<span class="rail__brand">Details</span>
 		<div class="rail__stats">
 			<span class="stat">
-				<span class="stat-dot" data-tone={statusTone}></span>
-				<span class="stat__value">{deployment.status.toUpperCase()}</span>
-			</span>
-			<span class="stat">
+				<span class="stat__unit">Revision</span>
 				<span class="stat__value">#{deployment.revision}</span>
-				<span class="stat__unit">revision</span>
 			</span>
 		</div>
 	</header>
@@ -747,15 +677,14 @@
 			{#if (deployment.envGroups || []).length}
 				<div class="chips">
 					{#each deployment.envGroups as name (name)}
-						<button type="button" class="chip"
-							style="--chip-h: {chipHue(name)}"
-							onclick={() => viewEnvGroup(name)}>
+						<button type="button" class="chip" onclick={() => viewEnvGroup(name)}>
+							<i class="fa-solid fa-layer-group"></i>
 							{name}
 						</button>
 					{/each}
 				</div>
 			{:else}
-				<div class="empty">no env groups attached</div>
+				<div class="empty">No env groups attached.</div>
 			{/if}
 		</section>
 	</div>

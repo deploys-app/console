@@ -66,58 +66,52 @@
 		border: 1px solid var(--rail-divider);
 		border-radius: 10px;
 		overflow: hidden;
-		font-family: var(--ffml-mono);
 		font-feature-settings: 'tnum' 1;
 	}
 
 	.rev-rail {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
 		border-bottom: 1px solid var(--rail-divider);
 		background: linear-gradient(180deg,
 			hsl(var(--hsl-base-200)) 0%,
 			hsl(var(--hsl-base-100)) 100%);
 		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
+		font-family: var(--ffml-primary);
 		flex-wrap: wrap;
 	}
 
 	.rev-rail__brand {
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
+		font-weight: 600;
 		color: var(--rail-fg);
-		font-size: 0.6875rem;
+		font-size: 0.9rem;
 	}
 
 	.rev-rail__stats {
 		display: flex;
 		align-items: center;
-		gap: 1.1rem;
-		padding-left: 0.5rem;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
 		border-left: 1px solid var(--rail-divider);
 	}
 
 	.stat {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
+		align-items: baseline;
+		gap: 0.35rem;
 		color: var(--rail-fg-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		font-size: 0.625rem;
-		font-weight: 600;
+		font-size: 0.8125rem;
 	}
 
 	.stat__value {
 		color: var(--rail-fg);
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
-	.stat__unit { color: var(--rail-fg-dim); font-size: 0.625rem; }
+	.stat__unit { color: var(--rail-fg-muted); }
 
 	.rev-list {
 		position: relative;
@@ -197,12 +191,11 @@
 	}
 
 	.rev-row__rev-tag {
-		font-size: 0.5625rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		padding: 0.1rem 0.35rem;
-		border-radius: 3px;
+		font-family: var(--ffml-primary);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		padding: 0.1rem 0.45rem;
+		border-radius: 999px;
 		color: hsl(var(--hsl-primary));
 		background: hsl(var(--hsl-primary) / 0.12);
 	}
@@ -250,16 +243,14 @@
 		align-items: center;
 		gap: 0.4rem;
 		background: transparent;
-		border: 1px solid hsl(var(--hsl-content) / 0.12);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
-		padding: 0 0.7rem;
+		padding: 0 0.75rem;
 		height: 1.75rem;
-		color: hsl(var(--hsl-content) / 0.8);
-		font-family: var(--ffml-mono);
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		color: hsl(var(--hsl-content));
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 	}
