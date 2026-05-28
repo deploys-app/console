@@ -10,9 +10,9 @@
 	const deployment = $derived(data.deployment)
 
 	const tabs = [
-		{ label: 'Metric', path: '/deployment/metrics' },
+		{ label: 'Metrics', path: '/deployment/metrics' },
 		{ label: 'Details', path: '/deployment/detail' },
-		{ label: 'Revision', path: '/deployment/revision' },
+		{ label: 'Revisions', path: '/deployment/revision' },
 		{ label: 'Logs', path: '/deployment/logs' },
 		{ label: 'Events', path: '/deployment/events' }
 	]
@@ -46,7 +46,12 @@
 
 <Header {deployment} invalidate={() => api.invalidate('deployment.get')} />
 
-<div class="panel is-level-300 grid gap-6">
+<!-- grid-cols-1 (= `grid-template-columns: repeat(1, minmax(0, 1fr))`) lets
+     wide children (Metrics chart cards, Logs/Events scan-line surfaces)
+     shrink with the viewport. Without it, `grid-auto-columns: auto` would
+     size the implicit column to the children's max-content and push the
+     page past the viewport on narrow / iPhone-sized screens. -->
+<div class="panel is-level-300 grid grid-cols-1 gap-6">
 	<div class="tabs is-variant-underline w-full flex-col lg:flex-row">
 		{#each tabs as t (t.path)}
 			<a class="tab-button" class:is-active={$page.url.pathname === t.path} href={tabHref(t.path)}>

@@ -94,7 +94,7 @@
 	const fillState = $derived(fillPct < 60 ? 'low' : fillPct < 90 ? 'mid' : 'high')
 
 	const statusState = $derived(paused ? 'paused' : connected ? 'live' : 'reconnecting')
-	const statusLabel = $derived(paused ? 'PAUSED' : connected ? 'LIVE' : 'RECONNECTING')
+	const statusLabel = $derived(paused ? 'Paused' : connected ? 'Live' : 'Connecting')
 
 	const throughputText = $derived.by(() => {
 		if (throughput < 10) return throughput.toFixed(1)
@@ -191,7 +191,6 @@
 		border: 1px solid var(--rail-divider);
 		border-radius: 10px;
 		overflow: hidden;
-		font-family: var(--ffml-mono);
 		font-feature-settings: 'tnum' 1, 'ss02' 1;
 		box-shadow:
 			0 1px 0 hsl(var(--hsl-content) / 0.03) inset,
@@ -202,14 +201,15 @@
 	.log-rail {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
-		padding: 0.5rem 0.75rem 0.5rem 1rem;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
 		border-bottom: 1px solid var(--rail-divider);
 		background:
 			linear-gradient(180deg,
 				hsl(var(--hsl-base-200)) 0%,
 				hsl(var(--hsl-base-100)) 100%);
 		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
+		font-family: var(--ffml-primary);
 		flex-wrap: wrap;
 	}
 
@@ -217,66 +217,58 @@
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.4rem;
-		margin-right: 0.25rem;
+		margin: 0 0.25rem 0 0;
+		font-weight: 400;
 	}
 
 	.log-rail__brand-name {
-		font-weight: 700;
-		letter-spacing: 0.22em;
-		text-transform: uppercase;
+		font-weight: 600;
 		color: var(--rail-fg);
-		font-size: 0.6875rem;
+		font-size: 0.9rem;
 	}
 
 	.log-rail__brand-slash {
 		color: var(--rail-fg-dim);
-		font-size: 0.75rem;
+		font-size: 0.9rem;
 	}
 
 	.log-rail__deployment {
 		color: var(--rail-fg-muted);
-		font-size: 0.75rem;
-		letter-spacing: 0.01em;
+		font-size: 0.8125rem;
 	}
 
 	.log-rail__stats {
 		display: flex;
 		align-items: center;
-		gap: 1.1rem;
-		padding-left: 0.5rem;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
 		border-left: 1px solid var(--rail-divider);
+		flex-wrap: wrap;
 	}
 
 	.stat {
 		display: inline-flex;
-		align-items: center;
-		gap: 0.45rem;
+		align-items: baseline;
+		gap: 0.35rem;
 		color: var(--rail-fg-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		font-size: 0.625rem;
-		font-weight: 600;
+		font-size: 0.8125rem;
 	}
 
 	.stat__value {
 		color: var(--rail-fg);
 		font-variant-numeric: tabular-nums;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		font-size: 0.75rem;
+		font-weight: 600;
 	}
 
 	.stat__unit {
-		color: var(--rail-fg-dim);
+		color: var(--rail-fg-muted);
 		font-size: 0.625rem;
 	}
 
 	.stat__dropped {
-		color: hsl(var(--hsl-negative) / 0.8);
-		font-size: 0.625rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
+		color: hsl(var(--hsl-negative) / 0.85);
+		font-size: 0.75rem;
+		font-weight: 500;
 		margin-left: 0.25rem;
 	}
 
@@ -397,16 +389,14 @@
 		align-items: center;
 		gap: 0.4rem;
 		background: transparent;
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
-		padding: 0 0.7rem;
+		padding: 0 0.75rem;
 		height: 1.75rem;
-		color: hsl(var(--hsl-content) / 0.8);
-		font-family: var(--ffml-mono);
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		color: hsl(var(--hsl-content));
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 500;
 		cursor: pointer;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 		text-decoration: none;
@@ -428,8 +418,11 @@
 	.log-surface {
 		position: relative;
 		flex: 1;
-		min-height: 32rem;
-		max-height: calc(100dvh - 18rem);
+		/* min-height is intentionally modest so the shell collapses gracefully on
+		   short viewports; the max-height accounts for the navbar, breadcrumb,
+		   masthead, tabs row, rail, and panel padding above + below. */
+		min-height: 14rem;
+		max-height: calc(100dvh - 31rem);
 		overflow-y: auto;
 		overflow-x: hidden;
 		isolation: isolate;
@@ -657,15 +650,14 @@
 	}
 
 	.log-empty__label {
-		text-transform: uppercase;
-		letter-spacing: 0.18em;
-		font-size: 0.6875rem;
-		color: hsl(var(--hsl-content) / 0.55);
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: hsl(var(--hsl-content) / 0.65);
 	}
 
 	.log-empty__hint {
-		font-size: 0.6875rem;
-		color: hsl(var(--hsl-content) / 0.35);
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.45);
 	}
 
 	/* responsive: tighten on narrow viewports */
@@ -687,11 +679,11 @@
 
 <div class="log-shell">
 	<header class="log-rail">
-		<div class="log-rail__brand">
+		<h6 class="log-rail__brand">
 			<span class="log-rail__brand-name">Logs</span>
 			<span class="log-rail__brand-slash">/</span>
 			<span class="log-rail__deployment">{deployment.name}</span>
-		</div>
+		</h6>
 
 		<div class="log-rail__stats">
 			<span class="stat" title={statusLabel.toLowerCase()}>
@@ -701,7 +693,7 @@
 
 			<span class="stat" title="lines per second (5s avg)">
 				<span class="stat__value">{throughputText}</span>
-				<span class="stat__unit">L/S</span>
+				<span class="stat__unit">l/s</span>
 			</span>
 
 			<span class="stat" title="buffered lines (cap {MAX_LINES})">

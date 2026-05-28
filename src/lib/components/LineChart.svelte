@@ -287,6 +287,15 @@
 	.chart {
 		position: relative;
 		width: 100%;
+		/* The SVG inside is sized via JS (`width={width}` attribute), which gives
+		   it an intrinsic min-content size equal to its current pixel width. Without
+		   `min-width: 0` the chart container is held open against its parent at
+		   that intrinsic size — the grid cell shrinks underneath but `.chart` does
+		   not, ResizeObserver never sees a smaller contentRect, and the SVG never
+		   re-renders. `overflow: hidden` clips the brief transient where the SVG
+		   still has its previous (larger) width between resize and re-render. */
+		min-width: 0;
+		overflow: hidden;
 	}
 
 	.surface {
