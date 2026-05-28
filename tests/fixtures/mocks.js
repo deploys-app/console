@@ -215,7 +215,7 @@ export const sampleRoute = {
 	location: 'gke',
 	domain: 'example.com',
 	path: '/',
-	target: 'web',
+	target: 'deployment://web',
 	deployment: 'web',
 	config: {},
 	createdAt: now,

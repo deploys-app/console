@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -9,6 +10,29 @@
 	const project = $derived(data.project)
 	const routes = $derived(data.routes)
 	const error = $derived(data.error)
+
+	/**
+	 * @param {Api.Route} route
+	 */
+	function openRoute (route) {
+		goto(`/route/manage?project=${project}` +
+			`&location=${encodeURIComponent(route.location)}` +
+			`&domain=${encodeURIComponent(route.domain)}` +
+			`&path=${encodeURIComponent(route.path)}`)
+	}
+
+	/**
+	 * @param {KeyboardEvent} e
+	 * @param {Api.Route} route
+	 */
+	function onRowKey (e, route) {
+		// Only the row itself drives navigation; inner buttons handle their own keys.
+		if (e.target !== e.currentTarget) return
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault()
+			openRoute(route)
+		}
+	}
 
 	/**
 	 * @param {Api.Route} route
@@ -60,25 +84,35 @@
 			</thead>
 			<tbody>
 				{#each routes as it (`${it.domain}${it.path}-${it.location}`)}
-					<tr>
-						<td>
-							<a class="link underline"
-							   href={`https://${it.domain}${it.path}`}
-							   target="_blank">https://{it.domain}{it.path}</a>
-						</td>
+					<tr class="route-row" role="button" tabindex="0"
+						onclick={() => openRoute(it)}
+						onkeydown={(e) => onRowKey(e, it)}>
+						<td>https://{it.domain}{it.path}</td>
 						<td>{it.target}</td>
 						<td>{it.location}</td>
 						<td>
-							{#if it.config.basicAuth}
-								<i class="fa-solid fa-lock"></i>
+							{#if it.config?.basicAuth}
+								<i class="fa-solid fa-lock" title="Basic auth"></i>
+							{/if}
+							{#if it.config?.forwardAuth}
+								<i class="fa-solid fa-shield-halved" title="Forward auth"></i>
 							{/if}
 						</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" aria-label="Remove" onclick={() => deleteRoute(it)}>
-								<i class="fa-solid fa-trash-alt"></i>
-							</button>
+							<div class="flex gap-1 justify-end">
+								<a class="icon-button" aria-label="Open route in new tab"
+								   href={`https://${it.domain}${it.path}`}
+								   target="_blank" rel="noreferrer"
+								   onclick={(e) => e.stopPropagation()}>
+									<i class="fa-solid fa-arrow-up-right-from-square"></i>
+								</a>
+								<button class="icon-button" type="button" aria-label="Remove"
+									onclick={(e) => { e.stopPropagation(); deleteRoute(it) }}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</div>
 						</td>
 					</tr>
 				{/each}
@@ -88,3 +122,13 @@
 		</table>
 	</div>
 </div>
+
+<style>
+	.route-row {
+		cursor: pointer;
+	}
+
+	.route-row:hover {
+		background-color: hsl(var(--hsl-content) / 0.04);
+	}
+</style>
