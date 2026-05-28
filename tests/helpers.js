@@ -29,6 +29,18 @@ export async function setMocks (overrides) {
 }
 
 /**
+ * Fetch the mock server's request log (every upstream call since the last
+ * reset), so a test can assert what the page sent — e.g. the `waf.set` body.
+ *
+ * @returns {Promise<{ path: string, method: string, body: string }[]>}
+ */
+export async function getRequestLog () {
+	const res = await fetch(`${MOCK_URL}/__log`)
+	if (!res.ok) throw new Error(`failed to read request log: ${res.status}`)
+	return res.json()
+}
+
+/**
  * Inject the auth token cookie so the SvelteKit `(auth)` group treats
  * the session as authenticated.
  *
