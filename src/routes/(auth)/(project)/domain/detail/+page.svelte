@@ -17,6 +17,37 @@
 	const hasDnsErrors = $derived(dnsErrors.length > 0)
 	const headerStatus = $derived(domain.cdn && domain.verification?.ssl?.pending ? 'verify' : domain.status)
 
+	// ─── DNS record groups (visibility mirrors the original conditionals) ───
+	const ipv4 = $derived(domain.dnsConfig?.ipv4 ?? [])
+	const ipv6 = $derived(domain.dnsConfig?.ipv6 ?? [])
+	const cnames = $derived(domain.dnsConfig?.cname ?? [])
+	const showConnect = $derived(
+		(domain.status === 'success' || domain.status === 'verify' || (!domain.cdn && !domain.wildcard)) &&
+		(ipv4.length > 0 || ipv6.length > 0 || cnames.length > 0)
+	)
+	const ownership = $derived(domain.verification?.ownership)
+	const hasOwnership = $derived(!!ownership?.type)
+	const ownershipErrors = $derived(ownership?.errors ?? [])
+	const ssl = $derived(domain.verification?.ssl)
+	const sslRecords = $derived(ssl?.records ?? [])
+	const hasSsl = $derived(sslRecords.length > 0 || !!ssl?.dcv?.name)
+	const hasAnyRecord = $derived(showConnect || hasOwnership || hasSsl)
+
+	// ─── Status banner ───
+	const banner = $derived.by(() => {
+		if (domain.cdn) {
+			if (domain.status === 'pending') return { tone: 'info', icon: 'fa-solid fa-spinner-third fa-spin', title: 'Setting up your domain' }
+			if (domain.verification?.ssl?.pending) return { tone: 'warning', icon: 'fa-solid fa-shield-halved', title: 'Issuing TLS certificate' }
+			if (domain.status === 'error') return { tone: 'negative', icon: 'fa-solid fa-circle-exclamation', title: 'Verification failed' }
+			return { tone: 'positive', icon: 'fa-solid fa-circle-check', title: 'Domain is active' }
+		}
+		if (domain.status === 'error') return { tone: 'negative', icon: 'fa-solid fa-circle-exclamation', title: 'DNS verification failed' }
+		if (domain.status !== 'success') return { tone: 'warning', icon: 'fa-solid fa-clock', title: domain.wildcard ? 'Waiting for ownership record' : 'Waiting for DNS' }
+		if (hasDnsErrors) return { tone: 'warning', icon: 'fa-solid fa-triangle-exclamation', title: 'DNS needs attention' }
+		return { tone: 'positive', icon: 'fa-solid fa-circle-check', title: 'Domain is active' }
+	})
+	const showDnsMeta = $derived(!domain.cdn && (domain.verification?.dns?.verifiedAt || domain.verification?.dns?.lastCheckedAt))
+
 	onMount(() => {
 		return setupCopy('.copy')
 	})
@@ -205,6 +236,319 @@
 	}
 </script>
 
+<style>
+	/* ─── shared shell vars (matches the deployment detail design language) ─── */
+	.shell {
+		--rail-fg: hsl(var(--hsl-content));
+		--rail-fg-muted: hsl(var(--hsl-content) / 0.5);
+		--rail-divider: hsl(var(--hsl-content) / 0.08);
+		--surface-bg: hsl(var(--hsl-base-100));
+
+		display: flex;
+		flex-direction: column;
+		background: var(--surface-bg);
+		border: 1px solid var(--rail-divider);
+		border-radius: 10px;
+		overflow: hidden;
+		font-family: var(--ffml-primary);
+		margin-bottom: 1rem;
+	}
+
+	.rail {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.55rem 1rem;
+		border-bottom: 1px solid var(--rail-divider);
+		background: linear-gradient(180deg,
+			hsl(var(--hsl-base-200)) 0%,
+			hsl(var(--hsl-base-100)) 100%);
+		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
+		flex-wrap: wrap;
+	}
+
+	.rail__brand {
+		margin: 0;
+		font-weight: 600;
+		color: var(--rail-fg);
+		font-size: 0.9rem;
+	}
+
+	.rail__stats {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		padding-left: 0.65rem;
+		border-left: 1px solid var(--rail-divider);
+	}
+
+	.stat {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.35rem;
+		color: var(--rail-fg-muted);
+		font-size: 0.8125rem;
+	}
+
+	.stat__value {
+		color: var(--rail-fg);
+		font-variant-numeric: tabular-nums;
+		font-weight: 600;
+	}
+
+	.stat__unit { color: var(--rail-fg-muted); }
+
+	.body { padding: 0.75rem 0; }
+
+	.section {
+		padding: 0.5rem 1rem 0.85rem;
+		border-top: 1px solid hsl(var(--hsl-content) / 0.05);
+	}
+
+	.section:first-child { border-top: none; }
+
+	/* ─── status banner ─── */
+	.banner {
+		--tone: var(--hsl-content);
+		display: flex;
+		gap: 0.85rem;
+		padding: 0.9rem 1rem;
+		margin: 0.5rem 1rem 0.25rem;
+		border: 1px solid hsl(var(--tone) / 0.3);
+		border-left-width: 3px;
+		border-radius: 8px;
+		background: hsl(var(--tone) / 0.06);
+	}
+	.banner.is-positive { --tone: var(--hsl-positive); }
+	.banner.is-warning { --tone: var(--hsl-warning); }
+	.banner.is-negative { --tone: var(--hsl-negative); }
+	.banner.is-info { --tone: var(--hsl-primary); }
+
+	.banner__icon {
+		font-size: 1.05rem;
+		line-height: 1.5;
+		color: hsl(var(--tone));
+		flex-shrink: 0;
+	}
+
+	.banner__content { min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+
+	.banner__title {
+		font-weight: 600;
+		font-size: 0.9rem;
+		color: hsl(var(--tone));
+	}
+
+	.banner__body {
+		font-size: 0.8125rem;
+		line-height: 1.55;
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+	.banner__body :global(strong) { color: hsl(var(--hsl-content)); font-weight: 600; }
+
+	.banner__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem 1.1rem;
+		margin-top: 0.15rem;
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.55);
+		font-variant-numeric: tabular-nums;
+	}
+	.banner__meta b { color: hsl(var(--hsl-content) / 0.8); font-weight: 600; }
+
+	.banner__err {
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-negative));
+		overflow-wrap: anywhere;
+	}
+
+	/* ─── spec grid (overview) ─── */
+	.spec-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		row-gap: 0.35rem;
+	}
+
+	@media (min-width: 1024px) {
+		.spec-grid { grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+	}
+
+	.spec {
+		display: grid;
+		grid-template-columns: 8rem 1fr auto;
+		align-items: baseline;
+		column-gap: 0.75rem;
+		padding: 0.2rem 0;
+		min-width: 0;
+	}
+
+	.spec__label {
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+
+	.spec__value {
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content));
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.spec__value.is-mono {
+		font-family: var(--ffml-mono);
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.92);
+	}
+
+	.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.12rem 0.5rem;
+		border-radius: 5px;
+		background: hsl(var(--hsl-content) / 0.06);
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+	.tag.is-on { background: hsl(var(--hsl-primary) / 0.12); color: hsl(var(--hsl-primary)); }
+	.tag i { font-size: 0.7rem; }
+
+	/* ─── DNS record groups ─── */
+	.group { display: flex; flex-direction: column; gap: 0.6rem; }
+
+	.group__head { display: flex; flex-direction: column; gap: 0.2rem; }
+
+	.group__title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 600;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content));
+	}
+	.group__title .step {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.3rem;
+		height: 1.3rem;
+		border-radius: 50%;
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+		font-size: 0.7rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.group__desc {
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.65);
+	}
+	.group__desc :global(em) { font-style: italic; color: hsl(var(--hsl-content) / 0.8); }
+
+	.recs { display: flex; flex-direction: column; gap: 0.5rem; }
+
+	.rec {
+		display: flex;
+		align-items: stretch;
+		gap: 0;
+		border: 1px solid hsl(var(--hsl-content) / 0.1);
+		border-radius: 8px;
+		overflow: hidden;
+		background: hsl(var(--hsl-base-100));
+	}
+
+	.rec__type {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 4.25rem;
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		color: hsl(var(--hsl-primary));
+		background: hsl(var(--hsl-primary) / 0.08);
+		border-right: 1px solid hsl(var(--hsl-content) / 0.08);
+	}
+
+	.rec__body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+	.rec__line {
+		display: grid;
+		grid-template-columns: 3.25rem 1fr auto;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.4rem 0.7rem;
+		min-width: 0;
+	}
+	.rec__line + .rec__line { border-top: 1px solid hsl(var(--hsl-content) / 0.06); }
+
+	.rec__k {
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: hsl(var(--hsl-content) / 0.45);
+		font-weight: 600;
+	}
+
+	.rec__v {
+		font-family: var(--ffml-mono);
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.92);
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.rec__copy {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.4);
+		cursor: pointer;
+		padding: 0.2rem 0.35rem;
+		border-radius: 4px;
+		transition: color 0.15s ease, background 0.15s ease;
+	}
+	.rec__copy:hover { color: hsl(var(--hsl-content)); background: hsl(var(--hsl-content) / 0.06); }
+	.rec__copy:global([data-copied]) { color: hsl(var(--hsl-positive)); }
+
+	.group__err {
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-negative));
+		overflow-wrap: anywhere;
+	}
+
+	/* ─── cache purge ─── */
+	.purge-row {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+	@media (min-width: 1024px) {
+		.purge-row { flex-direction: row; gap: 1.5rem; align-items: center; }
+	}
+	.purge-row + .purge-row {
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid hsl(var(--hsl-content) / 0.08);
+	}
+	.purge-row__text { flex: 1; display: grid; gap: 0.15rem; }
+	.purge-row__text strong { font-size: 0.875rem; }
+	.purge-row__text p { font-size: 0.8125rem; color: hsl(var(--hsl-content) / 0.65); }
+
+	.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+</style>
+
 <div class="breadcrumb">
 	<div class="breadcrumb-item">
 		<a href={`/domain?project=${project}`} class="link"><h6>Domains</h6></a>
@@ -221,325 +565,305 @@
 		<h4 class="flex flex-wrap items-center gap-y-2 min-w-0">
 			<StatusIcon status={headerStatus} />
 			<strong>Domain</strong>
-			{#if hasDnsErrors}
-				<i class="fa-solid fa-triangle-exclamation text-warning ml-3"
-					title="DNS verification is failing. See details below."></i>
-			{/if}
 		</h4>
 		<p class="page-sub font-mono min-w-0 wrap-anywhere">{domain.domain}</p>
 	</div>
 </div>
 
-<div class="panel is-level-300 grid gap-6">
-	<div class="grid gap-4 w-full">
-		<div class="field">
-			<label for="input-gsa">Domain</label>
-			<div class="input">
-				<input id="input-gsa" value={domain.domain} readonly disabled>
-			</div>
+<!-- ─── OVERVIEW ─── -->
+<div class="shell">
+	<header class="rail">
+		<h6 class="rail__brand">Overview</h6>
+		<div class="rail__stats">
+			<span class="stat">
+				<span class="stat__unit">Status</span>
+				<span class="stat__value">{headerStatus}</span>
+			</span>
 		</div>
-		<div class="field">
-			<label for="input-location">Location</label>
-			<div class="input">
-				<input id="input-location" value={domain.location} readonly disabled>
-			</div>
-		</div>
-		<div class="field mt-3">
-			<div class="checkbox">
-				<input id="input-cdn" type="checkbox" bind:checked={domain.cdn} disabled readonly>
-				<label for="input-cdn">CDN</label>
-			</div>
-		</div>
-		<div class="field">
-			<div class="checkbox">
-				<input id="input-wildcard" type="checkbox" bind:checked={domain.wildcard} disabled readonly>
-				<label for="input-wildcard">Wildcard</label>
-			</div>
-		</div>
-		<div class="field">
-			<label for="input-created_at">Created at</label>
-			<div class="input">
-				<input id="input-created_at" value={format.datetime(domain.createdAt)} readonly disabled>
-			</div>
-		</div>
-		<div class="field">
-			<label for="input-created_by">Created by</label>
-			<div class="input">
-				<input id="input-created_by" value={domain.createdBy} readonly disabled>
-			</div>
-		</div>
+	</header>
 
-		{#if domain.cdn && domain.status === 'pending'}
-			<hr>
-			<p><strong>Domain Verification</strong></p>
-			<div class="text-2xl">
-				<i class="fa-solid fa-spinner-third fa-spin"></i>
-			</div>
-		{/if}
-
-		{#if !domain.cdn && (domain.status !== 'success' || hasDnsErrors)}
-			<hr>
-			<p><strong>DNS Verification</strong></p>
-			{#if domain.status !== 'success'}
-				<p class="text-sm opacity-80">
-					{#if domain.wildcard}
-						Wildcard DNS can't resolve to a single IP, so verify ownership by
-						adding the TXT record below. We re-check every few minutes and
-						switch the domain to <strong>success</strong> once the record is
-						visible.
-					{:else}
-						Point your DNS at the records below. We re-check every few minutes
-						and switch the domain to <strong>success</strong> once it resolves
-						to this location. If your DNS is behind a CDN/proxy and the A/AAAA
-						records can't resolve to us directly, add the TXT record under
-						<em>Proxied DNS (alternative)</em>. That proves ownership but
-						doesn't enable certificate issuance — point DNS directly if you
-						need us to issue a TLS certificate.
-					{/if}
-				</p>
-
-				{#if domain.status === 'error'}
-					<p class="text-negative text-content/80">
-						DNS verification has been failing for over 48 hours. The certificate
-						has been torn down. Re-point DNS and we'll re-verify automatically.
-					</p>
-				{/if}
-			{:else if domain.wildcard}
-				<p class="text-content/80">
-					Ownership is confirmed. The wildcard certificate can't be issued
-					until you also add the SSL/TLS CNAME record above. We re-check
-					every few minutes and issue the certificate automatically once
-					the CNAME resolves.
-				</p>
-			{:else}
-				<p class="text-content/80">
-					We can't issue or renew a TLS certificate with your current DNS
-					setup. Re-check your DNS configuration against the records below.
-				</p>
-			{/if}
-
-			<p class="text-sm opacity-80">
-				Last verified: {format.datetime(domain.verification?.dns?.verifiedAt) || '-'}
-			</p>
-			<p class="text-sm opacity-80">
-				Last checked: {format.datetime(domain.verification?.dns?.lastCheckedAt) || '-'}
-			</p>
-			{#if hasDnsErrors}
-				{#each dnsErrors as e, i (i)}
-					<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
-				{/each}
-			{/if}
-		{/if}
-
-		{#snippet ownershipBlock()}
-			{#if domain.verification?.ownership?.type}
-				<hr>
-				<p>
-					<strong>
-						{#if domain.cdn}
-							Domain Verification
-						{:else if domain.wildcard}
-							Ownership TXT Record
+	<div class="body">
+		<!-- status banner -->
+		<div class="banner is-{banner.tone}">
+			<i class="banner__icon {banner.icon}"></i>
+			<div class="banner__content">
+				<div class="banner__title">{banner.title}</div>
+				<div class="banner__body">
+					{#if domain.cdn}
+						{#if domain.status === 'pending'}
+							<p>We're provisioning the CDN edge and verifying your domain. This usually takes a moment — the page refreshes automatically.</p>
+						{:else if domain.verification?.ssl?.pending}
+							<p>The CDN is live. We're now issuing a TLS certificate. Add the <strong>SSL/TLS</strong> records below if shown; the page refreshes automatically.</p>
+						{:else if domain.status === 'error'}
+							<p>We couldn't verify this domain. Check the verification records below and we'll re-check automatically.</p>
 						{:else}
-							Proxied DNS (alternative)
+							<p>Your domain is verified and serving traffic through the CDN.</p>
 						{/if}
-					</strong>
-				</p>
-				{#if !domain.cdn && !domain.wildcard}
-					<p class="text-sm opacity-80">
-						If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
-						records can't resolve to this location directly, add this TXT record
-						to prove ownership and we'll accept the proxied setup.
-					</p>
+					{:else if domain.status === 'error'}
+						<p>
+							DNS verification has been failing for over 48 hours, so the certificate
+							has been torn down. Re-point DNS using the records below and we'll
+							re-verify automatically.
+						</p>
+					{:else if domain.status !== 'success'}
+						{#if domain.wildcard}
+							<p>
+								Wildcard DNS can't resolve to a single IP, so verify ownership by
+								adding the <strong>ownership TXT</strong> record below. We re-check every
+								few minutes and switch the domain to <strong>success</strong> once the
+								record is visible.
+							</p>
+						{:else}
+							<p>
+								Point your DNS at the records below. We re-check every few minutes and
+								switch the domain to <strong>success</strong> once it resolves to this
+								location. If your DNS sits behind a CDN/proxy and the A/AAAA records
+								can't resolve to us directly, add the <em>Proxied DNS</em> TXT record
+								instead — that proves ownership but doesn't enable certificate issuance.
+							</p>
+						{/if}
+					{:else if hasDnsErrors}
+						<p>
+							The domain is verified, but our latest DNS check reported problems.
+							Review the errors below and confirm your records still match.
+						</p>
+					{:else}
+						<p>Your domain is verified and serving traffic.</p>
+					{/if}
+				</div>
+
+				{#if showDnsMeta}
+					<div class="banner__meta">
+						<span>Last verified <b>{format.datetime(domain.verification?.dns?.verifiedAt) || '—'}</b></span>
+						<span>Last checked <b>{format.datetime(domain.verification?.dns?.lastCheckedAt) || '—'}</b></span>
+					</div>
 				{/if}
-				{#if (domain.verification.ownership.errors ?? []).length > 0}
-					{#each domain.verification.ownership.errors as e, i (i)}
-						<p class="text-negative text-content/80 wrap-anywhere">{e}</p>
+
+				{#if hasDnsErrors}
+					{#each dnsErrors as e, i (i)}
+						<p class="banner__err">{e}</p>
 					{/each}
 				{/if}
-				<div class="field">
-					<label for="input-owner_name">TXT Name</label>
-					<div class="input -has-icon-right mb-1">
-						<input id="input-owner_name" value={domain.verification.ownership.name} readonly disabled>
-						<span class="icon -is-right copy"
-							data-clipboard-text={domain.verification.ownership.name}>
-							<i class="fa-light fa-copy"></i>
+			</div>
+		</div>
+
+		<section class="section">
+			<div class="spec-grid">
+				<div class="spec">
+					<span class="spec__label">Domain</span>
+					<span class="spec__value is-mono">{domain.domain}</span>
+					<span class="rec__copy copy" data-clipboard-text={domain.domain} title="Copy domain">
+						<i class="fa-light fa-copy"></i>
+					</span>
+				</div>
+				<div class="spec">
+					<span class="spec__label">Location</span>
+					<span class="spec__value is-mono">{domain.location}</span>
+					<span></span>
+				</div>
+				<div class="spec">
+					<span class="spec__label">Type</span>
+					<span class="spec__value">
+						<span class="chips">
+							<span class="tag {domain.cdn ? 'is-on' : ''}">
+								<i class="fa-solid {domain.cdn ? 'fa-bolt' : 'fa-xmark'}"></i> CDN
+							</span>
+							{#if domain.wildcard}
+								<span class="tag is-on"><i class="fa-solid fa-asterisk"></i> Wildcard</span>
+							{/if}
 						</span>
-					</div>
+					</span>
+					<span></span>
 				</div>
-				<div class="field">
-					<label for="input-owner_value">TXT Value</label>
-					<div class="input -has-icon-right mb-1">
-						<input id="input-owner_value" value={domain.verification.ownership.value} readonly disabled>
-						<span class="icon -is-right copy"
-							data-clipboard-text={domain.verification.ownership.value}>
-							<i class="fa-light fa-copy"></i>
-						</span>
-					</div>
-				</div>
-			{/if}
-		{/snippet}
-
-		{#if domain.cdn || domain.wildcard}
-			{@render ownershipBlock()}
-		{/if}
-
-		{#if (domain.verification?.ssl?.records ?? []).length > 0 || domain.verification?.ssl?.dcv?.name}
-			<hr>
-			<p><strong>SSL/TLS Verification</strong></p>
-
-			{#if domain.verification.ssl.dcv.name}
-				<div class="field">
-					<label for="input-ssl_dcv_name">CNAME Name</label>
-					<div class="input -has-icon-right mb-1">
-						<input id="input-ssl_dcv_name" value={domain.verification.ssl.dcv.name} readonly disabled>
-						<span class="icon -is-right copy"
-							data-clipboard-text={domain.verification.ssl.dcv.name}>
-								<i class="fa-light fa-copy"></i>
-							</span>
-					</div>
-				</div>
-				<div class="field">
-					<label for="input-ssl_dcv_value">CNAME Value</label>
-					<div class="input -has-icon-right mb-1">
-						<input id="input-ssl_dcv_value" value={domain.verification.ssl.dcv.value} readonly disabled>
-						<span class="icon -is-right copy"
-							data-clipboard-text={domain.verification.ssl.dcv.value}>
-								<i class="fa-light fa-copy"></i>
-							</span>
-					</div>
-				</div>
-			{:else}
-				{#each domain.verification.ssl.records as it, index (index)}
-					<div class="field">
-						<label for={`input-ssl_name_${index}`}>TXT Name</label>
-						<div class="input -has-icon-right mb-1">
-							<input id={`input-ssl_name_${index}`} value={it.txtName} readonly disabled>
-							<span class="icon -is-right copy"
-								data-clipboard-text={it.txtName}>
-									<i class="fa-light fa-copy"></i>
-								</span>
-						</div>
-					</div>
-					<div class="field">
-						<label for={`input-ssl_value_${index}`}>TXT Value</label>
-						<div class="input -has-icon-right mb-1">
-							<input id={`input-ssl_value_${index}`} value={it.txtValue} readonly disabled>
-							<span class="icon -is-right copy"
-								data-clipboard-text={it.txtValue}>
-									<i class="fa-light fa-copy"></i>
-								</span>
-						</div>
-					</div>
-				{/each}
-			{/if}
-		{/if}
-
-		{#if domain.status === 'success' || domain.status === 'verify' || (!domain.cdn && !domain.wildcard)}
-			<hr>
-			{#if (domain.dnsConfig.ipv4 ?? []).length > 0}
-				<div class="field">
-					<label for="input-ip">A Record</label>
-					{#each domain.dnsConfig.ipv4 as ip, i (i)}
-						<div class="input -has-icon-right mb-1">
-							<input id="input-ip" value={ip} readonly disabled>
-							<span class="icon -is-right copy"
-								data-clipboard-text={ip}>
-								<i class="fa-light fa-copy"></i>
-							</span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-			{#if (domain.dnsConfig.ipv6 ?? []).length > 0}
-				<div class="field">
-					<label for="input-ipv6">AAAA Record</label>
-					{#each domain.dnsConfig.ipv6 as ip, i (i)}
-						<div class="input -has-icon-right mb-1">
-							<input id="input-ipv6" value={ip} readonly disabled>
-							<span class="icon -is-right copy"
-								data-clipboard-text={ip}>
-								<i class="fa-light fa-copy"></i>
-							</span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-			{#if (domain.dnsConfig.cname ?? []).length > 0}
-				<div class="field">
-					<label for="input-cname">CNAME Record</label>
-					{#each domain.dnsConfig.cname as cname, i (i)}
-						<div class="input -has-icon-right">
-							<input id="input-cname" value={cname} readonly disabled>
-							<span class="icon -is-right copy"
-								data-clipboard-text={cname}>
-								<i class="fa-light fa-copy"></i>
-							</span>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		{/if}
-
-		{#if !domain.cdn && !domain.wildcard}
-			{@render ownershipBlock()}
-		{/if}
-
-		{#if domain.cdn && domain.status === 'success'}
-			<hr>
-			<div>
-				<div class="mb-3">
-					<strong>Purge Cache</strong>
-				</div>
-				<div class="bg-base-100 p-4 sm:p-6 border border-negative/70 rounded-md">
-					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
-						<div class="flex-1 grid grid-cols-1 gap-1">
-							<div><strong>Purge everything</strong></div>
-							<p class="text-sm opacity-80">Remove all cached resources</p>
-						</div>
-						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
-							Purge everything
-						</button>
-					</div>
-					<hr class="my-4 sm:my-6">
-					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
-						<div class="flex-1 grid grid-cols-1 gap-1">
-							<div><strong>Purge prefix</strong></div>
-							<p class="text-sm opacity-80">Remove cached resources at prefix path</p>
-						</div>
-						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCachePrefix}>
-							Purge prefix
-						</button>
-					</div>
-					<hr class="my-4 sm:my-6">
-					<div class="flex lg:flex-row flex-col gap-4 lg:gap-6 lg:items-center">
-						<div class="flex-1 grid grid-cols-1 gap-1">
-							<div><strong>Purge file</strong></div>
-							<p class="text-sm opacity-80">Remove cached resources at exact path</p>
-						</div>
-						<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCacheFile}>
-							Purge file
-						</button>
-					</div>
+				<div class="spec">
+					<span class="spec__label">Created</span>
+					<span class="spec__value">
+						<span class="is-mono">{format.datetime(domain.createdAt) || '—'}</span>
+						{#if domain.createdBy}<span class="spec__label"> by {domain.createdBy}</span>{/if}
+					</span>
+					<span></span>
 				</div>
 			</div>
-		{/if}
+		</section>
 	</div>
-
-	<hr>
-	{#if domain.cdn}
-		<div class="flex items-center flex-wrap">
-			<a class="button is-variant-secondary" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
-		</div>
-	{:else}
-		<div class="flex items-center flex-wrap">
-			<button class="button" onclick={upgradeCdn} disabled>Add CDN</button>
-		</div>
-	{/if}
-
-	<DangerZone description="Permanently delete this domain. Routing and TLS certificates will be removed.">
-		<button class="button is-variant-negative" type="button" onclick={deleteItem}>
-			Delete
-		</button>
-	</DangerZone>
 </div>
+
+{#snippet dnsRecord(type, host, value)}
+	<div class="rec">
+		<span class="rec__type">{type}</span>
+		<div class="rec__body">
+			<div class="rec__line">
+				<span class="rec__k">Host</span>
+				<span class="rec__v">{host}</span>
+				<span class="rec__copy copy" data-clipboard-text={host} title="Copy host">
+					<i class="fa-light fa-copy"></i>
+				</span>
+			</div>
+			<div class="rec__line">
+				<span class="rec__k">Value</span>
+				<span class="rec__v">{value}</span>
+				<span class="rec__copy copy" data-clipboard-text={value} title="Copy value">
+					<i class="fa-light fa-copy"></i>
+				</span>
+			</div>
+		</div>
+	</div>
+{/snippet}
+
+<!-- ─── DNS RECORDS ─── -->
+{#if hasAnyRecord}
+	<div class="shell">
+		<header class="rail">
+			<h6 class="rail__brand">DNS Records</h6>
+			<div class="rail__stats">
+				<span class="stat"><span class="stat__unit">Add these at your DNS provider</span></span>
+			</div>
+		</header>
+
+		<div class="body">
+			{#if showConnect}
+				<section class="section">
+					<div class="group">
+						<div class="group__head">
+							<div class="group__title"><span class="step">1</span> Point your domain</div>
+							<p class="group__desc">Create these records so traffic for <strong>{domain.domain}</strong> reaches this location.</p>
+						</div>
+						<div class="recs">
+							{#each ipv4 as ip, i (i)}
+								{@render dnsRecord('A', domain.domain, ip)}
+							{/each}
+							{#each ipv6 as ip, i (i)}
+								{@render dnsRecord('AAAA', domain.domain, ip)}
+							{/each}
+							{#each cnames as cname, i (i)}
+								{@render dnsRecord('CNAME', domain.domain, cname)}
+							{/each}
+						</div>
+					</div>
+				</section>
+			{/if}
+
+			{#if hasOwnership}
+				<section class="section">
+					<div class="group">
+						<div class="group__head">
+							<div class="group__title">
+								<span class="step">{showConnect ? '2' : '1'}</span>
+								{#if domain.cdn}
+									Verify domain ownership
+								{:else if domain.wildcard}
+									Verify ownership
+								{:else}
+									Proxied DNS (alternative)
+								{/if}
+							</div>
+							{#if !domain.cdn && !domain.wildcard}
+								<p class="group__desc">
+									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
+									records can't resolve here directly, add this TXT record instead to
+									prove ownership and we'll accept the proxied setup.
+								</p>
+							{:else}
+								<p class="group__desc">Add this TXT record so we can confirm you control the domain.</p>
+							{/if}
+						</div>
+						{#if ownershipErrors.length > 0}
+							{#each ownershipErrors as e, i (i)}
+								<p class="group__err">{e}</p>
+							{/each}
+						{/if}
+						<div class="recs">
+							{@render dnsRecord('TXT', ownership.name, ownership.value)}
+						</div>
+					</div>
+				</section>
+			{/if}
+
+			{#if hasSsl}
+				<section class="section">
+					<div class="group">
+						<div class="group__head">
+							<div class="group__title">
+								<span class="step">{(showConnect ? 1 : 0) + (hasOwnership ? 1 : 0) + 1}</span>
+								TLS certificate
+							</div>
+							<p class="group__desc">These records let us issue and renew the HTTPS certificate for your domain.</p>
+						</div>
+						{#if (ssl?.errors ?? []).length > 0}
+							{#each ssl.errors as e, i (i)}
+								<p class="group__err">{e}</p>
+							{/each}
+						{/if}
+						<div class="recs">
+							{#if ssl?.dcv?.name}
+								{@render dnsRecord('CNAME', ssl.dcv.name, ssl.dcv.value)}
+							{:else}
+								{#each sslRecords as it, i (i)}
+									{@render dnsRecord('TXT', it.txtName, it.txtValue)}
+								{/each}
+							{/if}
+						</div>
+					</div>
+				</section>
+			{/if}
+		</div>
+	</div>
+{/if}
+
+<!-- ─── CACHE ─── -->
+{#if domain.cdn && domain.status === 'success'}
+	<div class="shell">
+		<header class="rail">
+			<h6 class="rail__brand">Cache</h6>
+			<div class="rail__stats">
+				<span class="stat"><span class="stat__unit">Purge edge-cached content</span></span>
+			</div>
+		</header>
+		<div class="body">
+			<section class="section">
+				<div class="purge-row">
+					<div class="purge-row__text">
+						<strong>Purge everything</strong>
+						<p>Remove all cached resources</p>
+					</div>
+					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
+						Purge everything
+					</button>
+				</div>
+				<div class="purge-row">
+					<div class="purge-row__text">
+						<strong>Purge prefix</strong>
+						<p>Remove cached resources at a prefix path</p>
+					</div>
+					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCachePrefix}>
+						Purge prefix
+					</button>
+				</div>
+				<div class="purge-row">
+					<div class="purge-row__text">
+						<strong>Purge file</strong>
+						<p>Remove cached resources at an exact path</p>
+					</div>
+					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCacheFile}>
+						Purge file
+					</button>
+				</div>
+			</section>
+		</div>
+	</div>
+{/if}
+
+<!-- ─── ACTIONS ─── -->
+<div class="actions">
+	{#if domain.cdn}
+		<a class="button is-variant-secondary" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
+	{:else}
+		<button class="button" onclick={upgradeCdn} disabled>Add CDN</button>
+	{/if}
+</div>
+
+<DangerZone description="Permanently delete this domain. Routing and TLS certificates will be removed.">
+	<button class="button is-variant-negative" type="button" onclick={deleteItem}>
+		Delete
+	</button>
+</DangerZone>
