@@ -51,12 +51,14 @@
 	)
 
 	// deployment:// targets resolve to a deployment in the same location; link
-	// straight to its detail page so the route is navigable.
+	// straight to its detail page so the route is navigable. Derive the name from
+	// the parsed target (what's displayed) rather than route.deployment, which the
+	// API doesn't reliably populate.
 	const deploymentUrl = $derived(
-		parsed.prefix === 'deployment://' && route.deployment
+		parsed.prefix === 'deployment://' && parsed.value
 			? `/deployment/detail?project=${project}` +
 				`&location=${encodeURIComponent(route.location)}` +
-				`&name=${encodeURIComponent(route.deployment)}`
+				`&name=${encodeURIComponent(parsed.value)}`
 			: ''
 	)
 
