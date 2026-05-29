@@ -56,16 +56,23 @@ test.describe('route detail', () => {
 
 		await page.goto(detailUrl)
 
-		await expect(page.getByRole('heading', { name: 'Route detail' })).toBeVisible()
-		await expect(page.locator('#view-location')).toHaveValue('gke')
-		await expect(page.locator('#view-domain')).toHaveValue('example.com')
-		await expect(page.locator('#view-path')).toHaveValue('/')
-		// deployment://web is split into a friendly type + destination.
-		await expect(page.locator('#view-type')).toHaveValue('Deployment')
-		await expect(page.locator('#view-target')).toHaveValue('web')
-		await expect(page.locator('#view-auth')).toHaveValue('None')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Route detail' })).toBeVisible()
+
+		// The routing flow links the incoming URL out and the destination to its
+		// deployment detail page (name derived from the deployment:// target).
+		await expect(main.getByRole('link', { name: 'example.com/', exact: true }))
+			.toHaveAttribute('href', 'https://example.com/')
+		await expect(main.getByRole('link', { name: 'web', exact: true }))
+			.toHaveAttribute('href', '/deployment/detail?project=test-project&location=gke&name=web')
+
+		// deployment://web is split into a friendly Deployment type, and with no
+		// auth config the route reads as Public.
+		await expect(main.getByText('Deployment', { exact: true }).first()).toBeVisible()
+		await expect(main.getByText('Public', { exact: true }).first()).toBeVisible()
+
 		// Editing lives on a dedicated page; deleting stays here.
-		await expect(page.getByRole('link', { name: 'Edit' }))
+		await expect(page.locator('.page-head').getByRole('link', { name: 'Edit' }))
 			.toHaveAttribute('href', '/route/edit?project=test-project&location=gke&domain=example.com&path=%2F')
 		await expect(page.getByRole('button', { name: 'Delete route' })).toBeVisible()
 		// Read-only: no editable target/auth controls on the detail page.
