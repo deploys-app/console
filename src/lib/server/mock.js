@@ -178,6 +178,12 @@ const deployments = [
 	deployment('acme'),
 	{
 		...deployment('acme'),
+		name: 'web-paused',
+		status: 'success',
+		action: 'pause'
+	},
+	{
+		...deployment('acme'),
 		name: 'cron-cleanup',
 		type: 'CronJob',
 		schedule: '0 * * * *',

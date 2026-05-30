@@ -1,10 +1,17 @@
 <script>
 	/**
+	 * @typedef {'positive' | 'warning' | 'negative' | 'muted'} Tone
+	 */
+
+	/**
 	 * @typedef {Object} Option
 	 * @property {string | number} [value]
 	 * @property {string} [label]
 	 * @property {boolean} [disabled]
 	 * @property {boolean} [separator]
+	 * @property {Tone} [dot] leading status dot, colored by tone
+	 * @property {string} [badge] trailing pill text
+	 * @property {Tone} [badgeTone] pill color (defaults to muted)
 	 */
 
 	/**
@@ -298,7 +305,15 @@
 			{disabled}
 			onclick={() => (open ? close() : openMenu())}
 			onkeydown={onKeydown}>
-			<span class="select-value" class:is-placeholder={!hasSelection}>{displayLabel}</span>
+			<span class="select-value" class:is-placeholder={!hasSelection}>
+				{#if selectedOption?.dot}
+					<span class="select-dot" data-tone={selectedOption.dot}></span>
+				{/if}
+				<span class="truncate">{displayLabel}</span>
+				{#if selectedOption?.badge}
+					<span class="select-badge" data-tone={selectedOption.badgeTone ?? 'muted'}>{selectedOption.badge}</span>
+				{/if}
+			</span>
 			<i class="fa-solid fa-chevron-down select-chevron" class:is-open={open}></i>
 		</button>
 	{/if}
@@ -323,7 +338,13 @@
 						class:is-disabled={opt.disabled}
 						onmouseenter={() => { if (isSelectable(i)) activeIndex = i }}
 						onclick={() => commit(opt)}>
+						{#if opt.dot}
+							<span class="select-dot" data-tone={opt.dot}></span>
+						{/if}
 						<span class="truncate">{opt.label}</span>
+						{#if opt.badge}
+							<span class="select-badge" data-tone={opt.badgeTone ?? 'muted'}>{opt.badge}</span>
+						{/if}
 						{#if (opt.value ?? '') === value}
 							<i class="fa-solid fa-check select-check"></i>
 						{/if}
@@ -453,9 +474,54 @@
 	.select-value {
 		flex: 1;
 		min-width: 0;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.select-value .truncate,
+	.select-option .truncate {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.select-dot {
+		flex-shrink: 0;
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 9999px;
+		background: hsl(var(--hsl-content) / 0.35);
+	}
+
+	.select-dot[data-tone='positive'] { background: hsl(var(--hsl-positive)); }
+	.select-dot[data-tone='warning'] { background: hsl(var(--hsl-warning)); }
+	.select-dot[data-tone='negative'] { background: hsl(var(--hsl-negative)); }
+
+	.select-badge {
+		flex-shrink: 0;
+		padding: 0.05rem 0.4rem;
+		border-radius: 9999px;
+		font-size: 0.7rem;
+		font-weight: 600;
+		line-height: 1.25;
+		letter-spacing: 0.01em;
+		color: hsl(var(--hsl-content) / 0.7);
+		background: hsl(var(--hsl-content) / 0.1);
+	}
+
+	.select-badge[data-tone='warning'] {
+		color: hsl(var(--hsl-warning));
+		background: hsl(var(--hsl-warning) / 0.14);
+	}
+
+	.select-badge[data-tone='positive'] {
+		color: hsl(var(--hsl-positive));
+		background: hsl(var(--hsl-positive) / 0.14);
+	}
+
+	.select-badge[data-tone='negative'] {
+		color: hsl(var(--hsl-negative));
+		background: hsl(var(--hsl-negative) / 0.14);
 	}
 
 	.select-value.is-placeholder {

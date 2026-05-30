@@ -94,8 +94,24 @@
 		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
 	}[form.targetPrefix] || '')
 
-	/** @type {string[]} */
+	/** @type {{ name: string, paused: boolean }[]} */
 	let deployments = $state([])
+
+	// Paused deployments stay selectable so a route can be wired up ahead of a
+	// resume, but the picker flags them and we warn that traffic won't flow until
+	// the deployment is running again.
+	const deploymentOptions = $derived(deployments.map((d) => ({
+		value: d.name,
+		label: d.name,
+		dot: /** @type {'warning' | 'positive'} */ (d.paused ? 'warning' : 'positive'),
+		badge: d.paused ? 'Paused' : undefined,
+		badgeTone: /** @type {'warning'} */ ('warning')
+	})))
+
+	const selectedDeploymentPaused = $derived(
+		form.targetPrefix === 'deployment://' &&
+		deployments.some((d) => d.name === form.targetValue && d.paused)
+	)
 
 	async function fetchDeployments () {
 		deployments = []
@@ -109,7 +125,7 @@
 			.filter((/** @type {Api.Deployment} */ x) => x.location === route.location)
 			.filter((/** @type {Api.Deployment} */ x) => x.type === 'WebService')
 			.filter((/** @type {Api.Deployment} */ x) => x.ttl === 0)
-			.map((/** @type {Api.Deployment} */ x) => x.name)
+			.map((/** @type {Api.Deployment} */ x) => ({ name: x.name, paused: x.action === 'pause' }))
 	}
 
 	$effect(() => {
@@ -238,7 +254,13 @@
 					bind:value={form.targetValue}
 					required
 					placeholder="Select Deployment"
-					options={deployments.map((it) => ({ value: it, label: it }))} />
+					options={deploymentOptions} />
+				{#if selectedDeploymentPaused}
+					<p class="page-sub text-warning flex items-center gap-2">
+						<i class="fa-solid fa-triangle-exclamation"></i>
+						This deployment is paused — the route won’t serve traffic until you resume it.
+					</p>
+				{/if}
 			</div>
 		{:else}
 			<div class="field">
