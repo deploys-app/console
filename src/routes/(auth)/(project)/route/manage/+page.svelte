@@ -20,7 +20,7 @@
 	const fullUrl = $derived(`https://${route.domain}${route.path}`)
 
 	// Known target schemes (mirrors api.RouteTargetPrefix).
-	const targetPrefixes = ['deployment://', 'redirect://', 'ipfs://', 'ipns://', 'dnslink://']
+	const targetPrefixes = ['deployment://', 'redirect://', 'http://', 'ipfs://', 'ipns://', 'dnslink://']
 
 	/** @param {string | undefined} target */
 	function splitTarget (target) {
@@ -35,6 +35,7 @@
 		{
 			'deployment://': 'Deployment',
 			'redirect://': 'Redirect',
+			'http://': 'External server (HTTP)',
 			'ipfs://': 'IPFS',
 			'ipns://': 'IPNS',
 			'dnslink://': 'DNSLink'
@@ -44,6 +45,7 @@
 		{
 			'deployment://': 'fa-cube',
 			'redirect://': 'fa-arrow-right-arrow-left',
+			'http://': 'fa-server',
 			'ipfs://': 'fa-cubes',
 			'ipns://': 'fa-cubes',
 			'dnslink://': 'fa-link'

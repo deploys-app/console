@@ -27,7 +27,12 @@
 	})
 
 	const targetPlaceholder = $derived({
-		'redirect://': 'https://example.com'
+		'redirect://': 'https://example.com',
+		'http://': '203.0.113.10:8080'
+	}[form.targetPrefix] || '')
+
+	const targetHint = $derived({
+		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
 	}[form.targetPrefix] || '')
 
 	/** @type {Api.Domain[]} */
@@ -189,7 +194,8 @@
 					placeholder="Select Type"
 					options={[
 						{ value: 'deployment://', label: 'Deployment' },
-						{ value: 'redirect://', label: 'Redirect' }
+						{ value: 'redirect://', label: 'Redirect' },
+						{ value: 'http://', label: 'External server (HTTP)' }
 					]} />
 			</div>
 
@@ -209,6 +215,9 @@
 					<div class="input">
 						<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
 					</div>
+					{#if targetHint}
+						<p class="page-sub">{targetHint}</p>
+					{/if}
 				</div>
 			{/if}
 
