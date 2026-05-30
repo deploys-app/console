@@ -182,4 +182,79 @@ test.describe('route edit', () => {
 		await page.locator('#input-target_deployment').click()
 		await expect(page.getByRole('option', { name: 'web' })).toBeVisible()
 	})
+
+	test('flags a paused deployment and warns once it is selected', async ({ page }) => {
+		await setMocks({
+			'route.get': { ok: true, result: sampleRoute },
+			'deployment.list': {
+				ok: true,
+				result: {
+					items: [
+						sampleDeployment,
+						{ ...sampleDeployment, name: 'web-paused', action: 'pause' }
+					]
+				}
+			}
+		})
+
+		await page.goto(editUrl)
+
+		await page.locator('#input-target_deployment').click()
+		// The paused deployment stays selectable but carries a Paused badge.
+		const pausedOption = page.getByRole('option', { name: /web-paused/ })
+		await expect(pausedOption.getByText('Paused', { exact: true })).toBeVisible()
+
+		// Selecting it surfaces the inline warning; a running deployment doesn't.
+		const warning = page.getByText(/won.t serve traffic until you resume it/)
+		await pausedOption.click()
+		await expect(warning).toBeVisible()
+
+		await page.locator('#input-target_deployment').click()
+		await page.getByRole('option', { name: 'web', exact: true }).click()
+		await expect(warning).toHaveCount(0)
+	})
+})
+
+test.describe('route create — deployment picker', () => {
+	const createUrl = '/route/create?project=test-project'
+
+	/** @param {import('@playwright/test').Page} page */
+	async function pickDeploymentTarget (page) {
+		await page.goto(createUrl)
+		await page.locator('#input-location').click()
+		await page.getByRole('option', { name: 'gke' }).click()
+		await page.locator('#input-target_prefix').click()
+		await page.getByRole('option', { name: 'Deployment', exact: true }).click()
+		await page.locator('#input-target_deployment').click()
+	}
+
+	test('badges paused deployments and warns when one is chosen', async ({ page }) => {
+		await setMocks({
+			'deployment.list': {
+				ok: true,
+				result: {
+					items: [
+						sampleDeployment,
+						{ ...sampleDeployment, name: 'web-paused', action: 'pause' }
+					]
+				}
+			}
+		})
+
+		await pickDeploymentTarget(page)
+
+		const runningOption = page.getByRole('option', { name: 'web', exact: true })
+		const pausedOption = page.getByRole('option', { name: /web-paused/ })
+		await expect(runningOption).toBeVisible()
+		await expect(pausedOption.getByText('Paused', { exact: true })).toBeVisible()
+
+		const warning = page.getByText(/won.t serve traffic until you resume it/)
+
+		await runningOption.click()
+		await expect(warning).toHaveCount(0)
+
+		await page.locator('#input-target_deployment').click()
+		await pausedOption.click()
+		await expect(warning).toBeVisible()
+	})
 })
