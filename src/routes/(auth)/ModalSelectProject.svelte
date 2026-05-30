@@ -24,7 +24,8 @@
 		const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
 		if (!tokens.length) return projects
 		return projects.filter((it) => {
-			const haystack = `${it.name} ${it.project}`.toLowerCase()
+			// `it.id` is the numeric project number — searchable but not shown.
+			const haystack = `${it.name} ${it.project} ${it.id}`.toLowerCase()
 			return tokens.every((t) => haystack.includes(t))
 		})
 	})

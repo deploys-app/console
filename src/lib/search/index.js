@@ -10,6 +10,7 @@ import { projectMenu } from '$lib/nav'
  * @property {string} icon      Font Awesome class, e.g. `fa-rocket`
  * @property {string} label     primary text (the thing you'd type)
  * @property {string} [sublabel] secondary text (location, target, …)
+ * @property {string} [keywords] extra text folded into search only, never shown
  * @property {string} href      navigation target
  */
 
@@ -177,6 +178,8 @@ export function projectEntries (projects, currentProject, page) {
 				icon: 'fa-folder-open',
 				label: p.name,
 				sublabel: p.project,
+				// `p.id` is the numeric project number — searchable but not shown.
+				keywords: p.id,
 				href: `${overrideRedirect}?${q.toString()}`
 			})
 		})
@@ -244,7 +247,7 @@ export function filterEntries (entries, query) {
 	const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
 	if (!tokens.length) return entries
 	return entries.filter((e) => {
-		const haystack = `${e.label} ${e.sublabel ?? ''} ${e.group}`.toLowerCase()
+		const haystack = `${e.label} ${e.sublabel ?? ''} ${e.keywords ?? ''} ${e.group}`.toLowerCase()
 		return tokens.every((t) => haystack.includes(t))
 	})
 }
