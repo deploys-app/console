@@ -15,10 +15,11 @@
 		`&domain=${encodeURIComponent(route.domain)}` +
 		`&path=${encodeURIComponent(route.path)}`)
 
-	// Known target schemes (mirrors api.RouteTargetPrefix). Only deployment +
-	// redirect are creatable in-console; the rest are parsed so an existing
-	// route round-trips unchanged even though they aren't offered in the picker.
-	const targetPrefixes = ['deployment://', 'redirect://', 'ipfs://', 'ipns://', 'dnslink://']
+	// Known target schemes. deployment + redirect + http (external server) are
+	// creatable in-console; the ipfs/ipns/dnslink schemes are parsed so an
+	// existing route round-trips unchanged even though they aren't offered in
+	// the picker. http:// is validated server-side (api.validExternalTarget).
+	const targetPrefixes = ['deployment://', 'redirect://', 'http://', 'ipfs://', 'ipns://', 'dnslink://']
 
 	/** @param {string | undefined} target */
 	function splitTarget (target) {
@@ -75,7 +76,8 @@
 	const typeOptions = $derived.by(() => {
 		const base = [
 			{ value: 'deployment://', label: 'Deployment' },
-			{ value: 'redirect://', label: 'Redirect' }
+			{ value: 'redirect://', label: 'Redirect' },
+			{ value: 'http://', label: 'External server (HTTP)' }
 		]
 		if (!base.some((o) => o.value === form.targetPrefix)) {
 			base.unshift({ value: form.targetPrefix, label: form.targetPrefix })
@@ -84,7 +86,12 @@
 	})
 
 	const targetPlaceholder = $derived({
-		'redirect://': 'https://example.com'
+		'redirect://': 'https://example.com',
+		'http://': '203.0.113.10:8080'
+	}[form.targetPrefix] || '')
+
+	const targetHint = $derived({
+		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
 	}[form.targetPrefix] || '')
 
 	/** @type {string[]} */
@@ -239,6 +246,9 @@
 				<div class="input">
 					<input id="input-target_value" bind:value={form.targetValue} placeholder={targetPlaceholder} required>
 				</div>
+				{#if targetHint}
+					<p class="page-sub">{targetHint}</p>
+				{/if}
 			</div>
 		{/if}
 
