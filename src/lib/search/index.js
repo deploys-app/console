@@ -207,6 +207,11 @@ export function navEntries (project) {
  * results into search entries. Endpoints that fail (e.g. no permission) are
  * skipped silently so one forbidden resource never blanks the whole palette.
  *
+ * Calls go through `invoke` with `{ silent: true }`: this is a best-effort
+ * background fan-out, so a single transient `api: unauthorized` (e.g. one of the
+ * parallel requests hitting a momentary backend/DB blip) must NOT fire the
+ * global `onUnauth` handler and reload the whole app out from under the user.
+ *
  * @param {string} project
  * @param {typeof fetch} fetch
  * @returns {Promise<SearchEntry[]>}
@@ -215,7 +220,7 @@ export async function fetchResourceEntries (project, fetch) {
 	const settled = await Promise.all(resourceSources.map(async (src) => {
 		try {
 			/** @type {Api.Response<Api.List<any>>} */
-			const res = await api.invoke(src.fn, { project }, fetch)
+			const res = await api.invoke(src.fn, { project }, fetch, { silent: true })
 			const items = res.result?.items ?? []
 			return items.map((it) => {
 				const m = src.map(it, project)

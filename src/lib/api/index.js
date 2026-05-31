@@ -10,9 +10,13 @@ let onUnauth
  * @param {string} fn
  * @param {Object} args
  * @param {fetch} fetch
+ * @param {{ silent?: boolean }} [opts] when `silent`, an unauthorized response
+ *   is flagged on the result but the global `onUnauth` handler is NOT fired.
+ *   Use it for best-effort / background fan-outs (e.g. the search palette) where
+ *   a single transient unauthorized must not reload the whole app.
  * @returns {Promise<Api.Response<T>>}
  */
-async function invoke (fn, args, fetch) {
+async function invoke (fn, args, fetch, opts) {
 	const resp = await fetch(`${endpoint}/${fn}`, {
 		method: 'POST',
 		body: JSON.stringify(args || {}),
@@ -27,7 +31,9 @@ async function invoke (fn, args, fetch) {
 		switch (msg) {
 		case 'api: unauthorized':
 			body.error.unauth = true
-			onUnauth?.()
+			if (!opts?.silent) {
+				onUnauth?.()
+			}
 			break
 		case 'api: forbidden':
 			body.error.forbidden = true
