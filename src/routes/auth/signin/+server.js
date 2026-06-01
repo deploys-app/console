@@ -30,7 +30,7 @@ export async function GET ({ cookies, url }) {
 	cookies.set('state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,
-		sameSite: 'none',
+		sameSite: 'lax',
 		path: '/',
 		secure: import.meta.env.PROD
 	})
@@ -38,8 +38,7 @@ export async function GET ({ cookies, url }) {
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: `${authEndpoint}/?${q.toString()}`,
-			'cache-control': 'no-store'
+			location: `${authEndpoint}/?${q.toString()}`
 		}
 	})
 }
