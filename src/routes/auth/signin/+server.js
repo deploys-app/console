@@ -14,8 +14,24 @@ function randomState () {
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
+/**
+ * Safari / iOS WebKit drops a `Set-Cookie` carried on a response that redirects
+ * cross-origin, so those browsers lose the `state` cookie when /auth/signin
+ * 302's straight to auth.deploys.app. They need the same-origin cookie-commit
+ * interstitial. Chromium (Chrome/Edge/Opera) and Firefox on desktop are
+ * unaffected and keep the faster direct redirect. All iOS browsers are WebKit,
+ * so they're included regardless of brand.
+ * @param {string | null} ua
+ * @returns {boolean}
+ */
+function isWebKit (ua) {
+	if (!ua) return false
+	if (/iPhone|iPad|iPod/.test(ua)) return true
+	return /\bSafari\b/.test(ua) && /\bVersion\//.test(ua) && !/Chrom(e|ium)|Android|Edg\//.test(ua)
+}
+
 /** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET ({ cookies, url }) {
+export async function GET ({ cookies, url, request }) {
 	const state = randomState()
 
 	const callback = new URL(url.toString())
@@ -42,19 +58,29 @@ export async function GET ({ cookies, url }) {
 		secure: import.meta.env.PROD
 	})
 
-	// Stable WebKit (Safari) does NOT persist a Set-Cookie carried on a response
-	// that immediately redirects cross-origin, so 302'ing straight to
-	// auth.deploys.app dropped the `state` cookie and the callback then saw no
-	// cookie ("invalid state"). Commit the cookie on a normal same-origin 200,
-	// then redirect to the auth host from the client.
 	const authUrl = `${authEndpoint}/?${q.toString()}`
-	const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
-	const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
 
-	return new Response(html, {
-		status: 200,
+	// Safari/WebKit drops a Set-Cookie carried on a cross-origin redirect, so the
+	// `state` cookie set above would be lost if we 302'd straight to the auth
+	// host. For those browsers, commit the cookie on a normal same-origin 200 and
+	// redirect from the client; everyone else keeps the faster direct 302.
+	if (isWebKit(request.headers.get('user-agent'))) {
+		const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
+		const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
+
+		return new Response(html, {
+			status: 200,
+			headers: {
+				'content-type': 'text/html; charset=utf-8',
+				'cache-control': 'no-store'
+			}
+		})
+	}
+
+	return new Response(undefined, {
+		status: 302,
 		headers: {
-			'content-type': 'text/html; charset=utf-8',
+			location: authUrl,
 			'cache-control': 'no-store'
 		}
 	})
