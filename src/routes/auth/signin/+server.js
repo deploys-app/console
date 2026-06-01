@@ -53,26 +53,18 @@ export async function GET ({ cookies, url, request }) {
 		webkit
 	}))
 
-	// Safari/WebKit needs two things the other engines don't:
-	//   1. SameSite=None+Secure, so the cookie is sent back on the cross-site
-	//      OAuth redirect to /auth/callback. WebKit does NOT send a SameSite=Lax
-	//      cookie on a cross-site redirect (that's why the Lax `state` was
-	//      dropped while the attribute-less `project` cookie — unrestricted in
-	//      Safari — came through).
-	//   2. The cookie committed on a same-origin 200 (below), because WebKit
-	//      drops a Set-Cookie carried on a cross-origin redirect response.
-	// Other engines keep the more conservative Lax + a direct 302.
-	cookies.set('state', state, {
-		httpOnly: true,
-		maxAge: 60 * 60,
-		sameSite: webkit ? 'none' : 'lax',
-		path: '/',
-		secure: webkit || import.meta.env.PROD
-	})
-
 	const authUrl = `${authEndpoint}/?${q.toString()}`
 
 	if (webkit) {
+		// Safari/WebKit needs the state cookie to (1) be committed on a
+		// same-origin 200 — WebKit drops a Set-Cookie carried on a cross-origin
+		// redirect — and (2) carry NO SameSite attribute. Safari sends
+		// attribute-less cookies across the cross-site OAuth redirect to
+		// /auth/callback, but withholds SameSite=Lax on cross-site redirects and
+		// treats SameSite=None as Strict in some versions — both get dropped.
+		// This mirrors the unrestricted `project` cookie, which is the one cookie
+		// that does come through. SvelteKit's cookies.set always emits a SameSite,
+		// so write the header by hand. (`state` is hex, safe as a raw value.)
 		const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
 		const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
 
@@ -80,10 +72,19 @@ export async function GET ({ cookies, url, request }) {
 			status: 200,
 			headers: {
 				'content-type': 'text/html; charset=utf-8',
-				'cache-control': 'no-store'
+				'cache-control': 'no-store',
+				'set-cookie': `state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`
 			}
 		})
 	}
+
+	cookies.set('state', state, {
+		httpOnly: true,
+		maxAge: 60 * 60,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
 
 	return new Response(undefined, {
 		status: 302,
