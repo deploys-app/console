@@ -27,6 +27,13 @@ export async function GET ({ cookies, url }) {
 	q.set('redirect_uri', callback.toString())
 	q.set('state', state)
 
+	// TEMPORARY diagnostic — remove once the Safari "invalid state" issue is
+	// understood. `secure` must be true for SameSite=None to be stored at all.
+	console.warn('[auth-debug] signin ' + JSON.stringify({
+		state,
+		secure: import.meta.env.PROD
+	}))
+
 	cookies.set('state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,

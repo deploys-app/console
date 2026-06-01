@@ -3,9 +3,19 @@ import { env } from '$env/dynamic/private'
 const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 
 /** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET ({ cookies, url }) {
+export async function GET ({ cookies, url, request }) {
 	const state = url.searchParams.get('state') ?? ''
 	const code = url.searchParams.get('code') ?? ''
+
+	// TEMPORARY diagnostic — remove once the Safari "invalid state" issue is
+	// understood. Logs what the server actually receives vs the URL.
+	const cookieState = cookies.get('state')
+	console.warn('[auth-debug] callback ' + JSON.stringify({
+		urlState: state,
+		cookieState: cookieState ?? null,
+		match: state === cookieState,
+		rawCookie: request.headers.get('cookie')
+	}))
 
 	if (state !== cookies.get('state')) {
 		return new Response('invalid state', { status: 400 })
