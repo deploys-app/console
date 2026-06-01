@@ -73,12 +73,12 @@ export async function GET ({ cookies, url, request }) {
 			headers: {
 				'content-type': 'text/html; charset=utf-8',
 				'cache-control': 'no-store',
-				'set-cookie': `state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`
+				'set-cookie': `oauth_state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`
 			}
 		})
 	}
 
-	cookies.set('state', state, {
+	cookies.set('oauth_state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,
 		sameSite: 'lax',
