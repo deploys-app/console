@@ -49,4 +49,52 @@ test.describe('invoice detail', () => {
 		const memRow = page.locator('table tbody tr', { hasText: 'GiB-hours' })
 		await expect(memRow.locator('td').nth(3)).toHaveText('0.50 USD')
 	})
+
+	test('shows the discount column as a negative currency value (em dash when zero)', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		// Columns: Description, Quantity, Unit, Unit price, Discount, Amount.
+		const memRow = page.locator('table tbody tr', { hasText: 'GiB-hours' })
+		await expect(memRow.locator('td').nth(3)).toHaveText('0.50 USD') // list rate
+		await expect(memRow.locator('td').nth(4)).toHaveText('-0.25 USD') // discount
+		await expect(memRow.locator('td').nth(5)).toHaveText('0.75 USD') // amount
+
+		// No discount → em dash, not "0.00".
+		const cpuRow = page.locator('table tbody tr', { hasText: 'vCPU-seconds' })
+		await expect(cpuRow.locator('td').nth(4)).toHaveText('—')
+	})
+
+	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice },
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			// arpc encodes an unexpected server error as a blank body on a 500.
+			'billing.downloadInvoice': { __status: 500, ok: false, error: {} }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Download PDF' }).click()
+
+		// The empty error must not produce a blank "Oops…" dialog.
+		await expect(page.locator('.swal2-popup')).toBeVisible()
+		await expect(page.locator('#swal2-html-container')).toHaveText(/server error \(500\)/)
+	})
+
+	test('shows the API message when PDF download returns a typed error', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice },
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			'billing.downloadInvoice': { ok: false, error: { message: 'api: invoice pdf export is not available' } }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Download PDF' }).click()
+
+		await expect(page.locator('#swal2-html-container')).toHaveText(/invoice pdf export is not available/)
+	})
 })
