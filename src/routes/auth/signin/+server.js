@@ -68,17 +68,24 @@ export async function GET ({ cookies, url, request }) {
 		const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
 		const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
 
-		return new Response(html, {
-			status: 200,
-			headers: {
-				'content-type': 'text/html; charset=utf-8',
-				'cache-control': 'no-store',
-				'set-cookie': `oauth_state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`
-			}
+		const headers = new Headers({
+			'content-type': 'text/html; charset=utf-8',
+			'cache-control': 'no-store'
 		})
+		// DIAGNOSTIC: set both names to see which survives the edge/runtime.
+		headers.append('set-cookie', `oauth_state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`)
+		headers.append('set-cookie', `state=${state}; Max-Age=3600; Path=/; HttpOnly; Secure`)
+		return new Response(html, { status: 200, headers })
 	}
 
 	cookies.set('oauth_state', state, {
+		httpOnly: true,
+		maxAge: 60 * 60,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
+	cookies.set('state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,
 		sameSite: 'lax',

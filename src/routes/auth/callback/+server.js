@@ -9,11 +9,10 @@ export async function GET ({ cookies, url, request }) {
 
 	// TEMPORARY diagnostic — remove once the Safari "invalid state" issue is
 	// understood. Logs what the server actually receives vs the URL.
-	const cookieState = cookies.get('oauth_state')
 	console.warn('[auth-debug] callback ' + JSON.stringify({
 		urlState: state,
-		cookieState: cookieState ?? null,
-		match: state === cookieState,
+		oauth_state: cookies.get('oauth_state') ?? null,
+		state: cookies.get('state') ?? null,
 		rawCookie: request.headers.get('cookie')
 	}))
 
