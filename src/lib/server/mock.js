@@ -518,7 +518,8 @@ const invoices = [
 		createdAt: '2026-06-01T00:00:00Z',
 		lineItems: [
 			{ sku: 'cpu', description: 'vCPU-hours', quantity: 600, unit: 'hour', unitPrice: 1.5, amount: 900 },
-			{ sku: 'mem', description: 'GiB-hours', quantity: 600, unit: 'hour', unitPrice: 0.5, amount: 300 }
+			{ sku: 'mem', description: 'GiB-hours', quantity: 600, unit: 'hour', unitPrice: 0.5, amount: 300 },
+			{ sku: 'cpu-sec', description: 'vCPU-seconds', quantity: 2160000, unit: 'second', unitPrice: 0.0000125, amount: 27 }
 		]
 	},
 	{

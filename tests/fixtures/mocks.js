@@ -285,6 +285,33 @@ export const sampleBillingAccount = {
 	active: true
 }
 
+export const sampleInvoice = {
+	id: 'inv-1',
+	billingAccountId: 'ba-1',
+	number: 'INV-2024-001',
+	currency: 'USD',
+	periodStart: '2024-01-01T00:00:00Z',
+	periodEnd: '2024-02-01T00:00:00Z',
+	subtotal: 10,
+	taxRate: 0.07,
+	taxAmount: 0.7,
+	total: 10.7,
+	status: 'open',
+	taxId: '',
+	taxName: 'Acme Co',
+	taxAddress: '',
+	issuedAt: now,
+	paidAt: '0001-01-01T00:00:00Z',
+	voidedAt: '0001-01-01T00:00:00Z',
+	createdAt: now,
+	lineItems: [
+		// A tiny per-second rate: rounds to 0.00 at 2 decimals, so the detail
+		// page must widen precision to keep it visible.
+		{ sku: 'cpu', description: 'vCPU-seconds', quantity: 720000, unit: 'second', unitPrice: 0.0000125, amount: 9 },
+		{ sku: 'mem', description: 'GiB-hours', quantity: 2, unit: 'hour', unitPrice: 0.5, amount: 1 }
+	]
+}
+
 export const sampleRepository = {
 	name: 'web',
 	size: 12345678,
