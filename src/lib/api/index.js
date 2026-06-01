@@ -63,13 +63,6 @@ async function invoke (fn, args, fetch, opts) {
 			}
 			break
 		}
-		// Guarantee a human-facing message even when the error carries none —
-		// e.g. arpc encodes an unexpected server error as a blank `{}` on a 500,
-		// which would otherwise surface as an empty modal.
-		if (!body.error) body.error = {}
-		if (!body.error.message) {
-			body.error.message = resp.ok ? 'api: unexpected error' : `api: server error (${resp.status})`
-		}
 	}
 	return body
 }

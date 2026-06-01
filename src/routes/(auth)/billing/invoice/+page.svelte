@@ -25,7 +25,10 @@
 			/** @type {Api.Response<Api.InvoiceDownloadResult>} */
 			const resp = await api.invoke('billing.downloadInvoice', { invoiceId: invoice.id }, fetch)
 			if (!resp.ok || !resp.result) {
-				modal.error({ error: resp.error })
+				// Show the API's message when present (e.g. the PDF-unavailable
+				// error), else a clear fallback — arpc returns a blank `{}` for
+				// unexpected 500s, which would otherwise be an empty modal.
+				modal.error({ error: resp.error?.message ? resp.error : 'Could not download the invoice PDF. Please try again.' })
 				return
 			}
 			// The dropbox link serves the file as an attachment, so navigating

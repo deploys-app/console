@@ -82,7 +82,7 @@ test.describe('invoice detail', () => {
 
 		// The empty error must not produce a blank "Oops…" dialog.
 		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('#swal2-html-container')).toHaveText(/server error \(500\)/)
+		await expect(page.locator('#swal2-html-container')).toHaveText(/Could not download the invoice PDF/)
 	})
 
 	test('shows the API message when PDF download returns a typed error', async ({ page }) => {
