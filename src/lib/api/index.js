@@ -25,7 +25,20 @@ async function invoke (fn, args, fetch, opts) {
 		}
 	})
 
-	const body = await resp.json()
+	// A failed upstream (or the proxy itself) can answer with a non-JSON body —
+	// e.g. a gateway/ingress HTML error page on a 5xx. Parsing then throws, which
+	// would escape every caller. Fall back to a synthesized error envelope so the
+	// result shape is always `Api.Response`.
+	let body
+	try {
+		body = await resp.json()
+	} catch {
+		body = null
+	}
+	if (!body || typeof body !== 'object') {
+		return { ok: false, error: { message: `api: server error (${resp.status})` } }
+	}
+
 	if (!body.ok) {
 		const msg = body.error?.message || ''
 		switch (msg) {

@@ -430,7 +430,10 @@ declare namespace Api {
         description: string
         quantity: number
         unit: string
+        // unitPrice is the SKU list rate per unit (before discount).
         unitPrice: number
+        // discount, in the invoice currency: amount = unitPrice*quantity - discount.
+        discount: number
         amount: number
     }
 
