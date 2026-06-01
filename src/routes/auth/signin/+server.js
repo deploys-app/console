@@ -37,15 +37,24 @@ export async function GET ({ cookies, url }) {
 	cookies.set('state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,
-		sameSite: 'none',
+		sameSite: 'lax',
 		path: '/',
 		secure: import.meta.env.PROD
 	})
 
-	return new Response(undefined, {
-		status: 302,
+	// Stable WebKit (Safari) does NOT persist a Set-Cookie carried on a response
+	// that immediately redirects cross-origin, so 302'ing straight to
+	// auth.deploys.app dropped the `state` cookie and the callback then saw no
+	// cookie ("invalid state"). Commit the cookie on a normal same-origin 200,
+	// then redirect to the auth host from the client.
+	const authUrl = `${authEndpoint}/?${q.toString()}`
+	const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
+	const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
+
+	return new Response(html, {
+		status: 200,
 		headers: {
-			location: `${authEndpoint}/?${q.toString()}`,
+			'content-type': 'text/html; charset=utf-8',
 			'cache-control': 'no-store'
 		}
 	})
