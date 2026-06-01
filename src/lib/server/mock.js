@@ -517,10 +517,10 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-06-01T00:00:00Z',
 		lineItems: [
-			// unitPrice is the list rate; amount = unitPrice*quantity - discount.
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 600, unit: 'hour', unitPrice: 1.5, discount: 0, amount: 900 },
-			{ sku: 'mem', description: 'GiB-hours', quantity: 600, unit: 'hour', unitPrice: 0.5, discount: 50, amount: 250 },
-			{ sku: 'cpu-sec', description: 'vCPU-seconds', quantity: 2160000, unit: 'second', unitPrice: 0.0000125, discount: 0, amount: 27 }
+			// quantity is the billed usage (free tier already deducted); amount = unitPrice*quantity.
+			{ sku: 'cpu', description: 'vCPU-hours', quantity: 600, unit: 'hour', unitPrice: 1.5, amount: 900 },
+			{ sku: 'mem', description: 'GiB-hours', quantity: 500, unit: 'hour', unitPrice: 0.5, amount: 250 },
+			{ sku: 'cpu-sec', description: 'vCPU-seconds', quantity: 2160000, unit: 'second', unitPrice: 0.0000125, amount: 27 }
 		]
 	},
 	{
