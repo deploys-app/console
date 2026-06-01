@@ -50,25 +50,6 @@ test.describe('invoice detail', () => {
 		await expect(memRow.locator('td').nth(3)).toHaveText('0.50 USD')
 	})
 
-	test('shows the discount column as a negative currency value (em dash when zero)', async ({ page }) => {
-		await setMocks({
-			'billing.getInvoice': { ok: true, result: sampleInvoice },
-			'billing.get': { ok: true, result: sampleBillingAccount }
-		})
-
-		await page.goto('/billing/invoice?id=inv-1')
-
-		// Columns: Description, Quantity, Unit, Unit price, Discount, Amount.
-		const memRow = page.locator('table tbody tr', { hasText: 'GiB-hours' })
-		await expect(memRow.locator('td').nth(3)).toHaveText('0.50 USD') // list rate
-		await expect(memRow.locator('td').nth(4)).toHaveText('-0.25 USD') // discount
-		await expect(memRow.locator('td').nth(5)).toHaveText('0.75 USD') // amount
-
-		// No discount → em dash, not "0.00".
-		const cpuRow = page.locator('table tbody tr', { hasText: 'vCPU-seconds' })
-		await expect(cpuRow.locator('td').nth(4)).toHaveText('—')
-	})
-
 	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: sampleInvoice },

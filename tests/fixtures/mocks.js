@@ -307,10 +307,9 @@ export const sampleInvoice = {
 	lineItems: [
 		// A tiny per-second rate: rounds to 0.00 at 2 decimals, so the detail
 		// page must widen precision to keep it visible.
-		{ sku: 'cpu', description: 'vCPU-seconds', quantity: 720000, unit: 'second', unitPrice: 0.0000125, discount: 0, amount: 9 },
-		// unitPrice is the list rate; the free-tier discount lowers amount:
-		// 0.5*2 - 0.25 = 0.75.
-		{ sku: 'mem', description: 'GiB-hours', quantity: 2, unit: 'hour', unitPrice: 0.5, discount: 0.25, amount: 0.75 }
+		{ sku: 'cpu', description: 'vCPU-seconds', quantity: 720000, unit: 'second', unitPrice: 0.0000125, amount: 9 },
+		// quantity is the billed usage (free tier deducted); amount = unitPrice*quantity.
+		{ sku: 'mem', description: 'GiB-hours', quantity: 2, unit: 'hour', unitPrice: 0.5, amount: 1 }
 	]
 }
 

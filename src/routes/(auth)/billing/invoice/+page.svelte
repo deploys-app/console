@@ -213,7 +213,6 @@
 						<th class="is-align-right">Quantity</th>
 						<th>Unit</th>
 						<th class="is-align-right">Unit price</th>
-						<th class="is-align-right">Discount</th>
 						<th class="is-align-right">Amount</th>
 					</tr>
 				</thead>
@@ -224,12 +223,11 @@
 							<td class="is-align-right">{quantity(it.quantity)}</td>
 							<td>{it.unit}</td>
 							<td class="is-align-right">{unitPrice(it.unitPrice)}</td>
-							<td class="is-align-right">{it.discount ? `-${money(it.discount)}` : '—'}</td>
 							<td class="is-align-right">{money(it.amount)}</td>
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="6" class="text-content/60">No line items</td>
+							<td colspan="5" class="text-content/60">No line items</td>
 						</tr>
 					{/each}
 				</tbody>

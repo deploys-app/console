@@ -428,12 +428,11 @@ declare namespace Api {
     export type InvoiceLineItem = {
         sku: string
         description: string
+        // quantity is the billed usage, free-tier units already deducted.
         quantity: number
         unit: string
-        // unitPrice is the SKU list rate per unit (before discount).
+        // unitPrice is the per-unit rate; amount = unitPrice*quantity.
         unitPrice: number
-        // discount, in the invoice currency: amount = unitPrice*quantity - discount.
-        discount: number
         amount: number
     }
 
