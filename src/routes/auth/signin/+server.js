@@ -43,28 +43,36 @@ export async function GET ({ cookies, url, request }) {
 	q.set('redirect_uri', callback.toString())
 	q.set('state', state)
 
+	const webkit = isWebKit(request.headers.get('user-agent'))
+
 	// TEMPORARY diagnostic — remove once the Safari "invalid state" issue is
-	// understood. `secure` must be true for SameSite=None to be stored at all.
+	// understood.
 	console.warn('[auth-debug] signin ' + JSON.stringify({
 		state,
-		secure: import.meta.env.PROD
+		secure: import.meta.env.PROD,
+		webkit
 	}))
 
+	// Safari/WebKit needs two things the other engines don't:
+	//   1. SameSite=None+Secure, so the cookie is sent back on the cross-site
+	//      OAuth redirect to /auth/callback. WebKit does NOT send a SameSite=Lax
+	//      cookie on a cross-site redirect (that's why the Lax `state` was
+	//      dropped while the attribute-less `project` cookie — unrestricted in
+	//      Safari — came through).
+	//   2. The cookie committed on a same-origin 200 (below), because WebKit
+	//      drops a Set-Cookie carried on a cross-origin redirect response.
+	// Other engines keep the more conservative Lax + a direct 302.
 	cookies.set('state', state, {
 		httpOnly: true,
 		maxAge: 60 * 60,
-		sameSite: 'lax',
+		sameSite: webkit ? 'none' : 'lax',
 		path: '/',
-		secure: import.meta.env.PROD
+		secure: webkit || import.meta.env.PROD
 	})
 
 	const authUrl = `${authEndpoint}/?${q.toString()}`
 
-	// Safari/WebKit drops a Set-Cookie carried on a cross-origin redirect, so the
-	// `state` cookie set above would be lost if we 302'd straight to the auth
-	// host. For those browsers, commit the cookie on a normal same-origin 200 and
-	// redirect from the client; everyone else keeps the faster direct 302.
-	if (isWebKit(request.headers.get('user-agent'))) {
+	if (webkit) {
 		const safeAuthUrl = JSON.stringify(authUrl).replace(/</g, '\\u003c')
 		const html = `<!doctype html><html><head><meta charset="utf-8"><title>Signing in…</title><script>location.replace(${safeAuthUrl})</script><noscript><meta http-equiv="refresh" content="0;url=${authUrl.replace(/"/g, '%22')}"></noscript></head><body></body></html>`
 
