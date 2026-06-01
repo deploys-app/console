@@ -36,13 +36,13 @@ export async function GET ({ cookies, url }) {
 	cookies.set('token', token, {
 		httpOnly: true,
 		maxAge: 60 * 60 * 24 * 7,
-		sameSite: 'lax',
+		sameSite: 'none',
 		path: '/',
 		secure: import.meta.env.PROD
 	})
 	cookies.delete('state', {
 		httpOnly: true,
-		sameSite: 'lax',
+		sameSite: 'none',
 		path: '/',
 		secure: import.meta.env.PROD
 	})
@@ -50,7 +50,8 @@ export async function GET ({ cookies, url }) {
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: '/'
+			location: '/',
+			'cache-control': 'no-store'
 		}
 	})
 }
