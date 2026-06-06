@@ -253,7 +253,7 @@
 		{/if}
 	</div>
 
-	<div class="summary-grid">
+	<div class="summary-grid" class:is-loading={loading}>
 		<div class="summary-card is-primary">
 			<div class="summary-label">Total billing</div>
 			<div class="summary-value">
@@ -276,7 +276,7 @@
 				<i class="fa-solid fa-spinner-third fa-spin text-content/60"></i>
 			{/if}
 		</div>
-		{#if !report}
+		{#if loading || !report}
 			<div class="chart-loading">
 				<i class="fa-solid fa-spinner-third fa-spin"></i>
 			</div>
@@ -301,7 +301,7 @@
 
 	<div class="panel is-level-300">
 		<h5 class="mb-4"><strong>Breakdown</strong></h5>
-		<div class="table-container">
+		<div class="table-container" class:is-loading={loading}>
 			<table class="table">
 				<thead>
 					<tr>
@@ -556,6 +556,12 @@
 		font-size: 0.9375rem;
 		font-weight: 600;
 		color: hsl(var(--hsl-content) / 0.7);
+	}
+
+	.is-loading {
+		opacity: 0.45;
+		pointer-events: none;
+		transition: opacity 0.15s ease;
 	}
 
 	.chart-loading {
