@@ -9,7 +9,9 @@ ADD svelte.config.js ./
 RUN bun install --frozen-lockfile
 ADD . .
 RUN bun run build
-#RUN sed -i'' -e "s/import http from 'http'/import http from 'http2'/g" build/index.js
+# Serve the build over h2c (cleartext HTTP/2) instead of adapter-node's HTTP/1.1
+# entrypoint. server.js lives next to handler.js/env.js inside the build output.
+RUN cp server.js build/server.js
 
 FROM oven/bun:1.3.14-distroless
 
@@ -19,4 +21,4 @@ ENV ADDRESS_HEADER=X-Real-Ip
 
 WORKDIR /app
 COPY --from=0 /workspace/build .
-CMD ["index.js"]
+CMD ["server.js"]
