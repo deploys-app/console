@@ -584,7 +584,7 @@
 							Review the errors below and confirm your records still match.
 						</p>
 					{:else}
-						<p>Your domain is verified and serving traffic through the CDN.</p>
+						<p>Your domain is verified and serving traffic.</p>
 					{/if}
 				</div>
 
@@ -621,9 +621,10 @@
 					<span class="spec__label">Type</span>
 					<span class="spec__value">
 						<span class="chips">
-							<span class="tag is-on"><i class="fa-solid fa-bolt"></i> CDN</span>
 							{#if domain.wildcard}
 								<span class="tag is-on"><i class="fa-solid fa-asterisk"></i> Wildcard</span>
+							{:else}
+								<span class="tag"><i class="fa-solid fa-globe"></i> Standard</span>
 							{/if}
 						</span>
 					</span>
