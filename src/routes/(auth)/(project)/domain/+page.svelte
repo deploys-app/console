@@ -47,7 +47,6 @@
 			<tr>
 				<th>Domain</th>
 				<th>Wildcard</th>
-				<th>CDN</th>
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
@@ -56,10 +55,10 @@
 			</thead>
 			<tbody>
 				{#each domains as it (`${it.domain}-${it.location}`)}
-					{@const dnsHasErrors = !it.cdn && (it.verification?.dns?.errors?.length ?? 0) > 0}
+					{@const dnsHasErrors = (it.verification?.dns?.errors?.length ?? 0) > 0}
 					<tr>
 						<td>
-							<StatusIcon status={it.cdn && it.verification.ssl.pending ? 'verify' : it.status} />
+							<StatusIcon status={it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
 							{#if dnsHasErrors}
 								<i class="fa-solid fa-triangle-exclamation text-warning ml-2"
@@ -68,13 +67,6 @@
 						</td>
 						<td>
 							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
-							{:else}
-								<i class="fa-solid fa-circle-xmark text-negative text-content/80"></i>
-							{/if}
-						</td>
-						<td>
-							{#if it.cdn}
 								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
 							{:else}
 								<i class="fa-solid fa-circle-xmark text-negative text-content/80"></i>
@@ -90,8 +82,8 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={domains} />
-				<ErrorRow span={5} {error} />
+				<NoDataRow span={4} list={domains} />
+				<ErrorRow span={4} {error} />
 			</tbody>
 		</table>
 	</div>

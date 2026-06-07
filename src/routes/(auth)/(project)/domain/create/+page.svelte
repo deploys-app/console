@@ -11,7 +11,6 @@
 	const form = $state({
 		domain: '',
 		location: '',
-		cdn: false,
 		wildcard: false
 	})
 
@@ -33,7 +32,6 @@
 				project,
 				location: form.location,
 				domain: form.domain,
-				cdn: form.cdn,
 				wildcard: form.wildcard
 			}, fetch)
 			if (!resp.ok) {
@@ -61,7 +59,7 @@
 <div class="page-head">
 	<div>
 		<h4><strong>Create domain</strong></h4>
-		<p class="page-sub">Map a custom domain to your deployments, with optional CDN.</p>
+		<p class="page-sub">Map a custom domain to your deployments. CDN is included.</p>
 	</div>
 </div>
 
@@ -91,12 +89,6 @@
 			<div class="checkbox">
 				<input id="input-wildcard" type="checkbox" bind:checked={form.wildcard}>
 				<label for="input-wildcard">Wildcard</label>
-			</div>
-		</div>
-		<div class="field">
-			<div class="checkbox">
-				<input id="input-cdn" type="checkbox" bind:checked={form.cdn} disabled>
-				<label for="input-cdn">CDN</label>
 			</div>
 		</div>
 

@@ -15,14 +15,14 @@
 	const domain = $derived(data.domain)
 	const dnsErrors = $derived(domain.verification?.dns?.errors ?? [])
 	const hasDnsErrors = $derived(dnsErrors.length > 0)
-	const headerStatus = $derived(domain.cdn && domain.verification?.ssl?.pending ? 'verify' : domain.status)
+	const headerStatus = $derived(domain.status)
 
 	// ─── DNS record groups (visibility mirrors the original conditionals) ───
 	const ipv4 = $derived(domain.dnsConfig?.ipv4 ?? [])
 	const ipv6 = $derived(domain.dnsConfig?.ipv6 ?? [])
 	const cnames = $derived(domain.dnsConfig?.cname ?? [])
 	const showConnect = $derived(
-		(domain.status === 'success' || domain.status === 'verify' || (!domain.cdn && !domain.wildcard)) &&
+		(domain.status === 'success' || domain.status === 'verify' || !domain.wildcard) &&
 		(ipv4.length > 0 || ipv6.length > 0 || cnames.length > 0)
 	)
 	const ownership = $derived(domain.verification?.ownership)
@@ -35,18 +35,12 @@
 
 	// ─── Status banner ───
 	const banner = $derived.by(() => {
-		if (domain.cdn) {
-			if (domain.status === 'pending') return { tone: 'info', icon: 'fa-solid fa-spinner-third fa-spin', title: 'Setting up your domain' }
-			if (domain.verification?.ssl?.pending) return { tone: 'warning', icon: 'fa-solid fa-shield-halved', title: 'Issuing TLS certificate' }
-			if (domain.status === 'error') return { tone: 'negative', icon: 'fa-solid fa-circle-exclamation', title: 'Verification failed' }
-			return { tone: 'positive', icon: 'fa-solid fa-circle-check', title: 'Domain is active' }
-		}
 		if (domain.status === 'error') return { tone: 'negative', icon: 'fa-solid fa-circle-exclamation', title: 'DNS verification failed' }
 		if (domain.status !== 'success') return { tone: 'warning', icon: 'fa-solid fa-clock', title: domain.wildcard ? 'Waiting for ownership record' : 'Waiting for DNS' }
 		if (hasDnsErrors) return { tone: 'warning', icon: 'fa-solid fa-triangle-exclamation', title: 'DNS needs attention' }
 		return { tone: 'positive', icon: 'fa-solid fa-circle-check', title: 'Domain is active' }
 	})
-	const showDnsMeta = $derived(!domain.cdn && (domain.verification?.dns?.verifiedAt || domain.verification?.dns?.lastCheckedAt))
+	const showDnsMeta = $derived(domain.verification?.dns?.verifiedAt || domain.verification?.dns?.lastCheckedAt)
 
 	onMount(() => {
 		return setupCopy('.copy')
@@ -60,20 +54,15 @@
 		}
 	})
 	function handleReload () {
-		const nonCdnDnsNeedsAttention = !domain.cdn && (domain.status !== 'success' || hasDnsErrors)
-		if (!['pending', 'verify'].includes(domain.status) && !nonCdnDnsNeedsAttention) {
+		if (domain.status === 'success' && !hasDnsErrors) {
 			return
 		}
 		const f = async () => {
 			reloadTimeout = null
 			await api.invalidate('domain.get')
-			// Non-CDN DNS verification runs on a cron at minute-scale, no point polling faster.
-			if (!domain.cdn && (domain.status !== 'success' || hasDnsErrors)) {
+			// DNS verification runs on a cron at minute-scale, no point polling faster.
+			if (domain.status !== 'success' || hasDnsErrors) {
 				reloadTimeout = setTimeout(f, 30000)
-			} else if (domain.status === 'pending') {
-				reloadTimeout = setTimeout(f, 3000)
-			} else if (domain.status === 'verify') {
-				reloadTimeout = setTimeout(f, 5000)
 			}
 		}
 		setTimeout(f, 3000)
@@ -213,27 +202,6 @@
 		})
 	}
 
-	function upgradeCdn () {
-		modal.confirm({
-			html: `Add CDN to "${domain.domain}"?`,
-			yes: 'Upgrade',
-			callback: async () => {
-				const resp = await api.invoke('domain.create', {
-					project,
-					location: domain.location,
-					domain: domain.domain,
-					wildcard: domain.wildcard,
-					cdn: true
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				await api.invalidate('domain.get')
-				handleReload()
-			}
-		})
-	}
 </script>
 
 <style>
@@ -545,8 +513,6 @@
 	.purge-row__text { flex: 1; display: grid; gap: 0.15rem; }
 	.purge-row__text strong { font-size: 0.875rem; }
 	.purge-row__text p { font-size: 0.8125rem; color: hsl(var(--hsl-content) / 0.65); }
-
-	.actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
 </style>
 
 <div class="breadcrumb">
@@ -589,17 +555,7 @@
 			<div class="banner__content">
 				<div class="banner__title">{banner.title}</div>
 				<div class="banner__body">
-					{#if domain.cdn}
-						{#if domain.status === 'pending'}
-							<p>We're provisioning the CDN edge and verifying your domain. This usually takes a moment — the page refreshes automatically.</p>
-						{:else if domain.verification?.ssl?.pending}
-							<p>The CDN is live. We're now issuing a TLS certificate. Add the <strong>SSL/TLS</strong> records below if shown; the page refreshes automatically.</p>
-						{:else if domain.status === 'error'}
-							<p>We couldn't verify this domain. Check the verification records below and we'll re-check automatically.</p>
-						{:else}
-							<p>Your domain is verified and serving traffic through the CDN.</p>
-						{/if}
-					{:else if domain.status === 'error'}
+					{#if domain.status === 'error'}
 						<p>
 							DNS verification has been failing for over 48 hours, so the certificate
 							has been torn down. Re-point DNS using the records below and we'll
@@ -628,7 +584,7 @@
 							Review the errors below and confirm your records still match.
 						</p>
 					{:else}
-						<p>Your domain is verified and serving traffic.</p>
+						<p>Your domain is verified and serving traffic through the CDN.</p>
 					{/if}
 				</div>
 
@@ -665,9 +621,7 @@
 					<span class="spec__label">Type</span>
 					<span class="spec__value">
 						<span class="chips">
-							<span class="tag {domain.cdn ? 'is-on' : ''}">
-								<i class="fa-solid {domain.cdn ? 'fa-bolt' : 'fa-xmark'}"></i> CDN
-							</span>
+							<span class="tag is-on"><i class="fa-solid fa-bolt"></i> CDN</span>
 							{#if domain.wildcard}
 								<span class="tag is-on"><i class="fa-solid fa-asterisk"></i> Wildcard</span>
 							{/if}
@@ -749,15 +703,13 @@
 						<div class="group__head">
 							<div class="group__title">
 								<span class="step">{showConnect ? '2' : '1'}</span>
-								{#if domain.cdn}
-									Verify domain ownership
-								{:else if domain.wildcard}
+								{#if domain.wildcard}
 									Verify ownership
 								{:else}
 									Proxied DNS (alternative)
 								{/if}
 							</div>
-							{#if !domain.cdn && !domain.wildcard}
+							{#if !domain.wildcard}
 								<p class="group__desc">
 									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
 									records can't resolve here directly, add this TXT record instead to
@@ -811,7 +763,7 @@
 {/if}
 
 <!-- ─── CACHE ─── -->
-{#if domain.cdn && domain.status === 'success'}
+{#if domain.status === 'success'}
 	<div class="shell">
 		<header class="rail">
 			<h6 class="rail__brand">Cache</h6>
@@ -852,15 +804,6 @@
 		</div>
 	</div>
 {/if}
-
-<!-- ─── ACTIONS ─── -->
-<div class="actions">
-	{#if domain.cdn}
-		<a class="button is-variant-secondary" href="/domain/cdn-downgrade?project={project}&domain={domain.domain}">Remove CDN</a>
-	{:else}
-		<button class="button" onclick={upgradeCdn} disabled>Add CDN</button>
-	{/if}
-</div>
 
 <DangerZone description="Permanently delete this domain. Routing and TLS certificates will be removed.">
 	<button class="button is-variant-negative" type="button" onclick={deleteItem}>

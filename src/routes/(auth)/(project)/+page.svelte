@@ -102,12 +102,6 @@
 			icon: 'fa-clone',
 			label: 'Replica',
 			...formatAvgCount(usage.replica, 'replicas', 'replica-s')
-		},
-		{
-			key: 'domainCdn',
-			icon: 'fa-globe',
-			label: 'Domain CDN',
-			...formatAvgCount(usage.domainCdn, 'domains', 'domain-s')
 		}
 	])
 </script>
