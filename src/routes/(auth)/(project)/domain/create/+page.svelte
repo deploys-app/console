@@ -59,7 +59,7 @@
 <div class="page-head">
 	<div>
 		<h4><strong>Create domain</strong></h4>
-		<p class="page-sub">Map a custom domain to your deployments. CDN is included.</p>
+		<p class="page-sub">Map a custom domain to your deployments.</p>
 	</div>
 </div>
 
