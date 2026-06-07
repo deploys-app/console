@@ -30,6 +30,26 @@
 	}
 </script>
 
+<style>
+	/* Wildcard pill — mirrors the "Type" chip on the domain detail page.
+	   Only wildcard domains get a badge; standard domains stay clean. */
+	.wildcard-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin-left: 0.5rem;
+		padding: 0.08rem 0.45rem;
+		border-radius: 5px;
+		font-size: 0.7rem;
+		font-weight: 600;
+		line-height: 1.4;
+		vertical-align: middle;
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+	}
+	.wildcard-tag i { font-size: 0.62rem; }
+</style>
+
 <div class="page-head">
 	<div>
 		<h4><strong>Domains</strong></h4>
@@ -46,7 +66,6 @@
 			<thead>
 			<tr>
 				<th>Domain</th>
-				<th>Wildcard</th>
 				<th>Location</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
@@ -60,16 +79,14 @@
 						<td>
 							<StatusIcon status={it.status} />
 							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
+							{#if it.wildcard}
+								<span class="wildcard-tag" title="Wildcard domain — matches all subdomains">
+									<i class="fa-solid fa-asterisk"></i> Wildcard
+								</span>
+							{/if}
 							{#if dnsHasErrors}
 								<i class="fa-solid fa-triangle-exclamation text-warning ml-2"
 									title="DNS verification is failing. Open the domain to see details."></i>
-							{/if}
-						</td>
-						<td>
-							{#if it.wildcard}
-								<i class="fa-solid fa-check-circle text-positive text-content/80"></i>
-							{:else}
-								<i class="fa-solid fa-circle-xmark text-negative text-content/80"></i>
 							{/if}
 						</td>
 						<td>{it.location}</td>
@@ -82,8 +99,8 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={4} list={domains} />
-				<ErrorRow span={4} {error} />
+				<NoDataRow span={3} list={domains} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>
