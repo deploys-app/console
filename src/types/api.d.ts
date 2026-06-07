@@ -30,7 +30,6 @@ declare namespace Api {
     }
 
     export type ProjectConfig = {
-        domainAllowDisableCdn: boolean
     }
 
     export type Project = {
@@ -61,7 +60,6 @@ declare namespace Api {
         dropboxEgress: number
         disk: number
         replica: number
-        domainCdn: number
     }
 
     export type BillingProject = {
@@ -118,7 +116,6 @@ declare namespace Api {
         location: string
         domain: string
         wildcard: boolean
-        cdn: boolean
         verification: {
             ownership: {
                 type: string

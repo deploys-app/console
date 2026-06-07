@@ -72,7 +72,7 @@ const projects = [
 		name: 'Acme Corp',
 		billingAccount: 'ba_mock_1',
 		quota: { deployments: 50, deploymentMaxReplicas: 10 },
-		config: { domainAllowDisableCdn: true },
+		config: {},
 		createdAt: CREATED_AT
 	},
 	{
@@ -81,7 +81,7 @@ const projects = [
 		name: 'Staging',
 		billingAccount: 'ba_mock_1',
 		quota: { deployments: 20, deploymentMaxReplicas: 5 },
-		config: { domainAllowDisableCdn: false },
+		config: {},
 		createdAt: CREATED_AT
 	}
 ]
@@ -227,7 +227,6 @@ const domains = [
 		location: LOCATION_ID,
 		domain: 'acme.example.com',
 		wildcard: false,
-		cdn: true,
 		verification: {
 			ownership: { type: 'TXT', name: '_deploys.acme.example.com', value: 'verify=mock', errors: [] },
 			ssl: {
@@ -689,8 +688,7 @@ const handlers = {
 		registryEgress: 268435456,
 		dropboxEgress: 134217728,
 		disk: 10737418240,
-		replica: 4,
-		domainCdn: 2
+		replica: 4
 	}),
 
 	'billing.list': () => list(billingAccounts),
