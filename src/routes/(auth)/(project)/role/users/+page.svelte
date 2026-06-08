@@ -3,12 +3,14 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import gravatarUrl from 'gravatar-url'
 
 	const { data } = $props()
 
 	const project = $derived(data.project)
 	const users = $derived(data.users)
 	const error = $derived(data.error)
+	const myEmail = $derived(data.profile?.email ?? '')
 
 	/**
 	 * @param {string} email
@@ -33,6 +35,78 @@
 	}
 </script>
 
+<style>
+	.user-cell {
+		display: flex;
+		align-items: center;
+		gap: 0.7rem;
+		min-width: 0;
+	}
+
+	.avatar {
+		flex-shrink: 0;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		background: hsl(var(--hsl-content) / 0.06);
+		object-fit: cover;
+	}
+
+	.user-id {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+	}
+
+	.user-email {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content));
+		overflow-wrap: anywhere;
+	}
+
+	.you-tag {
+		flex-shrink: 0;
+		padding: 0.05rem 0.4rem;
+		border-radius: 5px;
+		font-size: 0.65rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+	}
+
+	.role-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.role-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.1rem 0.5rem;
+		border-radius: 5px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		font-family: var(--ffml-mono);
+		background: hsl(var(--hsl-content) / 0.06);
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+	.role-chip i { font-size: 0.62rem; opacity: 0.6; }
+
+	.no-roles {
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.45);
+		font-style: italic;
+	}
+</style>
+
 <div class="page-head">
 	<div>
 		<h4><strong>Users</strong></h4>
@@ -48,7 +122,7 @@
 		<table class="table is-variant-compact">
 			<thead>
 				<tr>
-					<th>Email</th>
+					<th>User</th>
 					<th>Roles</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
@@ -56,11 +130,29 @@
 			<tbody>
 				{#each users as it (it.email)}
 					<tr>
-						<td>{it.email}</td>
 						<td>
-							{#each it.roles as r (r)}
-								{r}<br>
-							{/each}
+							<div class="user-cell">
+								<img class="avatar" src={gravatarUrl(it.email, { default: 'mp' })} alt="" width="32" height="32" crossorigin="anonymous" draggable="false">
+								<div class="user-id">
+									<span class="user-email">
+										{it.email}
+										{#if it.email === myEmail}
+											<span class="you-tag">You</span>
+										{/if}
+									</span>
+								</div>
+							</div>
+						</td>
+						<td>
+							{#if it.roles.length > 0}
+								<div class="role-chips">
+									{#each it.roles as r (r)}
+										<span class="role-chip"><i class="fa-solid fa-user-shield"></i>{r}</span>
+									{/each}
+								</div>
+							{:else}
+								<span class="no-roles">No roles</span>
+							{/if}
 						</td>
 						<td>
 							<a href="/role/bind?project={project}&email={it.email}" aria-label="Edit">
@@ -80,4 +172,3 @@
 		</table>
 	</div>
 </div>
-
