@@ -42,8 +42,8 @@
 </script>
 
 <style>
-	/* Meta line under the deployment name — the type chip plus an endpoint or
-	   schedule, kept muted so the name stays the anchor of each row. */
+	/* Meta line under the deployment name — the type chip plus, for CronJobs,
+	   the schedule, kept muted so the name stays the anchor of each row. */
 	.dep-cell {
 		display: flex;
 		flex-direction: column;
@@ -84,16 +84,6 @@
 		color: hsl(var(--hsl-content) / 0.7);
 	}
 	.type-chip i { font-size: 0.62rem; opacity: 0.7; }
-
-	.endpoint {
-		display: inline-block;
-		max-width: 22rem;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		color: hsl(var(--hsl-content) / 0.5);
-		font-family: var(--ffml-mono);
-	}
 
 	.schedule {
 		color: hsl(var(--hsl-content) / 0.5);
@@ -216,8 +206,6 @@
 										<span class="type-chip"><i class="fa-solid {type.icon}"></i>{type.label}</span>
 										{#if it.type === 'CronJob' && it.schedule}
 											<span class="schedule">{it.schedule}</span>
-										{:else if it.url}
-											<span class="endpoint" title={it.url}>{it.url}</span>
 										{/if}
 									</div>
 								</div>
