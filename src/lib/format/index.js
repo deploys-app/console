@@ -20,7 +20,7 @@ export function cpu (v) {
  */
 export function cpuLimited (v) {
 	if (v === '0' || !v) {
-		return 'Cluster Default'
+		return 'Default'
 	}
 	return `${v} vCPU`
 }
