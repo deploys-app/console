@@ -115,7 +115,7 @@
 		text-transform: uppercase;
 	}
 	.status-pill.is-warning { background: hsl(var(--hsl-warning) / 0.14); color: hsl(var(--hsl-warning)); }
-	.status-pill.is-info { background: hsl(var(--hsl-primary) / 0.12); color: hsl(var(--hsl-primary)); }
+	.status-pill.is-info { background: hsl(var(--hsl-info) / 0.12); color: hsl(var(--hsl-info)); }
 	.status-pill.is-negative { background: hsl(var(--hsl-negative) / 0.12); color: hsl(var(--hsl-negative)); }
 	.status-pill.is-muted { background: hsl(var(--hsl-content) / 0.08); color: hsl(var(--hsl-content) / 0.6); }
 
@@ -225,7 +225,7 @@
 						</td>
 						<td>
 							<span class="resources">
-								{format.cpu(it.resources.requests.cpu)}
+								{format.cpuLimited(it.resources.limits.cpu)}
 								<span class="sep">·</span>
 								{format.memory(it.resources.requests.memory)}
 							</span>
