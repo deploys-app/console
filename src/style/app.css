@@ -981,6 +981,12 @@
 		padding-top: 1rem;
 		padding-bottom: 1rem;
 		white-space: nowrap;
+		/* Floor the cell content at the icon-button height (2rem) so rows in
+		   tables without an actions column line up with rows that have one.
+		   content-box keeps this a content-height minimum (independent of the
+		   global border-box) and taller content still grows the row. */
+		box-sizing: content-box;
+		height: 2rem;
 	}
 
 	.table td p {
