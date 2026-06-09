@@ -2,6 +2,17 @@ import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
 
 /**
+ * Escape a string for safe interpolation into a SweetAlert `html` body.
+ * @param {string} s
+ * @returns {string}
+ */
+function escapeHtml (s) {
+	return s.replace(/[&<>"']/g, (c) => (
+		{ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] ?? c
+	))
+}
+
+/**
  * @typedef {Object} ModalConfirmOptions
  * @property {string} [title]
  * @property {string} [html]
@@ -65,6 +76,22 @@ export async function error ({ error, callback }) {
 		}
 		if ('validate' in error && Array.isArray(error.validate)) {
 			msg = error.validate.join('<br>')
+		}
+		// Domain delete blocked by routes — render the blockers as a list with a
+		// clear next step instead of the raw "api: domain in used by route(s): …".
+		if ('domainInUsed' in error && error.domainInUsed) {
+			const routes = 'routes' in error && Array.isArray(error.routes) ? error.routes : []
+			const more = 'routesMore' in error && typeof error.routesMore === 'number' ? error.routesMore : 0
+			if (routes.length) {
+				const items = routes.map((r) => `<li>${escapeHtml(String(r))}</li>`).join('')
+				const list = `<ul style="text-align:left; margin:0.75rem auto 0; padding-left:1.25rem; max-width:24rem;">${items}</ul>`
+				const moreLine = more ? `<p style="margin-top:0.5rem; opacity:0.7;">…and ${more} more.</p>` : ''
+				const verb = routes.length === 1 ? 'it' : 'them'
+				const noun = routes.length === 1 ? 'route' : 'routes'
+				msg = `This domain is still used by the following ${noun}. Delete ${verb} first:${list}${moreLine}`
+			} else {
+				msg = 'This domain is still in use by one or more routes. Delete its routes first.'
+			}
 		}
 	}
 
