@@ -49,7 +49,7 @@
 				{#each repositories as repo (repo.name)}
 					<tr>
 						<td>
-							<a class="link"
+							<a class="link cell-name"
 							   href="/registry/detail?project={project}&repository={repo.name}">
 								{repo.name}
 							</a>

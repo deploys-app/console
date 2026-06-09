@@ -1023,6 +1023,126 @@
 	.table .is-align-center { text-align: center; }
 	.table .is-align-right { text-align: right; }
 
+	/* Table-cell vocabulary — shared chips/pills/badges used across the list
+	 * pages so every table speaks the same visual language. Introduced with
+	 * the deployment list redesign; reuse these rather than re-deriving local
+	 * copies per page.
+	 *
+	 * All selectors are scoped under `.table` on purpose: these are global
+	 * (unlayered-beating) class names, and scoping keeps them from bleeding
+	 * into identically-named scoped component styles elsewhere (e.g. the
+	 * deployment-detail header's own `.status-pill`). Every usage lives inside
+	 * a `<table class="table">`, so this costs nothing. */
+
+	/* Bold the primary name link in a row so it anchors the eye. */
+	.table .cell-name {
+		font-weight: 600;
+	}
+
+	/* Stacked primary cell — a name line above a muted meta line. */
+	.table .cell-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		min-width: 0;
+	}
+	.table .cell-line {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+	.table .cell-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		min-width: 0;
+		font-size: 0.78rem;
+	}
+
+	/* Neutral chip with an optional leading icon — type, location, metadata.
+	 * `.is-accent` tints it with the brand colour for emphasis. */
+	.table .meta-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.32rem;
+		flex-shrink: 0;
+		padding: 0.08rem 0.45rem;
+		border-radius: 5px;
+		font-size: 0.7rem;
+		font-weight: 600;
+		line-height: 1.4;
+		vertical-align: middle;
+		background: hsl(var(--hsl-content) / 0.06);
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+	.table .meta-chip > i { font-size: 0.62rem; opacity: 0.7; }
+	.table .meta-chip.is-accent {
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+	}
+
+	/* Inline location chip — a pin glyph plus the location id, dimmed. */
+	.table .loc-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.82rem;
+		color: hsl(var(--hsl-content) / 0.75);
+	}
+	.table .loc-chip > i { font-size: 0.7rem; opacity: 0.55; }
+
+	/* Numeric pill — replica counts, variable counts, etc. */
+	.table .count-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.1rem 0.5rem;
+		border-radius: 9999px;
+		font-size: 0.78rem;
+		font-weight: 600;
+		font-family: var(--ffml-mono);
+		background: hsl(var(--hsl-content) / 0.06);
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+	.table .count-pill > i { font-size: 0.62rem; opacity: 0.7; }
+	.table .count-pill.is-accent {
+		background: hsl(var(--hsl-primary) / 0.1);
+		color: hsl(var(--hsl-primary));
+	}
+
+	/* Status badge — colour-coded by tone. Render only for noteworthy states
+	 * so healthy rows stay clean. */
+	.table .status-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		flex-shrink: 0;
+		padding: 0.05rem 0.45rem;
+		border-radius: 5px;
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+	}
+	.table .status-pill.is-positive { background: hsl(var(--hsl-positive) / 0.12); color: hsl(var(--hsl-positive)); }
+	.table .status-pill.is-warning { background: hsl(var(--hsl-warning) / 0.14); color: hsl(var(--hsl-warning)); }
+	.table .status-pill.is-info { background: hsl(var(--hsl-info) / 0.12); color: hsl(var(--hsl-info)); }
+	.table .status-pill.is-negative { background: hsl(var(--hsl-negative) / 0.12); color: hsl(var(--hsl-negative)); }
+	.table .status-pill.is-muted { background: hsl(var(--hsl-content) / 0.08); color: hsl(var(--hsl-content) / 0.6); }
+
+	/* Muted relative timestamp in a cell; pair with title={absolute time}. */
+	.table .cell-time {
+		font-size: 0.82rem;
+		color: hsl(var(--hsl-content) / 0.65);
+		white-space: nowrap;
+	}
+
+	/* Muted secondary text / email / id in a cell. */
+	.table .cell-muted {
+		color: hsl(var(--hsl-content) / 0.6);
+	}
+
 	/* Dropdown + menu */
 	.dropdown {
 		position: relative;

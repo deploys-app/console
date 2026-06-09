@@ -23,7 +23,7 @@
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
-		<table class="table">
+		<table class="table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Name</th>
@@ -37,13 +37,17 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="link" href="/pull-secret/detail?project={project}&location={it.location}&name={it.name}">
+							<a class="link cell-name" href="/pull-secret/detail?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>
-						<td>{it.location}</td>
-						<td>{format.datetime(it.createdAt)}</td>
-						<td>{it.createdBy}</td>
+						<td>
+							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
+						</td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
+						<td><span class="cell-muted">{it.createdBy}</span></td>
 					</tr>
 				{/each}
 				<NoDataRow span={4} list={pullSecrets} />

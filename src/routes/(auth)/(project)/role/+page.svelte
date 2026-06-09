@@ -43,13 +43,15 @@
 				{#each roles as it (it.role)}
 					<tr>
 						<td>
-							<a href="/role/detail?project={project}&role={it.role}" class="link">
-								<strong>{it.role}</strong>
+							<a href="/role/detail?project={project}&role={it.role}" class="link cell-name">
+								{it.role}
 							</a>
 						</td>
-						<td>{it.name}</td>
-						<td>{format.datetime(it.createdAt)}</td>
-						<td>{it.createdBy}</td>
+						<td><span class="cell-muted">{it.name}</span></td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
+						<td><span class="cell-muted">{it.createdBy}</span></td>
 						<td>
 							{#if roleCanUpdate(it.role)}
 								<a href="/role/create?project={project}&role={it.role}" aria-label="Edit">

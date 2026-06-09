@@ -35,12 +35,14 @@
 				{#each serviceAccounts as it (it.email)}
 					<tr>
 						<td>
-							<a class="link" href="/service-account/detail?project={project}&id={it.sid}">
+							<a class="link cell-name" href="/service-account/detail?project={project}&id={it.sid}">
 								{it.email}
 							</a>
 						</td>
-						<td>{it.name}</td>
-						<td>{format.datetime(it.createdAt)}</td>
+						<td><span class="cell-muted">{it.name}</span></td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
 						<td>
 							<a href="/service-account/create?project={project}&id={it.sid}" aria-label="Edit">
 								<div class="icon-button">

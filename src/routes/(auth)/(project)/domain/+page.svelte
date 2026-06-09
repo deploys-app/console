@@ -30,26 +30,6 @@
 	}
 </script>
 
-<style>
-	/* Wildcard pill — mirrors the "Type" chip on the domain detail page.
-	   Only wildcard domains get a badge; standard domains stay clean. */
-	.wildcard-tag {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		margin-left: 0.5rem;
-		padding: 0.08rem 0.45rem;
-		border-radius: 5px;
-		font-size: 0.7rem;
-		font-weight: 600;
-		line-height: 1.4;
-		vertical-align: middle;
-		background: hsl(var(--hsl-primary) / 0.12);
-		color: hsl(var(--hsl-primary));
-	}
-	.wildcard-tag i { font-size: 0.62rem; }
-</style>
-
 <div class="page-head">
 	<div>
 		<h4><strong>Domains</strong></h4>
@@ -78,10 +58,10 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link">{it.domain}</a>
+							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link cell-name">{it.domain}</a>
 							{#if it.wildcard}
-								<span class="wildcard-tag" title="Wildcard domain — matches all subdomains">
-									<i class="fa-solid fa-asterisk"></i> Wildcard
+								<span class="meta-chip is-accent ml-2" title="Wildcard domain — matches all subdomains">
+									<i class="fa-solid fa-asterisk" aria-hidden="true"></i> Wildcard
 								</span>
 							{/if}
 							{#if dnsHasErrors}
@@ -89,7 +69,9 @@
 									title="DNS verification is failing. Open the domain to see details."></i>
 							{/if}
 						</td>
-						<td>{it.location}</td>
+						<td>
+							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
+						</td>
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>

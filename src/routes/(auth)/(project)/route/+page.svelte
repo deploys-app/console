@@ -87,9 +87,11 @@
 					<tr class="route-row" role="button" tabindex="0"
 						onclick={() => openRoute(it)}
 						onkeydown={(e) => onRowKey(e, it)}>
-						<td>https://{it.domain}{it.path}</td>
-						<td>{it.target}</td>
-						<td>{it.location}</td>
+						<td><span class="cell-name">https://{it.domain}{it.path}</span></td>
+						<td><span class="cell-muted">{it.target}</span></td>
+						<td>
+							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
+						</td>
 						<td>
 							{#if it.config?.basicAuth}
 								<i class="fa-solid fa-lock" title="Basic auth"></i>
