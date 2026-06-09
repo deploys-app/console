@@ -18,7 +18,7 @@
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
-		<table class="table">
+		<table class="table is-variant-compact">
 			<thead>
 			<tr>
 				<th>Domain</th>
@@ -29,9 +29,11 @@
 			<tbody>
 				{#each domains as it (it.domain)}
 					<tr>
-						<td>{it.domain}</td>
-						<td>-</td>
-						<td>{format.datetime(it.createdAt)}</td>
+						<td><span class="cell-name">{it.domain}</span></td>
+						<td><span class="cell-muted">—</span></td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
 					</tr>
 				{/each}
 				<NoDataRow span={3} list={domains} />

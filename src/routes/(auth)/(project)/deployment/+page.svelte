@@ -38,80 +38,10 @@
 		default: return null
 		}
 	}
-
 </script>
 
 <style>
-	/* Meta line under the deployment name — the type chip plus, for CronJobs,
-	   the schedule, kept muted so the name stays the anchor of each row. */
-	.dep-cell {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-		min-width: 0;
-	}
-
-	.dep-name {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		min-width: 0;
-	}
-
-	.dep-name .link {
-		font-weight: 600;
-	}
-
-	.dep-meta {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		min-width: 0;
-		font-size: 0.78rem;
-	}
-
-	.type-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.32rem;
-		flex-shrink: 0;
-		padding: 0.08rem 0.45rem;
-		border-radius: 5px;
-		font-size: 0.7rem;
-		font-weight: 600;
-		line-height: 1.4;
-		background: hsl(var(--hsl-content) / 0.06);
-		color: hsl(var(--hsl-content) / 0.7);
-	}
-	.type-chip i { font-size: 0.62rem; opacity: 0.7; }
-
-	.schedule {
-		color: hsl(var(--hsl-content) / 0.5);
-		font-family: var(--ffml-mono);
-		font-size: 0.74rem;
-	}
-
-	/* Status pill — colour-coded by tone, only rendered for non-running states. */
-	.status-pill {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		flex-shrink: 0;
-		padding: 0.05rem 0.45rem;
-		border-radius: 5px;
-		font-size: 0.68rem;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		text-transform: uppercase;
-	}
-	.status-pill.is-warning { background: hsl(var(--hsl-warning) / 0.14); color: hsl(var(--hsl-warning)); }
-	.status-pill.is-info { background: hsl(var(--hsl-info) / 0.12); color: hsl(var(--hsl-info)); }
-	.status-pill.is-negative { background: hsl(var(--hsl-negative) / 0.12); color: hsl(var(--hsl-negative)); }
-	.status-pill.is-muted { background: hsl(var(--hsl-content) / 0.08); color: hsl(var(--hsl-content) / 0.6); }
-
-	.ttl-flag { font-size: 0.72rem; }
-
-	/* Compute cell — CPU · Memory, monospaced and dimmed for scanability. */
+	/* Resources cell — CPU · Memory, monospaced and dimmed for scanability. */
 	.resources {
 		display: inline-flex;
 		align-items: center;
@@ -122,36 +52,16 @@
 	}
 	.resources .sep { color: hsl(var(--hsl-content) / 0.3); }
 
-	/* Replicas pill — fixed count, or a min–max range flagged as autoscaling. */
-	.replicas {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.35rem;
-		padding: 0.1rem 0.5rem;
-		border-radius: 9999px;
-		font-size: 0.78rem;
-		font-weight: 600;
+	/* CronJob schedule on the meta line. */
+	.schedule {
+		color: hsl(var(--hsl-content) / 0.5);
 		font-family: var(--ffml-mono);
-		background: hsl(var(--hsl-content) / 0.06);
-		color: hsl(var(--hsl-content) / 0.8);
+		font-size: 0.74rem;
 	}
-	.replicas.is-auto { background: hsl(var(--hsl-primary) / 0.1); color: hsl(var(--hsl-primary)); }
-	.replicas i { font-size: 0.62rem; opacity: 0.7; }
+
+	.ttl-flag { font-size: 0.72rem; }
+
 	.replicas-none { color: hsl(var(--hsl-content) / 0.35); }
-
-	.location-chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.82rem;
-		color: hsl(var(--hsl-content) / 0.75);
-	}
-	.location-chip i { font-size: 0.7rem; opacity: 0.55; }
-
-	.deployed {
-		font-size: 0.82rem;
-		color: hsl(var(--hsl-content) / 0.65);
-	}
 </style>
 
 <div class="page-head">
@@ -187,9 +97,9 @@
 								<div style="padding-top:0.15rem;">
 									<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
 								</div>
-								<div class="dep-cell">
-									<div class="dep-name">
-										<a class="link" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
+								<div class="cell-stack">
+									<div class="cell-line">
+										<a class="link cell-name" href={`/deployment/metrics?project=${project}&location=${it.location}&name=${it.name}`}>
 											{it.name}
 										</a>
 										{#if pill}
@@ -202,8 +112,8 @@
 												title={`Auto-delete at ${format.ttlExpireAt(it.ttl)} (in ${format.duration(it.ttl)})`}></i>
 										{/if}
 									</div>
-									<div class="dep-meta">
-										<span class="type-chip"><i class="fa-solid {type.icon}"></i>{type.label}</span>
+									<div class="cell-meta">
+										<span class="meta-chip"><i class="fa-solid {type.icon}" aria-hidden="true"></i>{type.label}</span>
 										{#if it.type === 'CronJob' && it.schedule}
 											<span class="schedule">{it.schedule}</span>
 										{/if}
@@ -220,9 +130,9 @@
 						</td>
 						<td>
 							{#if it.minReplicas > 0}
-								<span class="replicas" class:is-auto={autoscale}>
+								<span class="count-pill" class:is-accent={autoscale}>
 									{#if autoscale}
-										<i class="fa-solid fa-arrows-up-down"></i>{it.minReplicas}–{it.maxReplicas}
+										<i class="fa-solid fa-arrows-up-down" aria-hidden="true"></i>{it.minReplicas}–{it.maxReplicas}
 									{:else}
 										{it.minReplicas}
 									{/if}
@@ -232,12 +142,12 @@
 							{/if}
 						</td>
 						<td>
-							<span class="location-chip">
-								<i class="fa-solid fa-location-dot"></i>{it.location}
+							<span class="loc-chip">
+								<i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}
 							</span>
 						</td>
 						<td>
-							<span class="deployed" title={format.datetime(it.createdAt)}>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>
 								{format.fromNow(it.createdAt) || '—'}
 							</span>
 						</td>

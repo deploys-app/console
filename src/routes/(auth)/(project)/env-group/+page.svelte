@@ -28,7 +28,6 @@
 				<th>Name</th>
 				<th>Variables</th>
 				<th>Created at</th>
-				<th>Created by</th>
 				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
@@ -36,13 +35,14 @@
 				{#each envGroups as it (it.name)}
 					<tr>
 						<td>
-							<a class="link" href="/env-group/detail?project={project}&name={it.name}">
-								<strong>{it.name}</strong>
+							<a class="link cell-name" href="/env-group/detail?project={project}&name={it.name}">
+								{it.name}
 							</a>
 						</td>
-						<td>{Object.keys(it.env ?? {}).length}</td>
-						<td>{format.datetime(it.createdAt)}</td>
-						<td>{it.createdBy}</td>
+						<td><span class="count-pill"><i class="fa-solid fa-list" aria-hidden="true"></i>{Object.keys(it.env ?? {}).length}</span></td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
 						<td>
 							<a href="/env-group/create?project={project}&name={it.name}" aria-label="Edit">
 								<div class="icon-button">
@@ -52,8 +52,8 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={envGroups} />
-				<ErrorRow span={5} {error} />
+				<NoDataRow span={4} list={envGroups} />
+				<ErrorRow span={4} {error} />
 			</tbody>
 		</table>
 	</div>

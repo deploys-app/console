@@ -38,13 +38,17 @@
 					<tr>
 						<td>
 							<StatusIcon status={it.status} />
-							<a class="link" href="/disk/metrics?project={project}&location={it.location}&name={it.name}">
+							<a class="link cell-name" href="/disk/metrics?project={project}&location={it.location}&name={it.name}">
 								{it.name}
 							</a>
 						</td>
-						<td>{it.size} GiB</td>
-						<td>{it.location}</td>
-						<td>{format.datetime(it.createdAt)}</td>
+						<td><span class="count-pill"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i>{it.size} GiB</span></td>
+						<td>
+							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
+						</td>
+						<td>
+							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
+						</td>
 						<td>
 							<a href="/disk/create?project={project}&location={it.location}&name={it.name}" aria-label="Edit">
 								<div class="icon-button">
