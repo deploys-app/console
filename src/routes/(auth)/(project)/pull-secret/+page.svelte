@@ -29,7 +29,6 @@
 				<th>Name</th>
 				<th>Location</th>
 				<th>Created at</th>
-				<th>Created by</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -47,11 +46,10 @@
 						<td>
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
-						<td><span class="cell-muted">{it.createdBy}</span></td>
 					</tr>
 				{/each}
-				<NoDataRow span={4} list={pullSecrets} />
-				<ErrorRow span={4} {error} />
+				<NoDataRow span={3} list={pullSecrets} />
+				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>
 	</div>

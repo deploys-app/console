@@ -35,7 +35,6 @@
 				<th>Role</th>
 				<th>Name</th>
 				<th>Created At</th>
-				<th>Created By</th>
 				<th class="is-collapse is-align-right"></th>
 			</tr>
 			</thead>
@@ -51,7 +50,6 @@
 						<td>
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
-						<td><span class="cell-muted">{it.createdBy}</span></td>
 						<td>
 							{#if roleCanUpdate(it.role)}
 								<a href="/role/create?project={project}&role={it.role}" aria-label="Edit">
@@ -67,8 +65,8 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={roles} />
-				<ErrorRow span={5} {error} />
+				<NoDataRow span={4} list={roles} />
+				<ErrorRow span={4} {error} />
 			</tbody>
 		</table>
 	</div>
