@@ -10,6 +10,12 @@ declare namespace Api {
         forbidden?: boolean
         notFound?: boolean
         validate?: string[]
+        // set when the API rejects a domain delete because routes still depend
+        // on it; routes lists the blocking "<host><path>" identifiers and
+        // routesMore is the count elided past the server's cap.
+        domainInUsed?: boolean
+        routes?: string[]
+        routesMore?: number
     }
 
     export type Response<T> =

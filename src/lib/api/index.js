@@ -58,7 +58,24 @@ async function invoke (fn, args, fetch, opts) {
 			body.error.validate = body.error.items
 			break
 		default:
-			if (msg.includes('api: ') && msg.includes('not found')) {
+			if (msg.startsWith('api: domain in used')) {
+				// "api: domain in used by route(s): a/, b/api (+3 more)" — surface
+				// the blocking routes so the UI can tell the user what to delete.
+				body.error.domainInUsed = true
+				const m = msg.match(/by route\(s\): (.+)$/)
+				if (m) {
+					const more = m[1].match(/\(\+(\d+) more\)\s*$/)
+					body.error.routesMore = more ? Number(more[1]) : 0
+					body.error.routes = m[1]
+						.replace(/\s*\(\+\d+ more\)\s*$/, '')
+						.split(', ')
+						.map((s) => s.trim())
+						.filter(Boolean)
+				} else {
+					body.error.routes = []
+					body.error.routesMore = 0
+				}
+			} else if (msg.includes('api: ') && msg.includes('not found')) {
 				body.error.notFound = true
 			}
 			break
