@@ -1,4 +1,7 @@
 import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
 
 /**
  * @param {string} v
@@ -17,7 +20,7 @@ export function cpu (v) {
  */
 export function cpuLimited (v) {
 	if (v === '0' || !v) {
-		return 'Cluster Default'
+		return 'Default'
 	}
 	return `${v} vCPU`
 }
@@ -135,4 +138,16 @@ export function ttlExpireAt (ttlSeconds) {
 		return ''
 	}
 	return dayjs().add(ttlSeconds, 'second').format('YYYY-MM-DD HH:mm:ss')
+}
+
+/**
+ * Human-friendly relative time, e.g. "3 days ago". Empty for zero/unset dates.
+ * @param {string | undefined | null} v
+ * @returns {string}
+ */
+export function fromNow (v) {
+	if (!v || v.startsWith('0001-01-01')) {
+		return ''
+	}
+	return dayjs(v).fromNow()
 }
