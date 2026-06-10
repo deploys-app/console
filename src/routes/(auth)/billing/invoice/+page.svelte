@@ -59,28 +59,6 @@
 		return `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${invoice.currency}`
 	}
 
-	/**
-	 * Unit prices can be a tiny per-unit rate (e.g. a per-hour or per-second
-	 * compute price) that rounds to 0.00 at the 2-decimal precision used for
-	 * currency totals. Keep a 2-decimal floor, but for sub-cent values widen the
-	 * precision enough to keep the rate's significant digits visible.
-	 * @param {number} v
-	 */
-	function unitPrice (v) {
-		const abs = Math.abs(v)
-		const decimals = abs > 0 && abs < 0.01
-			? Math.min(10, Math.ceil(-Math.log10(abs)) + 3)
-			: 2
-		return `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: decimals })} ${invoice.currency}`
-	}
-
-	/**
-	 * @param {number} v
-	 */
-	function quantity (v) {
-		return v.toLocaleString(undefined, { maximumFractionDigits: 4 })
-	}
-
 	const taxRatePct = $derived(`${(invoice.taxRate * 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`)
 </script>
 
@@ -209,25 +187,19 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th>Description</th>
-						<th class="is-align-right">Quantity</th>
-						<th>Unit</th>
-						<th class="is-align-right">Unit price</th>
+						<th>Project</th>
 						<th class="is-align-right">Amount</th>
 					</tr>
 				</thead>
 				<tbody>
 					{#each invoice.lineItems as it, i (i)}
 						<tr>
-							<td>{it.description || it.sku}</td>
-							<td class="is-align-right">{quantity(it.quantity)}</td>
-							<td>{it.unit}</td>
-							<td class="is-align-right">{unitPrice(it.unitPrice)}</td>
+							<td>{it.description || it.project}</td>
 							<td class="is-align-right">{money(it.amount)}</td>
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="5" class="text-content/60">No line items</td>
+							<td colspan="2" class="text-content/60">No line items</td>
 						</tr>
 					{/each}
 				</tbody>

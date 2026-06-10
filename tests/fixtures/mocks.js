@@ -304,12 +304,12 @@ export const sampleInvoice = {
 	paidAt: '0001-01-01T00:00:00Z',
 	voidedAt: '0001-01-01T00:00:00Z',
 	createdAt: now,
+	// Invoices group by project: one summary line per project, amount is the
+	// project's gross (VAT-inclusive) total. projectId is numeric (int64 wire
+	// contract); project is the sid, description the display name.
 	lineItems: [
-		// A tiny per-second rate: rounds to 0.00 at 2 decimals, so the detail
-		// page must widen precision to keep it visible.
-		{ sku: 'cpu', description: 'vCPU-seconds', quantity: 720000, unit: 'second', unitPrice: 0.0000125, amount: 9 },
-		// quantity is the billed usage (free tier deducted); amount = unitPrice*quantity.
-		{ sku: 'mem', description: 'GiB-hours', quantity: 2, unit: 'hour', unitPrice: 0.5, amount: 1 }
+		{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 9 },
+		{ projectId: '1002', project: 'api-service', description: 'API service', amount: 1.7 }
 	]
 }
 

@@ -32,7 +32,7 @@ test.describe('billing accounts', () => {
 })
 
 test.describe('invoice detail', () => {
-	test('shows a tiny unit price with enough decimals instead of 0.00', async ({ page }) => {
+	test('lists line items grouped by project (project + amount)', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: sampleInvoice },
 			'billing.get': { ok: true, result: sampleBillingAccount }
@@ -40,14 +40,12 @@ test.describe('invoice detail', () => {
 
 		await page.goto('/billing/invoice?id=inv-1')
 
-		const row = page.locator('table tbody tr', { hasText: 'vCPU-seconds' })
-		const unitPriceCell = row.locator('td').nth(3)
-		// The sub-cent rate keeps its significant digits rather than rounding away.
-		await expect(unitPriceCell).toHaveText('0.0000125 USD')
+		// Each line is one project: name in the first column, gross amount in the second.
+		const webRow = page.locator('table tbody tr', { hasText: 'Web frontend' })
+		await expect(webRow.locator('td').nth(1)).toHaveText('9.00 USD')
 
-		// A normal-magnitude rate still reads at the 2-decimal currency floor.
-		const memRow = page.locator('table tbody tr', { hasText: 'GiB-hours' })
-		await expect(memRow.locator('td').nth(3)).toHaveText('0.50 USD')
+		const apiRow = page.locator('table tbody tr', { hasText: 'API service' })
+		await expect(apiRow.locator('td').nth(1)).toHaveText('1.70 USD')
 	})
 
 	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
