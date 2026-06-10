@@ -187,6 +187,7 @@
 			<table class="table">
 				<thead>
 					<tr>
+						<th>#</th>
 						<th>Project</th>
 						<th class="is-align-right">Amount</th>
 					</tr>
@@ -194,12 +195,13 @@
 				<tbody>
 					{#each invoice.lineItems as it, i (i)}
 						<tr>
+							<td class="text-content/60">{i + 1}</td>
 							<td>{it.description || it.project}</td>
 							<td class="is-align-right">{money(it.amount)}</td>
 						</tr>
 					{:else}
 						<tr>
-							<td colspan="2" class="text-content/60">No line items</td>
+							<td colspan="3" class="text-content/60">No line items</td>
 						</tr>
 					{/each}
 				</tbody>
