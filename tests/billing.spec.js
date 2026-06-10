@@ -48,6 +48,35 @@ test.describe('invoice detail', () => {
 		await expect(apiRow.locator('td').nth(2)).toHaveText('1.70 USD')
 	})
 
+	test('hides the receipt button on unpaid invoices', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		await expect(page.getByRole('button', { name: 'Download PDF' })).toBeVisible()
+		await expect(page.getByRole('button', { name: 'Download receipt' })).toHaveCount(0)
+	})
+
+	test('shows the receipt button on paid invoices and calls billing.downloadReceipt', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, status: 'paid', paidAt: '2026-05-03T00:00:00Z' } },
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			// Error response proves the click reaches billing.downloadReceipt and
+			// its message surfaces (success would navigate away to the file URL).
+			'billing.downloadReceipt': { ok: false, error: { message: 'api: invoice pdf export is not available' } }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		const btn = page.getByRole('button', { name: 'Download receipt' })
+		await expect(btn).toBeVisible()
+		await btn.click()
+		await expect(page.locator('#swal2-html-container')).toHaveText(/invoice pdf export is not available/)
+	})
+
 	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: sampleInvoice },
