@@ -40,12 +40,12 @@ test.describe('invoice detail', () => {
 
 		await page.goto('/billing/invoice?id=inv-1')
 
-		// Each line is one project: name in the first column, gross amount in the second.
+		// Each line is one project: # | project name | gross amount (right-aligned).
 		const webRow = page.locator('table tbody tr', { hasText: 'Web frontend' })
-		await expect(webRow.locator('td').nth(1)).toHaveText('9.00 USD')
+		await expect(webRow.locator('td').nth(2)).toHaveText('9.00 USD')
 
 		const apiRow = page.locator('table tbody tr', { hasText: 'API service' })
-		await expect(apiRow.locator('td').nth(1)).toHaveText('1.70 USD')
+		await expect(apiRow.locator('td').nth(2)).toHaveText('1.70 USD')
 	})
 
 	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
