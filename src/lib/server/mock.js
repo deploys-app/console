@@ -516,10 +516,9 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-06-01T00:00:00Z',
 		lineItems: [
-			// quantity is the billed usage (free tier already deducted); amount = unitPrice*quantity.
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 600, unit: 'hour', unitPrice: 1.5, amount: 900 },
-			{ sku: 'mem', description: 'GiB-hours', quantity: 500, unit: 'hour', unitPrice: 0.5, amount: 250 },
-			{ sku: 'cpu-sec', description: 'vCPU-seconds', quantity: 2160000, unit: 'second', unitPrice: 0.0000125, amount: 27 }
+			// One line per project: amount is the project's gross (VAT-inclusive) total.
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 900 },
+			{ projectId: '1002', project: 'api-service', description: 'API service', amount: 384 }
 		]
 	},
 	{
@@ -542,7 +541,7 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-05-01T00:00:00Z',
 		lineItems: [
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 100, unit: 'hour', unitPrice: 1.5, amount: 150 }
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 160.5 }
 		]
 	},
 	{
@@ -565,8 +564,8 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-05-01T00:00:00Z',
 		lineItems: [
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 720, unit: 'hour', unitPrice: 1.5, amount: 1080 },
-			{ sku: 'mem', description: 'GiB-hours', quantity: 720, unit: 'hour', unitPrice: 0.583, amount: 420 }
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 1080 },
+			{ projectId: '1003', project: 'worker', description: 'Background worker', amount: 525 }
 		]
 	},
 	{
@@ -589,7 +588,7 @@ const invoices = [
 		voidedAt: '2026-04-05T00:00:00Z',
 		createdAt: '2026-04-01T00:00:00Z',
 		lineItems: [
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 720, unit: 'hour', unitPrice: 1.5, amount: 1080 }
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 1155.6 }
 		]
 	},
 	{
@@ -612,8 +611,8 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-03-01T00:00:00Z',
 		lineItems: [
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 200, unit: 'hour', unitPrice: 0.04, amount: 8 },
-			{ sku: 'mem', description: 'GiB-hours', quantity: 200, unit: 'hour', unitPrice: 0.016, amount: 3.2 }
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 8 },
+			{ projectId: '1002', project: 'api-service', description: 'API service', amount: 3.2 }
 		]
 	},
 	{
@@ -636,7 +635,7 @@ const invoices = [
 		voidedAt: '',
 		createdAt: '2026-01-21T00:00:00Z',
 		lineItems: [
-			{ sku: 'cpu', description: 'vCPU-hours', quantity: 50, unit: 'hour', unitPrice: 1.5, amount: 75 }
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 80.25 }
 		]
 	}
 ]

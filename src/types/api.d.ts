@@ -428,14 +428,15 @@ declare namespace Api {
         createdAt: string
     }
 
+    // One summary line per project: invoices are grouped by project (not SKU),
+    // so each line is a project's total charge for the period. projectId /
+    // project / description are snapshotted at issue time.
     export type InvoiceLineItem = {
-        sku: string
+        projectId: string
+        // project is the project's sid (stable slug).
+        project: string
+        // description is the project's display name (falls back to the sid).
         description: string
-        // quantity is the billed usage, free-tier units already deducted.
-        quantity: number
-        unit: string
-        // unitPrice is the per-unit rate; amount = unitPrice*quantity.
-        unitPrice: number
         amount: number
     }
 
