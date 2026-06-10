@@ -12,23 +12,27 @@
 	const billingAccount = $derived(data.billingAccount)
 
 	let downloading = $state(false)
+	let downloadingReceipt = $state(false)
 	let payModal = $state(/** @type {?ReturnType<typeof PayInvoiceModal>} */ (null))
 
 	function onSlipUploaded () {
 		modal.success({ content: 'Payment slip uploaded. We\'ll verify it and mark the invoice as paid.' })
 	}
 
-	async function downloadPDF () {
-		if (downloading) return
-		downloading = true
+	/**
+	 * Shared download flow for the invoice and receipt PDFs.
+	 * @param {string} fn api function name
+	 * @param {string} fallbackError message when the API returns a blank error
+	 */
+	async function download (fn, fallbackError) {
 		try {
 			/** @type {Api.Response<Api.InvoiceDownloadResult>} */
-			const resp = await api.invoke('billing.downloadInvoice', { invoiceId: invoice.id }, fetch)
+			const resp = await api.invoke(fn, { invoiceId: invoice.id }, fetch)
 			if (!resp.ok || !resp.result) {
 				// Show the API's message when present (e.g. the PDF-unavailable
 				// error), else a clear fallback — arpc returns a blank `{}` for
 				// unexpected 500s, which would otherwise be an empty modal.
-				modal.error({ error: resp.error?.message ? resp.error : 'Could not download the invoice PDF. Please try again.' })
+				modal.error({ error: resp.error?.message ? resp.error : fallbackError })
 				return
 			}
 			// The dropbox link serves the file as an attachment, so navigating
@@ -38,8 +42,26 @@
 			// Defensive: a network failure (fetch rejection) shouldn't leave the
 			// button stuck spinning with no feedback.
 			modal.error({ error: err })
+		}
+	}
+
+	async function downloadPDF () {
+		if (downloading) return
+		downloading = true
+		try {
+			await download('billing.downloadInvoice', 'Could not download the invoice PDF. Please try again.')
 		} finally {
 			downloading = false
+		}
+	}
+
+	async function downloadReceipt () {
+		if (downloadingReceipt) return
+		downloadingReceipt = true
+		try {
+			await download('billing.downloadReceipt', 'Could not download the receipt PDF. Please try again.')
+		} finally {
+			downloadingReceipt = false
 		}
 	}
 
@@ -139,6 +161,17 @@
 				<i class="fa-solid fa-download"></i>
 				Download PDF
 			</button>
+			{#if invoice.status === 'paid'}
+				<button
+					class="button is-variant-secondary is-icon-left"
+					class:is-loading={downloadingReceipt}
+					disabled={downloadingReceipt}
+					onclick={downloadReceipt}
+				>
+					<i class="fa-solid fa-file-invoice"></i>
+					Download receipt
+				</button>
+			{/if}
 			{#if invoice.status === 'open'}
 				<button class="button is-icon-left" onclick={() => payModal?.open(invoice)}>
 					<i class="fa-solid fa-receipt"></i>

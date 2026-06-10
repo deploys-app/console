@@ -721,6 +721,17 @@ const handlers = {
 			expiresAt: '2026-06-02T00:00:00Z'
 		})
 	},
+	// Receipt is paid-only — mirror the API's typed error for other statuses.
+	'billing.downloadReceipt': (args) => {
+		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
+		if (inv.status !== 'paid') {
+			return { ok: false, error: { message: 'api: invoice is not paid' } }
+		}
+		return ok({
+			downloadUrl: `https://dropbox.deploys.app/files/mock-${inv.id}-receipt.pdf`,
+			expiresAt: '2026-06-02T00:00:00Z'
+		})
+	},
 	// Multipart upload: the proxy can't JSON-parse the body in mock mode, so
 	// args is empty here — just acknowledge the upload.
 	'billing.uploadTransferSlip': () => ok({
