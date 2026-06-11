@@ -6,7 +6,9 @@
 	import * as modal from '$lib/modal'
 	import * as format from '$lib/format'
 	import { actionLabels } from '$lib/waf/rules'
+	import { describeKey, modeLabels } from '$lib/waf/limits'
 	import WafActivityChart from '$lib/components/WafActivityChart.svelte'
+	import LineChart from '$lib/components/LineChart.svelte'
 
 	const { data } = $props()
 
@@ -19,6 +21,10 @@
 	const ruleMeta = $derived(new Map(
 		(data.zone?.rules ?? []).map((/** @type {Api.WafRule} */ r) => [r.id, r])
 	))
+
+	// Configured limits drive the rate-limit section: no limits, no section.
+	const limits = $derived(/** @type {Api.WafLimit[]} */ (data.zone?.limits ?? []))
+	const hasLimits = $derived(limits.length > 0)
 
 	// Stacks render block on top of log on top of allow — most-severe last so it
 	// sits at the top of the column.
@@ -53,6 +59,7 @@
 
 	let loading = $state(true)
 	let result = $state(/** @type {Api.WafMetricsResult | null} */ (null))
+	let limitResult = $state(/** @type {Api.WafLimitMetricsResult | null} */ (null))
 	// Anchor the time window to the moment of the latest fetch so the chart grid
 	// and "as of" line agree.
 	let fetchedAt = $state(Math.floor(Date.now() / 1000))
@@ -63,13 +70,19 @@
 	async function fetchMetrics () {
 		loading = true
 		try {
-			/** @type {Api.Response<Api.WafMetricsResult>} */
-			const res = await api.invoke('waf.metrics', { project, location, timeRange: range }, fetch)
+			const args = { project, location, timeRange: range }
+			const [res, limitRes] = await Promise.all([
+				/** @type {Promise<Api.Response<Api.WafMetricsResult>>} */ (api.invoke('waf.metrics', args, fetch)),
+				hasLimits
+					? /** @type {Promise<Api.Response<Api.WafLimitMetricsResult>>} */ (api.invoke('waf.limitMetrics', args, fetch))
+					: Promise.resolve(/** @type {Api.Response<Api.WafLimitMetricsResult>} */ ({ ok: true, result: { series: [], total: 0 } }))
+			])
 			if (!res.ok) {
 				modal.error({ error: res.error })
 				return
 			}
 			result = res.result ?? { series: [], total: 0 }
+			limitResult = (limitRes.ok ? limitRes.result : null) ?? { series: [], total: 0 }
 			fetchedAt = Math.floor(Date.now() / 1000)
 		} finally {
 			loading = false
@@ -94,6 +107,7 @@
 		u.searchParams.set('range', r)
 		replaceState(u, {})
 		result = null
+		limitResult = null
 		fetchMetrics()
 	}
 
@@ -184,8 +198,70 @@
 		return total > 0 ? `${Math.round((v / total) * 100)}%` : '—'
 	}
 
+	// Per-limit (allowed, limited) bucket counts, joined from the sparse series.
+	const limitBuckets = $derived.by(() => {
+		/** @type {Record<string, { allowed: Record<number, number>, limited: Record<number, number> }>} */
+		const byLimit = {}
+		for (const s of limitResult?.series ?? []) {
+			const entry = byLimit[s.limitId] ??= { allowed: {}, limited: {} }
+			const m = entry[s.result]
+			if (!m) continue
+			for (const [ts, v] of s.points ?? []) {
+				m[ts] = (m[ts] ?? 0) + v
+			}
+		}
+		return byLimit
+	})
+
+	// One share line per configured limit: limited / (allowed + limited) as a
+	// percentage, over the union of that limit's bucket timestamps. A missing
+	// series counts as 0, so a bucket with only limited traffic reads 100%.
+	const limitShareSeries = $derived.by(() => {
+		/** @type {import('$lib/charts/util').LineSeries[]} */
+		const out = []
+		for (const limit of limits) {
+			const entry = limitBuckets[limit.id]
+			if (!entry) continue
+			const xs = [...new Set([...Object.keys(entry.allowed), ...Object.keys(entry.limited)])]
+				.map(Number)
+				.sort((a, b) => a - b)
+			if (!xs.length) continue
+			const name = limit.description || limit.id
+			out.push({
+				name: limit.mode === 'shadow' ? `${name} · shadow` : name,
+				dashed: limit.mode === 'shadow',
+				points: xs.map((ts) => {
+					const allowed = entry.allowed[ts] ?? 0
+					const limited = entry.limited[ts] ?? 0
+					const t = allowed + limited
+					return { x: ts * 1000, y: t > 0 ? (limited / t) * 100 : 0 }
+				})
+			})
+		}
+		return out
+	})
+
+	// Summary rows — every configured limit gets one, with — when it saw no
+	// traffic in the window.
+	const limitRows = $derived(limits.map((limit) => {
+		const entry = limitBuckets[limit.id]
+		const sum = (/** @type {Record<number, number> | undefined} */ m) =>
+			Object.values(m ?? {}).reduce((acc, v) => acc + v, 0)
+		const allowed = sum(entry?.allowed)
+		const limited = sum(entry?.limited)
+		const traffic = allowed + limited
+		return { limit, allowed, limited, traffic, share: traffic > 0 ? (limited / traffic) * 100 : null }
+	}))
+
+	/** @param {number} v */
+	function sharePct (v) {
+		return `${v >= 10 ? v.toFixed(1) : v.toFixed(2)}%`
+	}
+
 	const showSpinner = $derived(loading && !result)
 	const isEmpty = $derived(!loading && total === 0)
+	const limitSpinner = $derived(loading && !limitResult)
+	const limitEmpty = $derived(!limitSpinner && limitShareSeries.length === 0)
 </script>
 
 <div class="breadcrumb">
@@ -328,6 +404,95 @@
 							<i class="fa-solid fa-spinner-third fa-spin"></i>
 						</td></tr>
 					{/if}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{/if}
+
+{#if hasLimits}
+	<div class="panel is-level-300 limit-panel">
+		<div class="panel-head">
+			<div>
+				<h6><strong>Rate limit activity</strong></h6>
+				<p class="page-sub">Share of requests over each limit — size shadow limits here before enforcing them.</p>
+			</div>
+		</div>
+
+		<div class="limit-chart-body">
+			{#if limitSpinner}
+				<div class="chart-state limit-state text-content/40">
+					<i class="fa-solid fa-spinner-third fa-spin text-2xl"></i>
+				</div>
+			{:else if limitEmpty}
+				<div class="chart-state limit-state">
+					<i class="fa-solid fa-gauge-high empty-icon"></i>
+					<p class="empty-title">No rate limit activity in this range.</p>
+					<p class="empty-sub">No request hit a configured limit's bucket in the {RANGE_LABEL[range]}.</p>
+				</div>
+			{:else}
+				<LineChart
+					series={limitShareSeries}
+					xType="time"
+					xDomain={[windowFrom * 1000, fetchedAt * 1000]}
+					height={280}
+					formatY={(v) => `${format.count(v)}%`}
+					formatValue={(v) => sharePct(v)}
+					legend />
+			{/if}
+		</div>
+
+		<div class="table-container limit-table">
+			<table class="table is-variant-compact">
+				<thead>
+					<tr>
+						<th>Limit</th>
+						<th>Mode</th>
+						<th class="is-align-right">Allowed</th>
+						<th class="is-align-right">Limited</th>
+						<th class="is-align-right">Share</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each limitRows as row (row.limit.id)}
+						<tr>
+							<td>
+								<div class="rule-cell">
+									<span class="rule-desc">{row.limit.description || row.limit.id}</span>
+									<span class="text-sm text-content/55">{describeKey(row.limit.key)} · {row.limit.rate} / {row.limit.window}</span>
+								</div>
+							</td>
+							<td>
+								<span class="mode-badge" data-mode={row.limit.mode ?? 'enforce'}>
+									{modeLabels[row.limit.mode ?? 'enforce'] ?? row.limit.mode}
+								</span>
+							</td>
+							<td class="is-align-right font-mono tabular-nums">
+								{#if row.traffic > 0}
+									{row.allowed.toLocaleString()}
+								{:else}
+									<span class="text-content/40">—</span>
+								{/if}
+							</td>
+							<td class="is-align-right">
+								{#if row.traffic > 0}
+									<span class="font-mono tabular-nums">{row.limited.toLocaleString()}</span>
+									{#if row.limit.mode === 'shadow'}
+										<span class="text-sm text-content/45">would be limited</span>
+									{/if}
+								{:else}
+									<span class="text-content/40">—</span>
+								{/if}
+							</td>
+							<td class="is-align-right font-mono tabular-nums">
+								{#if row.share != null}
+									{sharePct(row.share)}
+								{:else}
+									<span class="text-content/40">—</span>
+								{/if}
+							</td>
+						</tr>
+					{/each}
 				</tbody>
 			</table>
 		</div>
@@ -601,5 +766,41 @@
 	.act-badge[data-action='allow'] {
 		color: hsl(var(--hsl-positive));
 		background-color: hsl(var(--hsl-positive) / 0.12);
+	}
+
+	/* Rate limit activity */
+	.limit-panel {
+		margin-top: 1rem;
+	}
+
+	.limit-chart-body {
+		min-height: 280px;
+	}
+
+	.limit-state {
+		min-height: 280px;
+	}
+
+	.limit-table {
+		margin-top: 1rem;
+	}
+
+	/* Same badge as the manage page's limits table. */
+	.mode-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.125rem 0.625rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.75);
+		background-color: hsl(var(--hsl-content) / 0.08);
+	}
+
+	/* Shadow only observes — render it muted so Enforce stands out. */
+	.mode-badge[data-mode='shadow'] {
+		color: hsl(var(--hsl-content) / 0.5);
+		background-color: hsl(var(--hsl-content) / 0.05);
 	}
 </style>

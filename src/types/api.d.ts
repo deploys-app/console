@@ -486,11 +486,30 @@ declare namespace Api {
         priority: number
     }
 
+    export type WafLimit = {
+        id: string
+        description: string
+        // Bucket key characteristics. Allowed entries: 'ip' | 'host' | 'asn' |
+        // 'country' | 'header:<name>' | 'cookie:<name>'. Defaults to ['ip'].
+        key: string[]
+        // Requests per window per key; must be > 0.
+        rate: number
+        // Go duration string, 1s..1h (e.g. '10s', '1m', '1h').
+        window: string
+        algorithm?: 'fixed' | 'sliding'
+        // shadow counts matches but never rejects (default enforce).
+        mode?: 'enforce' | 'shadow'
+        // 429 (default) or 503 only.
+        status?: number
+        message?: string
+    }
+
     export type WafZone = {
         project: string
         location: string
         description: string
         rules: WafRule[]
+        limits: WafLimit[]
         status: 'pending' | 'success' | 'error'
         action: 'create' | 'delete'
         createdAt: string
@@ -514,6 +533,19 @@ declare namespace Api {
 
     export type WafMetricsResult = {
         series: WafMetricsSeries[]
+        total: number
+    }
+
+    export type WafLimitMetricsSeries = {
+        limitId: string
+        result: 'allowed' | 'limited'
+        total: number
+        // [unixSeconds, count], time-ordered; sparse — missing bucket = 0
+        points: [number, number][]
+    }
+
+    export type WafLimitMetricsResult = {
+        series: WafLimitMetricsSeries[]
         total: number
     }
 
