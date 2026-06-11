@@ -48,6 +48,17 @@ function metricLine (name, base) {
 	return [{ name, points }]
 }
 
+// Two pods of one id-named deployment (`0d<id>-<projectID>-<rsHash>-<podHash>`),
+// matching how the live (non-aggregate) `deployment.metrics` lines are keyed by
+// full pod name. Lets the metrics page exercise the legend's shared-prefix
+// stripping (only the trailing pod hash should show).
+const MOCK_PODS = ['0d128-77-7d8f9b6c5-x2k9p', '0d128-77-7d8f9b6c5-q8m2t']
+
+/** @param {number} base */
+function metricPodLines (base) {
+	return MOCK_PODS.map((name, i) => metricLine(name, base * (i === 0 ? 1 : 0.72))[0])
+}
+
 /**
  * dailyMetricLine builds a single daily series — one [unixSeconds, value] point
  * per day at midnight for the trailing 30 days — for the daily usage charts.
@@ -870,13 +881,13 @@ const handlers = {
 		}
 	})),
 	'deployment.metrics': () => ok({
-		cpuUsage: metricLine('web', 0.3),
-		cpuLimit: metricLine('limit', 0.5),
-		memoryUsage: metricLine('web', 268435456),
-		memory: metricLine('allocated', 402653184),
-		memoryLimit: metricLine('limit', 536870912),
-		requests: metricLine('web', 120),
-		egress: metricLine('web', 1048576)
+		cpuUsage: metricPodLines(0.3),
+		cpuLimit: metricPodLines(0.5),
+		memoryUsage: metricPodLines(268435456),
+		memory: metricPodLines(402653184),
+		memoryLimit: metricPodLines(536870912),
+		requests: metricPodLines(120),
+		egress: metricPodLines(1048576)
 	}),
 
 	'disk.list': () => list(disks),

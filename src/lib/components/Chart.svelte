@@ -48,10 +48,41 @@
 
 	const fmtY = $derived(unit === 'bytes' ? formatBytes : formatNumber)
 
+	// Every pod of one deployment shares a long, identical name prefix — the k8s
+	// resource name and project id (`web-123-…`, or `0d456-123-…` for id-named
+	// deployments). That prefix is the same on every line, so in the legend it's
+	// pure noise that pushes the part that actually differs (the pod hash) off
+	// the edge. Strip the longest prefix common to all lines, trimmed back to a
+	// '-' boundary so whole name segments are removed (never a hash mid-token).
+	// This also hides the otherwise-opaque `0d<id>` resource name.
+	const podPrefixLen = $derived.by(() => {
+		/** @type {string[]} */
+		const names = []
+		for (const s of series ?? []) {
+			for (const l of (s.lines ?? [])) names.push(l.name ?? '')
+		}
+		if (names.length < 2) return 0
+		let p = names[0]
+		for (let i = 1; i < names.length && p; i++) {
+			const n = names[i]
+			let j = 0
+			while (j < p.length && j < n.length && p[j] === n[j]) j++
+			p = p.slice(0, j)
+		}
+		const cut = p.lastIndexOf('-')
+		return cut >= 0 ? cut + 1 : 0
+	})
+
+	/** @param {string} name */
+	function podLabel (name) {
+		return name.slice(podPrefixLen) || name
+	}
+
 	// Flatten {prefix, lines[]} into one drawable line each. A single-line series
 	// keeps the bare prefix ("Usage"); multi-line series disambiguate with the
-	// line's own name ("Usage · web"). The first solid line gets the area fill so
-	// the panel reads as one primary trend with reference lines layered over it.
+	// pod's distinguishing suffix ("Usage · x2k9p"). The first solid line gets the
+	// area fill so the panel reads as one primary trend with reference lines
+	// layered over it.
 	const flat = $derived.by(() => {
 		let areaUsed = false
 		/** @type {import('$lib/charts/util').LineSeries[]} */
@@ -63,7 +94,7 @@
 				const area = !dashed && !areaUsed
 				if (area) areaUsed = true
 				out.push({
-					name: lines.length > 1 ? `${s.prefix} · ${l.name}` : s.prefix,
+					name: lines.length > 1 ? `${s.prefix} · ${podLabel(l.name)}` : s.prefix,
 					color: resolveColor(s.color),
 					dashed,
 					area,
