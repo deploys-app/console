@@ -16,9 +16,9 @@ import { env } from '$env/dynamic/private'
 // deployment, so the logs page exercises pod-name prefix stripping — only the
 // `<rsHash>-<podHash>` suffix should show in the chip.
 const PODS = [
-	'0d128-77-7d8f9b6c5-x2k9p',
-	'0d128-77-7d8f9b6c5-q8m2t',
-	'0d128-77-5b9c4d2a1-h3n7v'
+	'd128-77-7d8f9b6c5-x2k9p',
+	'd128-77-7d8f9b6c5-q8m2t',
+	'd128-77-5b9c4d2a1-h3n7v'
 ]
 
 const TEMPLATES = [

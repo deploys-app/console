@@ -9,21 +9,21 @@
 
 import { env } from '$env/dynamic/private'
 
-// Pod references use full id-named pod names (`0d128-77-<rsHash>-<podHash>`) so
+// Pod references use full id-named pod names (`d128-77-<rsHash>-<podHash>`) so
 // the events page exercises pod-name prefix stripping in free-text messages.
 const NORMAL = [
-	{ reason: 'Scheduled', message: 'Successfully assigned acme/0d128-77-7d8f9b6c5-x2k9p to gke-node-rcf2-pool-1-3a8f' },
+	{ reason: 'Scheduled', message: 'Successfully assigned acme/d128-77-7d8f9b6c5-x2k9p to gke-node-rcf2-pool-1-3a8f' },
 	{ reason: 'Pulling', message: 'Pulling image "registry.deploys.app/acme/web:latest"' },
 	{ reason: 'Pulled', message: 'Successfully pulled image "registry.deploys.app/acme/web:latest" in 2.317s' },
 	{ reason: 'Created', message: 'Created container web' },
 	{ reason: 'Started', message: 'Started container web' },
-	{ reason: 'SuccessfulCreate', message: 'Created pod: 0d128-77-7d8f9b6c5-q8m2t' },
-	{ reason: 'SuccessfulDelete', message: 'Deleted pod: 0d128-77-5b9c4d2a1-h3n7v' },
+	{ reason: 'SuccessfulCreate', message: 'Created pod: d128-77-7d8f9b6c5-q8m2t' },
+	{ reason: 'SuccessfulDelete', message: 'Deleted pod: d128-77-5b9c4d2a1-h3n7v' },
 	{ reason: 'Killing', message: 'Stopping container web' }
 ]
 
 const WARNINGS = [
-	{ reason: 'BackOff', message: 'Back-off restarting failed container web in pod 0d128-77-7d8f9b6c5-x2k9p' },
+	{ reason: 'BackOff', message: 'Back-off restarting failed container web in pod d128-77-7d8f9b6c5-x2k9p' },
 	{ reason: 'Unhealthy', message: 'Readiness probe failed: HTTP probe failed with statuscode: 503' },
 	{ reason: 'FailedScheduling', message: '0/5 nodes are available: 5 Insufficient memory.' },
 	{ reason: 'FailedMount', message: 'Unable to attach or mount volumes: unmounted volumes=[data]' }

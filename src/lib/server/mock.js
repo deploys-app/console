@@ -48,11 +48,11 @@ function metricLine (name, base) {
 	return [{ name, points }]
 }
 
-// Two pods of one id-named deployment (`0d<id>-<projectID>-<rsHash>-<podHash>`),
+// Two pods of one id-named deployment (`d<id>-<projectID>-<rsHash>-<podHash>`),
 // matching how the live (non-aggregate) `deployment.metrics` lines are keyed by
 // full pod name. Lets the metrics page exercise the legend's shared-prefix
 // stripping (only the trailing pod hash should show).
-const MOCK_PODS = ['0d128-77-7d8f9b6c5-x2k9p', '0d128-77-7d8f9b6c5-q8m2t']
+const MOCK_PODS = ['d128-77-7d8f9b6c5-x2k9p', 'd128-77-7d8f9b6c5-q8m2t']
 
 /** @param {number} base */
 function metricPodLines (base) {
@@ -176,7 +176,7 @@ function deployment (project = 'acme') {
 		address: '203.0.113.10',
 		// `<kubeName>-<projectID>` (the in-cluster service name); id-named here so
 		// the logs/events pages exercise pod-name prefix stripping.
-		internalAddress: '0d128-77',
+		internalAddress: 'd128-77',
 		status: 'success',
 		action: 'deploy',
 		allocatedPrice: 120.5,
