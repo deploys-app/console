@@ -5,6 +5,7 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
+	import { describeKey, keyRowToApi, modeLabels, normalizeLimits, toApiLimits } from '$lib/waf/limits'
 
 	const { data } = $props()
 
@@ -15,6 +16,7 @@
 	// (e.g. from the edit page) reloads the loader, which re-seeds this copy.
 	let description = $state(untrack(() => data.zone?.description ?? ''))
 	let rules = $state(untrack(() => normalizeRules(data.zone?.rules)))
+	let limits = $state(untrack(() => normalizeLimits(data.zone?.limits)))
 
 	let loadedLocation = untrack(() => data.location ?? '')
 
@@ -28,6 +30,7 @@
 				loadedLocation = next.location ?? ''
 				description = next.zone?.description ?? ''
 				rules = normalizeRules(next.zone?.rules)
+				limits = normalizeLimits(next.zone?.limits)
 			}
 		})
 	})
@@ -49,17 +52,23 @@
 		const zone = resp.result ?? null
 		description = zone?.description ?? ''
 		rules = normalizeRules(zone?.rules)
+		limits = normalizeLimits(zone?.limits)
 	}
 
-	// Persist the whole zone (priority follows row order). On error, surface it
-	// and reload from the server so the UI matches reality.
-	/** @param {import('$lib/waf/rules').RuleForm[]} nextRules */
-	async function persistZone (nextRules) {
+	// Persist the whole zone (priority follows row order). waf.set replaces the
+	// entire zone, so rules and limits must always travel together. On error,
+	// surface it and reload from the server so the UI matches reality.
+	/**
+	 * @param {import('$lib/waf/rules').RuleForm[]} nextRules
+	 * @param {import('$lib/waf/limits').LimitForm[]} [nextLimits]
+	 */
+	async function persistZone (nextRules, nextLimits = limits) {
 		const resp = await api.invoke('waf.set', {
 			project,
 			location,
 			description,
-			rules: toApiRules(nextRules)
+			rules: toApiRules(nextRules),
+			limits: toApiLimits(nextLimits)
 		}, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
@@ -106,6 +115,30 @@
 		goto(`/waf/edit?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
+	/** @param {number} i */
+	function removeLimit (i) {
+		const limit = limits[i]
+		if (!limit) return
+		modal.confirm({
+			title: `Delete rate limit ${limit.id}?`,
+			yes: 'Delete',
+			callback: async () => {
+				const next = limits.filter((_, k) => k !== i)
+				limits = next
+				await persistZone(rules, next)
+			}
+		})
+	}
+
+	/** @param {import('$lib/waf/limits').LimitForm} limit */
+	function editLimit (limit) {
+		goto(`/waf/limit?project=${project}&location=${encodeURIComponent(location)}&limit=${encodeURIComponent(limit.id)}`)
+	}
+
+	function addLimit () {
+		goto(`/waf/limit?project=${project}&location=${encodeURIComponent(location)}`)
+	}
+
 	async function saveDescription () {
 		if (savingDescription) return
 		savingDescription = true
@@ -118,7 +151,7 @@
 
 	function deleteZone () {
 		modal.confirm({
-			title: `Disable the firewall in ${location}? All rules will be removed.`,
+			title: `Disable the firewall in ${location}? All rules and rate limits will be removed.`,
 			yes: 'Disable',
 			callback: async () => {
 				const resp = await api.invoke('waf.delete', { project, location }, fetch)
@@ -268,7 +301,87 @@
 			</table>
 		</div>
 
-		<DangerZone description="Disable the firewall in this location and permanently remove all of its rules.">
+		<br>
+		<hr>
+		<br>
+
+		<div class="flex items-center justify-between">
+			<div>
+				<h6><strong>Rate limits</strong></h6>
+				<p class="text-content/50 text-sm mt-1">
+					Limit how often clients can hit your routes. Shadow mode counts
+					matches without rejecting.
+				</p>
+			</div>
+		</div>
+
+		<div class="table-container">
+			<table class="table is-variant-compact">
+				<thead>
+					<tr>
+						<th>Description</th>
+						<th>Key</th>
+						<th>Limit</th>
+						<th>Mode</th>
+						<th class="is-collapse is-align-right">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each limits as limit, i (limit.id)}
+						<tr>
+							<td>
+								{#if limit.description}
+									{limit.description}
+								{:else}
+									<span class="text-content/40">—</span>
+								{/if}
+							</td>
+							<td>{describeKey(limit.key.map(keyRowToApi).filter(Boolean))}</td>
+							<td>
+								<span class="font-mono text-sm">{limit.rate} / {limit.window}</span>
+							</td>
+							<td>
+								<span class="mode-badge" data-mode={limit.mode}>
+									{modeLabels[limit.mode] ?? limit.mode}
+								</span>
+							</td>
+							<td>
+								<div class="flex gap-1 justify-end">
+									<button class="icon-button" type="button" aria-label="Edit rate limit"
+										onclick={() => editLimit(limit)}>
+										<i class="fa-solid fa-pencil"></i>
+									</button>
+									<button class="icon-button" type="button" aria-label="Remove rate limit"
+										onclick={() => removeLimit(i)}>
+										<i class="fa-solid fa-trash-alt"></i>
+									</button>
+								</div>
+							</td>
+						</tr>
+					{/each}
+					{#if limits.length === 0}
+						<tr>
+							<td colspan="5" class="text-center text-content/50">
+								No rate limits yet. Add a limit to throttle traffic.
+							</td>
+						</tr>
+					{/if}
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="5">
+							<button class="button is-variant-secondary flex m-auto" type="button"
+								onclick={addLimit}>
+								<i class="fa-solid fa-plus mr-3"></i>
+								<span>Add Limit</span>
+							</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+
+		<DangerZone description="Disable the firewall in this location and permanently remove all of its rules and rate limits.">
 			<button class="button is-variant-negative" type="button" onclick={deleteZone}>Disable firewall</button>
 		</DangerZone>
 	</div>
@@ -295,5 +408,23 @@
 	.action-badge[data-action='allow'] {
 		color: hsl(var(--hsl-positive));
 		background-color: hsl(var(--hsl-positive) / 0.12);
+	}
+
+	.mode-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.125rem 0.625rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.75);
+		background-color: hsl(var(--hsl-content) / 0.08);
+	}
+
+	/* Shadow only observes — render it muted so Enforce stands out. */
+	.mode-badge[data-mode='shadow'] {
+		color: hsl(var(--hsl-content) / 0.5);
+		background-color: hsl(var(--hsl-content) / 0.05);
 	}
 </style>

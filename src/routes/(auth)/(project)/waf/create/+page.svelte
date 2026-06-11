@@ -27,7 +27,8 @@
 				project,
 				location: form.location,
 				description: form.description,
-				rules: []
+				rules: [],
+				limits: []
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })

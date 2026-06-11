@@ -14,6 +14,7 @@
 		normalizeRules,
 		toApiRules
 	} from '$lib/waf/rules'
+	import { normalizeLimits, toApiLimits } from '$lib/waf/limits'
 
 	const { data } = $props()
 
@@ -29,6 +30,9 @@
 	// The whole loaded zone's rules (ordered) are held in memory so Save can
 	// rewrite the entire zone with the edited rule in place.
 	const rules = untrack(() => normalizeRules(data.zone?.rules))
+	// waf.set replaces the whole zone, so the zone's limits must be echoed back
+	// untouched — otherwise saving a rule would wipe them.
+	const limits = untrack(() => normalizeLimits(data.zone?.limits))
 	const description = untrack(() => data.zone?.description ?? '')
 	// Index of the rule being edited, or -1 when adding a brand-new rule.
 	const editIndex = untrack(() => (data.ruleId ? rules.findIndex((r) => r.id === data.ruleId) : -1))
@@ -102,7 +106,8 @@
 				project,
 				location,
 				description,
-				rules: toApiRules(nextRules)
+				rules: toApiRules(nextRules),
+				limits: toApiLimits(limits)
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })

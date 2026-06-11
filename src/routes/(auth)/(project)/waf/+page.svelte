@@ -97,6 +97,7 @@
 					<th>Status</th>
 					<th>Description</th>
 					<th>Rules</th>
+					<th>Limits</th>
 					<th>Matches (24h)</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
@@ -133,6 +134,7 @@
 							{/if}
 						</td>
 						<td>{fw.rules?.length ?? 0}</td>
+						<td>{fw.limits?.length ?? 0}</td>
 						<td>
 							<!-- Reserve the loaded size in every state so the row/column keeps
 							     its dimensions while the async sparkline fills in (no layout shift). -->
@@ -164,14 +166,14 @@
 					</tr>
 				{/each}
 				<NoDataRow
-					span={6}
+					span={7}
 					list={firewalls}
 					icon="fa-shield-halved"
 					message="No firewalls yet"
 					hint="Create a firewall to start filtering traffic in a location."
 					ctaLabel="Create firewall"
 					ctaHref={`/waf/create?project=${project}`} />
-				<ErrorRow span={6} {error} />
+				<ErrorRow span={7} {error} />
 			</tbody>
 		</table>
 	</div>

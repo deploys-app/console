@@ -290,6 +290,29 @@ const wafZone = {
 			priority: 30
 		}
 	],
+	limits: [
+		{
+			id: 'per-ip',
+			description: 'Baseline per-client limit',
+			key: ['ip'],
+			rate: 100,
+			window: '1m',
+			algorithm: 'sliding',
+			mode: 'enforce',
+			status: 429,
+			message: 'Too Many Requests',
+			exclude: ['203.0.113.0/24']
+		},
+		{
+			id: 'login-burst',
+			description: 'Protect login from credential stuffing',
+			key: ['ip', 'header:x-forwarded-user'],
+			rate: 10,
+			window: '10s',
+			algorithm: 'fixed',
+			mode: 'shadow'
+		}
+	],
 	status: 'success',
 	action: 'create',
 	createdAt: CREATED_AT,
@@ -366,6 +389,7 @@ function wafConfiguredZone (location, advance = false) {
 		location,
 		description: entry.description,
 		rules: [],
+		limits: [],
 		status,
 		action: 'create',
 		createdAt: CREATED_AT,
