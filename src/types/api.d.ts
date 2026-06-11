@@ -502,8 +502,6 @@ declare namespace Api {
         // 429 (default) or 503 only.
         status?: number
         message?: string
-        // CIDRs whose client IP skips this limit.
-        exclude?: string[]
     }
 
     export type WafZone = {

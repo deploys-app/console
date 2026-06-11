@@ -300,8 +300,7 @@ const wafZone = {
 			algorithm: 'sliding',
 			mode: 'enforce',
 			status: 429,
-			message: 'Too Many Requests',
-			exclude: ['203.0.113.0/24']
+			message: 'Too Many Requests'
 		},
 		{
 			id: 'login-burst',

@@ -21,7 +21,6 @@
  * @property {'enforce' | 'shadow'} mode
  * @property {number} status
  * @property {string} message
- * @property {string[]} exclude
  */
 
 export const DEFAULT_LIMIT_STATUS = 429
@@ -118,8 +117,7 @@ export function limitForm (limit) {
 		algorithm: limit?.algorithm ?? 'fixed',
 		mode: limit?.mode ?? 'enforce',
 		status: limit?.status ?? DEFAULT_LIMIT_STATUS,
-		message: limit?.message ?? DEFAULT_LIMIT_MESSAGE,
-		exclude: [...(limit?.exclude ?? [])]
+		message: limit?.message ?? DEFAULT_LIMIT_MESSAGE
 	}
 }
 
@@ -155,7 +153,7 @@ export function normalizeLimits (apiLimits) {
 /**
  * Map form rows back to the API limit shape. Key rows are deduped (and
  * incomplete header/cookie rows dropped), falling back to ['ip'] when nothing
- * valid remains; exclude keeps only non-empty entries.
+ * valid remains.
  * @param {LimitForm[]} limits
  * @returns {Api.WafLimit[]}
  */
@@ -169,8 +167,6 @@ export function toApiLimits (limits) {
 		}
 		if (key.length === 0) key.push('ip')
 
-		const exclude = l.exclude.map((s) => s.trim()).filter(Boolean)
-
 		return {
 			id: l.id,
 			description: l.description,
@@ -180,8 +176,7 @@ export function toApiLimits (limits) {
 			algorithm: l.algorithm === 'sliding' ? 'sliding' : 'fixed',
 			mode: l.mode === 'shadow' ? 'shadow' : 'enforce',
 			status: Number(l.status) === 503 ? 503 : DEFAULT_LIMIT_STATUS,
-			message: l.message || DEFAULT_LIMIT_MESSAGE,
-			...(exclude.length > 0 ? { exclude } : {})
+			message: l.message || DEFAULT_LIMIT_MESSAGE
 		}
 	})
 }

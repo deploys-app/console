@@ -4,7 +4,6 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
-	import TagInput from '$lib/components/TagInput.svelte'
 	import { normalizeRules, toApiRules } from '$lib/waf/rules'
 	import {
 		DEFAULT_LIMIT_MESSAGE,
@@ -55,9 +54,9 @@
 			const taken = limits.map((l) => l.id)
 			return { ...limitForm(), id: genLimitId(taken) }
 		}
-		// Deep-copy the key rows + exclusions so edits don't leak into `limits`.
+		// Deep-copy the key rows so edits don't leak into `limits`.
 		const seed = limits[editIndex]
-		return { ...seed, key: seed.key.map((k) => ({ ...k })), exclude: [...seed.exclude] }
+		return { ...seed, key: seed.key.map((k) => ({ ...k })) }
 	}))
 
 	let saving = $state(false)
@@ -128,10 +127,9 @@
 		backToManage()
 	}
 
-	// Enter inside a text field (description/rate/message, the key name inputs,
-	// the exclusion chips) must not implicitly submit the limit — in the
-	// TagInput it means "add this CIDR", elsewhere nothing. Saving is
-	// deliberate, via the Save button (a <button>, where Enter still works).
+	// Enter inside a text field (description/rate/message, the key name inputs)
+	// must not implicitly submit the limit. Saving is deliberate, via the Save
+	// button (a <button>, where Enter still works).
 	/** @param {HTMLFormElement} node */
 	function blockEnterSubmit (node) {
 		/** @param {KeyboardEvent} e */
@@ -295,23 +293,6 @@
 				</div>
 			</div>
 		{/if}
-
-		<hr>
-
-		<div class="grid gap-4">
-			<div>
-				<h6><strong>Exclusions</strong></h6>
-				<p class="text-content/50 text-sm mt-1">
-					Requests from these CIDRs skip this limit.
-				</p>
-			</div>
-
-			<div class="field">
-				<label for="limit-exclude">CIDRs</label>
-				<TagInput id="limit-exclude" bind:tags={draft.exclude}
-					placeholder="e.g. 203.0.113.0/24, press Enter to add" />
-			</div>
-		</div>
 
 		<hr>
 
