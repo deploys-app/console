@@ -29,25 +29,146 @@
 		return `${Math.floor(diff / 86_400_000)}d ago`
 	}
 
-	/** @param {number} toRevision */
-	function rollback (toRevision) {
-		modal.confirm({
-			title: `Rollback ${deployment.name} to revision ${toRevision}`,
-			yes: 'Rollback',
-			callback: async () => {
-				const resp = await api.invoke('deployment.rollback', {
-					project: deployment.project,
-					location: deployment.location,
-					name: deployment.name,
-					revision: toRevision
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+	// The currently running revision — the page renders revisions newest-first
+	// and marks index 0 as Active.
+	const activeRevision = $derived(revisions[0])
+
+	// Rollback confirmation modal. An in-page modal (not modal.confirm) so the
+	// user sees exactly what changes hands: the active revision they're leaving
+	// and the revision whose image + configuration will be redeployed. Both
+	// carry user-provided content (image refs), which Svelte interpolation
+	// escapes for free.
+	let rollbackTarget = $state(/** @type {?Api.Deployment} */ (null))
+	let rollingBack = $state(false)
+
+	// Full spec of the rollback target (deployment.get with revision returns
+	// the historical spec), fetched when the modal opens so the diff below the
+	// comparison cards can show exactly which configuration changes hands.
+	let targetSpec = $state(/** @type {?Api.Deployment} */ (null))
+	let targetLoading = $state(false)
+
+	/** @param {Api.Deployment} it */
+	function rollback (it) {
+		rollbackTarget = it
+		loadTargetSpec(it.revision)
+	}
+
+	/** @param {number} revision */
+	async function loadTargetSpec (revision) {
+		targetSpec = null
+		targetLoading = true
+		try {
+			/** @type {Api.Response<Api.Deployment>} */
+			const resp = await api.invoke('deployment.get', {
+				project: deployment.project,
+				location: deployment.location,
+				name: deployment.name,
+				revision
+			}, fetch)
+			// Stale guard: the user may have switched targets while this was in
+			// flight.
+			if (resp.ok && rollbackTarget?.revision === revision) {
+				targetSpec = resp.result ?? null
 			}
-		})
+		} finally {
+			targetLoading = false
+		}
+	}
+
+	/**
+	 * @param {string[]} [xs]
+	 * @returns {string}
+	 */
+	function joinOrDash (xs) {
+		return xs?.length ? xs.join(' ') : '—'
+	}
+
+	// Settings that rollback will change, current → target. Image is omitted —
+	// the comparison cards above already show it side by side.
+	const specChanges = $derived.by(() => {
+		const t = targetSpec
+		if (!t) return []
+		/** @type {{ label: string, from: string, to: string }[]} */
+		const rows = []
+		/**
+		 * @param {string} label
+		 * @param {string} from
+		 * @param {string} to
+		 */
+		const add = (label, from, to) => {
+			if (from !== to) rows.push({ label, from, to })
+		}
+		add('Type', deployment.type, t.type)
+		add('Port', String(deployment.port || '—'), String(t.port || '—'))
+		add('Scaling', `${deployment.minReplicas}–${deployment.maxReplicas} replicas`, `${t.minReplicas}–${t.maxReplicas} replicas`)
+		add('Schedule', deployment.schedule || '—', t.schedule || '—')
+		add('Command', joinOrDash(deployment.command), joinOrDash(t.command))
+		add('Args', joinOrDash(deployment.args), joinOrDash(t.args))
+		add('Env groups', deployment.envGroups?.join(', ') || '—', t.envGroups?.join(', ') || '—')
+		add('Workload identity', deployment.workloadIdentity || '—', t.workloadIdentity || '—')
+		add('Pull secret', deployment.pullSecret || '—', t.pullSecret || '—')
+		add('Disk',
+			deployment.disk ? `${deployment.disk.name} @ ${deployment.disk.mountPath}` : '—',
+			t.disk ? `${t.disk.name} @ ${t.disk.mountPath}` : '—')
+		add('Memory', deployment.resources?.requests?.memory || '—', t.resources?.requests?.memory || '—')
+		return rows
+	})
+
+	// Per-key env diff, current → target.
+	const envChanges = $derived.by(() => {
+		const t = targetSpec
+		if (!t) return []
+		const from = deployment.env ?? {}
+		const to = t.env ?? {}
+		const keys = [...new Set([...Object.keys(from), ...Object.keys(to)])].sort()
+		/** @type {{ key: string, kind: 'added' | 'removed' | 'changed', from: string, to: string }[]} */
+		const rows = []
+		for (const key of keys) {
+			const a = from[key]
+			const b = to[key]
+			if (a === b) continue
+			if (a === undefined) rows.push({ key, kind: 'added', from: '', to: b })
+			else if (b === undefined) rows.push({ key, kind: 'removed', from: a, to: '' })
+			else rows.push({ key, kind: 'changed', from: a, to: b })
+		}
+		return rows
+	})
+
+	const hasChanges = $derived(specChanges.length > 0 || envChanges.length > 0)
+
+	function closeRollback () {
+		if (rollingBack) return
+		rollbackTarget = null
+		targetSpec = null
+	}
+
+	/**
+	 * Close only on a true backdrop click, not on clicks inside the panel.
+	 * @param {MouseEvent} e
+	 */
+	function onRollbackBackdrop (e) {
+		if (e.target === e.currentTarget) closeRollback()
+	}
+
+	async function confirmRollback () {
+		if (rollingBack || !rollbackTarget) return
+		rollingBack = true
+		try {
+			const resp = await api.invoke('deployment.rollback', {
+				project: deployment.project,
+				location: deployment.location,
+				name: deployment.name,
+				revision: rollbackTarget.revision
+			}, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
+				return
+			}
+			rollbackTarget = null
+			goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+		} finally {
+			rollingBack = false
+		}
 	}
 </script>
 
@@ -262,6 +383,121 @@
 		border-color: hsl(var(--hsl-content) / 0.2);
 	}
 
+	.rb-compare {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: stretch;
+		gap: 0.75rem;
+	}
+
+	.rb-side {
+		min-width: 0;
+		padding: 0.75rem 0.9rem;
+		border: 1px solid hsl(var(--hsl-content) / 0.1);
+		border-radius: 8px;
+		background: hsl(var(--hsl-content) / 0.03);
+	}
+
+	.rb-side[data-kind='to'] {
+		border-color: hsl(var(--hsl-primary) / 0.35);
+		background: hsl(var(--hsl-primary) / 0.06);
+	}
+
+	.rb-side__label {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.rb-side[data-kind='to'] .rb-side__label {
+		color: hsl(var(--hsl-primary));
+	}
+
+	.rb-side__rev {
+		margin-top: 0.25rem;
+		font-family: var(--ffml-mono);
+		font-size: 1.25rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.rb-side[data-kind='to'] .rb-side__rev {
+		color: hsl(var(--hsl-primary));
+	}
+
+	.rb-side__image {
+		margin-top: 0.35rem;
+		font-size: 0.8125rem;
+		overflow-wrap: anywhere;
+	}
+
+	.rb-side__meta {
+		margin-top: 0.35rem;
+		font-size: 0.6875rem;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.rb-arrow {
+		align-self: center;
+		color: hsl(var(--hsl-content) / 0.35);
+	}
+
+	@media (max-width: 640px) {
+		.rb-compare { grid-template-columns: 1fr; }
+		.rb-arrow { transform: rotate(90deg); justify-self: center; }
+	}
+
+	/* Roomier panel: the diff table needs width, and the whole panel scrolls
+	   when the diff is long. */
+	.modal-panel {
+		width: 100%;
+		max-width: 56rem;
+		max-height: calc(100dvh - 3rem);
+		overflow-y: auto;
+	}
+
+	.rb-diff__head { margin-bottom: 0.75rem; }
+
+	.rb-diff__table {
+		max-height: 19rem;
+		overflow-y: auto;
+	}
+
+	.rb-diff__field {
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.rb-diff__from { color: hsl(var(--hsl-content) / 0.55); }
+	.rb-diff__from, .rb-diff__to { overflow-wrap: anywhere; }
+
+	.rb-env-badge {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.1rem;
+		height: 1.1rem;
+		margin-right: 0.4rem;
+		border-radius: 4px;
+		font-family: var(--ffml-mono);
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: hsl(var(--hsl-content) / 0.6);
+		background: hsl(var(--hsl-content) / 0.08);
+	}
+
+	.rb-env-badge[data-kind='added'] {
+		color: hsl(var(--hsl-positive));
+		background: hsl(var(--hsl-positive) / 0.12);
+	}
+
+	.rb-env-badge[data-kind='removed'] {
+		color: hsl(var(--hsl-negative));
+		background: hsl(var(--hsl-negative) / 0.12);
+	}
+
 	@media (max-width: 768px) {
 		.rev-row {
 			grid-template-columns:
@@ -316,7 +552,7 @@
 				<span class="rev-row__act">
 					{#if i > 0}
 						<button type="button" class="rail-btn"
-							onclick={() => rollback(it.revision)}>
+							onclick={() => rollback(it)}>
 							<i class="fa-solid fa-rotate-left"></i>
 							Rollback
 						</button>
@@ -325,4 +561,110 @@
 			</li>
 		{/each}
 	</ol>
+</div>
+
+<!-- Rollback confirmation: spells out what's being rolled back — the revision
+     being left and the revision whose image + configuration will be redeployed
+     as a new revision. -->
+<div class="modal" onclick={onRollbackBackdrop} class:is-active={!!rollbackTarget} aria-hidden={!rollbackTarget}>
+	<div class="modal-panel">
+		<div class="modal-close" onclick={closeRollback} onkeypress={closeRollback} tabindex="0" role="button">✕</div>
+		<h4><strong>Rollback {deployment.name}?</strong></h4>
+
+		{#if rollbackTarget}
+			<div class="rb-compare mt-5">
+				<div class="rb-side" data-kind="from">
+					<div class="rb-side__label">Currently active</div>
+					<div class="rb-side__rev">#{activeRevision?.revision ?? deployment.revision}</div>
+					{#if activeRevision}
+						<div class="rb-side__image font-mono" title={activeRevision.image}>{activeRevision.image}</div>
+						<div class="rb-side__meta" title={activeRevision.createdAt}>
+							deployed {format.datetime(activeRevision.createdAt)} by {activeRevision.createdBy}
+						</div>
+					{/if}
+				</div>
+				<div class="rb-arrow" aria-hidden="true">
+					<i class="fa-solid fa-arrow-right"></i>
+				</div>
+				<div class="rb-side" data-kind="to">
+					<div class="rb-side__label">Rolling back to</div>
+					<div class="rb-side__rev">#{rollbackTarget.revision}</div>
+					<div class="rb-side__image font-mono" title={rollbackTarget.image}>{rollbackTarget.image}</div>
+					<div class="rb-side__meta" title={rollbackTarget.createdAt}>
+						deployed {format.datetime(rollbackTarget.createdAt)} by {rollbackTarget.createdBy}
+					</div>
+				</div>
+			</div>
+
+			<div class="rb-diff mt-5">
+				<div class="rb-diff__head">
+					<h6><strong>Configuration changes</strong></h6>
+					<p class="text-content/50 text-sm mt-1">
+						What changes when revision #{rollbackTarget.revision}’s configuration is reapplied.
+					</p>
+				</div>
+
+				{#if targetLoading}
+					<p class="text-content/50 text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Loading revision #{rollbackTarget.revision}…</p>
+				{:else if !targetSpec}
+					<p class="text-content/50 text-sm">Couldn’t load revision #{rollbackTarget.revision}’s configuration — only the image comparison above is shown.</p>
+				{:else if !hasChanges}
+					<p class="text-content/50 text-sm">
+						<i class="fa-solid fa-circle-check mr-2 text-positive"></i>
+						Same configuration — only the image differs.
+					</p>
+				{:else}
+					<div class="table-container rb-diff__table">
+						<table class="table is-variant-compact">
+							<thead>
+								<tr>
+									<th>Setting</th>
+									<th>Current</th>
+									<th>After rollback</th>
+								</tr>
+							</thead>
+							<tbody>
+								{#each specChanges as c (c.label)}
+									<tr>
+										<td class="rb-diff__field">{c.label}</td>
+										<td class="font-mono text-sm rb-diff__from">{c.from}</td>
+										<td class="font-mono text-sm rb-diff__to">{c.to}</td>
+									</tr>
+								{/each}
+								{#each envChanges as c (c.key)}
+									<tr>
+										<td class="rb-diff__field">
+											<span class="rb-env-badge" data-kind={c.kind}>
+												{c.kind === 'added' ? '+' : c.kind === 'removed' ? '−' : '±'}
+											</span>
+											<span class="font-mono text-sm">{c.key}</span>
+										</td>
+										<td class="font-mono text-sm rb-diff__from">{c.kind === 'added' ? '—' : c.from}</td>
+										<td class="font-mono text-sm rb-diff__to">{c.kind === 'removed' ? '—' : c.to}</td>
+									</tr>
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				{/if}
+			</div>
+
+			<p class="text-content/60 text-sm mt-4">
+				This redeploys revision <strong>#{rollbackTarget.revision}</strong>’s image and
+				configuration (env, scaling, command, disks, schedule) as a new revision.
+				Sidecars and mounted files keep their current configuration. No history is
+				deleted.
+			</p>
+		{/if}
+
+		<div class="flex items-center gap-3 mt-6">
+			<button type="button" class="button" class:is-loading={rollingBack}
+				disabled={rollingBack} onclick={confirmRollback}>
+				<i class="fa-solid fa-rotate-left mr-2"></i>
+				Rollback
+			</button>
+			<button type="button" class="button is-variant-secondary" disabled={rollingBack}
+				onclick={closeRollback}>Cancel</button>
+		</div>
+	</div>
 </div>

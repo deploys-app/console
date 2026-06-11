@@ -759,18 +759,37 @@ const handlers = {
 	'location.get': (args) => ok(locations.find((l) => l.id === args?.location) ?? locations[0]),
 
 	'deployment.list': () => list(deployments),
-	'deployment.get': (args) => ok({ ...deployment(args?.project), name: args?.name ?? 'web', location: args?.location ?? LOCATION_ID }),
+	// revision > 0 returns that revision's historical spec (like the real
+	// deployment.get), with per-revision differences so the rollback modal's
+	// config diff has something to show.
+	'deployment.get': (args) => {
+		const base = { ...deployment(args?.project), name: args?.name ?? 'web', location: args?.location ?? LOCATION_ID }
+		const revision = Number(args?.revision ?? 0)
+		if (!revision || revision >= base.revision) return ok(base)
+		return ok({
+			...base,
+			revision,
+			image: base.image.replace(/:latest$/, `:v${revision}`),
+			env: { NODE_ENV: 'production', PORT: '8080', LOG_LEVEL: 'debug', FEATURE_FLAGS: 'beta-checkout' },
+			maxReplicas: 2,
+			command: revision === 5 ? ['node', 'server.js'] : base.command
+		})
+	},
 	'deployment.deploy': () => ok({}),
 	'deployment.delete': () => ok({}),
 	'deployment.pause': () => ok({}),
 	'deployment.resume': () => ok({}),
 	'deployment.rollback': () => ok({}),
-	'deployment.revisions': (args) => list([7, 6, 5].map((revision) => ({
-		...deployment(args?.project),
-		name: args?.name ?? 'web',
-		location: args?.location ?? LOCATION_ID,
-		revision
-	}))),
+	'deployment.revisions': (args) => list([7, 6, 5].map((revision) => {
+		const base = deployment(args?.project)
+		return {
+			...base,
+			name: args?.name ?? 'web',
+			location: args?.location ?? LOCATION_ID,
+			revision,
+			image: revision === base.revision ? base.image : base.image.replace(/:latest$/, `:v${revision}`)
+		}
+	})),
 	'deployment.metrics': () => ok({
 		cpuUsage: metricLine('web', 0.3),
 		cpuLimit: metricLine('limit', 0.5),
