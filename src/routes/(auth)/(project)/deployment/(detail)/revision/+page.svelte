@@ -29,25 +29,55 @@
 		return `${Math.floor(diff / 86_400_000)}d ago`
 	}
 
-	/** @param {number} toRevision */
-	function rollback (toRevision) {
-		modal.confirm({
-			title: `Rollback ${deployment.name} to revision ${toRevision}`,
-			yes: 'Rollback',
-			callback: async () => {
-				const resp = await api.invoke('deployment.rollback', {
-					project: deployment.project,
-					location: deployment.location,
-					name: deployment.name,
-					revision: toRevision
-				}, fetch)
-				if (!resp.ok) {
-					modal.error({ error: resp.error })
-					return
-				}
-				goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+	// The currently running revision — the page renders revisions newest-first
+	// and marks index 0 as Active.
+	const activeRevision = $derived(revisions[0])
+
+	// Rollback confirmation modal. An in-page modal (not modal.confirm) so the
+	// user sees exactly what changes hands: the active revision they're leaving
+	// and the revision whose image + configuration will be redeployed. Both
+	// carry user-provided content (image refs), which Svelte interpolation
+	// escapes for free.
+	let rollbackTarget = $state(/** @type {?Api.Deployment} */ (null))
+	let rollingBack = $state(false)
+
+	/** @param {Api.Deployment} it */
+	function rollback (it) {
+		rollbackTarget = it
+	}
+
+	function closeRollback () {
+		if (rollingBack) return
+		rollbackTarget = null
+	}
+
+	/**
+	 * Close only on a true backdrop click, not on clicks inside the panel.
+	 * @param {MouseEvent} e
+	 */
+	function onRollbackBackdrop (e) {
+		if (e.target === e.currentTarget) closeRollback()
+	}
+
+	async function confirmRollback () {
+		if (rollingBack || !rollbackTarget) return
+		rollingBack = true
+		try {
+			const resp = await api.invoke('deployment.rollback', {
+				project: deployment.project,
+				location: deployment.location,
+				name: deployment.name,
+				revision: rollbackTarget.revision
+			}, fetch)
+			if (!resp.ok) {
+				modal.error({ error: resp.error })
+				return
 			}
-		})
+			rollbackTarget = null
+			goto(`/deployment/detail?project=${deployment.project}&location=${deployment.location}&name=${deployment.name}`)
+		} finally {
+			rollingBack = false
+		}
 	}
 </script>
 
@@ -262,6 +292,72 @@
 		border-color: hsl(var(--hsl-content) / 0.2);
 	}
 
+	.rb-compare {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: stretch;
+		gap: 0.75rem;
+	}
+
+	.rb-side {
+		min-width: 0;
+		padding: 0.75rem 0.9rem;
+		border: 1px solid hsl(var(--hsl-content) / 0.1);
+		border-radius: 8px;
+		background: hsl(var(--hsl-content) / 0.03);
+	}
+
+	.rb-side[data-kind='to'] {
+		border-color: hsl(var(--hsl-primary) / 0.35);
+		background: hsl(var(--hsl-primary) / 0.06);
+	}
+
+	.rb-side__label {
+		font-size: 0.6875rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.rb-side[data-kind='to'] .rb-side__label {
+		color: hsl(var(--hsl-primary));
+	}
+
+	.rb-side__rev {
+		margin-top: 0.25rem;
+		font-family: var(--ffml-mono);
+		font-size: 1.25rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.rb-side[data-kind='to'] .rb-side__rev {
+		color: hsl(var(--hsl-primary));
+	}
+
+	.rb-side__image {
+		margin-top: 0.35rem;
+		font-size: 0.8125rem;
+		overflow-wrap: anywhere;
+	}
+
+	.rb-side__meta {
+		margin-top: 0.35rem;
+		font-size: 0.6875rem;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.rb-arrow {
+		align-self: center;
+		color: hsl(var(--hsl-content) / 0.35);
+	}
+
+	@media (max-width: 640px) {
+		.rb-compare { grid-template-columns: 1fr; }
+		.rb-arrow { transform: rotate(90deg); justify-self: center; }
+	}
+
 	@media (max-width: 768px) {
 		.rev-row {
 			grid-template-columns:
@@ -316,7 +412,7 @@
 				<span class="rev-row__act">
 					{#if i > 0}
 						<button type="button" class="rail-btn"
-							onclick={() => rollback(it.revision)}>
+							onclick={() => rollback(it)}>
 							<i class="fa-solid fa-rotate-left"></i>
 							Rollback
 						</button>
@@ -325,4 +421,55 @@
 			</li>
 		{/each}
 	</ol>
+</div>
+
+<!-- Rollback confirmation: spells out what's being rolled back — the revision
+     being left and the revision whose image + configuration will be redeployed
+     as a new revision. -->
+<div class="modal" onclick={onRollbackBackdrop} class:is-active={!!rollbackTarget} aria-hidden={!rollbackTarget}>
+	<div class="modal-panel">
+		<div class="modal-close" onclick={closeRollback} onkeypress={closeRollback} tabindex="0" role="button">✕</div>
+		<h4><strong>Rollback {deployment.name}?</strong></h4>
+
+		{#if rollbackTarget}
+			<div class="rb-compare mt-5">
+				<div class="rb-side" data-kind="from">
+					<div class="rb-side__label">Currently active</div>
+					<div class="rb-side__rev">#{activeRevision?.revision ?? deployment.revision}</div>
+					{#if activeRevision}
+						<div class="rb-side__image font-mono" title={activeRevision.image}>{activeRevision.image}</div>
+						<div class="rb-side__meta" title={activeRevision.createdAt}>
+							deployed {format.datetime(activeRevision.createdAt)} by {activeRevision.createdBy}
+						</div>
+					{/if}
+				</div>
+				<div class="rb-arrow" aria-hidden="true">
+					<i class="fa-solid fa-arrow-right"></i>
+				</div>
+				<div class="rb-side" data-kind="to">
+					<div class="rb-side__label">Rolling back to</div>
+					<div class="rb-side__rev">#{rollbackTarget.revision}</div>
+					<div class="rb-side__image font-mono" title={rollbackTarget.image}>{rollbackTarget.image}</div>
+					<div class="rb-side__meta" title={rollbackTarget.createdAt}>
+						deployed {format.datetime(rollbackTarget.createdAt)} by {rollbackTarget.createdBy}
+					</div>
+				</div>
+			</div>
+
+			<p class="text-content/60 text-sm mt-4">
+				This redeploys revision <strong>#{rollbackTarget.revision}</strong>’s image and
+				configuration (env, scaling, command) as a new revision. No history is deleted.
+			</p>
+		{/if}
+
+		<div class="flex items-center gap-3 mt-6">
+			<button type="button" class="button" class:is-loading={rollingBack}
+				disabled={rollingBack} onclick={confirmRollback}>
+				<i class="fa-solid fa-rotate-left mr-2"></i>
+				Rollback
+			</button>
+			<button type="button" class="button is-variant-secondary" disabled={rollingBack}
+				onclick={closeRollback}>Cancel</button>
+		</div>
+	</div>
 </div>
