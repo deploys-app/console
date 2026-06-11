@@ -359,6 +359,62 @@ function wafMetrics (timeRange) {
 	return { series, total }
 }
 
+// Bucket widths per range, matching waf.metrics / waf.limitMetrics server-side.
+/** @type {Record<string, number>} */
+const wafBucketSeconds = { '1h': 60, '6h': 300, '12h': 600, '1d': 1200, '7d': 3600, '30d': 14400 }
+
+// Synthetic rate-limit metrics for the seed zone's two limits, so the
+// "Rate limit activity" section has a trend to draw. Each limit gets an
+// `allowed` series with large counts and a `limited` series with small counts,
+// tuned so the limited share lands around the limit's target with some
+// time variation across the window.
+/** @param {string} [timeRange] */
+function wafLimitMetrics (timeRange) {
+	const now = Math.floor(Date.now() / 1000)
+	const range = timeRange ?? '1d'
+	const windowSeconds = wafRangeSeconds[range] ?? wafRangeSeconds['1d']
+	const bucket = wafBucketSeconds[range] ?? wafBucketSeconds['1d']
+	const from = now - windowSeconds
+
+	/**
+	 * @param {string} limitId
+	 * @param {number} base   typical allowed count per bucket
+	 * @param {number} share  typical limited share (0..1)
+	 */
+	const makeLimit = (limitId, base, share) => {
+		/** @type {[number, number][]} */
+		const allowed = []
+		/** @type {[number, number][]} */
+		const limited = []
+		let allowedTotal = 0
+		let limitedTotal = 0
+		for (let ts = from + bucket; ts <= now; ts += bucket) {
+			const a = Math.round(base * (0.7 + 0.6 * Math.random()))
+			allowed.push([ts, a])
+			allowedTotal += a
+			// Drift the share over the window (sinus + noise) so the trend line
+			// actually trends; sparse — calm buckets emit no `limited` point.
+			const wave = 0.6 + 0.4 * Math.sin(((ts - from) / windowSeconds) * Math.PI * 5) + 0.4 * Math.random()
+			const l = Math.round(a * share * wave)
+			if (l > 0) {
+				limited.push([ts, l])
+				limitedTotal += l
+			}
+		}
+		return [
+			{ limitId, result: 'allowed', total: allowedTotal, points: allowed },
+			{ limitId, result: 'limited', total: limitedTotal, points: limited }
+		]
+	}
+
+	const series = [
+		...makeLimit('per-ip', 450, 0.018), // share ~0.5–3%
+		...makeLimit('login-burst', 80, 0.07) // share ~4–10%
+	]
+	const total = series.reduce((acc, s) => acc + s.total, 0)
+	return { series, total }
+}
+
 // Locations (besides the seed LOCATION_ID) that have had a firewall created in
 // this dev session, mapped to { description, polls }. `polls` counts how many
 // times the zone has been read while pending; the deployer is simulated by
@@ -863,6 +919,11 @@ const handlers = {
 		// no-traffic state on the index).
 		const location = args?.location ?? LOCATION_ID
 		if (location === LOCATION_ID) return ok(wafMetrics(args?.timeRange))
+		return ok({ series: [], total: 0 })
+	},
+	'waf.limitMetrics': (args) => {
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok(wafLimitMetrics(args?.timeRange))
 		return ok({ series: [], total: 0 })
 	},
 	'waf.delete': (args) => {

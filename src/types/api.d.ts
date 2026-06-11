@@ -536,6 +536,19 @@ declare namespace Api {
         total: number
     }
 
+    export type WafLimitMetricsSeries = {
+        limitId: string
+        result: 'allowed' | 'limited'
+        total: number
+        // [unixSeconds, count], time-ordered; sparse — missing bucket = 0
+        points: [number, number][]
+    }
+
+    export type WafLimitMetricsResult = {
+        series: WafLimitMetricsSeries[]
+        total: number
+    }
+
     export type DropboxItem = {
         downloadUrl: string
         filename: string
