@@ -1,9 +1,15 @@
 <script>
 	import { onMount } from 'svelte'
+	import { podPrefixStripper } from '$lib/deployment/podName'
 
 	const { data } = $props()
 
 	const deployment = $derived(data.deployment)
+
+	// Pod names show up inside event reasons/messages; strip the shared
+	// `<kubeName>-<projectID>-` prefix so only the pod-distinguishing suffix
+	// remains (the full text stays available on hover).
+	const stripPods = $derived(podPrefixStripper(deployment))
 
 	const POLL_INTERVAL_MS = 5000
 
@@ -451,8 +457,8 @@
 						</span>
 						<span class="event-row__mark" aria-hidden="true"></span>
 						<span class="event-row__type">{ev.type}</span>
-						<span class="event-row__reason" title={ev.reason}>{ev.reason}</span>
-						<span class="event-row__msg">{ev.message}</span>
+						<span class="event-row__reason" title={ev.reason}>{stripPods(ev.reason)}</span>
+						<span class="event-row__msg" title={ev.message}>{stripPods(ev.message)}</span>
 					</li>
 				{/each}
 			</ol>
