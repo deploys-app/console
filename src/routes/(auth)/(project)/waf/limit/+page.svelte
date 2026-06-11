@@ -231,16 +231,18 @@
 			</div>
 
 			<div class="flex flex-wrap items-center gap-3">
-				<div class="field">
+				<div class="field w-40">
 					<label for="limit-rate">Requests</label>
 					<div class="input">
 						<input id="limit-rate" type="number" min="1" bind:value={draft.rate} placeholder="100">
 					</div>
 				</div>
 				<span class="text-content/60 text-sm mt-6">requests per</span>
-				<div class="field">
+				<!-- fixed width so the row doesn't reflow when the selected
+				     window label changes length (e.g. 1 second → 30 minutes) -->
+				<div class="field w-44">
 					<label for="limit-window">Window</label>
-					<Select id="limit-window" bind:value={draft.window} options={allWindowOptions} />
+					<Select id="limit-window" bind:value={draft.window} options={allWindowOptions} class="w-full" />
 				</div>
 			</div>
 		</div>
