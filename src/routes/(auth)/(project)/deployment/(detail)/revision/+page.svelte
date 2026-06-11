@@ -458,7 +458,9 @@
 
 			<p class="text-content/60 text-sm mt-4">
 				This redeploys revision <strong>#{rollbackTarget.revision}</strong>’s image and
-				configuration (env, scaling, command) as a new revision. No history is deleted.
+				configuration (env, scaling, command, disks, schedule) as a new revision.
+				Sidecars and mounted files keep their current configuration. No history is
+				deleted.
 			</p>
 		{/if}
 
