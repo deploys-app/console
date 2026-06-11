@@ -1,10 +1,15 @@
 <script>
 	import { onMount } from 'svelte'
 	import { SvelteSet } from 'svelte/reactivity'
+	import { podPrefixStripper } from '$lib/deployment/podName'
 
 	const { data } = $props()
 
 	const deployment = $derived(data.deployment)
+
+	// Drop the `<kubeName>-<projectID>-` prefix shared by every pod of this
+	// deployment so the chip shows only the pod-distinguishing suffix.
+	const podLabel = $derived(podPrefixStripper(deployment))
 
 	// Cap how many lines we keep in memory and render. Without this the
 	// previous implementation accumulated every line into a single string and
@@ -776,7 +781,7 @@
 						<span class="log-row__mark" aria-hidden="true"></span>
 						<span class="log-row__pod" style="--pod-h: {podHue(line.pod)}"
 							title={line.pod}>
-							{line.pod}
+							{podLabel(line.pod)}
 						</span>
 						<span class="log-row__msg">{line.log}</span>
 					</li>

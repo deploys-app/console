@@ -12,7 +12,14 @@
 
 import { env } from '$env/dynamic/private'
 
-const PODS = ['web-7d4f-x1', 'web-7d4f-x2', 'worker-6f9-a1']
+// Full pod names (`<kubeName>-<projectID>-<rsHash>-<podHash>`) for an id-named
+// deployment, so the logs page exercises pod-name prefix stripping — only the
+// `<rsHash>-<podHash>` suffix should show in the chip.
+const PODS = [
+	'0d128-77-7d8f9b6c5-x2k9p',
+	'0d128-77-7d8f9b6c5-q8m2t',
+	'0d128-77-5b9c4d2a1-h3n7v'
+]
 
 const TEMPLATES = [
 	() => `GET /api/users?page=${(Math.random() * 5 | 0) + 1} 200 ${(Math.random() * 200 | 0) + 20}ms`,

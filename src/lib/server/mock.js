@@ -174,7 +174,9 @@ function deployment (project = 'acme') {
 		podsUrl: '',
 		statusUrl: HEALTHY_STATUS_URL,
 		address: '203.0.113.10',
-		internalAddress: '10.0.0.10',
+		// `<kubeName>-<projectID>` (the in-cluster service name); id-named here so
+		// the logs/events pages exercise pod-name prefix stripping.
+		internalAddress: '0d128-77',
 		status: 'success',
 		action: 'deploy',
 		allocatedPrice: 120.5,
