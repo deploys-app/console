@@ -18,10 +18,20 @@
 	const headerStatus = $derived(domain.status)
 
 	// ─── DNS record groups (visibility mirrors the original conditionals) ───
+	// Prefer CNAME; fall back to A/AAAA only when no CNAME is available.
 	const cnames = $derived(domain.dnsConfig?.cname ?? [])
+	const useCname = $derived(cnames.length > 0)
+	const connectRecords = $derived.by(() => {
+		if (useCname) return cnames.map((value) => ({ type: 'CNAME', value }))
+		return [
+			...(domain.dnsConfig?.ipv4 ?? []).map((value) => ({ type: 'A', value })),
+			...(domain.dnsConfig?.ipv6 ?? []).map((value) => ({ type: 'AAAA', value }))
+		]
+	})
+	const connectLabel = $derived(useCname ? 'CNAME record' : 'A/AAAA records')
 	const showConnect = $derived(
 		(domain.status === 'success' || domain.status === 'verify' || !domain.wildcard) &&
-		cnames.length > 0
+		connectRecords.length > 0
 	)
 	const ownership = $derived(domain.verification?.ownership)
 	const hasOwnership = $derived(!!ownership?.type)
@@ -571,7 +581,7 @@
 							<p>
 								Point your DNS at the records below. We re-check every few minutes and
 								switch the domain to <strong>success</strong> once it resolves to this
-								location. If your DNS sits behind a CDN/proxy and the CNAME record
+								location. If your DNS sits behind a CDN/proxy and the {connectLabel}
 								can't resolve to us directly, add the <em>Proxied DNS</em> TXT record
 								instead — that proves ownership but doesn't enable certificate issuance.
 							</p>
@@ -682,8 +692,8 @@
 							<p class="group__desc">Create these records so traffic for <strong>{domain.domain}</strong> reaches this location.</p>
 						</div>
 						<div class="recs">
-							{#each cnames as cname, i (i)}
-								{@render dnsRecord('CNAME', domain.domain, cname)}
+							{#each connectRecords as rec, i (i)}
+								{@render dnsRecord(rec.type, domain.domain, rec.value)}
 							{/each}
 						</div>
 					</div>
@@ -704,9 +714,9 @@
 							</div>
 							{#if !domain.wildcard}
 								<p class="group__desc">
-									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the CNAME
-									record can't resolve here directly, add this TXT record instead to
-									prove ownership and we'll accept the proxied setup.
+									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the
+									{connectLabel} can't resolve here directly, add this TXT record
+									instead to prove ownership and we'll accept the proxied setup.
 								</p>
 							{:else}
 								<p class="group__desc">Add this TXT record so we can confirm you control the domain.</p>
