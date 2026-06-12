@@ -530,7 +530,7 @@ const permissions = [
 const serviceAccounts = [
 	{
 		sid: 'sa_mock_ci',
-		email: 'ci@acme.deploys.app',
+		email: 'ci@acme.serviceaccount.deploys.app',
 		name: 'CI Deployer',
 		description: 'Used by CI to deploy services',
 		createdAt: CREATED_AT,
@@ -545,7 +545,7 @@ const githubLinks = [
 		repository: 'acme/web',
 		installationId: 77,
 		serviceAccount: 'sa_mock_ci',
-		serviceAccountEmail: 'ci@acme.deploys.app',
+		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	}
