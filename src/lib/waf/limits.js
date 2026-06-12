@@ -21,6 +21,7 @@
  * @property {'enforce' | 'shadow'} mode
  * @property {number} status
  * @property {string} message
+ * @property {string} filter
  */
 
 export const DEFAULT_LIMIT_STATUS = 429
@@ -117,7 +118,8 @@ export function limitForm (limit) {
 		algorithm: limit?.algorithm ?? 'fixed',
 		mode: limit?.mode ?? 'enforce',
 		status: limit?.status ?? DEFAULT_LIMIT_STATUS,
-		message: limit?.message ?? DEFAULT_LIMIT_MESSAGE
+		message: limit?.message ?? DEFAULT_LIMIT_MESSAGE,
+		filter: limit?.filter ?? ''
 	}
 }
 
@@ -176,7 +178,8 @@ export function toApiLimits (limits) {
 			algorithm: l.algorithm === 'sliding' ? 'sliding' : 'fixed',
 			mode: l.mode === 'shadow' ? 'shadow' : 'enforce',
 			status: Number(l.status) === 503 ? 503 : DEFAULT_LIMIT_STATUS,
-			message: l.message || DEFAULT_LIMIT_MESSAGE
+			message: l.message || DEFAULT_LIMIT_MESSAGE,
+			filter: (l.filter ?? '').trim()
 		}
 	})
 }

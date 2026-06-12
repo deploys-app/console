@@ -322,7 +322,8 @@ const wafZone = {
 			rate: 10,
 			window: '10s',
 			algorithm: 'fixed',
-			mode: 'shadow'
+			mode: 'shadow',
+			filter: 'request.path == "/login" && request.method == "POST"'
 		}
 	],
 	status: 'success',

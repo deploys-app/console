@@ -502,6 +502,10 @@ declare namespace Api {
         // 429 (default) or 503 only.
         status?: number
         message?: string
+        // Optional CEL expression (same request.* surface as WafRule.expression)
+        // scoping the limit: empty applies it to every request. request.body is
+        // always '' in limit filters.
+        filter?: string
     }
 
     export type WafZone = {
