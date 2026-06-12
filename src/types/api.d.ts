@@ -349,6 +349,24 @@ declare namespace Api {
         createdBy: string
     }
 
+    export type GithubLink = {
+        repositoryId: number
+        // owner/name
+        repository: string
+        installationId: number
+        // service account sid
+        serviceAccount: string
+        serviceAccountEmail: string
+        createdAt: string
+        createdBy: string
+    }
+
+    export type GithubLookupRepoResult = {
+        repositoryId: number
+        repository: string
+        installationId: number
+    }
+
     export type EmailDomain = {
         domain: string
         createdAt: string

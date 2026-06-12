@@ -538,6 +538,19 @@ const serviceAccounts = [
 	}
 ]
 
+// github repo links — mutated by github.link / github.unlink within a session.
+const githubLinks = [
+	{
+		repositoryId: 812345678,
+		repository: 'acme/web',
+		installationId: 77,
+		serviceAccount: 'sa_mock_ci',
+		serviceAccountEmail: 'ci@acme.deploys.app',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	}
+]
+
 // Synthesize enough rows to exercise the infinite-scroll cursor offline. The
 // real backend orders `id desc`; we mirror that here so the array is already in
 // the order the API would return.
@@ -993,6 +1006,40 @@ const handlers = {
 		{ email: 'teammate@acme.example.com', roles: ['viewer'] }
 	]),
 
+	'github.list': () => list([...githubLinks]),
+	'github.lookupRepo': (args) => {
+		const repository = args?.repository ?? ''
+		if (repository.startsWith('notinstalled/')) {
+			return err('api: github app is not installed on the repository')
+		}
+		return ok({
+			repositoryId: 700000 + repository.length,
+			repository,
+			installationId: 77
+		})
+	},
+	'github.link': (args) => {
+		if (githubLinks.some((l) => l.repositoryId === args?.repositoryId)) {
+			return err('api: github repository already linked')
+		}
+		const sa = serviceAccounts.find((s) => s.sid === args?.serviceAccount)
+		githubLinks.push({
+			repositoryId: args?.repositoryId,
+			repository: args?.repository,
+			installationId: args?.installationId ?? 0,
+			serviceAccount: args?.serviceAccount,
+			serviceAccountEmail: sa?.email ?? `${args?.serviceAccount}@acme.serviceaccount.deploys.app`,
+			createdAt: CREATED_AT,
+			createdBy: USER_EMAIL
+		})
+		return ok({})
+	},
+	'github.unlink': (args) => {
+		const i = githubLinks.findIndex((l) => l.repositoryId === args?.repositoryId)
+		if (i < 0) return err('api: github repository link not found')
+		githubLinks.splice(i, 1)
+		return ok({})
+	},
 	'serviceAccount.list': () => list(serviceAccounts),
 	'serviceAccount.get': (args) => ok({
 		...serviceAccounts[0],
