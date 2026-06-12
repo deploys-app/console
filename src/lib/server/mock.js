@@ -1007,6 +1007,10 @@ const handlers = {
 	]),
 
 	'github.getApp': () => ok({ installUrl: 'https://github.com/apps/deploys-app/installations/new' }),
+	'github.addInstallation': () => ok({}),
+	'github.listInstallations': () => list([
+		{ installationId: 77, createdAt: '2026-05-01T08:00:00Z' }
+	]),
 	'github.listRepos': () => list([
 		{ repositoryId: 812345678, repository: 'acme/web', private: false },
 		{ repositoryId: 812345679, repository: 'acme/api', private: false },
