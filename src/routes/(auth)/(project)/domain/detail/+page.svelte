@@ -18,12 +18,10 @@
 	const headerStatus = $derived(domain.status)
 
 	// ─── DNS record groups (visibility mirrors the original conditionals) ───
-	const ipv4 = $derived(domain.dnsConfig?.ipv4 ?? [])
-	const ipv6 = $derived(domain.dnsConfig?.ipv6 ?? [])
 	const cnames = $derived(domain.dnsConfig?.cname ?? [])
 	const showConnect = $derived(
 		(domain.status === 'success' || domain.status === 'verify' || !domain.wildcard) &&
-		(ipv4.length > 0 || ipv6.length > 0 || cnames.length > 0)
+		cnames.length > 0
 	)
 	const ownership = $derived(domain.verification?.ownership)
 	const hasOwnership = $derived(!!ownership?.type)
@@ -573,7 +571,7 @@
 							<p>
 								Point your DNS at the records below. We re-check every few minutes and
 								switch the domain to <strong>success</strong> once it resolves to this
-								location. If your DNS sits behind a CDN/proxy and the A/AAAA records
+								location. If your DNS sits behind a CDN/proxy and the CNAME record
 								can't resolve to us directly, add the <em>Proxied DNS</em> TXT record
 								instead — that proves ownership but doesn't enable certificate issuance.
 							</p>
@@ -684,12 +682,6 @@
 							<p class="group__desc">Create these records so traffic for <strong>{domain.domain}</strong> reaches this location.</p>
 						</div>
 						<div class="recs">
-							{#each ipv4 as ip, i (i)}
-								{@render dnsRecord('A', domain.domain, ip)}
-							{/each}
-							{#each ipv6 as ip, i (i)}
-								{@render dnsRecord('AAAA', domain.domain, ip)}
-							{/each}
 							{#each cnames as cname, i (i)}
 								{@render dnsRecord('CNAME', domain.domain, cname)}
 							{/each}
@@ -712,8 +704,8 @@
 							</div>
 							{#if !domain.wildcard}
 								<p class="group__desc">
-									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the A/AAAA
-									records can't resolve here directly, add this TXT record instead to
+									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the CNAME
+									record can't resolve here directly, add this TXT record instead to
 									prove ownership and we'll accept the proxied setup.
 								</p>
 							{:else}
