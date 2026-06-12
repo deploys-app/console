@@ -6,28 +6,46 @@ export async function load ({ parent, url, fetch }) {
 	const urlInstallationId = url.searchParams.get('installation_id')
 		? Number(url.searchParams.get('installation_id'))
 		: null
+	const hasValidUrlId = urlInstallationId !== null && Number.isInteger(urlInstallationId) && urlInstallationId > 0
 
-	const [links, serviceAccounts, appInfo] = await Promise.all([
+	// If a valid installation_id came from GitHub's setup redirect, persist it
+	// BEFORE calling listRepos — the backend now restricts listRepos to saved ids.
+	/** @type {Api.Error | undefined} */
+	let addInstallationError
+	if (hasValidUrlId) {
+		const addResp = await api.invoke('github.addInstallation', { project, installationId: urlInstallationId }, fetch)
+		if (!addResp.ok) {
+			addInstallationError = addResp.error
+		}
+	}
+
+	const [links, serviceAccounts, appInfo, installations] = await Promise.all([
 		api.invoke('github.list', { project }, fetch),
 		api.invoke('serviceAccount.list', { project }, fetch),
-		api.invoke('github.getApp', { project }, fetch)
+		api.invoke('github.getApp', { project }, fetch),
+		api.invoke('github.listInstallations', { project }, fetch)
 	])
 
-	// Collect unique installation ids from existing links + url param
+	// Collect unique installation ids from saved installations + existing links + url param
 	/** @type {Set<number>} */
 	const installationIds = new Set()
+	const savedItems = installations.result?.items ?? []
+	for (const s of savedItems) {
+		const id = s.installationId
+		if (Number.isInteger(id) && id > 0) installationIds.add(id)
+	}
 	const linkItems = links.result?.items ?? []
 	for (const l of linkItems) {
 		const id = l.installationId
 		if (Number.isInteger(id) && id > 0) installationIds.add(id)
 	}
-	if (urlInstallationId !== null && Number.isInteger(urlInstallationId) && urlInstallationId > 0) installationIds.add(urlInstallationId)
+	if (hasValidUrlId) installationIds.add(urlInstallationId)
 
 	// Fetch repos for each installation id in parallel
 	/** @type {Map<number, Api.GithubRepoItem>} */
 	const repoMap = new Map()
 	/** @type {Api.Error | undefined} */
-	let repoError
+	let repoError = addInstallationError
 
 	await Promise.all(
 		[...installationIds].map(async (installationId) => {

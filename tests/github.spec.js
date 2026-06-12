@@ -29,11 +29,15 @@ const repos = [
 	{ repositoryId: 812345681, repository: 'acme/mobile', private: true }
 ]
 
+const savedInstallation = { installationId: 77, createdAt: '2026-01-01T00:00:00Z' }
+
 function mocks (overrides = {}) {
 	return setMocks({
 		'github.list': { ok: true, result: { items: [link] } },
 		'github.getApp': { ok: true, result: appInfo },
 		'github.listRepos': { ok: true, result: { items: repos } },
+		'github.listInstallations': { ok: true, result: { items: [savedInstallation] } },
+		'github.addInstallation': { ok: true, result: {} },
 		'serviceAccount.list': { ok: true, result: { items: [serviceAccount] } },
 		'location.list': { ok: true, result: { items: [location] } },
 		...overrides
@@ -161,7 +165,8 @@ test.describe('github link page', () => {
 
 	test('link page with ?installation_id=99 calls github.listRepos with installationId 99', async ({ page }) => {
 		await mocks({
-			'github.list': { ok: true, result: { items: [] } }
+			'github.list': { ok: true, result: { items: [] } },
+			'github.listInstallations': { ok: true, result: { items: [] } }
 		})
 
 		await page.goto('/github/link?project=test-project&installation_id=99')
@@ -175,6 +180,61 @@ test.describe('github link page', () => {
 		const listReposReqs = log.filter((r) => r.path === '/github.listRepos')
 		const bodies = listReposReqs.map((r) => JSON.parse(r.body ?? '{}'))
 		expect(bodies.some((b) => b.installationId === 99)).toBe(true)
+	})
+
+	test('landing with ?installation_id=88 calls addInstallation before listRepos for that id', async ({ page }) => {
+		await mocks({
+			'github.list': { ok: true, result: { items: [] } },
+			'github.listInstallations': { ok: true, result: { items: [] } }
+		})
+
+		await page.goto('/github/link?project=test-project&installation_id=88')
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.listRepos')
+		}).toBe(true)
+
+		const log = await getRequestLog()
+
+		// addInstallation must have been called with the correct payload
+		const addIndex = log.findIndex((r) => r.path === '/github.addInstallation')
+		expect(addIndex).toBeGreaterThanOrEqual(0)
+		const addBody = JSON.parse(log[addIndex]?.body ?? '{}')
+		expect(addBody.installationId).toBe(88)
+		expect(addBody.project).toBe('test-project')
+
+		// addInstallation must appear before listRepos for id 88 in the log
+		const listReposIndex = log.findIndex(
+			(r) => r.path === '/github.listRepos' && JSON.parse(r.body ?? '{}').installationId === 88
+		)
+		expect(listReposIndex).toBeGreaterThan(addIndex)
+	})
+
+	test('without ?installation_id repos are populated from remembered installations', async ({ page }) => {
+		// savedInstallation has installationId: 77 — listInstallations returns it, no URL param
+		await mocks({
+			'github.list': { ok: true, result: { items: [] } },
+			'github.listInstallations': { ok: true, result: { items: [savedInstallation] } }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// The repo dropdown should be populated from installation 77
+		const repoSelect = main.locator('#link-repository')
+		await repoSelect.click()
+		await expect(page.getByRole('option', { name: 'acme/api' })).toBeVisible()
+
+		// Confirm listRepos was called for the saved installation id
+		const log = await getRequestLog()
+		const listReposBodies = log
+			.filter((r) => r.path === '/github.listRepos')
+			.map((r) => JSON.parse(r.body ?? '{}'))
+		expect(listReposBodies.some((b) => b.installationId === 77)).toBe(true)
+
+		// addInstallation must NOT have been called (no URL param)
+		expect(log.some((r) => r.path === '/github.addInstallation')).toBe(false)
 	})
 
 	test('already-linked repos are hidden from dropdown', async ({ page }) => {

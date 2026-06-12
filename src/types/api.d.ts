@@ -380,6 +380,11 @@ declare namespace Api {
         installationId: number
     }
 
+    export type GithubInstallationItem = {
+        installationId: number
+        createdAt: string
+    }
+
     export type EmailDomain = {
         domain: string
         createdAt: string
