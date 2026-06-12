@@ -28,5 +28,6 @@ export const projectMenu = [
 	{ id: 'service-account', title: 'Service Accounts', icon: 'fa-user-lock', link: '/service-account' },
 	{ id: 'dropbox', title: 'Dropbox', icon: 'fa-box-open', link: '/dropbox' },
 	{ id: 'registry', title: 'Registry', icon: 'fa-warehouse-full', link: '/registry' },
+	{ id: 'github', title: 'GitHub', icon: 'fa-code-branch', link: '/github', preview: true },
 	{ id: 'audit-log', title: 'Audit Logs', icon: 'fa-clipboard-list', link: '/audit-log' }
 ]
