@@ -339,6 +339,11 @@
 							<td>{describeKey(limit.key.map(keyRowToApi).filter(Boolean))}</td>
 							<td>
 								<span class="font-mono text-sm">{limit.rate} / {limit.window}</span>
+								{#if limit.filter}
+									<div class="font-mono text-xs text-content/50 mt-1 truncate max-w-56" title={limit.filter}>
+										<i class="fa-solid fa-filter mr-1"></i>{limit.filter}
+									</div>
+								{/if}
 							</td>
 							<td>
 								<span class="mode-badge" data-mode={limit.mode}>

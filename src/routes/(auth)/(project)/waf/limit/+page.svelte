@@ -4,6 +4,8 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
+	import { parseExpression } from '$lib/waf/expression'
 	import { normalizeRules, toApiRules } from '$lib/waf/rules'
 	import {
 		DEFAULT_LIMIT_MESSAGE,
@@ -60,6 +62,28 @@
 	}))
 
 	let saving = $state(false)
+
+	// Filter editing mode — Visual (condition builder) or Expression (raw CEL
+	// textarea), same pattern as the rule editor. The filter is optional: empty
+	// means the limit applies to every request.
+	const canUseVisual = $derived(parseExpression(draft.filter) !== null)
+	let filterMode = $state(/** @type {'visual' | 'raw'} */ (
+		untrack(() => (parseExpression(draft.filter) !== null ? 'visual' : 'raw'))
+	))
+
+	// If we're in Visual but the filter becomes non-representable, fall back to
+	// raw so the disabled Visual tab can't show stale rows.
+	$effect(() => {
+		if (filterMode === 'visual' && !canUseVisual) filterMode = 'raw'
+	})
+
+	/** @type {{ clearExpression: () => void } | undefined} */
+	let filterBuilder = $state()
+
+	function clearFilter () {
+		if (filterMode === 'visual' && filterBuilder) filterBuilder.clearExpression()
+		else draft.filter = ''
+	}
 
 	// A loaded zone may carry a window outside the presets (the API accepts any
 	// 1s..1h Go duration) — keep it selectable so editing preserves it.
@@ -170,6 +194,82 @@
 			<div class="input">
 				<input id="limit-description" bind:value={draft.description} placeholder="Optional description">
 			</div>
+		</div>
+
+		<hr>
+
+		<div class="grid gap-4">
+			<div class="flex flex-wrap items-start justify-between gap-3">
+				<div>
+					<h6><strong>Apply to matching requests</strong></h6>
+					<p class="text-content/50 text-sm mt-1">
+						Optional — leave empty to apply this limit to every request.
+						Only matching requests are counted against the limit.
+					</p>
+				</div>
+				<div class="flex flex-col items-end gap-1">
+					<div class="flex items-center gap-2">
+						<div class="tabs is-variant-underline" role="tablist">
+							<button type="button" class="tab-button" class:is-active={filterMode === 'visual'}
+								role="tab" aria-selected={filterMode === 'visual'}
+								disabled={!canUseVisual}
+								title={canUseVisual ? undefined : 'This expression can’t be shown in the visual editor'}
+								onclick={() => { if (canUseVisual) filterMode = 'visual' }}>
+								<i class="fa-solid fa-sliders mr-2"></i>
+								<span>Visual</span>
+							</button>
+							<button type="button" class="tab-button" class:is-active={filterMode === 'raw'}
+								role="tab" aria-selected={filterMode === 'raw'}
+								onclick={() => (filterMode = 'raw')}>
+								<i class="fa-solid fa-code mr-2"></i>
+								<span>Expression</span>
+							</button>
+						</div>
+						<button type="button" class="button is-variant-tertiary is-size-small"
+							disabled={!draft.filter}
+							onclick={clearFilter}>
+							<i class="fa-solid fa-eraser mr-2"></i>
+							<span>Clear</span>
+						</button>
+					</div>
+					{#if !canUseVisual}
+						<p class="text-content/50 text-xs text-right max-w-xs">
+							This expression can’t be shown in the visual editor — edit it as raw CEL.
+						</p>
+					{/if}
+				</div>
+			</div>
+
+			{#if filterMode === 'visual'}
+				<WafConditionBuilder bind:this={filterBuilder} bind:expression={draft.filter} />
+			{:else}
+				<p class="text-content/60 text-sm">
+					Match on
+					<code class="font-mono">request.method</code>,
+					<code class="font-mono">.path</code>,
+					<code class="font-mono">.host</code>,
+					<code class="font-mono">.query</code>,
+					<code class="font-mono">.uri</code>,
+					<code class="font-mono">.scheme</code>,
+					<code class="font-mono">.user_agent</code>,
+					<code class="font-mono">.referer</code>,
+					<code class="font-mono">.remote_ip</code>,
+					<code class="font-mono">.country</code>,
+					<code class="font-mono">.asn</code>,
+					<code class="font-mono">.content_length</code>,
+					<code class="font-mono">.headers[…]</code>,
+					<code class="font-mono">.args[…]</code>,
+					<code class="font-mono">.cookies[…]</code>.
+					<code class="font-mono">request.body</code> is always empty here — rate limits run before the body is read.
+				</p>
+				<div class="field">
+					<label for="limit-filter-raw">Filter (CEL)</label>
+					<div class="textarea">
+						<textarea id="limit-filter-raw" class="font-mono" rows="5" bind:value={draft.filter}
+							placeholder="e.g. request.path.startsWith(&quot;/api/&quot;) && request.method == &quot;POST&quot;"></textarea>
+					</div>
+				</div>
+			{/if}
 		</div>
 
 		<hr>
