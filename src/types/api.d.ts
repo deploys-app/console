@@ -367,6 +367,19 @@ declare namespace Api {
         installationId: number
     }
 
+    export type GithubAppInfo = {
+        installUrl: string
+    }
+
+    export type GithubRepoItem = {
+        repositoryId: number
+        // owner/name
+        repository: string
+        private: boolean
+        // installation id this repo belongs to
+        installationId: number
+    }
+
     export type EmailDomain = {
         domain: string
         createdAt: string

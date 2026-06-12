@@ -1006,6 +1006,15 @@ const handlers = {
 		{ email: 'teammate@acme.example.com', roles: ['viewer'] }
 	]),
 
+	'github.getApp': () => ok({ installUrl: 'https://github.com/apps/deploys-app/installations/new' }),
+	'github.listRepos': () => list([
+		{ repositoryId: 812345678, repository: 'acme/web', private: false },
+		{ repositoryId: 812345679, repository: 'acme/api', private: false },
+		{ repositoryId: 812345680, repository: 'acme/docs', private: false },
+		{ repositoryId: 812345681, repository: 'acme/mobile', private: true },
+		{ repositoryId: 812345682, repository: 'contoso/site', private: false },
+		{ repositoryId: 812345683, repository: 'contoso/backend', private: false }
+	]),
 	'github.list': () => list([...githubLinks]),
 	'github.lookupRepo': (args) => {
 		const repository = args?.repository ?? ''

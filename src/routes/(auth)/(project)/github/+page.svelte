@@ -11,63 +11,16 @@
 	const { data } = $props()
 
 	const project = $derived(data.project)
-	const serviceAccounts = $derived(data.serviceAccounts)
 	const locations = $derived(data.locations)
 	const error = $derived(data.error)
 
 	let links = $state(untrack(() => data.links))
 
-	const serviceAccountOptions = $derived(serviceAccounts.map((sa) => ({
-		value: sa.sid,
-		label: `${sa.sid} — ${sa.name}`
-	})))
 	const locationOptions = $derived(locations.map((l) => ({ value: l.id, label: l.id })))
-
-	// link form
-	const linkDraft = $state({ repository: '', serviceAccount: '' })
-	let linking = $state(false)
-	const canLink = $derived(/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(linkDraft.repository.trim()) && !!linkDraft.serviceAccount)
 
 	async function reloadLinks () {
 		const resp = await api.invoke('github.list', { project }, fetch)
 		if (resp.ok) links = resp.result?.items ?? []
-	}
-
-	/** @param {Event} e */
-	async function link (e) {
-		e.preventDefault()
-		if (linking || !canLink) return
-
-		linking = true
-		try {
-			// Resolve owner/name to the immutable repository id through the
-			// GitHub App — this also verifies the App is installed on the repo.
-			const lookup = await api.invoke('github.lookupRepo', {
-				project,
-				repository: linkDraft.repository.trim()
-			}, fetch)
-			if (!lookup.ok) {
-				modal.error({ error: lookup.error })
-				return
-			}
-
-			const resp = await api.invoke('github.link', {
-				project,
-				repositoryId: lookup.result.repositoryId,
-				repository: lookup.result.repository,
-				installationId: lookup.result.installationId,
-				serviceAccount: linkDraft.serviceAccount
-			}, fetch)
-			if (!resp.ok) {
-				modal.error({ error: resp.error })
-				return
-			}
-
-			linkDraft.repository = ''
-			await reloadLinks()
-		} finally {
-			linking = false
-		}
 	}
 
 	/** @param {Api.GithubLink} it */
@@ -133,6 +86,12 @@ jobs:
 		<h4><strong>GitHub</strong></h4>
 		<p class="page-sub">Build and deploy linked repositories with GitHub Actions — keyless, with pull request previews</p>
 	</div>
+	<div>
+		<a class="button" href={`/github/link?project=${project}`}>
+			<i class="fa-solid fa-link mr-2"></i>
+			Link repository
+		</a>
+	</div>
 </div>
 
 <div class="panel is-level-300 grid gap-6">
@@ -178,43 +137,6 @@ jobs:
 			</tbody>
 		</table>
 	</div>
-
-	<hr>
-
-	<form class="grid gap-4" onsubmit={link}>
-		<div>
-			<h6><strong>Link a repository</strong></h6>
-			<p class="text-content/50 text-sm mt-1">
-				Install the deploys.app GitHub App on the repository first — linking
-				verifies the installation. The service account needs
-				<span class="font-mono">deployment.deploy</span>,
-				<span class="font-mono">deployment.get</span>,
-				<span class="font-mono">deployment.delete</span> and
-				<span class="font-mono">registry.push</span>.
-			</p>
-		</div>
-		<div class="grid gap-4 sm:grid-cols-2">
-			<div class="field">
-				<label for="github-repository">Repository</label>
-				<div class="input">
-					<input id="github-repository" class="font-mono" bind:value={linkDraft.repository} placeholder="owner/name">
-				</div>
-			</div>
-			<div class="field">
-				<label for="github-service-account">Service account</label>
-				<Select id="github-service-account" bind:value={linkDraft.serviceAccount}
-					options={serviceAccountOptions} placeholder="Select a service account" />
-			</div>
-		</div>
-		<div class="flex items-center gap-3">
-			<button class="button" class:is-loading={linking} disabled={linking || !canLink}>Link</button>
-			{#if serviceAccounts.length === 0}
-				<p class="text-content/50 text-sm">
-					No service accounts yet — <a class="link" href={`/service-account/create?project=${project}`}>create one</a> first.
-				</p>
-			{/if}
-		</div>
-	</form>
 </div>
 
 {#if links.length > 0}
