@@ -9,7 +9,7 @@ export async function load ({ parent, url, fetch }) {
 	const hasValidUrlId = urlInstallationId !== null && Number.isInteger(urlInstallationId) && urlInstallationId > 0
 
 	// If a valid installation_id came from GitHub's setup redirect, persist it
-	// BEFORE calling listRepos — the backend now restricts listRepos to saved ids.
+	// BEFORE the client calls listRepos — the backend restricts listRepos to saved ids.
 	/** @type {Api.Error | undefined} */
 	let addInstallationError
 	if (hasValidUrlId) {
@@ -41,30 +41,6 @@ export async function load ({ parent, url, fetch }) {
 	}
 	if (hasValidUrlId) installationIds.add(urlInstallationId)
 
-	// Fetch repos for each installation id in parallel
-	/** @type {Map<number, Api.GithubRepoItem>} */
-	const repoMap = new Map()
-	/** @type {Api.Error | undefined} */
-	let repoError = addInstallationError
-
-	await Promise.all(
-		[...installationIds].map(async (installationId) => {
-			const resp = await api.invoke('github.listRepos', { project, installationId }, fetch)
-			if (!resp.ok) {
-				repoError = resp.error
-				return
-			}
-			for (const item of resp.result?.items ?? []) {
-				if (!repoMap.has(item.repositoryId)) {
-					repoMap.set(item.repositoryId, { ...item, installationId })
-				}
-			}
-		})
-	)
-
-	// Sort by repository name
-	const repos = [...repoMap.values()].sort((a, b) => a.repository.localeCompare(b.repository))
-
 	// Set of already-linked repository ids
 	const linkedRepoIds = new Set(linkItems.map((l) => l.repositoryId))
 
@@ -72,11 +48,11 @@ export async function load ({ parent, url, fetch }) {
 	const error = links.error ?? serviceAccounts.error ?? appInfo.error
 
 	return {
-		repos,
 		serviceAccounts: serviceAccounts.result?.items ?? [],
 		installUrl: appInfo.result?.installUrl ?? '',
 		linkedRepoIds: [...linkedRepoIds],
 		error,
-		repoError
+		addInstallationError,
+		installationIds: [...installationIds]
 	}
 }

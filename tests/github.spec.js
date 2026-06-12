@@ -275,6 +275,37 @@ test.describe('github link page', () => {
 		await expect(page.getByRole('option', { name: 'acme/api' })).toBeVisible()
 	})
 
+	test('Refresh re-fetches repositories and the dropdown reflects updated data', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [] } } })
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Wait for the initial client-side fetch to populate the dropdown.
+		const repoSelect = main.locator('#link-repository')
+		await repoSelect.click()
+		await expect(page.getByRole('option', { name: 'acme/api' })).toBeVisible()
+		await page.keyboard.press('Escape')
+
+		// A new repo was created on GitHub — the next listRepos returns it.
+		await setMocks({
+			'github.listRepos': {
+				ok: true,
+				result: { items: [...repos, { repositoryId: 812345700, repository: 'acme/new-repo', private: false }] }
+			}
+		})
+
+		await main.getByRole('button', { name: 'Refresh' }).click()
+
+		await repoSelect.click()
+		await expect(page.getByRole('option', { name: 'acme/new-repo' })).toBeVisible()
+
+		// listRepos must have been issued again by the Refresh click.
+		const log = await getRequestLog()
+		const listReposCalls = log.filter((r) => r.path === '/github.listRepos')
+		expect(listReposCalls.length).toBeGreaterThanOrEqual(2)
+	})
+
 	test('shows inline warning when github.listRepos fails and hides complete-step-1 copy', async ({ page }) => {
 		await mocks({
 			'github.listRepos': { ok: false, error: { message: 'boom' } }

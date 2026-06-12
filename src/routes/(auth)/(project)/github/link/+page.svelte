@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -7,11 +8,62 @@
 	const { data } = $props()
 
 	const project = $derived(data.project)
-	const repos = $derived(data.repos)
 	const serviceAccounts = $derived(data.serviceAccounts)
 	const installUrl = $derived(data.installUrl)
-	const repoError = $derived(data.repoError)
 	const linkedRepoIds = $derived(new Set(data.linkedRepoIds))
+
+	/** @type {Api.GithubRepoItem[]} */
+	let repos = $state([])
+	/** @type {Api.Error | undefined} */
+	let repoError = $state(undefined)
+	let loadingRepos = $state(false)
+	let loadedOnce = $state(false)
+
+	const displayError = $derived(repoError ?? data.addInstallationError)
+
+	async function loadRepos () {
+		if (loadingRepos) return
+
+		loadingRepos = true
+		repoError = undefined
+		try {
+			/** @type {Record<number, Api.GithubRepoItem>} */
+			const repoMap = {}
+
+			await Promise.all(
+				data.installationIds.map(async (installationId) => {
+					const resp = await api.invoke('github.listRepos', { project, installationId }, fetch)
+					if (!resp.ok) {
+						repoError = resp.error
+						return
+					}
+					for (const item of resp.result?.items ?? []) {
+						if (!(item.repositoryId in repoMap)) {
+							repoMap[item.repositoryId] = { ...item, installationId }
+						}
+					}
+				})
+			)
+
+			repos = Object.values(repoMap).sort((a, b) => a.repository.localeCompare(b.repository))
+
+			// If the selected repo disappeared after a refresh, clear the selection.
+			if (selectedRepoName !== '' && !repos.some((r) => r.repository === selectedRepoName)) {
+				selectedRepoName = ''
+			}
+		} finally {
+			loadedOnce = true
+			loadingRepos = false
+		}
+	}
+
+	onMount(() => {
+		if (data.installationIds.length === 0) {
+			loadedOnce = true
+			return
+		}
+		loadRepos()
+	})
 
 	// Repos not yet linked
 	const availableRepos = $derived(repos.filter((r) => !linkedRepoIds.has(r.repositoryId)))
@@ -108,14 +160,15 @@
 <div class="panel is-level-300 grid gap-6">
 	<div>
 		<h6><strong>Step 2 — Pick a repository</strong></h6>
-		{#if repoError}
-			<p class="text-negative text-sm mt-1">Couldn't load repositories: {repoError.message}</p>
+		{#if displayError}
+			<p class="text-negative text-sm mt-1">Couldn't load repositories: {displayError.message}</p>
 		{/if}
 		<p class="text-content/50 text-sm mt-1">
-			{#if repos.length === 0 && !repoError}
+			{#if loadedOnce && repos.length === 0 && !displayError}
 				No repositories found. Complete step 1 to grant access — GitHub will redirect back here automatically.
 			{:else if repos.length > 0}
 				Select a repository from those visible to the installed GitHub App.
+				Just created a repository on GitHub? Hit Refresh to pick it up.
 				{#if hiddenCount > 0}
 					<span class="text-content/40">{hiddenCount} {hiddenCount === 1 ? 'repository is' : 'repositories are'} already linked and hidden.</span>
 				{/if}
@@ -133,13 +186,27 @@
 	<div class="grid gap-4 sm:grid-cols-2">
 		<div class="field">
 			<label for="link-repository">Repository</label>
-			<Select
-				id="link-repository"
-				bind:value={selectedRepoName}
-				options={repoOptions}
-				placeholder="Search repositories…"
-				editable={true}
-				disabled={repoOptions.length === 0} />
+			<div class="flex items-center gap-2">
+				<div class="flex-1">
+					<Select
+						id="link-repository"
+						bind:value={selectedRepoName}
+						options={repoOptions}
+						placeholder={loadingRepos ? 'Loading repositories…' : 'Search repositories…'}
+						editable={true}
+						disabled={loadingRepos || repoOptions.length === 0} />
+				</div>
+				<button
+					class="button is-variant-secondary"
+					class:is-loading={loadingRepos}
+					disabled={loadingRepos}
+					onclick={loadRepos}
+					aria-label="Refresh"
+					title="Re-fetch the repository list — newly created repos appear after Refresh"
+					type="button">
+					<i class="fa-solid fa-rotate"></i>
+				</button>
+			</div>
 		</div>
 		<div class="field">
 			<label for="link-service-account">Service account</label>
