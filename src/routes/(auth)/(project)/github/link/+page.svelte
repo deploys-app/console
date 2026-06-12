@@ -10,6 +10,7 @@
 	const repos = $derived(data.repos)
 	const serviceAccounts = $derived(data.serviceAccounts)
 	const installUrl = $derived(data.installUrl)
+	const repoError = $derived(data.repoError)
 	const linkedRepoIds = $derived(new Set(data.linkedRepoIds))
 
 	// Repos not yet linked
@@ -17,8 +18,8 @@
 	const hiddenCount = $derived(repos.length - availableRepos.length)
 
 	const repoOptions = $derived(availableRepos.map((r) => ({
-		value: r.repositoryId,
-		label: r.private ? `${r.repository} — private` : r.repository
+		value: r.repository,
+		label: r.repository
 	})))
 
 	const serviceAccountOptions = $derived(serviceAccounts.map((sa) => ({
@@ -26,15 +27,14 @@
 		label: `${sa.sid} — ${sa.name}`
 	})))
 
-	/** @type {number | ''} */
-	let selectedRepoId = $state('')
+	let selectedRepoName = $state('')
 	let selectedServiceAccount = $state('')
 	let linking = $state(false)
 
 	const selectedRepo = $derived(
-		selectedRepoId !== '' ? repos.find((r) => r.repositoryId === selectedRepoId) : undefined
+		selectedRepoName !== '' ? repos.find((r) => r.repository === selectedRepoName) : undefined
 	)
-	const canLink = $derived(selectedRepoId !== '' && !!selectedServiceAccount)
+	const canLink = $derived(!!selectedRepo && !!selectedServiceAccount)
 
 	const installHref = $derived(
 		installUrl + (project ? `?state=${encodeURIComponent(project)}` : '')
@@ -108,10 +108,13 @@
 <div class="panel is-level-300 grid gap-6">
 	<div>
 		<h6><strong>Step 2 — Pick a repository</strong></h6>
+		{#if repoError}
+			<p class="text-negative text-sm mt-1">Couldn't load repositories: {repoError.message}</p>
+		{/if}
 		<p class="text-content/50 text-sm mt-1">
-			{#if repos.length === 0}
+			{#if repos.length === 0 && !repoError}
 				No repositories found. Complete step 1 to grant access — GitHub will redirect back here automatically.
-			{:else}
+			{:else if repos.length > 0}
 				Select a repository from those visible to the installed GitHub App.
 				{#if hiddenCount > 0}
 					<span class="text-content/40">{hiddenCount} {hiddenCount === 1 ? 'repository is' : 'repositories are'} already linked and hidden.</span>
@@ -132,7 +135,7 @@
 			<label for="link-repository">Repository</label>
 			<Select
 				id="link-repository"
-				bind:value={selectedRepoId}
+				bind:value={selectedRepoName}
 				options={repoOptions}
 				placeholder="Search repositories…"
 				editable={true}

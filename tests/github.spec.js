@@ -194,6 +194,38 @@ test.describe('github link page', () => {
 		const webOption = page.getByRole('option', { name: /acme\/web/ })
 		await expect(webOption).toHaveCount(0)
 	})
+
+	test('after selecting a repo the input shows the repo name and dropdown still lists options on reopen', async ({ page }) => {
+		// Keep the default mocks (link has installationId 77 → listRepos is called)
+		await mocks()
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		const repoSelect = main.locator('#link-repository')
+		await repoSelect.click()
+		await repoSelect.fill('acme/api')
+		await page.getByRole('option', { name: 'acme/api' }).click()
+
+		// Input must display the full name, not a numeric id
+		await expect(repoSelect).toHaveValue('acme/api')
+
+		// Reopen the dropdown — options must still appear (regression for numeric-value bug)
+		await repoSelect.click()
+		await expect(page.getByRole('option', { name: 'acme/api' })).toBeVisible()
+	})
+
+	test('shows inline warning when github.listRepos fails and hides complete-step-1 copy', async ({ page }) => {
+		await mocks({
+			'github.listRepos': { ok: false, error: { message: 'boom' } }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await expect(main.getByText(/Couldn't load repositories: boom/)).toBeVisible()
+		await expect(main.getByText(/Complete step 1 to grant access/)).toHaveCount(0)
+	})
 })
 
 test.describe('github-setup redirect', () => {
