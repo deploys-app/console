@@ -546,6 +546,18 @@ const githubLinks = [
 		installationId: 77,
 		serviceAccount: 'sa_mock_ci',
 		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
+		productionBranch: 'main',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	},
+	{
+		repositoryId: 812345682,
+		repository: 'contoso/site',
+		installationId: 77,
+		serviceAccount: 'sa_mock_ci',
+		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
+		// no productionBranch — any branch can deploy; exercises the "—" / fallback path
+		productionBranch: '',
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	}
@@ -1042,6 +1054,7 @@ const handlers = {
 			installationId: args?.installationId ?? 0,
 			serviceAccount: args?.serviceAccount,
 			serviceAccountEmail: sa?.email ?? `${args?.serviceAccount}@acme.serviceaccount.deploys.app`,
+			productionBranch: args?.productionBranch ?? '',
 			createdAt: CREATED_AT,
 			createdBy: USER_EMAIL
 		})

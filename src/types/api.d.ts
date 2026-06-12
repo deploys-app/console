@@ -357,6 +357,9 @@ declare namespace Api {
         // service account sid
         serviceAccount: string
         serviceAccountEmail: string
+        // production deploys (push events) are only accepted from this branch;
+        // empty = any branch. pull-request previews are always allowed.
+        productionBranch?: string
         createdAt: string
         createdBy: string
     }
