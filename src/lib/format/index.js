@@ -97,7 +97,8 @@ export function deploymentType (t) {
 		TCPService: 'TCP Service',
 		InternalTCPService: 'Internal TCP Service',
 		Worker: 'Worker',
-		CronJob: 'Cron Job'
+		CronJob: 'Cron Job',
+		Static: 'Static'
 	}[t] || t
 }
 
@@ -107,6 +108,22 @@ export function deploymentType (t) {
  */
 export function shortDigest (s) {
 	return s.replace(/^sha256:/, '').slice(0, 12)
+}
+
+/**
+ * releaseSha extracts a Static deployment's release-sha. A Static deployment
+ * carries its release pointer either as a `site://<bucket>/<project>/<name>@<sha>`
+ * URI (the `site` field) or as a bare digest (`siteManifestDigest`). Pass both;
+ * the URI's trailing `@<sha>` wins, falling back to the bare digest, then to the
+ * raw site string.
+ * @param {{ site?: string, siteManifestDigest?: string }} [d]
+ * @returns {string}
+ */
+export function releaseSha (d) {
+	const site = d?.site ?? ''
+	const at = site.lastIndexOf('@')
+	if (at >= 0) return site.slice(at + 1)
+	return d?.siteManifestDigest || site
 }
 
 /**

@@ -32,6 +32,11 @@
 	const hasExternalTCPAddress = $derived(['TCPService'].includes(deployment.type))
 	const hasInternalTCPAddress = $derived(['WebService', 'TCPService', 'InternalTCPService'].includes(deployment.type))
 
+	// Static deployments reference a content-addressed release instead of a
+	// container image — surface the release-sha under a "Release" label.
+	const isStatic = $derived(deployment.type === 'Static')
+	const release = $derived(format.releaseSha(deployment))
+
 	onMount(() => setupCopy('.copy'))
 
 	function deleteItem () {
@@ -413,7 +418,7 @@
 				<span class="section__rule"></span>
 			</div>
 			<div class="spec-grid is-full">
-				{#if deployment.type === 'WebService' && !deployment.internal}
+				{#if (deployment.type === 'WebService' && !deployment.internal) || deployment.type === 'Static'}
 					<div class="spec">
 						<span class="spec__label">URL</span>
 						<a class="spec__link" href={`https://${deployment.url}`} target="_blank" rel="noopener">
@@ -484,31 +489,46 @@
 					</span>
 					<span></span>
 				</div>
-				<div class="spec">
-					<span class="spec__label">Image</span>
-					<span class="spec__value is-mono">{deployment.image}</span>
-					<span class="spec__copy copy" data-clipboard-text={deployment.image} title="Copy image">
-						<i class="fa-light fa-copy"></i>
-					</span>
-				</div>
-				<div class="spec">
-					<span class="spec__label">Command</span>
-					{#if deployment.command.length}
-						<span class="spec__value is-mono">{deployment.command.join(' ')}</span>
-					{:else}
-						<span class="spec__value is-dim">—</span>
-					{/if}
-					<span></span>
-				</div>
-				<div class="spec">
-					<span class="spec__label">Args</span>
-					{#if deployment.args.length}
-						<span class="spec__value is-mono">{deployment.args.join(' ')}</span>
-					{:else}
-						<span class="spec__value is-dim">—</span>
-					{/if}
-					<span></span>
-				</div>
+				{#if isStatic}
+					<div class="spec">
+						<span class="spec__label">Release</span>
+						{#if release}
+							<span class="spec__value is-mono">{release}</span>
+							<span class="spec__copy copy" data-clipboard-text={release} title="Copy release">
+								<i class="fa-light fa-copy"></i>
+							</span>
+						{:else}
+							<span class="spec__value is-dim">—</span>
+							<span></span>
+						{/if}
+					</div>
+				{:else}
+					<div class="spec">
+						<span class="spec__label">Image</span>
+						<span class="spec__value is-mono">{deployment.image}</span>
+						<span class="spec__copy copy" data-clipboard-text={deployment.image} title="Copy image">
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
+					<div class="spec">
+						<span class="spec__label">Command</span>
+						{#if deployment.command.length}
+							<span class="spec__value is-mono">{deployment.command.join(' ')}</span>
+						{:else}
+							<span class="spec__value is-dim">—</span>
+						{/if}
+						<span></span>
+					</div>
+					<div class="spec">
+						<span class="spec__label">Args</span>
+						{#if deployment.args.length}
+							<span class="spec__value is-mono">{deployment.args.join(' ')}</span>
+						{:else}
+							<span class="spec__value is-dim">—</span>
+						{/if}
+						<span></span>
+					</div>
+				{/if}
 				{#if deployment.type === 'CronJob'}
 					<div class="spec">
 						<span class="spec__label">Schedule</span>
@@ -519,7 +539,8 @@
 			</div>
 		</section>
 
-		<!-- ─── Resources ─── -->
+		<!-- ─── Resources ─── (container-only; not shown for Static) -->
+		{#if !isStatic}
 		<section class="section">
 			<div class="section__head">
 				<span class="section__title">Resources</span>
@@ -584,6 +605,7 @@
 				{/if}
 			</div>
 		</section>
+		{/if}
 
 		<!-- ─── Integration ─── -->
 		<section class="section">

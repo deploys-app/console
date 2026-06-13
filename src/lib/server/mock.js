@@ -187,8 +187,41 @@ function deployment (project = 'acme') {
 	}
 }
 
+// A Static (bucket-native static web) deployment: no container image/port — it
+// references a content-addressed release via `site` (site://…@<release-sha>) and
+// `siteManifestDigest`. Lets the detail/revision pages exercise the Release row
+// and release-sha rollback offline.
+const STATIC_RELEASE_SHA = 'a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00'
+
+/**
+ * @param {string} [project]
+ * @param {string} [releaseSha]
+ */
+function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
+	return {
+		...deployment(project),
+		name: 'website',
+		type: 'Static',
+		image: '',
+		site: `site://deploys-static/${project}/website@${releaseSha}`,
+		siteManifestDigest: releaseSha,
+		command: [],
+		args: [],
+		minReplicas: 0,
+		maxReplicas: 0,
+		port: 0,
+		protocol: '',
+		pullSecret: '',
+		workloadIdentity: '',
+		internalUrl: '',
+		internalAddress: '',
+		url: 'website.acme.rcf2.deploys.app'
+	}
+}
+
 const deployments = [
 	deployment('acme'),
+	staticDeployment('acme'),
 	{
 		...deployment('acme'),
 		name: 'web-paused',
@@ -886,6 +919,15 @@ const handlers = {
 	// deployment.get), with per-revision differences so the rollback modal's
 	// config diff has something to show.
 	'deployment.get': (args) => {
+		// Static deployment: distinct release-sha per historical revision so the
+		// rollback comparison shows release-sha old → new.
+		if (args?.name === 'website') {
+			const base = { ...staticDeployment(args?.project), location: args?.location ?? LOCATION_ID }
+			const revision = Number(args?.revision ?? 0)
+			if (!revision || revision >= base.revision) return ok(base)
+			const sha = `${revision}`.repeat(64).slice(0, 64)
+			return ok({ ...base, revision, site: `site://deploys-static/${args?.project ?? 'acme'}/website@${sha}`, siteManifestDigest: sha })
+		}
 		const base = { ...deployment(args?.project), name: args?.name ?? 'web', location: args?.location ?? LOCATION_ID }
 		const revision = Number(args?.revision ?? 0)
 		if (!revision || revision >= base.revision) return ok(base)
@@ -903,16 +945,32 @@ const handlers = {
 	'deployment.pause': () => ok({}),
 	'deployment.resume': () => ok({}),
 	'deployment.rollback': () => ok({}),
-	'deployment.revisions': (args) => list([7, 6, 5].map((revision) => {
-		const base = deployment(args?.project)
-		return {
-			...base,
-			name: args?.name ?? 'web',
-			location: args?.location ?? LOCATION_ID,
-			revision,
-			image: revision === base.revision ? base.image : base.image.replace(/:latest$/, `:v${revision}`)
+	'deployment.revisions': (args) => {
+		// Static deployment: per-revision release-shas, no image.
+		if (args?.name === 'website') {
+			const base = staticDeployment(args?.project)
+			return list([7, 6, 5].map((revision) => {
+				const sha = revision === base.revision ? STATIC_RELEASE_SHA : `${revision}`.repeat(64).slice(0, 64)
+				return {
+					...base,
+					location: args?.location ?? LOCATION_ID,
+					revision,
+					site: `site://deploys-static/${args?.project ?? 'acme'}/website@${sha}`,
+					siteManifestDigest: sha
+				}
+			}))
 		}
-	})),
+		return list([7, 6, 5].map((revision) => {
+			const base = deployment(args?.project)
+			return {
+				...base,
+				name: args?.name ?? 'web',
+				location: args?.location ?? LOCATION_ID,
+				revision,
+				image: revision === base.revision ? base.image : base.image.replace(/:latest$/, `:v${revision}`)
+			}
+		}))
+	},
 	'deployment.metrics': () => ok({
 		cpuUsage: metricPodLines(0.3),
 		cpuLimit: metricPodLines(0.5),

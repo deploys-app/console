@@ -132,6 +132,55 @@ test.describe('github', () => {
 		await expect(yaml).toContainText('branches: [main]')
 	})
 
+	test('Static build type emits a mode: static workflow with framework/outputDir and no dockerfile/port', async ({ page }) => {
+		await mocks()
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+		const yaml = main.locator('.workflow-yaml')
+
+		// Default is Dockerfile mode — the container workflow carries port.
+		await expect(yaml).toContainText('port:')
+		await expect(yaml).not.toContainText('mode: static')
+
+		// Switch the build type to Static.
+		await main.locator('#gen-build-type').click()
+		await page.getByRole('option', { name: 'Static' }).click()
+
+		// The static workflow carries mode: static + framework/outputDir/spa/notFound,
+		// and the production branch filter is preserved.
+		await expect(yaml).toContainText('mode: static')
+		await expect(yaml).toContainText('framework: auto')
+		await expect(yaml).toContainText('outputDir: public')
+		await expect(yaml).toContainText('spa: false')
+		await expect(yaml).toContainText('notFound: 404.html')
+		await expect(yaml).toContainText('branches: [release]')
+		await expect(yaml).toContainText('pull-requests: write')
+
+		// No Dockerfile-mode inputs leak into the static workflow.
+		await expect(yaml).not.toContainText('port:')
+		await expect(yaml).not.toContainText('dockerfile')
+
+		// buildCommand is omitted until the user fills it in.
+		await expect(yaml).not.toContainText('buildCommand:')
+		await main.locator('#gen-build-command').fill('hugo --minify')
+		await expect(yaml).toContainText('buildCommand: hugo --minify')
+
+		// Static framework + spa selections flow through to the YAML.
+		await main.locator('#gen-framework').click()
+		await page.getByRole('option', { name: 'Hugo' }).click()
+		await expect(yaml).toContainText('framework: hugo')
+		await main.locator('#gen-spa').check()
+		await expect(yaml).toContainText('spa: true')
+
+		// Copy + Create-on-GitHub deep-link carry the static YAML.
+		const copyText = await main.locator('.copy-workflow').getAttribute('data-clipboard-text')
+		expect(copyText).toContain('mode: static')
+		const href = await main.getByRole('link', { name: 'Create on GitHub' }).getAttribute('href')
+		expect(decodeURIComponent(href ?? '')).toContain('mode: static')
+		expect(decodeURIComponent(href ?? '')).toContain('framework: hugo')
+	})
+
 	test('unlinks after confirmation', async ({ page }) => {
 		await mocks({ 'github.unlink': { ok: true, result: {} } })
 
