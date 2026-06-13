@@ -241,8 +241,11 @@
 				</div>
 				<button
 					class="button is-variant-secondary"
+					disabled={!data.canCreateServiceAccount}
 					onclick={() => createServiceAccountModal.open()}
-					title="Create a new deploy service account without leaving this page"
+					title={data.canCreateServiceAccount
+						? 'Create a new deploy service account without leaving this page'
+						: 'You need the serviceAccount.create permission to create one here.'}
 					type="button">
 					<i class="fa-solid fa-plus mr-2"></i>
 					New
@@ -281,4 +284,5 @@
 <CreateServiceAccountModal
 	bind:this={createServiceAccountModal}
 	{project}
+	canGrantRole={data.canGrantRole}
 	oncreated={onServiceAccountCreated} />

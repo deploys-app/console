@@ -791,6 +791,8 @@ const dropboxItems = [
 /** @type {Record<string, (args: any) => object>} */
 const handlers = {
 	'me.get': () => ok({ email: USER_EMAIL }),
+	// The mock user is a full-access owner, so every permission probe passes.
+	'me.authorized': () => ok({ authorized: true }),
 
 	'project.list': () => list(projects),
 	'project.get': (args) => ok(projects.find((p) => p.project === args?.project) ?? { ...projects[0], project: args?.project ?? 'acme' }),

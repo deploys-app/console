@@ -41,6 +41,13 @@ export function defaultMocks () {
 			ok: true,
 			result: defaultProfile
 		},
+		// Permission probe — default to authorized so affordances are enabled.
+		// me.authorized is a logical AND over the listed permissions; tests that
+		// need a denied state override per-request (e.g. via page.route).
+		'/me.authorized': {
+			ok: true,
+			result: { authorized: true }
+		},
 		'/project.list': {
 			ok: true,
 			result: { items: [defaultProject] }
