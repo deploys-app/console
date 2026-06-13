@@ -47,7 +47,7 @@
 		<h4 class="min-w-0 wrap-anywhere"><strong>{envGroup.name}</strong></h4>
 		<p class="page-sub">{entries.length} {entries.length === 1 ? 'variable' : 'variables'}</p>
 	</div>
-	<GuardedButton permission="envGroup.update" class="button is-variant-secondary is-icon-left"
+	<GuardedButton permission="envgroup.update" class="button is-variant-secondary is-icon-left"
 		href={`/env-group/create?project=${project}&name=${encodeURIComponent(envGroup.name)}`}>
 		<i class="fa-solid fa-pen"></i>
 		Edit
@@ -117,7 +117,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this env group. Deployments referencing it may fail to start.">
-			<GuardedButton permission="envGroup.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
+			<GuardedButton permission="envgroup.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

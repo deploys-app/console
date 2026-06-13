@@ -403,7 +403,7 @@
 			<i class="fa-solid fa-arrow-up-right-from-square"></i>
 			Visit
 		</a>
-		<GuardedButton permission="route.createV2" class="button is-icon-left" href={`/route/edit?${params}`}>
+		<GuardedButton permission="route.create" class="button is-icon-left" href={`/route/edit?${params}`}>
 			<i class="fa-solid fa-pencil"></i>
 			Edit
 		</GuardedButton>

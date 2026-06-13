@@ -37,7 +37,7 @@
 	// The submit RPC depends on whether we're editing an existing env group
 	// (envGroup.update) or creating a new one (envGroup.create); gate on the one
 	// the save handler will actually call.
-	const savePermission = $derived(envGroup ? 'envGroup.update' : 'envGroup.create')
+	const savePermission = $derived(envGroup ? 'envgroup.update' : 'envgroup.create')
 
 	/**
 	 * @param {Event} e
@@ -56,7 +56,7 @@
 				return p
 			}, {})
 
-			const fn = envGroup ? 'envGroup.update' : 'envGroup.create'
+			const fn = envGroup ? 'envgroup.update' : 'envgroup.create'
 			const resp = await api.invoke(fn, {
 				project,
 				name: form.name,

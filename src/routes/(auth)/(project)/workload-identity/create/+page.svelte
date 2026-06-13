@@ -89,6 +89,6 @@
 			</div>
 		</div>
 		<hr>
-		<GuardedButton permission="workloadIdentity.create" type="submit" class="button mr-auto" loading={saving}>Create</GuardedButton>
+		<GuardedButton permission="workloadidentity.create" type="submit" class="button mr-auto" loading={saving}>Create</GuardedButton>
 	</form>
 </div>

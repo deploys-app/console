@@ -15,8 +15,12 @@ export function hasPermission (permissions, admin, permission) {
 	if (admin) return true
 	if (!permissions || permissions.length === 0) return false
 	if (permissions.includes('*')) return true
-	const dot = permission.indexOf('.')
-	if (dot > 0 && permissions.includes(permission.slice(0, dot) + '.*')) return true
+	// The server only honors a '<resource>.*' wildcard for TWO-segment
+	// permissions (iam.validPermissions checks len(parts)==2). Three-segment
+	// permissions like 'serviceaccount.key.create' require an exact grant (or
+	// '*'); 'serviceaccount.*' does NOT cover them. Mirror that exactly.
+	const parts = permission.split('.')
+	if (parts.length === 2 && permissions.includes(parts[0] + '.*')) return true
 	return permissions.includes(permission)
 }
 

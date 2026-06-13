@@ -274,7 +274,7 @@
 
 			<hr>
 
-			<GuardedButton permission="route.createV2" type="submit" class="button mr-auto" loading={saving}>Save</GuardedButton>
+			<GuardedButton permission="route.create" type="submit" class="button mr-auto" loading={saving}>Save</GuardedButton>
 		{/if}
 	</form>
 </div>

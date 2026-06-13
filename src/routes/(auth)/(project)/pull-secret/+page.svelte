@@ -17,7 +17,7 @@
 		<h4><strong>Pull Secrets</strong></h4>
 		<p class="page-sub">{pullSecrets.length} {pullSecrets.length === 1 ? 'pull secret' : 'pull secrets'}</p>
 	</div>
-	<GuardedButton permission="pullSecret.create" class="button is-icon-left" href="/pull-secret/create?project={project}">
+	<GuardedButton permission="pullsecret.create" class="button is-icon-left" href="/pull-secret/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
 	</GuardedButton>

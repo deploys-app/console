@@ -782,7 +782,7 @@
 						<strong>Purge everything</strong>
 						<p>Remove all cached resources</p>
 					</div>
-					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
+					<GuardedButton permission="domain.purgecache" class="button is-variant-secondary" loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 						Purge everything
 					</GuardedButton>
 				</div>
@@ -791,7 +791,7 @@
 						<strong>Purge prefix</strong>
 						<p>Remove cached resources at a prefix path</p>
 					</div>
-					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCachePrefix}>
+					<GuardedButton permission="domain.purgecache" class="button is-variant-secondary" loading={purging} onclick={purgeCachePrefix}>
 						Purge prefix
 					</GuardedButton>
 				</div>
@@ -800,7 +800,7 @@
 						<strong>Purge file</strong>
 						<p>Remove cached resources at an exact path</p>
 					</div>
-					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCacheFile}>
+					<GuardedButton permission="domain.purgecache" class="button is-variant-secondary" loading={purging} onclick={purgeCacheFile}>
 						Purge file
 					</GuardedButton>
 				</div>

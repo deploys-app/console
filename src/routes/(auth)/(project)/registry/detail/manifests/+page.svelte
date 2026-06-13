@@ -43,7 +43,7 @@
 					<td>{format.shortDigest(manifest.digest)}</td>
 					<td>{format.datetime(manifest.createdAt)}</td>
 					<td>
-						<GuardedButton permission="registry.deleteManifest" class="icon-button" aria-label="Delete" onclick={() => deleteManifest(manifest.digest)}>
+						<GuardedButton permission="registry.push" class="icon-button" aria-label="Delete" onclick={() => deleteManifest(manifest.digest)}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</GuardedButton>
 					</td>

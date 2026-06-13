@@ -69,7 +69,7 @@
 		<h4><strong>Routes</strong></h4>
 		<p class="page-sub">{routes.length} {routes.length === 1 ? 'route' : 'routes'}</p>
 	</div>
-	<GuardedButton permission="route.createV2" class="button is-icon-left" href={`/route/create?project=${project}`}>
+	<GuardedButton permission="route.create" class="button is-icon-left" href={`/route/create?project=${project}`}>
 		<i class="fa-solid fa-plus"></i>
 		Create
 	</GuardedButton>

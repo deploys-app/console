@@ -56,7 +56,7 @@
 							</a>
 						</td>
 						<td>
-							<GuardedButton permission="registry.delete" class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
+							<GuardedButton permission="registry.push" class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</GuardedButton>
 						</td>

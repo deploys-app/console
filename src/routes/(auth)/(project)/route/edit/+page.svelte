@@ -338,7 +338,7 @@
 		<hr>
 
 		<div class="flex gap-3">
-			<GuardedButton permission="route.createV2" type="submit" loading={saving}>Save</GuardedButton>
+			<GuardedButton permission="route.create" type="submit" loading={saving}>Save</GuardedButton>
 			<a class="button is-variant-tertiary" href={detailUrl}>Cancel</a>
 		</div>
 	</form>

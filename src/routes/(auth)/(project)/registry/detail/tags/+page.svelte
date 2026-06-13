@@ -62,7 +62,7 @@
 					</td>
 					<td>{format.datetime(tag.createdAt)}</td>
 					<td>
-						<GuardedButton permission="registry.untag" class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
+						<GuardedButton permission="registry.push" class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
 							<i class="fa-solid fa-trash-alt"></i>
 						</GuardedButton>
 					</td>

@@ -98,7 +98,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this pull secret. Deployments using it will fail to pull images.">
-			<GuardedButton permission="pullSecret.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
+			<GuardedButton permission="pullsecret.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

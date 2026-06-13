@@ -17,7 +17,7 @@
 		<h4><strong>Workload Identities</strong></h4>
 		<p class="page-sub">{workloadIdentities.length} {workloadIdentities.length === 1 ? 'workload identity' : 'workload identities'}</p>
 	</div>
-	<GuardedButton permission="workloadIdentity.create" class="button is-icon-left" href="/workload-identity/create?project={project}">
+	<GuardedButton permission="workloadidentity.create" class="button is-icon-left" href="/workload-identity/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
 	</GuardedButton>

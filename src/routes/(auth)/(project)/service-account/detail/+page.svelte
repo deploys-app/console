@@ -136,15 +136,15 @@
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</div>
-					<GuardedButton permission="serviceAccount.deleteKey" class="icon" onclick={() => deleteKey(key.secret)} type="button" aria-label="Delete">
+					<GuardedButton permission="serviceaccount.key.delete" class="icon" onclick={() => deleteKey(key.secret)} type="button" aria-label="Delete">
 						<i class="fa-solid fa-trash-alt"></i>
 					</GuardedButton>
 				</div>
 			{/each}
 
 			<div class="grid gap-4 w-full">
-				<span class="inline-flex mx-auto" title={can('serviceAccount.createKey') ? null : denyTooltip('serviceAccount.createKey')}>
-					<button class="button" class:loading={loadingCreateKey} onclick={createKey} disabled={!can('serviceAccount.createKey') || loadingCreateKey} type="button">
+				<span class="inline-flex mx-auto" title={can('serviceaccount.key.create') ? null : denyTooltip('serviceaccount.key.create')}>
+					<button class="button" class:loading={loadingCreateKey} onclick={createKey} disabled={!can('serviceaccount.key.create') || loadingCreateKey} type="button">
 						<i class="fa-solid fa-plus mr-3"></i>
 						Create key
 					</button>
@@ -153,7 +153,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this service account and revoke all of its keys.">
-			<GuardedButton permission="serviceAccount.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>
+			<GuardedButton permission="serviceaccount.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>
 				Delete
 			</GuardedButton>
 		</DangerZone>

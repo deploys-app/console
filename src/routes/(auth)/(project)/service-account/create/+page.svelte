@@ -107,7 +107,7 @@
 		</div>
 
 		<GuardedButton
-			permission={id ? 'serviceAccount.update' : 'serviceAccount.create'}
+			permission="serviceaccount.create"
 			type="submit"
 			class="button mr-auto"
 			loading={saving}

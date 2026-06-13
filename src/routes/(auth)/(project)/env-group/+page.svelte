@@ -21,7 +21,7 @@
 		<h4><strong>Env Groups</strong></h4>
 		<p class="page-sub">{envGroups.length} {envGroups.length === 1 ? 'env group' : 'env groups'}</p>
 	</div>
-	<GuardedButton permission="envGroup.create" class="button is-icon-left" href="/env-group/create?project={project}">
+	<GuardedButton permission="envgroup.create" class="button is-icon-left" href="/env-group/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
 	</GuardedButton>
@@ -50,11 +50,11 @@
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
-							<span class="inline-flex" title={can('envGroup.update') ? null : denyTooltip('envGroup.update')}>
+							<span class="inline-flex" title={can('envgroup.update') ? null : denyTooltip('envgroup.update')}>
 								<a
-									href={can('envGroup.update') ? `/env-group/create?project=${project}&name=${it.name}` : null}
+									href={can('envgroup.update') ? `/env-group/create?project=${project}&name=${it.name}` : null}
 									aria-label="Edit"
-									aria-disabled={can('envGroup.update') ? null : 'true'}>
+									aria-disabled={can('envgroup.update') ? null : 'true'}>
 									<div class="icon-button">
 										<i class="fa-solid fa-pen"></i>
 									</div>

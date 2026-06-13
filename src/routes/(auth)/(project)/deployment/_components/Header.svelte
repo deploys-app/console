@@ -312,15 +312,15 @@
 		</div>
 		<div class="masthead__actions">
 			{#if canPause}
-				<span class="inline-flex" title={can('deployment.pause') ? null : denyTooltip('deployment.pause')}>
-					<button class="mast-btn" type="button" disabled={!can('deployment.pause')} aria-disabled={!can('deployment.pause')} onclick={pause}>
+				<span class="inline-flex" title={can('deployment.deploy') ? null : denyTooltip('deployment.deploy')}>
+					<button class="mast-btn" type="button" disabled={!can('deployment.deploy')} aria-disabled={!can('deployment.deploy')} onclick={pause}>
 						<i class="fa-solid fa-pause"></i> Pause
 					</button>
 				</span>
 			{/if}
 			{#if canResume}
-				<span class="inline-flex" title={can('deployment.resume') ? null : denyTooltip('deployment.resume')}>
-					<button class="mast-btn" type="button" disabled={!can('deployment.resume')} aria-disabled={!can('deployment.resume')} onclick={resume}>
+				<span class="inline-flex" title={can('deployment.deploy') ? null : denyTooltip('deployment.deploy')}>
+					<button class="mast-btn" type="button" disabled={!can('deployment.deploy')} aria-disabled={!can('deployment.deploy')} onclick={resume}>
 						<i class="fa-solid fa-play"></i> Resume
 					</button>
 				</span>

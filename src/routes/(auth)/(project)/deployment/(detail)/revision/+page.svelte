@@ -556,9 +556,9 @@
 				</span>
 				<span class="rev-row__act">
 					{#if i > 0}
-						<span class="inline-flex" title={can('deployment.rollback') ? null : denyTooltip('deployment.rollback')}>
+						<span class="inline-flex" title={can('deployment.delete') ? null : denyTooltip('deployment.delete')}>
 							<button type="button" class="rail-btn"
-								disabled={!can('deployment.rollback')}
+								disabled={!can('deployment.delete')}
 								onclick={() => rollback(it)}>
 								<i class="fa-solid fa-rotate-left"></i>
 								Rollback
@@ -666,7 +666,7 @@
 		{/if}
 
 		<div class="flex items-center gap-3 mt-6">
-			<GuardedButton permission="deployment.rollback" class="button"
+			<GuardedButton permission="deployment.delete" class="button"
 				loading={rollingBack} onclick={confirmRollback}>
 				<i class="fa-solid fa-rotate-left mr-2"></i>
 				Rollback

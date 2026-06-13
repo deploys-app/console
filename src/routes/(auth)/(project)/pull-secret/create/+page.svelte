@@ -115,6 +115,6 @@
 
 		<hr>
 
-		<GuardedButton permission="pullSecret.create" type="submit" class="button mr-auto" loading={saving}>Save</GuardedButton>
+		<GuardedButton permission="pullsecret.create" type="submit" class="button mr-auto" loading={saving}>Save</GuardedButton>
 	</form>
 </div>

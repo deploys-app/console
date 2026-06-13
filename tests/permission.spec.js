@@ -24,8 +24,17 @@ test.describe('hasPermission', () => {
 		expect(hasPermission(['deployment.*'], false, 'role.bind')).toBe(false)
 	})
 
+	test("a '<resource>.*' wildcard does NOT cover a three-segment permission", () => {
+		// Mirrors the server: iam.validPermissions only applies the wildcard for
+		// two-segment permissions, so serviceaccount.* does not grant
+		// serviceaccount.key.create — only an exact grant or '*' does.
+		expect(hasPermission(['serviceaccount.*'], false, 'serviceaccount.key.create')).toBe(false)
+		expect(hasPermission(['serviceaccount.key.create'], false, 'serviceaccount.key.create')).toBe(true)
+		expect(hasPermission(['*'], false, 'serviceaccount.key.create')).toBe(true)
+	})
+
 	test('an exact grant matches', () => {
-		expect(hasPermission(['serviceAccount.create'], false, 'serviceAccount.create')).toBe(true)
+		expect(hasPermission(['serviceaccount.create'], false, 'serviceaccount.create')).toBe(true)
 		expect(hasPermission(['role.bind', 'role.get'], false, 'role.get')).toBe(true)
 	})
 

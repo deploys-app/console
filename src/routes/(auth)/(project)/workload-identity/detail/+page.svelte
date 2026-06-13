@@ -96,7 +96,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this workload identity. Deployments using it will lose GCP access.">
-			<GuardedButton permission="workloadIdentity.delete" class="button is-variant-negative" onclick={deleteItem}>Delete</GuardedButton>
+			<GuardedButton permission="workloadidentity.delete" class="button is-variant-negative" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>
