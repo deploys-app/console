@@ -4,11 +4,11 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import CreateServiceAccountModal from '$lib/components/CreateServiceAccountModal.svelte'
 
 	const { data } = $props()
 
 	const project = $derived(data.project)
-	const serviceAccounts = $derived(data.serviceAccounts)
 	const installUrl = $derived(data.installUrl)
 	const linkedRepoIds = $derived(new Set(data.linkedRepoIds))
 
@@ -74,10 +74,29 @@
 		label: r.repository
 	})))
 
+	// Service accounts created inline via the modal, merged with the loaded list
+	// so a freshly-created SA is immediately selectable without a full reload.
+	/** @type {{ sid: string, name: string }[]} */
+	let extraServiceAccounts = $state([])
+
+	const serviceAccounts = $derived([...data.serviceAccounts, ...extraServiceAccounts])
+
 	const serviceAccountOptions = $derived(serviceAccounts.map((sa) => ({
 		value: sa.sid,
 		label: `${sa.sid} — ${sa.name}`
 	})))
+
+	/** @type {CreateServiceAccountModal} */
+	let createServiceAccountModal = $state(/** @type {any} */ (undefined))
+
+	/** @param {{ sid: string, name: string, email: string }} sa */
+	function onServiceAccountCreated (sa) {
+		if (!extraServiceAccounts.some((s) => s.sid === sa.sid) &&
+			!data.serviceAccounts.some((s) => s.sid === sa.sid)) {
+			extraServiceAccounts = [...extraServiceAccounts, { sid: sa.sid, name: sa.name }]
+		}
+		selectedServiceAccount = sa.sid
+	}
 
 	let selectedRepoName = $state('')
 	let selectedServiceAccount = $state('')
@@ -212,11 +231,23 @@
 		</div>
 		<div class="field">
 			<label for="link-service-account">Service account</label>
-			<Select
-				id="link-service-account"
-				bind:value={selectedServiceAccount}
-				options={serviceAccountOptions}
-				placeholder="Select a service account" />
+			<div class="flex items-center gap-2">
+				<div class="flex-1">
+					<Select
+						id="link-service-account"
+						bind:value={selectedServiceAccount}
+						options={serviceAccountOptions}
+						placeholder="Select a service account" />
+				</div>
+				<button
+					class="button is-variant-secondary"
+					onclick={() => createServiceAccountModal.open()}
+					title="Create a new deploy service account without leaving this page"
+					type="button">
+					<i class="fa-solid fa-plus mr-2"></i>
+					New
+				</button>
+			</div>
 		</div>
 		<div class="field sm:col-span-2">
 			<label for="link-production-branch">Production branch</label>
@@ -246,3 +277,8 @@
 		{/if}
 	</div>
 </div>
+
+<CreateServiceAccountModal
+	bind:this={createServiceAccountModal}
+	{project}
+	oncreated={onServiceAccountCreated} />

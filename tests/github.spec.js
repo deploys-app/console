@@ -352,6 +352,82 @@ test.describe('github link page', () => {
 		expect(listReposCalls.length).toBeGreaterThanOrEqual(2)
 	})
 
+	test('New opens the modal and Create & select issues serviceAccount.create then role.bind, selecting the new SA', async ({ page }) => {
+		await mocks({
+			'serviceAccount.create': { ok: true, result: {} },
+			'role.get': { ok: false, error: { message: 'api: role not found' } },
+			'role.create': { ok: true, result: {} },
+			'role.bind': { ok: true, result: {} }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Open the modal via the "New" button beside the Service account select.
+		await main.getByRole('button', { name: 'New' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Create service account' })).toBeVisible()
+
+		// Defaults are prefilled; submit.
+		await expect(modal.locator('#create-sa-sid')).toHaveValue('github-deploy')
+		await modal.getByRole('button', { name: 'Create & select' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/role.bind')
+		}).toBe(true)
+
+		const log = await getRequestLog()
+		const createIndex = log.findIndex((r) => r.path === '/serviceAccount.create')
+		const bindIndex = log.findIndex((r) => r.path === '/role.bind')
+		expect(createIndex).toBeGreaterThanOrEqual(0)
+		expect(bindIndex).toBeGreaterThanOrEqual(0)
+		expect(createIndex).toBeLessThan(bindIndex)
+
+		const createReq = JSON.parse(log[createIndex]?.body ?? '{}')
+		expect(createReq.sid).toBe('github-deploy')
+		expect(createReq.name).toBe('GitHub Deploy')
+
+		const bindReq = JSON.parse(log[bindIndex]?.body ?? '{}')
+		expect(bindReq.roles).toEqual(['github-deploy'])
+
+		// Modal closes and the picker shows the new SA selected.
+		await expect(modal).toHaveCount(0)
+		await expect(main.locator('#link-service-account')).toContainText('github-deploy — GitHub Deploy')
+	})
+
+	test('unchecking "Grant deploy role" creates the SA but does not bind or create a role', async ({ page }) => {
+		await mocks({
+			'serviceAccount.create': { ok: true, result: {} }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await main.getByRole('button', { name: 'New' }).click()
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Create service account' })).toBeVisible()
+
+		// Untick the grant-role checkbox.
+		await modal.locator('#create-sa-grant').uncheck()
+		await modal.getByRole('button', { name: 'Create & select' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/serviceAccount.create')
+		}).toBe(true)
+
+		// Give any stray follow-up calls a chance to land before asserting absence.
+		await expect(modal).toHaveCount(0)
+
+		const log = await getRequestLog()
+		expect(log.some((r) => r.path === '/serviceAccount.create')).toBe(true)
+		expect(log.some((r) => r.path === '/role.bind')).toBe(false)
+		expect(log.some((r) => r.path === '/role.create')).toBe(false)
+		expect(log.some((r) => r.path === '/role.get')).toBe(false)
+	})
+
 	test('shows inline warning when github.listRepos fails and hides complete-step-1 copy', async ({ page }) => {
 		await mocks({
 			'github.listRepos': { ok: false, error: { message: 'boom' } }
