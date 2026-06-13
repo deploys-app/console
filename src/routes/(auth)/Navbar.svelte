@@ -109,7 +109,7 @@
 
 		<div>
 			<div class="avatar" onclick={toggle} onkeypress={toggle} tabindex="0" role="button">
-				<img src={profile ? gravatarUrl(profile.email) : 'https://www.gravatar.com/avatar'} alt="profile" width="36" class="rounded-full" crossorigin="anonymous" draggable="false">
+				<img src={profile ? gravatarUrl(profile.email, { default: 'mp' }) : 'https://www.gravatar.com/avatar?d=mp'} alt="profile" width="36" class="rounded-full" crossorigin="anonymous" draggable="false">
 			</div>
 
 			{#if active}
