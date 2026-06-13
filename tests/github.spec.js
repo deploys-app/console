@@ -6,6 +6,19 @@ const link = {
 	installationId: 77,
 	serviceAccount: 'ci',
 	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
+	productionBranch: 'release',
+	createdAt: '2026-01-01T00:00:00Z',
+	createdBy: 'dev@deploys.app'
+}
+
+// linked repo without a production branch — any branch may deploy
+const linkAnyBranch = {
+	repositoryId: 812345681,
+	repository: 'acme/mobile',
+	installationId: 77,
+	serviceAccount: 'ci',
+	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
+	productionBranch: '',
 	createdAt: '2026-01-01T00:00:00Z',
 	createdBy: 'dev@deploys.app'
 }
@@ -92,6 +105,33 @@ test.describe('github', () => {
 		expect(href).toBe('/github/link?project=test-project')
 	})
 
+	test('renders the production branch per row, with "—" when unset', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await expect(main.getByRole('columnheader', { name: 'Branch' })).toBeVisible()
+		await expect(main.locator('tr', { hasText: 'acme/web' })).toContainText('release')
+		await expect(main.locator('tr', { hasText: 'acme/mobile' })).toContainText('—')
+	})
+
+	test('workflow generator uses the link production branch, falling back to main', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Default selection is acme/web, which restricts production to "release".
+		const yaml = main.locator('.workflow-yaml')
+		await expect(yaml).toContainText('branches: [release]')
+
+		// acme/mobile has no production branch — the generator falls back to main.
+		await main.locator('#gen-repository').click()
+		await page.getByRole('option', { name: 'acme/mobile' }).click()
+		await expect(yaml).toContainText('branches: [main]')
+	})
+
 	test('unlinks after confirmation', async ({ page }) => {
 		await mocks({ 'github.unlink': { ok: true, result: {} } })
 
@@ -147,6 +187,11 @@ test.describe('github link page', () => {
 		await main.locator('#link-service-account').click()
 		await page.getByRole('option', { name: /ci — CI Deployer/ }).click()
 
+		// Production branch is prefilled with "main"; override it (trimmed on submit)
+		const branchInput = main.locator('#link-production-branch')
+		await expect(branchInput).toHaveValue('main')
+		await branchInput.fill('  release  ')
+
 		// Click link
 		await main.getByRole('button', { name: 'Link', exact: true }).click()
 
@@ -161,6 +206,7 @@ test.describe('github link page', () => {
 		expect(linkReq.installationId).toBe(77)
 		expect(linkReq.serviceAccount).toBe('ci')
 		expect(linkReq.repository).toBe('acme/api')
+		expect(linkReq.productionBranch).toBe('release')
 	})
 
 	test('link page with ?installation_id=99 calls github.listRepos with installationId 99', async ({ page }) => {

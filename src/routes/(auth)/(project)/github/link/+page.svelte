@@ -81,6 +81,7 @@
 
 	let selectedRepoName = $state('')
 	let selectedServiceAccount = $state('')
+	let productionBranch = $state('main')
 	let linking = $state(false)
 
 	const selectedRepo = $derived(
@@ -102,7 +103,8 @@
 				repositoryId: selectedRepo.repositoryId,
 				repository: selectedRepo.repository,
 				installationId: selectedRepo.installationId,
-				serviceAccount: selectedServiceAccount
+				serviceAccount: selectedServiceAccount,
+				productionBranch: productionBranch.trim()
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -215,6 +217,16 @@
 				bind:value={selectedServiceAccount}
 				options={serviceAccountOptions}
 				placeholder="Select a service account" />
+		</div>
+		<div class="field sm:col-span-2">
+			<label for="link-production-branch">Production branch</label>
+			<div class="input">
+				<input id="link-production-branch" class="font-mono" bind:value={productionBranch} placeholder="main">
+			</div>
+			<p class="text-content/50 text-sm mt-1">
+				Production deploys are only accepted from this branch; pull-request previews are always allowed.
+				Leave empty to allow any branch.
+			</p>
 		</div>
 	</div>
 

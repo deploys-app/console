@@ -50,11 +50,12 @@
 		port: 8080
 	})))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
+	const genBranch = $derived(links.find((l) => l.repository === gen.repository)?.productionBranch || 'main')
 
 	const workflowYaml = $derived(`name: Deploy
 on:
   push:
-    branches: [main]
+    branches: [${genBranch}]
   pull_request:
 
 permissions:
@@ -109,6 +110,7 @@ jobs:
 			<tr>
 				<th>Repository</th>
 				<th>Service Account</th>
+				<th>Branch</th>
 				<th>Linked</th>
 				<th class="is-collapse is-align-right"></th>
 			</tr>
@@ -123,6 +125,13 @@ jobs:
 						</td>
 						<td><span class="cell-muted font-mono text-sm">{it.serviceAccountEmail}</span></td>
 						<td>
+							{#if it.productionBranch}
+								<span class="cell-muted font-mono text-sm">{it.productionBranch}</span>
+							{:else}
+								<span class="cell-muted" title="Any branch can deploy">—</span>
+							{/if}
+						</td>
+						<td>
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
@@ -132,8 +141,8 @@ jobs:
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={4} list={links} />
-				<ErrorRow span={4} {error} />
+				<NoDataRow span={5} list={links} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>
