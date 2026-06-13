@@ -791,6 +791,8 @@ const dropboxItems = [
 /** @type {Record<string, (args: any) => object>} */
 const handlers = {
 	'me.get': () => ok({ email: USER_EMAIL }),
+	// The mock user is a full-access owner, so every permission probe passes.
+	'me.authorized': () => ok({ authorized: true }),
 
 	'project.list': () => list(projects),
 	'project.get': (args) => ok(projects.find((p) => p.project === args?.project) ?? { ...projects[0], project: args?.project ?? 'acme' }),
@@ -1072,7 +1074,21 @@ const handlers = {
 		sid: args?.id ?? serviceAccounts[0].sid,
 		keys: [{ secret: 'sk_mock_0000000000000000' }]
 	}),
-	'serviceAccount.create': () => ok({}),
+	'serviceAccount.create': (args) => {
+		const sid = args?.sid ?? 'new-sa'
+		const project = args?.project ?? 'acme'
+		if (!serviceAccounts.some((s) => s.sid === sid)) {
+			serviceAccounts.push({
+				sid,
+				email: `${sid}@${project}.serviceaccount.deploys.app`,
+				name: args?.name ?? sid,
+				description: '',
+				createdAt: CREATED_AT,
+				createdBy: USER_EMAIL
+			})
+		}
+		return ok({})
+	},
 	'serviceAccount.update': () => ok({}),
 	'serviceAccount.createKey': () => ok({}),
 	'serviceAccount.delete': () => ok({}),

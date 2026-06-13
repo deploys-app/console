@@ -352,6 +352,136 @@ test.describe('github link page', () => {
 		expect(listReposCalls.length).toBeGreaterThanOrEqual(2)
 	})
 
+	test('New opens the modal and Create & select issues serviceAccount.create then role.bind, selecting the new SA', async ({ page }) => {
+		await mocks({
+			'serviceAccount.create': { ok: true, result: {} },
+			'role.get': { ok: false, error: { message: 'api: role not found' } },
+			'role.create': { ok: true, result: {} },
+			'role.bind': { ok: true, result: {} }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Open the modal via the "New" button beside the Service account select.
+		await main.getByRole('button', { name: 'New' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Create service account' })).toBeVisible()
+
+		// Defaults are prefilled; submit.
+		await expect(modal.locator('#create-sa-sid')).toHaveValue('github-deploy')
+		await modal.getByRole('button', { name: 'Create & select' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/role.bind')
+		}).toBe(true)
+
+		const log = await getRequestLog()
+		const createIndex = log.findIndex((r) => r.path === '/serviceAccount.create')
+		const bindIndex = log.findIndex((r) => r.path === '/role.bind')
+		expect(createIndex).toBeGreaterThanOrEqual(0)
+		expect(bindIndex).toBeGreaterThanOrEqual(0)
+		expect(createIndex).toBeLessThan(bindIndex)
+
+		const createReq = JSON.parse(log[createIndex]?.body ?? '{}')
+		expect(createReq.sid).toBe('github-deploy')
+		expect(createReq.name).toBe('GitHub Deploy')
+
+		const bindReq = JSON.parse(log[bindIndex]?.body ?? '{}')
+		expect(bindReq.roles).toEqual(['github-deploy'])
+
+		// Modal closes and the picker shows the new SA selected.
+		await expect(modal).toHaveCount(0)
+		await expect(main.locator('#link-service-account')).toContainText('github-deploy — GitHub Deploy')
+	})
+
+	test('unchecking "Grant deploy role" creates the SA but does not bind or create a role', async ({ page }) => {
+		await mocks({
+			'serviceAccount.create': { ok: true, result: {} }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await main.getByRole('button', { name: 'New' }).click()
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Create service account' })).toBeVisible()
+
+		// Untick the grant-role checkbox.
+		await modal.locator('#create-sa-grant').uncheck()
+		await modal.getByRole('button', { name: 'Create & select' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/serviceAccount.create')
+		}).toBe(true)
+
+		// Give any stray follow-up calls a chance to land before asserting absence.
+		await expect(modal).toHaveCount(0)
+
+		const log = await getRequestLog()
+		expect(log.some((r) => r.path === '/serviceAccount.create')).toBe(true)
+		expect(log.some((r) => r.path === '/role.bind')).toBe(false)
+		expect(log.some((r) => r.path === '/role.create')).toBe(false)
+		// The load probe issues one role.get; the modal's create() must not add a
+		// second one when the grant checkbox is off.
+		expect(log.filter((r) => r.path === '/role.get').length).toBeLessThanOrEqual(1)
+	})
+
+	test('when role perms are denied the grant checkbox is disabled/unchecked with a note, and Create & select skips role.bind', async ({ page }) => {
+		await mocks({
+			// Deny role.bind and role.create up front; serviceAccount.create stays
+			// authorized so the "New" button is still enabled.
+			'me.authorized': { ok: true, result: {}, __authorizedDeny: ['role.bind', 'role.create'] },
+			'serviceAccount.create': { ok: true, result: {} }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await main.getByRole('button', { name: 'New' }).click()
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Create service account' })).toBeVisible()
+
+		// Grant checkbox is forced off + disabled, with the explanatory note.
+		const grant = modal.locator('#create-sa-grant')
+		await expect(grant).toBeDisabled()
+		await expect(grant).not.toBeChecked()
+		await expect(modal.getByText(/You don't have permission to grant roles in this project \(needs role\.bind\)/)).toBeVisible()
+
+		await modal.getByRole('button', { name: 'Create & select' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/serviceAccount.create')
+		}).toBe(true)
+
+		// Modal closes once the SA is created; let any stray follow-ups land.
+		await expect(modal).toHaveCount(0)
+
+		const log = await getRequestLog()
+		expect(log.some((r) => r.path === '/serviceAccount.create')).toBe(true)
+		expect(log.some((r) => r.path === '/role.bind')).toBe(false)
+		expect(log.some((r) => r.path === '/role.create')).toBe(false)
+		// The load probe issues one role.get; with the grant path gated off the
+		// modal's create() must not add a second one.
+		expect(log.filter((r) => r.path === '/role.get').length).toBeLessThanOrEqual(1)
+	})
+
+	test('when serviceAccount.create is denied the "New" button is disabled', async ({ page }) => {
+		await mocks({
+			// Deny serviceAccount.create only — the other probes stay authorized.
+			'me.authorized': { ok: true, result: {}, __authorizedDeny: ['serviceAccount.create'] }
+		})
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await expect(main.getByRole('button', { name: 'New' })).toBeDisabled()
+	})
+
 	test('shows inline warning when github.listRepos fails and hides complete-step-1 copy', async ({ page }) => {
 		await mocks({
 			'github.listRepos': { ok: false, error: { message: 'boom' } }

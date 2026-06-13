@@ -65,6 +65,24 @@ const server = http.createServer(async (req, res) => {
 		requestLog.push({ path, method: req.method, body })
 
 		const response = responses[path]
+
+		// Body-aware authorization probe: `me.authorized` is a logical AND over the
+		// requested permissions. A response of { __authorizedDeny: [perms] } denies
+		// (authorized:false) whenever the request asks for any listed permission,
+		// and authorizes otherwise — letting a test gate role perms off while
+		// keeping serviceAccount.create on. Evaluated server-side so it also
+		// applies to the SSR load() fetches, which page.route can't intercept.
+		if (response && Array.isArray(response.__authorizedDeny)) {
+			let requested = []
+			try {
+				requested = JSON.parse(body || '{}').permissions ?? []
+			} catch { /* malformed body → treat as no permissions requested */ }
+			const denied = requested.some((p) => response.__authorizedDeny.includes(p))
+			res.writeHead(200, { 'content-type': 'application/json' })
+			res.end(JSON.stringify({ ok: true, result: { authorized: !denied } }))
+			return
+		}
+
 		if (response === undefined) {
 			res.writeHead(404, { 'content-type': 'application/json' })
 			res.end(JSON.stringify({
