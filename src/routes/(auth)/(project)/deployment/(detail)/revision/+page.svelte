@@ -14,6 +14,25 @@
 	const deployment = $derived(data.deployment)
 	const revisions = $derived(data.revisions)
 
+	// Static deployments reference a content-addressed release per revision
+	// instead of a container image; render the per-revision release-sha in its
+	// place. The rollback flow itself is unchanged (deployment.rollback re-points
+	// the Site).
+	const isStatic = $derived(deployment.type === 'Static')
+
+	/**
+	 * Per-revision artifact label: the release-sha for Static, else the image.
+	 * @param {Api.Deployment} it
+	 * @returns {string}
+	 */
+	function artifact (it) {
+		return isStatic ? format.releaseSha(it) : it.image
+	}
+
+	// Noun used in the rollback prose so the "what changes" copy reads sensibly
+	// for static (release-sha) vs container (image) deployments.
+	const artifactNoun = $derived(isStatic ? 'release' : 'image')
+
 	let now = $state(Date.now())
 	onMount(() => {
 		const t = setInterval(() => { now = Date.now() }, 30_000)
@@ -88,8 +107,9 @@
 		return xs?.length ? xs.join(' ') : '—'
 	}
 
-	// Settings that rollback will change, current → target. Image is omitted —
-	// the comparison cards above already show it side by side.
+	// Settings that rollback will change, current → target. The artifact
+	// (image / release-sha) is omitted — the comparison cards above already show
+	// it side by side.
 	const specChanges = $derived.by(() => {
 		const t = targetSpec
 		if (!t) return []
@@ -547,7 +567,7 @@
 						<span class="rev-row__rev-tag">Active</span>
 					{/if}
 				</span>
-				<span class="rev-row__image" title={it.image}>{it.image}</span>
+				<span class="rev-row__image" title={artifact(it)}>{artifact(it)}</span>
 				<span class="rev-row__meta">
 					<span class="rev-row__when" title={it.createdAt}>
 						{format.datetime(it.createdAt)} · {relTime(it.createdAt, now)}
@@ -585,7 +605,7 @@
 					<div class="rb-side__label">Currently active</div>
 					<div class="rb-side__rev">#{activeRevision?.revision ?? deployment.revision}</div>
 					{#if activeRevision}
-						<div class="rb-side__image font-mono" title={activeRevision.image}>{activeRevision.image}</div>
+						<div class="rb-side__image font-mono" title={artifact(activeRevision)}>{artifact(activeRevision)}</div>
 						<div class="rb-side__meta" title={activeRevision.createdAt}>
 							deployed {format.datetime(activeRevision.createdAt)} by {activeRevision.createdBy}
 						</div>
@@ -597,7 +617,7 @@
 				<div class="rb-side" data-kind="to">
 					<div class="rb-side__label">Rolling back to</div>
 					<div class="rb-side__rev">#{rollbackTarget.revision}</div>
-					<div class="rb-side__image font-mono" title={rollbackTarget.image}>{rollbackTarget.image}</div>
+					<div class="rb-side__image font-mono" title={artifact(rollbackTarget)}>{artifact(rollbackTarget)}</div>
 					<div class="rb-side__meta" title={rollbackTarget.createdAt}>
 						deployed {format.datetime(rollbackTarget.createdAt)} by {rollbackTarget.createdBy}
 					</div>
@@ -615,11 +635,11 @@
 				{#if targetLoading}
 					<p class="text-content/50 text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Loading revision #{rollbackTarget.revision}…</p>
 				{:else if !targetSpec}
-					<p class="text-content/50 text-sm">Couldn’t load revision #{rollbackTarget.revision}’s configuration — only the image comparison above is shown.</p>
+					<p class="text-content/50 text-sm">Couldn’t load revision #{rollbackTarget.revision}’s configuration — only the {artifactNoun} comparison above is shown.</p>
 				{:else if !hasChanges}
 					<p class="text-content/50 text-sm">
 						<i class="fa-solid fa-circle-check mr-2 text-positive"></i>
-						Same configuration — only the image differs.
+						Same configuration — only the {artifactNoun} differs.
 					</p>
 				{:else}
 					<div class="table-container rb-diff__table">
@@ -657,12 +677,20 @@
 				{/if}
 			</div>
 
-			<p class="text-content/60 text-sm mt-4">
-				This redeploys revision <strong>#{rollbackTarget.revision}</strong>’s image and
-				configuration (env, scaling, command, disks, schedule) as a new revision.
-				Sidecars and mounted files keep their current configuration. No history is
-				deleted.
-			</p>
+			{#if isStatic}
+				<p class="text-content/60 text-sm mt-4">
+					This re-points the site to revision <strong>#{rollbackTarget.revision}</strong>’s
+					release as a new revision — an instant pointer swap, no rebuild or re-upload.
+					No history is deleted.
+				</p>
+			{:else}
+				<p class="text-content/60 text-sm mt-4">
+					This redeploys revision <strong>#{rollbackTarget.revision}</strong>’s image and
+					configuration (env, scaling, command, disks, schedule) as a new revision.
+					Sidecars and mounted files keep their current configuration. No history is
+					deleted.
+				</p>
+			{/if}
 		{/if}
 
 		<div class="flex items-center gap-3 mt-6">

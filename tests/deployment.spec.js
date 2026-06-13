@@ -2,7 +2,9 @@ import { test, expect, setMocks } from './helpers.js'
 import {
 	defaultLocation,
 	sampleCloudSqlProxySidecar,
-	sampleDeployment
+	sampleDeployment,
+	sampleStaticDeployment,
+	sampleStaticReleaseSha
 } from './fixtures/mocks.js'
 
 test.describe('deployments', () => {
@@ -315,5 +317,81 @@ test.describe('deployment detail — environment variables', () => {
 
 		await expect(main.getByText('topsecret-value')).toBeHidden()
 		await expect(main.getByText('https://example.test')).toBeHidden()
+	})
+})
+
+test.describe('deployment detail — static', () => {
+	test('shows the Release (release-sha), not an Image row', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=website')
+
+		const main = page.locator('.content-wrapper')
+
+		// The Runtime section shows a Release row carrying the release-sha; no
+		// container Image row is rendered for a Static deployment.
+		const release = main.locator('.spec').filter({ hasText: 'Release' })
+		await expect(release).toBeVisible()
+		await expect(release).toContainText(sampleStaticReleaseSha)
+		await expect(main.locator('.spec').filter({ hasText: /^Image/ })).toHaveCount(0)
+
+		// Type renders as Static and the public URL is shown.
+		await expect(main.locator('.spec').filter({ hasText: 'Type' })).toContainText('Static')
+		await expect(main.getByRole('link', { name: 'https://website.test-project.app.in.th' })).toBeVisible()
+	})
+})
+
+test.describe('deployment revision — static rollback', () => {
+	test('revision list and rollback comparison render release-shas', async ({ page }) => {
+		const shaActive = sampleStaticReleaseSha
+		const shaPrev = 'b'.repeat(64)
+
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation },
+			'deployment.revisions': {
+				ok: true,
+				result: {
+					items: [
+						{ ...sampleStaticDeployment, revision: 2, site: `site://deploys-static/test-project/website@${shaActive}`, siteManifestDigest: shaActive },
+						{ ...sampleStaticDeployment, revision: 1, site: `site://deploys-static/test-project/website@${shaPrev}`, siteManifestDigest: shaPrev }
+					]
+				}
+			}
+		})
+
+		await page.goto('/deployment/revision?project=test-project&location=gke&name=website')
+
+		const main = page.locator('.content-wrapper')
+
+		// Each revision row renders its release-sha (not an image).
+		await expect(main.locator('.rev-row__image').first()).toHaveText(shaActive)
+		await expect(main.locator('.rev-row__image').nth(1)).toHaveText(shaPrev)
+		await expect(main.getByText(':latest')).toHaveCount(0)
+
+		// The deployment.get for revision 1 (rollback target spec) must return the
+		// historical release so the comparison reads sensibly.
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: { ...sampleStaticDeployment, revision: 1, site: `site://deploys-static/test-project/website@${shaPrev}`, siteManifestDigest: shaPrev }
+			}
+		})
+
+		// Open the rollback modal for the older revision.
+		await main.getByRole('button', { name: 'Rollback' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await expect(modal).toBeVisible()
+
+		// Comparison cards show release-shas old → new.
+		await expect(modal.locator('.rb-side[data-kind="from"] .rb-side__image')).toHaveText(shaActive)
+		await expect(modal.locator('.rb-side[data-kind="to"] .rb-side__image')).toHaveText(shaPrev)
+
+		// The static prose reads "re-points the site … release", not "image".
+		await expect(modal.getByText(/re-points the site/)).toBeVisible()
 	})
 })

@@ -285,7 +285,8 @@ declare namespace Api {
         'TCPService' |
         'InternalTCPService' |
         'Worker' |
-        'CronJob'
+        'CronJob' |
+        'Static'
 
     export type DeploymentAction =
         'deploy' |
@@ -305,6 +306,11 @@ declare namespace Api {
         type: DeploymentType
         revision: number
         image: string
+        // Static deployments carry a content-addressed release pointer instead
+        // of a container image. `site` is the `site://<bucket>/<project>/<name>@<release-sha>`
+        // URI; `siteManifestDigest` is the bare release-sha.
+        site?: string
+        siteManifestDigest?: string
         env: Env
         envGroups: string[]
         command: string[]

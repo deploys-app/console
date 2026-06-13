@@ -197,6 +197,29 @@ export const sampleCloudSqlProxySidecar = {
 	}
 }
 
+// A Static (bucket-native static web) deployment: no container image/port — it
+// references a content-addressed release via `site` (site://…@<release-sha>) and
+// `siteManifestDigest`.
+export const sampleStaticReleaseSha =
+	'a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00'
+
+export const sampleStaticDeployment = {
+	...sampleDeployment,
+	name: 'website',
+	type: 'Static',
+	image: '',
+	site: `site://deploys-static/test-project/website@${sampleStaticReleaseSha}`,
+	siteManifestDigest: sampleStaticReleaseSha,
+	command: [],
+	args: [],
+	minReplicas: 0,
+	maxReplicas: 0,
+	port: 0,
+	protocol: '',
+	url: 'website.test-project.app.in.th',
+	internalUrl: ''
+}
+
 export const sampleDomain = {
 	project: 'test-project',
 	location: 'gke',

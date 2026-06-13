@@ -48,12 +48,31 @@
 		repository: data.links[0]?.repository ?? '',
 		location: data.locations[0]?.id ?? '',
 		name: 'web',
-		port: 8080
+		// 'dockerfile' (default) emits today's container workflow; 'static' emits
+		// a bucket-native static-web workflow (mode: static).
+		buildType: 'dockerfile',
+		port: 8080,
+		// static fields — only used when buildType === 'static'
+		framework: 'auto',
+		buildCommand: '',
+		outputDir: 'public',
+		spa: false,
+		notFound: '404.html'
 	})))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
 	const genBranch = $derived(links.find((l) => l.repository === gen.repository)?.productionBranch || 'main')
 
-	const workflowYaml = $derived(`name: Deploy
+	const buildTypeOptions = [
+		{ value: 'dockerfile', label: 'Dockerfile' },
+		{ value: 'static', label: 'Static' }
+	]
+	const frameworkOptions = [
+		{ value: 'auto', label: 'Auto-detect' },
+		{ value: 'hugo', label: 'Hugo' },
+		{ value: 'node', label: 'Node' }
+	]
+
+	const dockerfileYaml = $derived(`name: Deploy
 on:
   push:
     branches: [${genBranch}]
@@ -75,6 +94,36 @@ jobs:
         name: ${gen.name || 'web'}
         port: ${Number(gen.port) || 8080}
 `)
+
+	const staticYaml = $derived(`name: Deploy
+on:
+  push:
+    branches: [${genBranch}]
+  pull_request:
+
+permissions:
+  id-token: write   # required — this is the credential
+  contents: read
+  pull-requests: write   # sticky PR preview comment
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: deploys-app/build-deploy-action@v1
+      with:
+        project: ${project}
+        location: ${gen.location}
+        name: ${gen.name || 'web'}
+        mode: static
+        framework: ${gen.framework || 'auto'}
+${gen.buildCommand.trim() ? `        buildCommand: ${gen.buildCommand.trim()}\n` : ''}        outputDir: ${gen.outputDir || 'public'}
+        spa: ${gen.spa ? 'true' : 'false'}
+        notFound: ${gen.notFound || '404.html'}
+`)
+
+	const workflowYaml = $derived(gen.buildType === 'static' ? staticYaml : dockerfileYaml)
 
 	const createOnGitHubURL = $derived(gen.repository
 		? `https://github.com/${gen.repository}/new/main?filename=.github/workflows/deploy.yml&value=${encodeURIComponent(workflowYaml)}`
@@ -176,11 +225,46 @@ jobs:
 				</div>
 			</div>
 			<div class="field">
-				<label for="gen-port">Port</label>
-				<div class="input">
-					<input id="gen-port" type="number" min="1" bind:value={gen.port} placeholder="8080">
-				</div>
+				<label for="gen-build-type">Build type</label>
+				<Select id="gen-build-type" bind:value={gen.buildType} options={buildTypeOptions} />
 			</div>
+			{#if gen.buildType === 'dockerfile'}
+				<div class="field">
+					<label for="gen-port">Port</label>
+					<div class="input">
+						<input id="gen-port" type="number" min="1" bind:value={gen.port} placeholder="8080">
+					</div>
+				</div>
+			{:else}
+				<div class="field">
+					<label for="gen-framework">Framework</label>
+					<Select id="gen-framework" bind:value={gen.framework} options={frameworkOptions} />
+				</div>
+				<div class="field">
+					<label for="gen-build-command">Build command</label>
+					<div class="input">
+						<input id="gen-build-command" class="font-mono" bind:value={gen.buildCommand} placeholder="preset (e.g. hugo --minify)">
+					</div>
+				</div>
+				<div class="field">
+					<label for="gen-output-dir">Output directory</label>
+					<div class="input">
+						<input id="gen-output-dir" class="font-mono" bind:value={gen.outputDir} placeholder="public">
+					</div>
+				</div>
+				<div class="field">
+					<label for="gen-not-found">404 document</label>
+					<div class="input">
+						<input id="gen-not-found" class="font-mono" bind:value={gen.notFound} placeholder="404.html">
+					</div>
+				</div>
+				<div class="field self-end">
+					<div class="checkbox">
+						<input id="gen-spa" type="checkbox" bind:checked={gen.spa}>
+						<label for="gen-spa">SPA fallback to index.html</label>
+					</div>
+				</div>
+			{/if}
 		</div>
 
 		<pre class="workflow-yaml font-mono text-sm">{workflowYaml}</pre>
