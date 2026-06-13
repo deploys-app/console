@@ -48,6 +48,13 @@ export function defaultMocks () {
 			ok: true,
 			result: { authorized: true }
 		},
+		// Effective grants used by the (project) layout to drive GuardedButton.
+		// Default to the '*' wildcard (full access) so action buttons render
+		// enabled; tests that need a denied state override with a restricted set.
+		'/me.permissions': {
+			ok: true,
+			result: { permissions: ['*'], admin: false }
+		},
 		'/project.list': {
 			ok: true,
 			result: { items: [defaultProject] }

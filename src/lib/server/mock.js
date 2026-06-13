@@ -793,6 +793,9 @@ const handlers = {
 	'me.get': () => ok({ email: USER_EMAIL }),
 	// The mock user is a full-access owner, so every permission probe passes.
 	'me.authorized': () => ok({ authorized: true }),
+	// Effective grants for the mock user: the '*' wildcard grants everything, so
+	// all gated buttons (GuardedButton) render enabled by default offline.
+	'me.permissions': () => ok({ permissions: ['*'], admin: false }),
 
 	'project.list': () => list(projects),
 	'project.get': (args) => ok(projects.find((p) => p.project === args?.project) ?? { ...projects[0], project: args?.project ?? 'acme' }),

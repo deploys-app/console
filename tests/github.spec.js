@@ -432,9 +432,11 @@ test.describe('github link page', () => {
 
 	test('when role perms are denied the grant checkbox is disabled/unchecked with a note, and Create & select skips role.bind', async ({ page }) => {
 		await mocks({
-			// Deny role.bind and role.create up front; serviceAccount.create stays
-			// authorized so the "New" button is still enabled.
-			'me.authorized': { ok: true, result: {}, __authorizedDeny: ['role.bind', 'role.create'] },
+			// Deny role.bind and role.create via the effective grant set; keep
+			// serviceAccount.create so the "New" button is still enabled. The
+			// (project) layout reads me.permissions during SSR load() to drive the
+			// gating, so denying here gates the grant path off.
+			'me.permissions': { ok: true, result: { permissions: ['serviceAccount.create', 'role.get'], admin: false } },
 			'serviceAccount.create': { ok: true, result: {} }
 		})
 
@@ -472,8 +474,10 @@ test.describe('github link page', () => {
 
 	test('when serviceAccount.create is denied the "New" button is disabled', async ({ page }) => {
 		await mocks({
-			// Deny serviceAccount.create only — the other probes stay authorized.
-			'me.authorized': { ok: true, result: {}, __authorizedDeny: ['serviceAccount.create'] }
+			// Deny serviceAccount.create via the effective grant set; keep the
+			// role grants so only the "New" button is gated off. The (project)
+			// layout reads me.permissions during SSR load() to drive the gating.
+			'me.permissions': { ok: true, result: { permissions: ['role.bind', 'role.create', 'role.get'], admin: false } }
 		})
 
 		await page.goto('/github/link?project=test-project')
