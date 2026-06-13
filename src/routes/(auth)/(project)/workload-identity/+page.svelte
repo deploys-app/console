@@ -3,6 +3,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -16,10 +17,10 @@
 		<h4><strong>Workload Identities</strong></h4>
 		<p class="page-sub">{workloadIdentities.length} {workloadIdentities.length === 1 ? 'workload identity' : 'workload identities'}</p>
 	</div>
-	<a class="button is-icon-left" href="/workload-identity/create?project={project}">
+	<GuardedButton permission="workloadIdentity.create" class="button is-icon-left" href="/workload-identity/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">

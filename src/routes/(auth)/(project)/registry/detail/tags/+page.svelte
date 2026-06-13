@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -61,9 +62,9 @@
 					</td>
 					<td>{format.datetime(tag.createdAt)}</td>
 					<td>
-						<button class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
+						<GuardedButton permission="registry.untag" class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
 							<i class="fa-solid fa-trash-alt"></i>
-						</button>
+						</GuardedButton>
 					</td>
 				</tr>
 			{/each}

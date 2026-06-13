@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -32,6 +33,11 @@
 	}
 
 	let saving = $state(false)
+
+	// The submit RPC depends on whether we're editing an existing env group
+	// (envGroup.update) or creating a new one (envGroup.create); gate on the one
+	// the save handler will actually call.
+	const savePermission = $derived(envGroup ? 'envGroup.update' : 'envGroup.create')
 
 	/**
 	 * @param {Event} e
@@ -173,9 +179,9 @@
 		<hr>
 
 		<div class="flex gap-4">
-			<button class="button" class:is-loading={saving}>
+			<GuardedButton permission={savePermission} type="submit" class="button" loading={saving}>
 				{#if envGroup}Update{:else}Create{/if}
-			</button>
+			</GuardedButton>
 		</div>
 	</form>
 </div>

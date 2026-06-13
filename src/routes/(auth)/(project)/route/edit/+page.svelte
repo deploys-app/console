@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -337,7 +338,7 @@
 		<hr>
 
 		<div class="flex gap-3">
-			<button class="button" class:is-loading={saving}>Save</button>
+			<GuardedButton permission="route.createV2" type="submit" loading={saving}>Save</GuardedButton>
 			<a class="button is-variant-tertiary" href={detailUrl}>Cancel</a>
 		</div>
 	</form>

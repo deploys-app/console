@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 
 	const { data } = $props()
@@ -46,11 +47,11 @@
 		<h4 class="min-w-0 wrap-anywhere"><strong>{envGroup.name}</strong></h4>
 		<p class="page-sub">{entries.length} {entries.length === 1 ? 'variable' : 'variables'}</p>
 	</div>
-	<a class="button is-variant-secondary is-icon-left"
+	<GuardedButton permission="envGroup.update" class="button is-variant-secondary is-icon-left"
 		href={`/env-group/create?project=${project}&name=${encodeURIComponent(envGroup.name)}`}>
 		<i class="fa-solid fa-pen"></i>
 		Edit
-	</a>
+	</GuardedButton>
 </div>
 
 <div class="panel is-level-300 grid gap-6">
@@ -116,7 +117,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this env group. Deployments referencing it may fail to start.">
-			<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+			<GuardedButton permission="envGroup.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

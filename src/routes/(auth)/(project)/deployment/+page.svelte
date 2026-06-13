@@ -3,6 +3,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -69,10 +70,10 @@
 		<h4><strong>Deployments</strong></h4>
 		<p class="page-sub">{deployments.length} {deployments.length === 1 ? 'deployment' : 'deployments'}</p>
 	</div>
-	<a class="button is-icon-left" href="/deployment/deploy?project={project}">
+	<GuardedButton permission="deployment.deploy" class="button is-icon-left" href="/deployment/deploy?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Deploy
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">

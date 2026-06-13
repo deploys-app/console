@@ -2,6 +2,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -22,10 +23,10 @@
 		<h4><strong>Roles</strong></h4>
 		<p class="page-sub">{roles.length} {roles.length === 1 ? 'role' : 'roles'}</p>
 	</div>
-	<a class="button is-icon-left" href="/role/create?project={project}">
+	<GuardedButton permission="role.create" class="button is-icon-left" href="/role/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -52,11 +53,11 @@
 						</td>
 						<td>
 							{#if roleCanUpdate(it.role)}
-								<a href="/role/create?project={project}&role={it.role}" aria-label="Edit">
+								<GuardedButton permission="role.create" class="contents" href="/role/create?project={project}&role={it.role}" aria-label="Edit">
 									<div class="icon-button">
 										<i class="fa-solid fa-pen"></i>
 									</div>
-								</a>
+								</GuardedButton>
 							{:else}
 								<!-- Reserve the icon-button's footprint so rows without an
 								     edit action keep the same height as the others. -->

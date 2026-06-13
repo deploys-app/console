@@ -6,6 +6,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -402,10 +403,10 @@
 			<i class="fa-solid fa-arrow-up-right-from-square"></i>
 			Visit
 		</a>
-		<a class="button is-icon-left" href={`/route/edit?${params}`}>
+		<GuardedButton permission="route.createV2" class="button is-icon-left" href={`/route/edit?${params}`}>
 			<i class="fa-solid fa-pencil"></i>
 			Edit
-		</a>
+		</GuardedButton>
 	</div>
 </div>
 
@@ -591,5 +592,5 @@
 </div>
 
 <DangerZone description="Delete this route. Traffic to this domain path stops being forwarded.">
-	<button class="button is-variant-negative" type="button" onclick={deleteRoute}>Delete route</button>
+	<GuardedButton permission="route.delete" class="button is-variant-negative" type="button" onclick={deleteRoute}>Delete route</GuardedButton>
 </DangerZone>

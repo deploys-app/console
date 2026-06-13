@@ -1,9 +1,14 @@
 <script>
-	import { onMount } from 'svelte'
+	import { onMount, getContext } from 'svelte'
 	import * as format from '$lib/format'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { denyTooltip } from '$lib/permission'
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	const { data } = $props()
 	const deployment = $derived(data.deployment)
@@ -551,11 +556,14 @@
 				</span>
 				<span class="rev-row__act">
 					{#if i > 0}
-						<button type="button" class="rail-btn"
-							onclick={() => rollback(it)}>
-							<i class="fa-solid fa-rotate-left"></i>
-							Rollback
-						</button>
+						<span class="inline-flex" title={can('deployment.rollback') ? null : denyTooltip('deployment.rollback')}>
+							<button type="button" class="rail-btn"
+								disabled={!can('deployment.rollback')}
+								onclick={() => rollback(it)}>
+								<i class="fa-solid fa-rotate-left"></i>
+								Rollback
+							</button>
+						</span>
 					{/if}
 				</span>
 			</li>
@@ -658,11 +666,11 @@
 		{/if}
 
 		<div class="flex items-center gap-3 mt-6">
-			<button type="button" class="button" class:is-loading={rollingBack}
-				disabled={rollingBack} onclick={confirmRollback}>
+			<GuardedButton permission="deployment.rollback" class="button"
+				loading={rollingBack} onclick={confirmRollback}>
 				<i class="fa-solid fa-rotate-left mr-2"></i>
 				Rollback
-			</button>
+			</GuardedButton>
 			<button type="button" class="button is-variant-secondary" disabled={rollingBack}
 				onclick={closeRollback}>Cancel</button>
 		</div>

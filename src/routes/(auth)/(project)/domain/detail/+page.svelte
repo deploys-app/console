@@ -6,6 +6,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import Swal from 'sweetalert2'
 
@@ -781,27 +782,27 @@
 						<strong>Purge everything</strong>
 						<p>Remove all cached resources</p>
 					</div>
-					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
+					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCache} disabled={domain.wildcard}>
 						Purge everything
-					</button>
+					</GuardedButton>
 				</div>
 				<div class="purge-row">
 					<div class="purge-row__text">
 						<strong>Purge prefix</strong>
 						<p>Remove cached resources at a prefix path</p>
 					</div>
-					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCachePrefix}>
+					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCachePrefix}>
 						Purge prefix
-					</button>
+					</GuardedButton>
 				</div>
 				<div class="purge-row">
 					<div class="purge-row__text">
 						<strong>Purge file</strong>
 						<p>Remove cached resources at an exact path</p>
 					</div>
-					<button class="button is-variant-secondary" class:is-loading={purging} onclick={purgeCacheFile}>
+					<GuardedButton permission="domain.purgeCache" class="button is-variant-secondary" loading={purging} onclick={purgeCacheFile}>
 						Purge file
-					</button>
+					</GuardedButton>
 				</div>
 			</section>
 		</div>
@@ -809,7 +810,7 @@
 {/if}
 
 <DangerZone description="Permanently delete this domain. Routing and TLS certificates will be removed.">
-	<button class="button is-variant-negative" type="button" onclick={deleteItem}>
+	<GuardedButton permission="domain.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>
 		Delete
-	</button>
+	</GuardedButton>
 </DangerZone>

@@ -6,6 +6,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 
@@ -782,7 +783,7 @@
 </div>
 
 <DangerZone description="Permanently delete this deployment. All running instances will be stopped and removed.">
-	<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+	<GuardedButton permission="deployment.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 </DangerZone>
 
 <EnvGroupModal bind:this={envGroupModal} />

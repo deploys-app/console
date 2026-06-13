@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 	const locations = $derived(data.locations)
@@ -18,6 +19,9 @@
 		name: name || '',
 		size: disk?.size || 1
 	})
+
+	// Edit mode submits disk.update; create mode submits disk.create.
+	const submitPermission = $derived(disk ? 'disk.update' : 'disk.create')
 
 	let saving = $state(false)
 
@@ -106,13 +110,13 @@
 			</div>
 		</div>
 
-		<button class="button mr-auto" class:is-loading={saving}>
+		<GuardedButton permission={submitPermission} type="submit" class="button mr-auto" loading={saving}>
 			{#if disk}
 				Save
 			{:else}
 				Create
 			{/if}
-		</button>
+		</GuardedButton>
 	</form>
 </div>
 

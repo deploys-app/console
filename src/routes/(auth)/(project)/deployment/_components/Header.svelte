@@ -1,9 +1,11 @@
 <script>
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
+	import { getContext } from 'svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
 	import * as format from '$lib/format'
+	import { denyTooltip } from '$lib/permission'
 
 	/**
 	 * @typedef {Object} Props
@@ -15,6 +17,9 @@
 	const { deployment, invalidate } = $props()
 
 	const project = $derived($page.data.project)
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	const canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
 	const canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
@@ -178,17 +183,21 @@
 		text-decoration: none;
 		transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 	}
-	.mast-btn:hover {
+	.mast-btn:hover:not(:disabled) {
 		background: hsl(var(--hsl-content) / 0.05);
 		color: hsl(var(--hsl-content));
 		border-color: hsl(var(--hsl-content) / 0.2);
+	}
+	.mast-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 	.mast-btn.is-primary {
 		background: hsl(var(--hsl-primary));
 		border-color: hsl(var(--hsl-primary));
 		color: hsl(var(--hsl-primary-content));
 	}
-	.mast-btn.is-primary:hover {
+	.mast-btn.is-primary:hover:not(:disabled) {
 		background: hsl(var(--hsl-primary) / 0.92);
 		border-color: hsl(var(--hsl-primary) / 0.92);
 	}
@@ -303,19 +312,31 @@
 		</div>
 		<div class="masthead__actions">
 			{#if canPause}
-				<button class="mast-btn" type="button" onclick={pause}>
-					<i class="fa-solid fa-pause"></i> Pause
-				</button>
+				<span class="inline-flex" title={can('deployment.pause') ? null : denyTooltip('deployment.pause')}>
+					<button class="mast-btn" type="button" disabled={!can('deployment.pause')} aria-disabled={!can('deployment.pause')} onclick={pause}>
+						<i class="fa-solid fa-pause"></i> Pause
+					</button>
+				</span>
 			{/if}
 			{#if canResume}
-				<button class="mast-btn" type="button" onclick={resume}>
-					<i class="fa-solid fa-play"></i> Resume
-				</button>
+				<span class="inline-flex" title={can('deployment.resume') ? null : denyTooltip('deployment.resume')}>
+					<button class="mast-btn" type="button" disabled={!can('deployment.resume')} aria-disabled={!can('deployment.resume')} onclick={resume}>
+						<i class="fa-solid fa-play"></i> Resume
+					</button>
+				</span>
 			{/if}
-			<a class="mast-btn is-primary"
-				href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-				<i class="fa-solid fa-rocket"></i> Deploy New Revision
-			</a>
+			{#if can('deployment.deploy')}
+				<a class="mast-btn is-primary"
+					href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
+					<i class="fa-solid fa-rocket"></i> Deploy New Revision
+				</a>
+			{:else}
+				<span class="inline-flex" title={denyTooltip('deployment.deploy')}>
+					<button class="mast-btn is-primary" type="button" disabled aria-disabled="true">
+						<i class="fa-solid fa-rocket"></i> Deploy New Revision
+					</button>
+				</span>
+			{/if}
 		</div>
 	</div>
 

@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -64,11 +65,11 @@
 <hr>
 
 <div class="flex gap-4">
-	<a class="button" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</a>
+	<GuardedButton permission="disk.update" href={`/disk/create?project=${project}&location=${location}&name=${name}`}>Update</GuardedButton>
 </div>
 
 <DangerZone description="Permanently delete this disk. All data stored on it will be lost.">
-	<button class="button is-variant-negative" type="button" onclick={deleteItem}>
+	<GuardedButton permission="disk.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>
 		Delete
-	</button>
+	</GuardedButton>
 </DangerZone>

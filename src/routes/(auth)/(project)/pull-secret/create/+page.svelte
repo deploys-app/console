@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -114,6 +115,6 @@
 
 		<hr>
 
-		<button class="button mr-auto" class:is-loading={saving}>Save</button>
+		<GuardedButton permission="pullSecret.create" type="submit" class="button mr-auto" loading={saving}>Save</GuardedButton>
 	</form>
 </div>

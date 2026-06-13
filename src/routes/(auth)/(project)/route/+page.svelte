@@ -1,9 +1,15 @@
 <script>
+	import { getContext } from 'svelte'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { denyTooltip } from '$lib/permission'
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	const { data } = $props()
 
@@ -63,10 +69,10 @@
 		<h4><strong>Routes</strong></h4>
 		<p class="page-sub">{routes.length} {routes.length === 1 ? 'route' : 'routes'}</p>
 	</div>
-	<a class="button is-icon-left" href={`/route/create?project=${project}`}>
+	<GuardedButton permission="route.createV2" class="button is-icon-left" href={`/route/create?project=${project}`}>
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -110,10 +116,13 @@
 								   onclick={(e) => e.stopPropagation()}>
 									<i class="fa-solid fa-arrow-up-right-from-square"></i>
 								</a>
-								<button class="icon-button" type="button" aria-label="Remove"
-									onclick={(e) => { e.stopPropagation(); deleteRoute(it) }}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
+								<span class="inline-flex" title={can('route.delete') ? null : denyTooltip('route.delete')}>
+									<button class="icon-button" type="button" aria-label="Remove"
+										disabled={!can('route.delete')}
+										onclick={(e) => { e.stopPropagation(); deleteRoute(it) }}>
+										<i class="fa-solid fa-trash-alt"></i>
+									</button>
+								</span>
 							</div>
 						</td>
 					</tr>

@@ -4,6 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -42,9 +43,9 @@
 					<td>{format.shortDigest(manifest.digest)}</td>
 					<td>{format.datetime(manifest.createdAt)}</td>
 					<td>
-						<button class="icon-button" aria-label="Delete" onclick={() => deleteManifest(manifest.digest)}>
+						<GuardedButton permission="registry.deleteManifest" class="icon-button" aria-label="Delete" onclick={() => deleteManifest(manifest.digest)}>
 							<i class="fa-solid fa-trash-alt"></i>
-						</button>
+						</GuardedButton>
 					</td>
 				</tr>
 			{/each}

@@ -6,6 +6,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -95,7 +96,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this workload identity. Deployments using it will lose GCP access.">
-			<button class="button is-variant-negative" onclick={deleteItem}>Delete</button>
+			<GuardedButton permission="workloadIdentity.delete" class="button is-variant-negative" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

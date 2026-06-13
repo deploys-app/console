@@ -5,6 +5,7 @@
 	import Select from '$lib/components/Select.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import * as format from '$lib/format'
 	import { setupCopy } from '$lib/clipboard'
 
@@ -88,10 +89,10 @@ jobs:
 		<p class="page-sub">Build and deploy linked repositories with GitHub Actions — keyless, with pull request previews</p>
 	</div>
 	<div>
-		<a class="button" href={`/github/link?project=${project}`}>
+		<GuardedButton permission="github.link" href={`/github/link?project=${project}`}>
 			<i class="fa-solid fa-link mr-2"></i>
 			Link repository
-		</a>
+		</GuardedButton>
 	</div>
 </div>
 
@@ -135,9 +136,9 @@ jobs:
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
-							<button class="icon-button" type="button" aria-label="Unlink repository" onclick={() => unlink(it)}>
+							<GuardedButton permission="github.unlink" class="icon-button" type="button" aria-label="Unlink repository" onclick={() => unlink(it)}>
 								<i class="fa-solid fa-link-slash"></i>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				{/each}

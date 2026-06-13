@@ -6,6 +6,7 @@
 	import api from '$lib/api'
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -934,9 +935,9 @@
 
 		<hr>
 
-		<button class="button mt-4 mr-auto" class:is-loading={saving}>
+		<GuardedButton permission="deployment.deploy" type="submit" class="button mt-4 mr-auto" loading={saving}>
 			Deploy
-		</button>
+		</GuardedButton>
 	{/if}
 	</form>
 </div>

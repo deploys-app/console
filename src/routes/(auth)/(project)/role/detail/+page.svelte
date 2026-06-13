@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -48,11 +49,12 @@
 		<p class="page-sub">{role.name}</p>
 	</div>
 	{#if canUpdate}
-		<a class="button is-variant-secondary is-icon-left"
+		<GuardedButton permission="role.create"
+			class="button is-variant-secondary is-icon-left"
 			href={`/role/create?project=${project}&role=${encodeURIComponent(role.role)}`}>
 			<i class="fa-solid fa-pen"></i>
 			Edit
-		</a>
+		</GuardedButton>
 	{/if}
 </div>
 
@@ -156,7 +158,7 @@
 
 		{#if canUpdate}
 			<DangerZone description="Permanently delete this role. Members assigned only this role will lose their access.">
-				<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+				<GuardedButton permission="role.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 			</DangerZone>
 		{/if}
 	</div>

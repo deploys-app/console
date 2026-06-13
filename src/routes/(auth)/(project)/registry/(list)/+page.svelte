@@ -1,6 +1,7 @@
 <script>
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
@@ -55,9 +56,9 @@
 							</a>
 						</td>
 						<td>
-							<button class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
+							<GuardedButton permission="registry.delete" class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
 								<i class="fa-solid fa-trash-alt"></i>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				{/each}

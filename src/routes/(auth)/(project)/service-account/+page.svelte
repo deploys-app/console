@@ -2,6 +2,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -15,10 +16,10 @@
 		<h4><strong>Service Accounts</strong></h4>
 		<p class="page-sub">{serviceAccounts.length} {serviceAccounts.length === 1 ? 'service account' : 'service accounts'}</p>
 	</div>
-	<a class="button is-icon-left" href="/service-account/create?project={project}">
+	<GuardedButton permission="serviceAccount.create" class="button is-icon-left" href="/service-account/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -44,11 +45,11 @@
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
-							<a href="/service-account/create?project={project}&id={it.sid}" aria-label="Edit">
+							<GuardedButton permission="serviceAccount.update" class="" href="/service-account/create?project={project}&id={it.sid}" aria-label="Edit">
 								<div class="icon-button">
 									<i class="fa-solid fa-pen"></i>
 								</div>
-							</a>
+							</GuardedButton>
 						</td>
 					</tr>
 				{/each}

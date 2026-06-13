@@ -5,6 +5,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 	const role = $derived(data.role)
@@ -152,9 +153,9 @@
 		<hr>
 
 		<div class="flex gap-4">
-			<button class="button" class:is-loading={saving}>
+			<GuardedButton permission="role.create" type="submit" class="button" loading={saving}>
 				{#if role}Update{:else}Create{/if}
-			</button>
+			</GuardedButton>
 		</div>
 	</form>
 </div>
