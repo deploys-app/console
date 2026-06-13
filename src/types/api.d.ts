@@ -113,6 +113,7 @@ declare namespace Api {
             workloadIdentity?: boolean
             disk?: Record<string, never>
             waf?: Record<string, never>
+            cache?: Record<string, never>
         }
         createdAt: string
     }
@@ -595,6 +596,69 @@ declare namespace Api {
 
     export type WafLimitMetricsResult = {
         series: WafLimitMetricsSeries[]
+        total: number
+    }
+
+    export type CacheAction = 'cache' | 'bypass'
+
+    export type CacheOverride = {
+        id: string
+        description: string
+        // 'cache' (default) forces a caching policy onto the fill; 'bypass'
+        // skips the cache entirely for matching requests. ttl/policy/status/
+        // stale_* apply only to action 'cache'.
+        action: CacheAction
+        // Optional CEL expression (same request.* surface as WafRule.expression)
+        // scoping the override: empty applies it to every request. request.body
+        // is always '' in cache filters.
+        filter?: string
+        // Go duration; required for action 'cache' (1s..720h). The forced
+        // freshness lifetime.
+        ttl?: string
+        // 'conservative' | 'balanced' (default) | 'aggressive'. How far the
+        // force reaches over the origin's Cache-Control. cache action only.
+        policy?: string
+        // RFC 5861 windows (Go durations) riding the forced policy; need a ttl.
+        staleWhileRevalidate?: string
+        staleIfError?: string
+        // Force only these origin response statuses; empty = every cacheable
+        // status. cache action only.
+        status?: number[]
+        // shadow counts matches but never changes caching (default enforce).
+        mode?: 'enforce' | 'shadow'
+        // ascending; first match wins among cache rules. 0 -> parapet default
+        // (100). Bypass rules are not ordered against each other.
+        priority: number
+    }
+
+    export type CacheZone = {
+        project: string
+        location: string
+        description: string
+        overrides: CacheOverride[]
+        status: 'pending' | 'success' | 'error'
+        action: 'create' | 'delete'
+        createdAt: string
+        createdBy: string
+    }
+
+    export type CacheZoneList = {
+        project: string
+        items: CacheZone[]
+    }
+
+    // cache.metrics reuses WafMetricsTimeRange.
+    export type CacheMetricsSeries = {
+        overrideId: string
+        action: CacheAction
+        result: 'applied' | 'shadow' | 'error'
+        total: number
+        // [unixSeconds, count], time-ordered
+        points: [number, number][]
+    }
+
+    export type CacheMetricsResult = {
+        series: CacheMetricsSeries[]
         total: number
     }
 
