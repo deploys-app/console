@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 	const id = $derived(data.id)
@@ -105,6 +106,11 @@
 			</div>
 		</div>
 
-		<button class="button mr-auto" class:is-loading={saving} disabled={saving}>Save</button>
+		<GuardedButton
+			permission="serviceaccount.create"
+			type="submit"
+			class="button mr-auto"
+			loading={saving}
+			disabled={saving}>Save</GuardedButton>
 	</form>
 </div>

@@ -7,6 +7,8 @@ import { browser } from '$app/environment'
  * @property {string} project
  * @property {Api.Project} projectInfo
  * @property {Api.Location[]} locations
+ * @property {string[]} permissions  caller's effective grants for this project
+ * @property {boolean} permissionsAdmin  caller is a platform admin
  */
 
 /** @type {BrowserCache | null} */
@@ -27,7 +29,9 @@ export async function load ({ url, data, fetch }) {
 		return {
 			project,
 			projectInfo: browserCache.projectInfo,
-			locations: browserCache.locations
+			locations: browserCache.locations,
+			permissions: browserCache.permissions,
+			permissionsAdmin: browserCache.permissionsAdmin
 		}
 	}
 
@@ -47,17 +51,30 @@ export async function load ({ url, data, fetch }) {
 	if (!locations.ok) error(500, `locations: ${locations.error?.message}`)
 	if (!locations.result) redirect(302, '/project')
 
+	// Effective permissions for the current user on this project. A non-ok
+	// response must never break the page — gate everything off instead (empty
+	// grants + non-admin), so action buttons render disabled rather than the
+	// whole project layout failing to load.
+	/** @type {Api.Response<{ permissions: string[], admin: boolean }>} */
+	const permissionsResp = await api.invoke('me.permissions', { project }, fetch)
+	const permissions = permissionsResp.ok ? (permissionsResp.result?.permissions ?? []) : []
+	const permissionsAdmin = permissionsResp.ok ? (permissionsResp.result?.admin === true) : false
+
 	if (browser) {
 		browserCache = {
 			project,
 			projectInfo: projectInfo.result,
-			locations: locations.result.items ?? []
+			locations: locations.result.items ?? [],
+			permissions,
+			permissionsAdmin
 		}
 	}
 
 	return {
 		project,
 		projectInfo: projectInfo.result,
-		locations: locations.result.items ?? []
+		locations: locations.result.items ?? [],
+		permissions,
+		permissionsAdmin
 	}
 }

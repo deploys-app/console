@@ -4,6 +4,7 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -35,10 +36,10 @@
 		<h4><strong>Domains</strong></h4>
 		<p class="page-sub">{domains.length} {domains.length === 1 ? 'domain' : 'domains'}</p>
 	</div>
-	<a class="button is-icon-left" href={`/domain/create?project=${project}`}>
+	<GuardedButton permission="domain.create" class="button is-icon-left" href={`/domain/create?project=${project}`}>
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -75,9 +76,9 @@
 <!--						<td>{format.datetime(it.createdAt)}</td>-->
 <!--						<td>{it.createdBy}</td>-->
 						<td>
-							<button class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
+							<GuardedButton permission="domain.delete" class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
 								<i class="fa-solid fa-trash-alt"></i>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				{/each}

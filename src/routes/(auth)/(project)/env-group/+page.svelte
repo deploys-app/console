@@ -1,7 +1,13 @@
 <script>
+	import { getContext } from 'svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { denyTooltip } from '$lib/permission'
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	const { data } = $props()
 
@@ -15,10 +21,10 @@
 		<h4><strong>Env Groups</strong></h4>
 		<p class="page-sub">{envGroups.length} {envGroups.length === 1 ? 'env group' : 'env groups'}</p>
 	</div>
-	<a class="button is-icon-left" href="/env-group/create?project={project}">
+	<GuardedButton permission="envgroup.create" class="button is-icon-left" href="/env-group/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -44,11 +50,16 @@
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
-							<a href="/env-group/create?project={project}&name={it.name}" aria-label="Edit">
-								<div class="icon-button">
-									<i class="fa-solid fa-pen"></i>
-								</div>
-							</a>
+							<span class="inline-flex" title={can('envgroup.update') ? null : denyTooltip('envgroup.update')}>
+								<a
+									href={can('envgroup.update') ? `/env-group/create?project=${project}&name=${it.name}` : null}
+									aria-label="Edit"
+									aria-disabled={can('envgroup.update') ? null : 'true'}>
+									<div class="icon-button">
+										<i class="fa-solid fa-pen"></i>
+									</div>
+								</a>
+							</span>
 						</td>
 					</tr>
 				{/each}

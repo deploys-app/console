@@ -1,7 +1,9 @@
 import api from '$lib/api'
+import { hasPermission } from '$lib/permission'
 
 export async function load ({ parent, url, fetch }) {
-	const { project } = await parent()
+	const parentData = await parent()
+	const { project, permissions, permissionsAdmin } = parentData
 
 	const urlInstallationId = url.searchParams.get('installation_id')
 		? Number(url.searchParams.get('installation_id'))
@@ -24,31 +26,26 @@ export async function load ({ parent, url, fetch }) {
 		serviceAccounts,
 		appInfo,
 		installations,
-		canCreateSaResp,
-		canBindResp,
-		canCreateRoleResp,
 		githubDeployRole
 	] = await Promise.all([
 		api.invoke('github.list', { project }, fetch),
 		api.invoke('serviceAccount.list', { project }, fetch),
 		api.invoke('github.getApp', { project }, fetch),
 		api.invoke('github.listInstallations', { project }, fetch),
-		// Up-front permission probes — me.authorized is a logical AND over the
-		// listed permissions. A failed probe just gates the affordance off; it
-		// must never break the page, so any non-ok response is treated as false.
-		api.invoke('me.authorized', { project, permissions: ['serviceAccount.create'] }, fetch),
-		api.invoke('me.authorized', { project, permissions: ['role.bind'] }, fetch),
-		api.invoke('me.authorized', { project, permissions: ['role.create'] }, fetch),
+		// Still needed to decide whether the shared github-deploy role already
+		// exists (vs. needing role.create to grant it below).
 		api.invoke('role.get', { project, role: 'github-deploy' }, fetch)
 	])
 
-	const canCreateServiceAccount = canCreateSaResp.result?.authorized === true
-	const canBindRole = canBindResp.result?.authorized === true
-	const canCreateRole = canCreateRoleResp.result?.authorized === true
+	// Permission flags come from the project layout's effective grants (me.permissions)
+	// rather than per-affordance me.authorized probes. hasPermission mirrors the
+	// server's wildcard matching, so a denied grant just gates the affordance off.
+	const canCreateServiceAccount = hasPermission(permissions, permissionsAdmin, 'serviceAccount.create')
 	const githubDeployRoleExists = githubDeployRole.ok && !!githubDeployRole.result
 	// Granting the deploy role needs role.bind, plus role.create only when the
 	// shared github-deploy role doesn't exist yet.
-	const canGrantRole = canBindRole && (githubDeployRoleExists || canCreateRole)
+	const canGrantRole = hasPermission(permissions, permissionsAdmin, 'role.bind') &&
+		(githubDeployRoleExists || hasPermission(permissions, permissionsAdmin, 'role.create'))
 
 	// Collect unique installation ids from saved installations + existing links + url param
 	/** @type {Set<number>} */

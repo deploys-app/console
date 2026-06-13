@@ -1,11 +1,16 @@
 <script>
-	import { onMount } from 'svelte'
+	import { onMount, getContext } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { setupCopy } from '$lib/clipboard'
+	import { denyTooltip } from '$lib/permission'
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	onMount(() => setupCopy('.copy'))
 
@@ -131,24 +136,26 @@
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</div>
-					<button class="icon" onclick={() => deleteKey(key.secret)} type="button" aria-label="Delete">
+					<GuardedButton permission="serviceaccount.key.delete" class="icon" onclick={() => deleteKey(key.secret)} type="button" aria-label="Delete">
 						<i class="fa-solid fa-trash-alt"></i>
-					</button>
+					</GuardedButton>
 				</div>
 			{/each}
 
 			<div class="grid gap-4 w-full">
-				<button class="button mx-auto" class:loading={loadingCreateKey} onclick={createKey} disabled={loadingCreateKey} type="button">
-					<i class="fa-solid fa-plus mr-3"></i>
-					Create key
-				</button>
+				<span class="inline-flex mx-auto" title={can('serviceaccount.key.create') ? null : denyTooltip('serviceaccount.key.create')}>
+					<button class="button" class:loading={loadingCreateKey} onclick={createKey} disabled={!can('serviceaccount.key.create') || loadingCreateKey} type="button">
+						<i class="fa-solid fa-plus mr-3"></i>
+						Create key
+					</button>
+				</span>
 			</div>
 		</div>
 
 		<DangerZone description="Permanently delete this service account and revoke all of its keys.">
-			<button class="button is-variant-negative" type="button" onclick={deleteItem}>
+			<GuardedButton permission="serviceaccount.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>
 				Delete
-			</button>
+			</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

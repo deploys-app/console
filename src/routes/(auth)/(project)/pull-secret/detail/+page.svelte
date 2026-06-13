@@ -5,6 +5,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -97,7 +98,7 @@
 		</div>
 
 		<DangerZone description="Permanently delete this pull secret. Deployments using it will fail to pull images.">
-			<button class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</button>
+			<GuardedButton permission="pullsecret.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

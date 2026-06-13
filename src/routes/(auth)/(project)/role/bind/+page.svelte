@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import Select from '$lib/components/Select.svelte'
 
@@ -158,8 +159,8 @@
 			</table>
 		</div>
 
-		<button class="button mt-4 mr-auto" class:is-loading={saving}>
+		<GuardedButton permission="role.bind" type="submit" class="button mt-4 mr-auto" loading={saving}>
 			Save
-		</button>
+		</GuardedButton>
 	</form>
 </div>

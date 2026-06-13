@@ -1,11 +1,17 @@
 <script>
+	import { getContext } from 'svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { denyTooltip } from '$lib/permission'
 	import gravatarUrl from 'gravatar-url'
 
 	const { data } = $props()
+
+	/** @type {{ can: (p: string) => boolean }} */
+	const { can } = getContext('permission')
 
 	const project = $derived(data.project)
 	const users = $derived(data.users)
@@ -112,10 +118,10 @@
 		<h4><strong>Users</strong></h4>
 		<p class="page-sub">{users.length} {users.length === 1 ? 'user' : 'users'}</p>
 	</div>
-	<a class="button is-icon-left" href="/role/bind?project={project}">
+	<GuardedButton permission="role.bind" class="button is-icon-left" href="/role/bind?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Add
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
@@ -155,14 +161,22 @@
 							{/if}
 						</td>
 						<td>
-							<a href="/role/bind?project={project}&email={it.email}" aria-label="Edit">
-								<div class="icon-button">
-									<i class="fa-solid fa-pen"></i>
-								</div>
-							</a>
-							<button class="icon-button" aria-label="Remove" onclick={() => deleteUser(it.email)}>
+							{#if can('role.bind')}
+								<a href="/role/bind?project={project}&email={it.email}" aria-label="Edit">
+									<div class="icon-button">
+										<i class="fa-solid fa-pen"></i>
+									</div>
+								</a>
+							{:else}
+								<span class="inline-flex" title={denyTooltip('role.bind')}>
+									<button class="icon-button" type="button" aria-label="Edit" disabled aria-disabled="true">
+										<i class="fa-solid fa-pen"></i>
+									</button>
+								</span>
+							{/if}
+							<GuardedButton permission="role.bind" class="icon-button" aria-label="Remove" onclick={() => deleteUser(it.email)}>
 								<i class="fa-solid fa-trash-alt"></i>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				{/each}

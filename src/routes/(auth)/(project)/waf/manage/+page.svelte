@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 	import { describeKey, keyRowToApi, modeLabels, normalizeLimits, toApiLimits } from '$lib/waf/limits'
 
@@ -208,10 +209,10 @@
 				<input id="input-description" bind:value={description} placeholder="Optional description">
 			</div>
 			<div class="flex justify-self-start mt-2">
-				<button type="button" class="button is-variant-secondary is-size-small"
-					class:is-loading={savingDescription} onclick={saveDescription}>
+				<GuardedButton permission="waf.set" class="button is-variant-secondary is-size-small"
+					loading={savingDescription} onclick={saveDescription}>
 					Save
-				</button>
+				</GuardedButton>
 			</div>
 		</div>
 
@@ -259,22 +260,22 @@
 							</td>
 							<td>
 								<div class="flex gap-1 justify-end">
-									<button class="icon-button" type="button" aria-label="Edit rule"
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Edit rule"
 										onclick={() => editRule(rule)}>
 										<i class="fa-solid fa-pencil"></i>
-									</button>
-									<button class="icon-button" type="button" aria-label="Move rule up"
+									</GuardedButton>
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Move rule up"
 										disabled={i === 0} onclick={() => moveRule(i, -1)}>
 										<i class="fa-solid fa-chevron-up"></i>
-									</button>
-									<button class="icon-button" type="button" aria-label="Move rule down"
+									</GuardedButton>
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Move rule down"
 										disabled={i === rules.length - 1} onclick={() => moveRule(i, 1)}>
 										<i class="fa-solid fa-chevron-down"></i>
-									</button>
-									<button class="icon-button" type="button" aria-label="Remove rule"
+									</GuardedButton>
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Remove rule"
 										onclick={() => removeRule(i)}>
 										<i class="fa-solid fa-trash-alt"></i>
-									</button>
+									</GuardedButton>
 								</div>
 							</td>
 						</tr>
@@ -290,11 +291,11 @@
 				<tfoot>
 					<tr>
 						<td colspan="4">
-							<button class="button is-variant-secondary flex m-auto" type="button"
+							<GuardedButton permission="waf.set" class="button is-variant-secondary flex m-auto"
 								onclick={addRule}>
 								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Rule</span>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				</tfoot>
@@ -352,14 +353,14 @@
 							</td>
 							<td>
 								<div class="flex gap-1 justify-end">
-									<button class="icon-button" type="button" aria-label="Edit rate limit"
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Edit rate limit"
 										onclick={() => editLimit(limit)}>
 										<i class="fa-solid fa-pencil"></i>
-									</button>
-									<button class="icon-button" type="button" aria-label="Remove rate limit"
+									</GuardedButton>
+									<GuardedButton permission="waf.set" class="icon-button" aria-label="Remove rate limit"
 										onclick={() => removeLimit(i)}>
 										<i class="fa-solid fa-trash-alt"></i>
-									</button>
+									</GuardedButton>
 								</div>
 							</td>
 						</tr>
@@ -375,11 +376,11 @@
 				<tfoot>
 					<tr>
 						<td colspan="5">
-							<button class="button is-variant-secondary flex m-auto" type="button"
+							<GuardedButton permission="waf.set" class="button is-variant-secondary flex m-auto"
 								onclick={addLimit}>
 								<i class="fa-solid fa-plus mr-3"></i>
 								<span>Add Limit</span>
-							</button>
+							</GuardedButton>
 						</td>
 					</tr>
 				</tfoot>
@@ -387,7 +388,7 @@
 		</div>
 
 		<DangerZone description="Disable the firewall in this location and permanently remove all of its rules and rate limits.">
-			<button class="button is-variant-negative" type="button" onclick={deleteZone}>Disable firewall</button>
+			<GuardedButton permission="waf.delete" class="button is-variant-negative" onclick={deleteZone}>Disable firewall</GuardedButton>
 		</DangerZone>
 	</div>
 </div>

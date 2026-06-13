@@ -4,6 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
 	import { parseExpression } from '$lib/waf/expression'
 	import { normalizeRules, toApiRules } from '$lib/waf/rules'
@@ -399,8 +400,8 @@
 		<hr>
 
 		<div class="flex items-center gap-3">
-			<button class="button" class:is-loading={saving} disabled={saving || !canSave}
-				title={canSave ? undefined : 'Set a rate, window, and complete every key characteristic before saving'}>Save</button>
+			<GuardedButton permission="waf.set" type="submit" loading={saving} disabled={saving || !canSave}
+				title={canSave ? undefined : 'Set a rate, window, and complete every key characteristic before saving'}>Save</GuardedButton>
 			<button type="button" class="button is-variant-secondary" onclick={cancel}>Cancel</button>
 			{#if !canSave}
 				<p class="text-content/50 text-sm">

@@ -2,6 +2,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import Sparkline from '$lib/components/Sparkline.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
@@ -82,10 +83,10 @@
 			{firewalls.length} {firewalls.length === 1 ? 'firewall' : 'firewalls'}
 		</p>
 	</div>
-	<a class="button is-icon-left" href={`/waf/create?project=${project}`}>
+	<GuardedButton permission="waf.set" class="button is-icon-left" href={`/waf/create?project=${project}`}>
 		<i class="fa-solid fa-plus"></i>
 		Create firewall
-	</a>
+	</GuardedButton>
 </div>
 
 <div class="panel is-level-300">

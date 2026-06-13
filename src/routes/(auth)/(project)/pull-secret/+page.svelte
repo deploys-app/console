@@ -3,6 +3,7 @@
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
 
@@ -16,10 +17,10 @@
 		<h4><strong>Pull Secrets</strong></h4>
 		<p class="page-sub">{pullSecrets.length} {pullSecrets.length === 1 ? 'pull secret' : 'pull secrets'}</p>
 	</div>
-	<a class="button is-icon-left" href="/pull-secret/create?project={project}">
+	<GuardedButton permission="pullsecret.create" class="button is-icon-left" href="/pull-secret/create?project={project}">
 		<i class="fa-solid fa-plus"></i>
 		Create
-	</a>
+	</GuardedButton>
 </div>
 <div class="panel is-level-300">
 	<div class="table-container">
