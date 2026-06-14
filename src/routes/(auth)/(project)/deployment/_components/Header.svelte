@@ -21,8 +21,14 @@
 	/** @type {{ can: (p: string) => boolean }} */
 	const { can } = getContext('permission')
 
-	const canPause = $derived(deployment.status === 'success' && deployment.action === 'deploy')
-	const canResume = $derived(deployment.status === 'success' && deployment.action === 'pause')
+	// Static deployments serve a release from the edge and have no container/pods.
+	// The console deploy form is container-image only (a static revision needs a
+	// site:// release reference from the publish/GitHub-action path), and the
+	// apiserver rejects pause/resume for static — so hide all three actions.
+	const isStatic = $derived(deployment.type === 'Static')
+
+	const canPause = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'deploy')
+	const canResume = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'pause')
 
 	const statusTone = $derived(
 		deployment.status === 'success' && deployment.action === 'pause'
@@ -325,17 +331,19 @@
 					</button>
 				</span>
 			{/if}
-			{#if can('deployment.deploy')}
-				<a class="mast-btn is-primary"
-					href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
-					<i class="fa-solid fa-rocket"></i> Deploy New Revision
-				</a>
-			{:else}
-				<span class="inline-flex" title={denyTooltip('deployment.deploy')}>
-					<button class="mast-btn is-primary" type="button" disabled aria-disabled="true">
+			{#if !isStatic}
+				{#if can('deployment.deploy')}
+					<a class="mast-btn is-primary"
+						href={`/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`}>
 						<i class="fa-solid fa-rocket"></i> Deploy New Revision
-					</button>
-				</span>
+					</a>
+				{:else}
+					<span class="inline-flex" title={denyTooltip('deployment.deploy')}>
+						<button class="mast-btn is-primary" type="button" disabled aria-disabled="true">
+							<i class="fa-solid fa-rocket"></i> Deploy New Revision
+						</button>
+					</span>
+				{/if}
 			{/if}
 		</div>
 	</div>
