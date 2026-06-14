@@ -1302,6 +1302,16 @@ const handlers = {
 		githubLinks.splice(i, 1)
 		return ok({})
 	},
+	'github.update': (args) => {
+		const l = githubLinks.find((x) => x.repositoryId === args?.repositoryId)
+		if (!l) return err('api: github repository link not found')
+		const sa = serviceAccounts.find((s) => s.sid === args?.serviceAccount)
+		l.serviceAccount = args?.serviceAccount ?? l.serviceAccount
+		l.serviceAccountEmail = sa?.email ?? l.serviceAccountEmail
+		l.trigger = args?.trigger ?? 'all'
+		l.productionBranch = l.trigger === 'pr' ? '' : (args?.productionBranch ?? '')
+		return ok({})
+	},
 	'serviceAccount.list': () => list(serviceAccounts),
 	'serviceAccount.get': (args) => ok({
 		...serviceAccounts[0],

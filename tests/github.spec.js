@@ -170,6 +170,81 @@ test.describe('github repositories page', () => {
 		await expect(svcCard).toContainText('main')
 	})
 
+	test('edits a link: changes branch via the modal and nudges to recreate the workflow', async ({ page }) => {
+		await mocks({ 'github.update': { ok: true, result: {} } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		const card = main.locator('.repo-card', { hasText: 'acme/web' })
+		await card.getByRole('button', { name: 'Edit acme/web' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Edit link' })).toBeVisible()
+
+		// Branch is prefilled with the link's current production branch.
+		const branchInput = modal.locator('#edit-link-production-branch')
+		await expect(branchInput).toHaveValue('release')
+		await branchInput.fill('  develop  ')
+
+		await modal.getByRole('button', { name: 'Save', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.update')
+		}).toBe(true)
+
+		const req = JSON.parse((await getRequestLog()).find((r) => r.path === '/github.update')?.body ?? '{}')
+		expect(req.repositoryId).toBe(link.repositoryId)
+		expect(req.serviceAccount).toBe('ci')
+		expect(req.productionBranch).toBe('develop')
+		expect(req.trigger).toBe('all')
+
+		// Because the branch changed, the modal stays open with a nudge to recreate
+		// deploy.yaml via the workflow generator (the redirect path), preselecting the repo.
+		await expect(modal.getByRole('heading', { name: 'Link updated' })).toBeVisible()
+		const recreate = modal.getByRole('link', { name: /Recreate workflow/ })
+		await expect(recreate).toHaveAttribute('href', '/github/workflow?project=test-project&repo=acme%2Fweb')
+	})
+
+	test('editing to the pr trigger disables and clears the production branch', async ({ page }) => {
+		await mocks({ 'github.update': { ok: true, result: {} } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await main.locator('.repo-card', { hasText: 'acme/web' }).getByRole('button', { name: 'Edit acme/web' }).click()
+		const modal = page.locator('.modal.is-active')
+
+		// Switch the trigger to "PR previews only" — the branch input disables.
+		await modal.locator('#edit-link-trigger').click()
+		await page.getByRole('option', { name: 'PR previews only (no branch deploys)' }).click()
+		await expect(modal.locator('#edit-link-production-branch')).toBeDisabled()
+
+		await modal.getByRole('button', { name: 'Save', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.update')
+		}).toBe(true)
+
+		const req = JSON.parse((await getRequestLog()).find((r) => r.path === '/github.update')?.body ?? '{}')
+		expect(req.trigger).toBe('pr')
+		expect(req.productionBranch).toBe('')
+	})
+
+	test('Edit is disabled without the github.update permission', async ({ page }) => {
+		await mocks({
+			'me.permissions': { ok: true, result: { permissions: ['github.list'], admin: false } }
+		})
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		const card = main.locator('.repo-card', { hasText: 'acme/web' })
+		await expect(card.getByRole('button', { name: 'Edit acme/web' })).toBeDisabled()
+	})
+
 	test('unlinks after confirmation', async ({ page }) => {
 		await mocks({ 'github.unlink': { ok: true, result: {} } })
 

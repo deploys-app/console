@@ -3,6 +3,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import EditGithubLinkModal from '$lib/components/EditGithubLinkModal.svelte'
 	import * as format from '$lib/format'
 	import GitHubNav from './_components/GitHubNav.svelte'
 
@@ -10,12 +11,21 @@
 
 	const project = $derived(data.project)
 	const error = $derived(data.error)
+	const serviceAccounts = $derived(data.serviceAccounts)
 
 	let links = $state(untrack(() => data.links))
+
+	/** @type {EditGithubLinkModal} */
+	let editModal = $state(/** @type {any} */ (undefined))
 
 	async function reloadLinks () {
 		const resp = await api.invoke('github.list', { project }, fetch)
 		if (resp.ok) links = resp.result?.items ?? []
+	}
+
+	/** @param {Api.GithubLink} it */
+	function edit (it) {
+		editModal.open(it)
 	}
 
 	/** @param {Api.GithubLink} it */
@@ -74,6 +84,10 @@
 					<a class="repo-name link" href={`https://github.com/${it.repository}`} target="_blank" rel="noreferrer">
 						{it.repository}
 					</a>
+					<GuardedButton permission="github.update" class="icon-button repo-edit" type="button"
+						aria-label={`Edit ${it.repository}`} onclick={() => edit(it)}>
+						<i class="fa-solid fa-pen"></i>
+					</GuardedButton>
 					<GuardedButton permission="github.unlink" class="icon-button repo-unlink" type="button"
 						aria-label={`Unlink ${it.repository}`} onclick={() => unlink(it)}>
 						<i class="fa-solid fa-link-slash"></i>
@@ -143,6 +157,8 @@
 	</div>
 {/if}
 
+<EditGithubLinkModal bind:this={editModal} {project} {serviceAccounts} onsaved={reloadLinks} />
+
 <style>
 	.repo-grid {
 		display: grid;
@@ -206,12 +222,17 @@
 		white-space: nowrap;
 	}
 
-	/* The unlink control is rendered by GuardedButton (a child component), so it
-	 * doesn't carry this component's scope hash — reach it via :global, anchored
-	 * under .repo-card so it can't leak. */
+	/* The edit/unlink controls are rendered by GuardedButton (a child component),
+	 * so they don't carry this component's scope hash — reach them via :global,
+	 * anchored under .repo-card so they can't leak. */
+	.repo-card :global(.repo-edit),
 	.repo-card :global(.repo-unlink) {
 		flex-shrink: 0;
 		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.repo-card :global(.repo-edit):hover {
+		color: hsl(var(--hsl-primary));
 	}
 
 	.repo-card :global(.repo-unlink):hover {
