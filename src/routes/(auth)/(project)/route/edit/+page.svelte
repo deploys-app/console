@@ -124,7 +124,7 @@
 		const list = resp.result?.items ?? []
 		deployments = list
 			.filter((/** @type {Api.Deployment} */ x) => x.location === route.location)
-			.filter((/** @type {Api.Deployment} */ x) => x.type === 'WebService')
+			.filter((/** @type {Api.Deployment} */ x) => x.type === 'WebService' || x.type === 'Static')
 			.filter((/** @type {Api.Deployment} */ x) => x.ttl === 0)
 			.map((/** @type {Api.Deployment} */ x) => ({ name: x.name, paused: x.action === 'pause' }))
 	}

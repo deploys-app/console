@@ -86,7 +86,7 @@
 		const list = resp.result.items ?? []
 		deployments = list
 			.filter((x) => x.location === form.location)
-			.filter((x) => x.type === 'WebService')
+			.filter((x) => x.type === 'WebService' || x.type === 'Static')
 			.filter((x) => x.ttl === 0)
 			.map((x) => ({ name: x.name, paused: x.action === 'pause' }))
 	}
