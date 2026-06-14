@@ -80,7 +80,7 @@ test.describe('github', () => {
 
 		// Create-on-GitHub deep-link targets the linked repo's file editor.
 		const href = await main.getByRole('link', { name: 'Create on GitHub' }).getAttribute('href')
-		expect(href).toContain('https://github.com/acme/web/new/main?filename=.github/workflows/deploy.yml&value=')
+		expect(href).toContain('https://github.com/acme/web/new/main?filename=.github/workflows/deploy.yaml&value=')
 		expect(decodeURIComponent(href ?? '')).toContain('name: api')
 	})
 
