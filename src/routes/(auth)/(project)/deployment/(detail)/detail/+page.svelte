@@ -621,25 +621,30 @@
 						<i class="fa-light fa-copy"></i>
 					</span>
 				</div>
-				<div class="spec">
-					<span class="spec__label">Pull Secret</span>
-					{#if deployment.pullSecret}
-						<span class="spec__value is-mono">{deployment.pullSecret}</span>
-					{:else}
-						<span class="spec__value is-dim">—</span>
-					{/if}
-					<span></span>
-				</div>
-				{#if location.features.workloadIdentity}
+				<!-- Pull secret and workload identity bind a container image to a
+				     registry / GCP identity — neither applies to a Static deployment,
+				     which serves a content-addressed release with no pods. -->
+				{#if !isStatic}
 					<div class="spec">
-						<span class="spec__label">Workload Identity</span>
-						{#if deployment.workloadIdentity}
-							<span class="spec__value is-mono">{deployment.workloadIdentity}</span>
+						<span class="spec__label">Pull Secret</span>
+						{#if deployment.pullSecret}
+							<span class="spec__value is-mono">{deployment.pullSecret}</span>
 						{:else}
 							<span class="spec__value is-dim">—</span>
 						{/if}
 						<span></span>
 					</div>
+					{#if location.features.workloadIdentity}
+						<div class="spec">
+							<span class="spec__label">Workload Identity</span>
+							{#if deployment.workloadIdentity}
+								<span class="spec__value is-mono">{deployment.workloadIdentity}</span>
+							{:else}
+								<span class="spec__value is-dim">—</span>
+							{/if}
+							<span></span>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</section>
@@ -661,16 +666,20 @@
 					<span class="spec__value is-mono">{deployment.createdBy}</span>
 					<span></span>
 				</div>
-				<div class="spec">
-					<span class="spec__label">Allocated Price</span>
-					<span class="spec__value">
-						<span class="spec__value is-mono" style="font-family: var(--ffml-mono);">
-							{deployment.allocatedPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+				<!-- Allocated price is per running replica — a Static deployment runs
+				     no replicas, so it carries no allocation cost to show. -->
+				{#if !isStatic}
+					<div class="spec">
+						<span class="spec__label">Allocated Price</span>
+						<span class="spec__value">
+							<span class="spec__value is-mono" style="font-family: var(--ffml-mono);">
+								{deployment.allocatedPrice.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+							</span>
+							THB / month / replica
 						</span>
-						THB / month / replica
-					</span>
-					<span></span>
-				</div>
+						<span></span>
+					</div>
+				{/if}
 				{#if deployment.ttl === -1}
 					<div class="spec">
 						<span class="spec__label">Auto-delete</span>
@@ -698,6 +707,10 @@
 	</div>
 </div>
 
+<!-- Env groups, env vars and mount data all inject configuration into a running
+     container. A Static deployment has no container, so none of these apply —
+     hide all three shells for it. -->
+{#if !isStatic}
 <!-- ─── ENV GROUPS shell ─── -->
 <div class="shell">
 	<header class="rail">
@@ -803,6 +816,7 @@
 		</section>
 	</div>
 </div>
+{/if}
 
 <DangerZone description="Permanently delete this deployment. All running instances will be stopped and removed.">
 	<GuardedButton permission="deployment.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
