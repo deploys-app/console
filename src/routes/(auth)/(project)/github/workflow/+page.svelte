@@ -57,7 +57,10 @@
 		pullSecret: ''
 	})))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
-	const genBranch = $derived(links.find((l) => l.repository === gen.repository)?.productionBranch || 'main')
+	const genLink = $derived(links.find((l) => l.repository === gen.repository))
+	const genBranch = $derived(genLink?.productionBranch || 'main')
+	// Which workflow runs deploy — drives the generated `on:` triggers.
+	const genTrigger = $derived(genLink?.trigger ?? 'all')
 
 	// Keep the deployment name defaulting to the selected repository's name until
 	// the user edits it — switching repos then re-fills with the new repo name.
@@ -280,11 +283,18 @@
 		return out.join('\n')
 	}
 
+	// The on: block matches the link's trigger: all = push + pull_request,
+	// branch = push only, pr = pull_request only.
+	const onBlock = $derived(
+		'on:\n' +
+		[
+			genTrigger !== 'pr' ? `  push:\n    branches: [${genBranch}]` : null,
+			genTrigger !== 'branch' ? '  pull_request:' : null
+		].filter(Boolean).join('\n')
+	)
+
 	const workflowYaml = $derived(`name: Deploy
-on:
-  push:
-    branches: [${genBranch}]
-  pull_request:
+${onBlock}
 
 ${permissionsBlock}
 
@@ -342,7 +352,13 @@ ${withBlock()}
 				<h6><strong>Generate workflow</strong></h6>
 				<p class="text-content/50 text-sm mt-1">
 					Configure the deploy action, then drop the file into your repository.
-					It deploys on push to the production branch and posts a preview on every pull request.
+					{#if genTrigger === 'pr'}
+						This repository is pull-request only — it posts a preview on every pull request and never deploys a branch.
+					{:else if genTrigger === 'branch'}
+						It deploys on push to the production branch. Pull requests get no preview.
+					{:else}
+						It deploys on push to the production branch and posts a preview on every pull request.
+					{/if}
 				</p>
 			</div>
 
