@@ -42,7 +42,9 @@
 		if (e.target === e.currentTarget) close()
 	}
 
-	const DEPLOY_PERMISSIONS = ['deployment.deploy', 'deployment.get', 'deployment.delete', 'registry.push']
+	// site.publish lets GitHub Actions publish static-web releases (mode: static
+	// in build-deploy-action); without it a static deploy 403s at /sites/*.
+	const DEPLOY_PERMISSIONS = ['deployment.deploy', 'deployment.get', 'deployment.delete', 'registry.push', 'site.publish']
 
 	async function create () {
 		if (!canSubmit) return
@@ -133,7 +135,7 @@
 			<div class="field">
 				<div class="checkbox">
 					<input id="create-sa-grant" type="checkbox" bind:checked={grantRole} disabled={!canGrantRole}>
-					<label for="create-sa-grant">Grant deploy role — deployment.deploy, deployment.get, deployment.delete, registry.push</label>
+					<label for="create-sa-grant">Grant deploy role — deployment.deploy, deployment.get, deployment.delete, registry.push, site.publish</label>
 				</div>
 				{#if !canGrantRole}
 					<p class="text-warning text-sm mt-1">

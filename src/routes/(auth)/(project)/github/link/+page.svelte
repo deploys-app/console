@@ -199,8 +199,9 @@
 			Workflows deploy as the linked service account — it needs
 			<span class="font-mono">deployment.deploy</span>,
 			<span class="font-mono">deployment.get</span>,
-			<span class="font-mono">deployment.delete</span> and
-			<span class="font-mono">registry.push</span>.
+			<span class="font-mono">deployment.delete</span>,
+			<span class="font-mono">registry.push</span> and
+			<span class="font-mono">site.publish</span> (static-web publishing).
 		</p>
 	</div>
 
