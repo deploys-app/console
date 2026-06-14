@@ -26,6 +26,10 @@
 
 	const deployment = $derived(data.deployment)
 
+	// Static deployments have no live metrics pipeline — the live and aggregate
+	// windows resolve to the same data, so the Live row is redundant noise.
+	const isStatic = $derived(deployment.type === 'Static')
+
 	const RELOAD_INTERVAL_MS = 60_000
 
 	const validRanges = new Set(RANGES.map((o) => o.value))
@@ -283,17 +287,19 @@
 	</div>
 
 	<div class="metric-rail__ranges" role="group" aria-label="time range">
-		<span class="range-group">
-			<span class="range-group__label">Live</span>
-			{#each RANGES.filter((r) => r.group === 'live') as r (r.value)}
-				<button type="button" class="range-pill"
-					data-active={filter.range === r.value}
-					data-group="live"
-					onclick={() => setRange(r.value)}>
-					{r.label}
-				</button>
-			{/each}
-		</span>
+		{#if !isStatic}
+			<span class="range-group">
+				<span class="range-group__label">Live</span>
+				{#each RANGES.filter((r) => r.group === 'live') as r (r.value)}
+					<button type="button" class="range-pill"
+						data-active={filter.range === r.value}
+						data-group="live"
+						onclick={() => setRange(r.value)}>
+						{r.label}
+					</button>
+				{/each}
+			</span>
+		{/if}
 		<span class="range-group">
 			<span class="range-group__label">Agg</span>
 			{#each RANGES.filter((r) => r.group === 'agg') as r (r.value)}
