@@ -309,8 +309,12 @@
 </header>
 
 <div class="metric-grid">
-	<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
-	<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
+	<!-- Static deployments run no pods, so there is no CPU/memory to chart —
+	     only egress (bytes served by the static-gateway) applies. -->
+	{#if deployment.type !== 'Static'}
+		<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
+		<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
+	{/if}
 	{#if deployment.type === 'WebService'}
 		<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
 	{/if}

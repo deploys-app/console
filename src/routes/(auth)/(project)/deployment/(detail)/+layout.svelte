@@ -9,13 +9,19 @@
 	const project = $derived(data.project)
 	const deployment = $derived(data.deployment)
 
-	const tabs = [
+	// A Static deployment runs no pods, so it has no logs or k8s events — hide
+	// those tabs (the metrics tab stays but drops the pod-only charts).
+	const tabs = $derived([
 		{ label: 'Metrics', path: '/deployment/metrics' },
 		{ label: 'Details', path: '/deployment/detail' },
 		{ label: 'Revisions', path: '/deployment/revision' },
-		{ label: 'Logs', path: '/deployment/logs' },
-		{ label: 'Events', path: '/deployment/events' }
-	]
+		...(deployment.type === 'Static'
+			? []
+			: [
+				{ label: 'Logs', path: '/deployment/logs' },
+				{ label: 'Events', path: '/deployment/events' }
+			])
+	])
 
 	/** @param {string} path */
 	function tabHref (path) {
