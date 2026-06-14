@@ -105,7 +105,7 @@ const locations = [
 		cname: 'rcf2.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {}, waf: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {} },
 		createdAt: CREATED_AT
 	},
 	{
@@ -115,7 +115,7 @@ const locations = [
 		cname: 'sg1.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {}, waf: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {} },
 		createdAt: CREATED_AT
 	}
 ]
@@ -492,6 +492,122 @@ function wafConfiguredZone (location, advance = false) {
 		description: entry.description,
 		rules: [],
 		limits: [],
+		status,
+		action: 'create',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	}
+}
+
+const cacheZone = {
+	project: 'acme',
+	location: LOCATION_ID,
+	description: 'Force-cache static assets, bypass the admin area',
+	overrides: [
+		{
+			id: 'static-assets',
+			description: 'Force long-lived caching for static assets',
+			action: 'cache',
+			filter: "request.path.startsWith('/static/')",
+			ttl: '1h',
+			policy: 'balanced',
+			staleWhileRevalidate: '30s',
+			status: [200],
+			mode: 'enforce',
+			priority: 0
+		},
+		{
+			id: 'bypass-admin',
+			description: 'Never cache the admin area',
+			action: 'bypass',
+			filter: "request.path.startsWith('/admin')",
+			mode: 'enforce',
+			priority: 1
+		},
+		{
+			id: 'shadow-api',
+			description: 'Trial caching of API GETs (shadow only)',
+			action: 'cache',
+			filter: "request.path.startsWith('/api/') && request.method == 'GET'",
+			ttl: '5m',
+			policy: 'aggressive',
+			mode: 'shadow',
+			priority: 2
+		}
+	],
+	status: 'success',
+	action: 'create',
+	createdAt: CREATED_AT,
+	createdBy: USER_EMAIL
+}
+
+// Synthetic cache decision metrics for the seed zone, so the cache index
+// sparkline + total and the metrics page have something to draw. Scatters
+// counts across the requested window per (override, action, result), mirroring
+// cache.metrics' shape (sparse buckets, grand total). Reuses wafRangeSeconds.
+/** @param {string} [timeRange] */
+function cacheMetrics (timeRange) {
+	const now = Math.floor(Date.now() / 1000)
+	const windowSeconds = wafRangeSeconds[timeRange ?? '1d'] ?? wafRangeSeconds['1d']
+
+	/**
+	 * @param {string} overrideId
+	 * @param {Api.CacheAction} action
+	 * @param {Api.CacheMetricsSeries['result']} result
+	 * @param {number} buckets  // how many active samples
+	 * @param {number} scale    // max count per sample
+	 */
+	const makeSeries = (overrideId, action, result, buckets, scale) => {
+		/** @type {[number, number][]} */
+		const points = []
+		let total = 0
+		for (let i = 0; i < buckets; i++) {
+			const ts = now - Math.floor(Math.random() * windowSeconds)
+			const v = 1 + Math.floor(Math.random() * scale)
+			points.push([ts, v])
+			total += v
+		}
+		points.sort((a, b) => a[0] - b[0])
+		return { overrideId, action, result, total, points }
+	}
+
+	const series = [
+		makeSeries('static-assets', 'cache', 'applied', 90, 8),
+		makeSeries('static-assets', 'cache', 'error', 12, 2),
+		makeSeries('bypass-admin', 'bypass', 'applied', 40, 3),
+		makeSeries('shadow-api', 'cache', 'shadow', 70, 5)
+	]
+	const total = series.reduce((acc, s) => acc + s.total, 0)
+	return { series, total }
+}
+
+// Locations (besides the seed LOCATION_ID) that have had cache configured in
+// this dev session, mapped to { description, polls }. Mirrors wafConfigured —
+// the simulated deployer flips a freshly created zone from pending → success
+// after the first list read, so the index spinner resolves on its own.
+/** @type {Map<string, { description: string, polls: number }>} */
+const cacheConfigured = new Map()
+
+/**
+ * Build a cache zone for a session-created location. `advance` simulates the
+ * deployer: set on cache.list reads (the index poll) so the first list shows
+ * pending/create and the next list settles to success. cache.get reads observe
+ * the same state without advancing it.
+ * @param {string} location
+ * @param {boolean} [advance]
+ */
+function cacheConfiguredZone (location, advance = false) {
+	const entry = cacheConfigured.get(location) ?? { description: '', polls: 0 }
+	const status = entry.polls > 0 ? 'success' : 'pending'
+	if (advance) {
+		entry.polls += 1
+		cacheConfigured.set(location, entry)
+	}
+	return {
+		project: 'acme',
+		location,
+		description: entry.description,
+		overrides: [],
 		status,
 		action: 'create',
 		createdAt: CREATED_AT,
@@ -1049,6 +1165,47 @@ const handlers = {
 	},
 	'waf.delete': (args) => {
 		if (args?.location) wafConfigured.delete(args.location)
+		return ok({})
+	},
+
+	// The seed location starts configured and live; every other location is
+	// "cache not configured yet" (not-found) until created. A freshly created
+	// location starts as { status: 'pending', action: 'create' } and the
+	// simulated deployer flips it to 'success' after the first read (see
+	// cacheConfiguredZone), so the index spinner resolves on its own. cache.set
+	// and cache.delete keep the index/create/manage flows coherent within a
+	// session.
+	'cache.list': () => {
+		const items = [{ ...cacheZone, location: LOCATION_ID }]
+		for (const location of cacheConfigured.keys()) {
+			items.push(cacheConfiguredZone(location, true))
+		}
+		return ok({ project: 'acme', items })
+	},
+	'cache.get': (args) => {
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok({ ...cacheZone, location: LOCATION_ID })
+		if (cacheConfigured.has(location)) {
+			return ok(cacheConfiguredZone(location))
+		}
+		return err('api: cache zone not found')
+	},
+	'cache.set': (args) => {
+		const location = args?.location
+		if (location && location !== LOCATION_ID) {
+			cacheConfigured.set(location, { description: args?.description ?? '', polls: 0 })
+		}
+		return ok({})
+	},
+	'cache.metrics': (args) => {
+		// Seed zone has activity; session-created zones read empty (shows the "—"
+		// no-traffic state on the index).
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok(cacheMetrics(args?.timeRange))
+		return ok({ series: [], total: 0 })
+	},
+	'cache.delete': (args) => {
+		if (args?.location) cacheConfigured.delete(args.location)
 		return ok({})
 	},
 
