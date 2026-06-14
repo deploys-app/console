@@ -48,11 +48,22 @@
 		})
 	}
 
+	// Derive a sensible deployment name from a `owner/name` repository: the repo
+	// name, lowercased with anything outside [a-z0-9-] folded to a hyphen.
+	/** @param {string | undefined} repository */
+	function repoToName (repository) {
+		const short = (repository ?? '').split('/').pop() ?? ''
+		return short
+			.toLowerCase()
+			.replace(/[^a-z0-9-]+/g, '-')
+			.replace(/^-+|-+$/g, '')
+	}
+
 	// workflow generator
 	const gen = $state(untrack(() => ({
 		repository: data.links[0]?.repository ?? '',
 		location: data.locations[0]?.id ?? '',
-		name: 'web',
+		name: repoToName(data.links[0]?.repository) || 'web',
 		// 'dockerfile' (default) emits today's container workflow; 'static' emits
 		// a bucket-native static-web workflow (mode: static).
 		buildType: 'dockerfile',
@@ -73,6 +84,14 @@
 	})))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
 	const genBranch = $derived(links.find((l) => l.repository === gen.repository)?.productionBranch || 'main')
+
+	// Keep the deployment name defaulting to the selected repository's name until
+	// the user edits it — switching repos then re-fills with the new repo name.
+	let nameTouched = $state(false)
+	$effect(() => {
+		const derivedName = repoToName(gen.repository)
+		if (!nameTouched && derivedName) gen.name = derivedName
+	})
 
 	const buildTypeOptions = [
 		{ value: 'dockerfile', label: 'Dockerfile' },
@@ -398,7 +417,7 @@ ${withBlock()}
 			<div class="field">
 				<label for="gen-name">Deployment name</label>
 				<div class="input">
-					<input id="gen-name" class="font-mono" bind:value={gen.name} placeholder="web">
+					<input id="gen-name" class="font-mono" bind:value={gen.name} oninput={() => nameTouched = true} placeholder="web">
 				</div>
 			</div>
 			<div class="field">
