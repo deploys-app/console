@@ -30,6 +30,8 @@ make deploy  # build and deploy to deploys-app project
 
 `main` is protected — all changes must go through a pull request; never commit or push directly to `main`. Branch off the latest `main` (`git checkout main && git pull`), make changes, then open a PR. Merging a PR auto-deletes its branch, which can silently leave your local checkout on `main` — so verify the current branch before committing or pushing.
 
+**UI changes must include screenshots in the PR description.** Any PR that adds or changes user-visible UI (a page, component, modal, layout, or styling) must show the result visually in the PR body — not just describe it. Capture the affected screens with the mock + Playwright (`bun dev:mock`, then screenshot via `@playwright/test`), covering the relevant states (e.g. empty vs populated, a toggle on/off, light/dark when it matters); a before/after is ideal for changes to existing screens. Preferred attach mechanism: drag-and-drop the images into the GitHub PR editor — GitHub stores them under `user-attachments`, keeping binaries out of the repo. Don't commit screenshots into the source tree just to embed them.
+
 ## Architecture
 
 This is a **SvelteKit 2** console for deploys.app, a deployment platform. It uses **Svelte 5** runes (`$state`, `$derived`, `$props`) and is deployed on Cloudflare (default) or Node.js via env-controlled adapter selection.
