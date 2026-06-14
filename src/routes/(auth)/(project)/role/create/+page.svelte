@@ -4,7 +4,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
-	import Select from '$lib/components/Select.svelte'
+	import OptionSelect from '$lib/components/OptionSelect.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
 	const { data } = $props()
@@ -116,8 +116,10 @@
 			<h6><strong>Permissions</strong></h6>
 
 			<div class="field flex mb-3">
-				<Select
-					placeholder="Select Permission"
+				<OptionSelect
+					id="input-permission"
+					placeholder="Search permissions"
+					emptyText="No matching permission"
 					resetOnSelect
 					onchange={(v) => addPermission(String(v))}
 					options={permissions.filter((x) => !form.permissions.includes(x)).map((it) => ({ value: it, label: it }))} />
