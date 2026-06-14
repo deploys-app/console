@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private'
+import { sanitizeRedirect } from '$lib/server/redirect'
 
 const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 
@@ -47,10 +48,20 @@ export async function GET ({ cookies, url }) {
 		secure: import.meta.env.PROD
 	})
 
+	// Return the user to where they were headed before sign-in. Re-validate at the
+	// point of use (the cookie is the open-redirect sink) and fall back to home.
+	const redirectTo = sanitizeRedirect(cookies.get('redirect')) || '/'
+	cookies.delete('redirect', {
+		httpOnly: true,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
+
 	return new Response(undefined, {
 		status: 302,
 		headers: {
-			location: '/'
+			location: redirectTo
 		}
 	})
 }

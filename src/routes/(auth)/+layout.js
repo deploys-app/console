@@ -1,7 +1,7 @@
 import { redirect, error } from '@sveltejs/kit'
 import api from '$lib/api'
 
-export async function load ({ fetch }) {
+export async function load ({ fetch, url }) {
 	/** @type {[Api.Response<Api.Profile>, Api.Response<Api.List<Api.Project>>]} */
 	const [
 		me,
@@ -11,7 +11,15 @@ export async function load ({ fetch }) {
 		api.invoke('project.list', {}, fetch)
 	])
 	if (!me.ok) {
-		if (me.error?.unauth) redirect(302, '/auth/signin')
+		if (me.error?.unauth) {
+			// Remember where the user was headed so the OAuth round-trip can land
+			// them back here instead of dumping them on the dashboard. The path is
+			// same-origin by construction; signin/callback re-validate it.
+			const next = url.pathname + url.search
+			redirect(302, next && next !== '/'
+				? `/auth/signin?redirect=${encodeURIComponent(next)}`
+				: '/auth/signin')
+		}
 		error(500, me.error?.message)
 	}
 	if (!projects.ok) error(500, projects.error?.message)

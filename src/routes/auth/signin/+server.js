@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private'
+import { sanitizeRedirect } from '$lib/server/redirect'
 
 const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 
@@ -20,6 +21,9 @@ export async function GET ({ cookies, url }) {
 
 	const callback = new URL(url.toString())
 	callback.pathname = '/auth/callback'
+	// The OAuth redirect_uri must match exactly what the provider has registered —
+	// strip our own `?redirect=` (and anything else) so it never leaks upstream.
+	callback.search = ''
 
 	const q = new URLSearchParams()
 	q.set('response_type', 'code')
@@ -34,6 +38,27 @@ export async function GET ({ cookies, url }) {
 		path: '/',
 		secure: import.meta.env.PROD
 	})
+
+	// Stash the post-login destination first-party (it never travels to the OAuth
+	// provider). Clear any stale value when this sign-in has no target so an
+	// abandoned attempt can't bounce a later login somewhere unexpected.
+	const redirectTo = sanitizeRedirect(url.searchParams.get('redirect'))
+	if (redirectTo) {
+		cookies.set('redirect', redirectTo, {
+			httpOnly: true,
+			maxAge: 60 * 60,
+			sameSite: 'lax',
+			path: '/',
+			secure: import.meta.env.PROD
+		})
+	} else {
+		cookies.delete('redirect', {
+			httpOnly: true,
+			sameSite: 'lax',
+			path: '/',
+			secure: import.meta.env.PROD
+		})
+	}
 
 	return new Response(undefined, {
 		status: 302,

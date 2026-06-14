@@ -1,16 +1,20 @@
 import { test, unauthedTest, expect, setMocks } from './helpers.js'
 
 unauthedTest.describe('unauthenticated access', () => {
-	unauthedTest('redirects to /auth/signin when there is no token', async ({ page }) => {
+	unauthedTest('redirects to /auth/signin (remembering the path) when there is no token', async ({ page }) => {
 		const resp = await page.request.get('/?project=test-project', { maxRedirects: 0 })
 		expect([301, 302, 303, 307, 308]).toContain(resp.status())
-		expect(resp.headers().location).toBe('/auth/signin')
+		const loc = new URL(resp.headers().location, 'http://localhost')
+		expect(loc.pathname).toBe('/auth/signin')
+		expect(loc.searchParams.get('redirect')).toBe('/?project=test-project')
 	})
 
 	unauthedTest('redirects to /auth/signin from the project list as well', async ({ page }) => {
 		const resp = await page.request.get('/project', { maxRedirects: 0 })
 		expect([301, 302, 303, 307, 308]).toContain(resp.status())
-		expect(resp.headers().location).toBe('/auth/signin')
+		const loc = new URL(resp.headers().location, 'http://localhost')
+		expect(loc.pathname).toBe('/auth/signin')
+		expect(loc.searchParams.get('redirect')).toBe('/project')
 	})
 
 	unauthedTest('/auth/signin redirects to the OAuth provider', async ({ page }) => {
@@ -23,6 +27,64 @@ unauthedTest.describe('unauthenticated access', () => {
 		expect(location).toMatch(/client_id=test-client/)
 		expect(location).toMatch(/redirect_uri=/)
 		expect(location).toMatch(/state=[0-9a-f]+/)
+		// our own ?redirect= must never leak into the OAuth redirect_uri
+		const redirectUri = new URL(location).searchParams.get('redirect_uri') || ''
+		expect(redirectUri).not.toContain('redirect=')
+	})
+})
+
+unauthedTest.describe('post-login redirect', () => {
+	/** Read a Set-Cookie value off an APIResponse, undoing SvelteKit's encoding. */
+	function readSetCookie (resp, name) {
+		const header = resp.headersArray()
+			.filter((h) => h.name.toLowerCase() === 'set-cookie')
+			.map((h) => h.value)
+			.find((v) => v.startsWith(`${name}=`))
+		if (!header) return undefined
+		return decodeURIComponent(header.split(';')[0].slice(name.length + 1))
+	}
+
+	unauthedTest('signin records a safe redirect target', async ({ page }) => {
+		const target = '/deployment?project=foo'
+		const resp = await page.request.get('/auth/signin?redirect=' + encodeURIComponent(target), { maxRedirects: 0 })
+		expect(resp.status()).toBe(302)
+		expect(readSetCookie(resp, 'redirect')).toBe(target)
+	})
+
+	unauthedTest('signin refuses an off-site redirect target', async ({ page }) => {
+		const resp = await page.request.get('/auth/signin?redirect=' + encodeURIComponent('https://evil.example/phish'), { maxRedirects: 0 })
+		expect(resp.status()).toBe(302)
+		// either no redirect cookie, or a cleared one — never the off-site value
+		expect(readSetCookie(resp, 'redirect') || '').toBe('')
+	})
+
+	unauthedTest('callback returns the user to the remembered page', async ({ context, page }) => {
+		await context.addCookies([
+			{ name: 'state', value: 'test-state', domain: 'localhost', path: '/', sameSite: 'Lax' },
+			{ name: 'redirect', value: '/deployment?project=foo', domain: 'localhost', path: '/', sameSite: 'Lax' }
+		])
+		const resp = await page.request.get('/auth/callback?code=test-code&state=test-state', { maxRedirects: 0 })
+		expect(resp.status()).toBe(302)
+		expect(resp.headers().location).toBe('/deployment?project=foo')
+	})
+
+	unauthedTest('callback falls back to home without a remembered page', async ({ context, page }) => {
+		await context.addCookies([
+			{ name: 'state', value: 'test-state', domain: 'localhost', path: '/', sameSite: 'Lax' }
+		])
+		const resp = await page.request.get('/auth/callback?code=test-code&state=test-state', { maxRedirects: 0 })
+		expect(resp.status()).toBe(302)
+		expect(resp.headers().location).toBe('/')
+	})
+
+	unauthedTest('callback ignores an unsafe remembered value', async ({ context, page }) => {
+		await context.addCookies([
+			{ name: 'state', value: 'test-state', domain: 'localhost', path: '/', sameSite: 'Lax' },
+			{ name: 'redirect', value: 'https://evil.example/phish', domain: 'localhost', path: '/', sameSite: 'Lax' }
+		])
+		const resp = await page.request.get('/auth/callback?code=test-code&state=test-state', { maxRedirects: 0 })
+		expect(resp.status()).toBe(302)
+		expect(resp.headers().location).toBe('/')
 	})
 })
 

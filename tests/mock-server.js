@@ -61,6 +61,16 @@ const server = http.createServer(async (req, res) => {
 			return
 		}
 
+		// Stand-in for the OAuth provider's token endpoint. `AUTH_ENDPOINT` is set
+		// to `${MOCK_URL}/__auth`, so the sign-in callback exchanges its code here.
+		// Always hand back a refresh token so the callback can complete.
+		if (path === '/__auth/token' && req.method === 'POST') {
+			await readBody(req)
+			res.writeHead(200, { 'content-type': 'application/json' })
+			res.end(JSON.stringify({ access_token: 'test-access', refresh_token: 'test-token' }))
+			return
+		}
+
 		const body = await readBody(req)
 		requestLog.push({ path, method: req.method, body })
 
