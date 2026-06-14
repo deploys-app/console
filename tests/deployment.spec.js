@@ -342,6 +342,71 @@ test.describe('deployment detail — static', () => {
 		await expect(main.locator('.spec').filter({ hasText: 'Type' })).toContainText('Static')
 		await expect(main.getByRole('link', { name: 'https://website.test-project.app.in.th' })).toBeVisible()
 	})
+
+	test('status icon shows success without polling for pod readiness', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=website')
+
+		// A successful Static deployment is done immediately — the header icon is
+		// the success check, not a readiness spinner.
+		await expect(page.locator('.masthead__icon i.fa-check-circle')).toBeVisible()
+		await expect(page.locator('.masthead__icon i.fa-spinner')).toHaveCount(0)
+	})
+
+	test('hides the Logs and Events tabs', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=website')
+
+		const tabs = page.locator('.tabs')
+		await expect(tabs.getByRole('link', { name: 'Metrics' })).toBeVisible()
+		await expect(tabs.getByRole('link', { name: 'Details' })).toBeVisible()
+		await expect(tabs.getByRole('link', { name: 'Revisions' })).toBeVisible()
+		await expect(tabs.getByRole('link', { name: 'Logs' })).toHaveCount(0)
+		await expect(tabs.getByRole('link', { name: 'Events' })).toHaveCount(0)
+	})
+
+	test('metrics tab hides the CPU and Memory charts but keeps Egress', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation },
+			'deployment.metrics': { ok: true, result: {} }
+		})
+
+		await page.goto('/deployment/metrics?project=test-project&location=gke&name=website')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Egress (bytes)')).toBeVisible()
+		await expect(main.getByText('vCPU (second)')).toHaveCount(0)
+		await expect(main.getByText('Memory (bytes)')).toHaveCount(0)
+	})
+})
+
+test.describe('deployment detail — non-static keeps pod surface', () => {
+	test('WebService keeps the Logs and Events tabs and the CPU/Memory charts', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleDeployment },
+			'location.get': { ok: true, result: defaultLocation },
+			'deployment.metrics': { ok: true, result: {} }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
+		const tabs = page.locator('.tabs')
+		await expect(tabs.getByRole('link', { name: 'Logs' })).toBeVisible()
+		await expect(tabs.getByRole('link', { name: 'Events' })).toBeVisible()
+
+		await page.goto('/deployment/metrics?project=test-project&location=gke&name=web')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('vCPU (second)')).toBeVisible()
+		await expect(main.getByText('Memory (bytes)')).toBeVisible()
+	})
 })
 
 test.describe('deployment revision — static rollback', () => {

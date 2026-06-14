@@ -107,6 +107,11 @@
 	})
 
 	onMount(() => {
+		// Static deployments have no pods and no logUrl. The Logs tab is hidden
+		// for them, but guard direct navigation so we don't open EventSource('')
+		// (which resolves to this page and would reconnect-loop on it).
+		if (!deployment.logUrl) return
+
 		const source = new EventSource(deployment.logUrl)
 		source.addEventListener('open', () => {
 			connected = true

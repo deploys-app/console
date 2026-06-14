@@ -35,8 +35,9 @@
 
 	// Pod readiness only changes the icon for a running (non-paused) success
 	// deployment; every other state is resolved from props alone, so there's no
-	// reason to hit statusUrl for it.
-	const needsPodStatus = $derived(status === 'success' && action !== 'pause')
+	// reason to hit statusUrl for it. Static deployments have no pods (served by
+	// the static-gateway, no statusUrl), so they never poll either.
+	const needsPodStatus = $derived(status === 'success' && action !== 'pause' && type !== 'Static')
 
 	/**
 	 * @returns {string}
@@ -48,6 +49,11 @@
 
 		if (action === 'pause') {
 			return 'fa-solid fa-pause text-warning'
+		}
+
+		if (type === 'Static') {
+			// No pods to wait on — a successful release is simply done.
+			return 'fa-solid fa-check-circle text-positive/80'
 		}
 
 		if (!podStatus) {

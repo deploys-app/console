@@ -20,6 +20,11 @@
 	let now = $state(Date.now())
 
 	onMount(() => {
+		// Static deployments have no pods and no eventUrl. The Events tab is
+		// hidden for them, but guard direct navigation so we don't poll
+		// fetch('') against this page every few seconds.
+		if (!deployment.eventUrl) return
+
 		reload()
 		const poll = setInterval(reload, POLL_INTERVAL_MS)
 		const ticker = setInterval(() => { now = Date.now() }, 1000)
