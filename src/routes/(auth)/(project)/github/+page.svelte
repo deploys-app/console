@@ -322,7 +322,7 @@ ${withBlock()}
 `)
 
 	const createOnGitHubURL = $derived(gen.repository
-		? `https://github.com/${gen.repository}/new/main?filename=.github/workflows/deploy.yml&value=${encodeURIComponent(workflowYaml)}`
+		? `https://github.com/${gen.repository}/new/main?filename=.github/workflows/deploy.yaml&value=${encodeURIComponent(workflowYaml)}`
 		: '')
 
 	onMount(() => setupCopy('.copy-workflow'))
@@ -400,7 +400,7 @@ ${withBlock()}
 		<div>
 			<h6><strong>Workflow</strong></h6>
 			<p class="text-content/50 text-sm mt-1">
-				Add this file as <span class="font-mono">.github/workflows/deploy.yml</span>
+				Add this file as <span class="font-mono">.github/workflows/deploy.yaml</span>
 				to deploy on push and get pull request previews.
 			</p>
 		</div>
