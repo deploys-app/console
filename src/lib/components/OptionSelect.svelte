@@ -28,6 +28,13 @@
 	 *                                   isn't one of `options` (e.g. an HTTP method
 	 *                                   outside the known set). Off for closed sets
 	 *                                   like country codes.
+	 * @property {(value: string) => void} [onchange] notified with the committed
+	 *                                   value whenever an option (or custom value)
+	 *                                   is picked.
+	 * @property {boolean} [resetOnSelect] single mode — don't rest on the pick:
+	 *                                   clear the field and keep the menu open so the
+	 *                                   next value can be typed right away, turning
+	 *                                   the control into an "add to a list" picker.
 	 */
 
 	/** @type {Props} */
@@ -39,7 +46,9 @@
 		id,
 		placeholder = 'Search',
 		emptyText = 'No matches',
-		allowCustom = false
+		allowCustom = false,
+		onchange,
+		resetOnSelect = false
 	} = $props()
 
 	/** Resting/chip label for a stored value (falls back to the bare value). */
@@ -114,11 +123,18 @@
 			query = ''
 			activeIndex = 0
 			inputEl?.focus()
+		} else if (resetOnSelect) {
+			// Adder mode: surface the pick, then clear the field and keep the menu
+			// open so the next value can be typed without reopening.
+			query = ''
+			activeIndex = 0
+			inputEl?.focus()
 		} else {
 			value = o.value
 			query = labelOf(o.value)
 			close()
 		}
+		onchange?.(o.value)
 	}
 
 	// Commit the typed text as a brand-new value (creatable mode).
@@ -130,11 +146,16 @@
 			query = ''
 			activeIndex = 0
 			inputEl?.focus()
+		} else if (resetOnSelect) {
+			query = ''
+			activeIndex = 0
+			inputEl?.focus()
 		} else {
 			value = v
 			query = labelOf(v)
 			close()
 		}
+		onchange?.(v)
 	}
 
 	/** @param {number} i */
@@ -186,12 +207,13 @@
 			open ? moveActive(-1) : openMenu()
 			break
 		case 'Enter':
-			if (open && activeIndex >= 0 && matches[activeIndex]) {
+			// While the menu is open, Enter belongs to the combobox — never let it
+			// submit a surrounding form. Commit a highlighted option or the typed
+			// custom value if there is one; otherwise just swallow it.
+			if (open) {
 				e.preventDefault()
-				commit(matches[activeIndex])
-			} else if (open && customValue) {
-				e.preventDefault()
-				commitCustom()
+				if (activeIndex >= 0 && matches[activeIndex]) commit(matches[activeIndex])
+				else if (customValue) commitCustom()
 			}
 			break
 		case 'Escape':
