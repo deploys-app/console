@@ -300,6 +300,16 @@ declare namespace Api {
         'error' |
         'cancelled'
 
+    // Per-deployment Google-login gate. Optional/pointer on the wire: nil OR
+    // requireGoogleLogin=false means the deployment is PUBLIC. When gated with
+    // both lists empty, any signed-in Google account may access. The server is
+    // authoritative — it lowercases/dedupes and validates emails/domains.
+    export type DeploymentAccessConfig = {
+        requireGoogleLogin: boolean
+        allowedEmails: string[]
+        allowedDomains: string[]
+    }
+
     export type Deployment = {
         project: string
         location: string
@@ -330,6 +340,7 @@ declare namespace Api {
         annotations: Annotations
         resources: DeploymentResource
         sidecars: Sidecar[]
+        access?: DeploymentAccessConfig | null
         url: string
         internalUrl: string
         logUrl: string
