@@ -101,7 +101,16 @@
 	let selectedRepoName = $state('')
 	let selectedServiceAccount = $state('')
 	let productionBranch = $state('main')
+	// Which workflow runs deploy. 'pr' has no production branch, so the branch
+	// input is cleared + disabled for it.
+	let trigger = $state('all')
 	let linking = $state(false)
+
+	const triggerOptions = [
+		{ value: 'all', label: 'Branch + PR previews' },
+		{ value: 'branch', label: 'Branch only (no previews)' },
+		{ value: 'pr', label: 'PR previews only (no branch deploys)' }
+	]
 
 	const selectedRepo = $derived(
 		selectedRepoName !== '' ? repos.find((r) => r.repository === selectedRepoName) : undefined
@@ -123,7 +132,8 @@
 				repository: selectedRepo.repository,
 				installationId: selectedRepo.installationId,
 				serviceAccount: selectedServiceAccount,
-				productionBranch: productionBranch.trim()
+				productionBranch: trigger === 'pr' ? '' : productionBranch.trim(),
+				trigger
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -253,14 +263,33 @@
 				</button>
 			</div>
 		</div>
-		<div class="field sm:col-span-2">
+		<div class="field">
+			<label for="link-trigger">Deploy trigger</label>
+			<Select
+				id="link-trigger"
+				bind:value={trigger}
+				options={triggerOptions} />
+			<p class="text-content/50 text-sm mt-1">
+				{#if trigger === 'pr'}
+					Only pull requests deploy (each a preview). Pushes to any branch are rejected — no production deploys.
+				{:else if trigger === 'branch'}
+					Pushes to the production branch deploy; pull requests get no preview.
+				{:else}
+					Pushes to the production branch deploy, and every pull request gets a preview.
+				{/if}
+			</p>
+		</div>
+		<div class="field">
 			<label for="link-production-branch">Production branch</label>
 			<div class="input">
-				<input id="link-production-branch" class="font-mono" bind:value={productionBranch} placeholder="main">
+				<input id="link-production-branch" class="font-mono" bind:value={productionBranch} placeholder="main" disabled={trigger === 'pr'}>
 			</div>
 			<p class="text-content/50 text-sm mt-1">
-				Production deploys are only accepted from this branch; pull-request previews are always allowed.
-				Leave empty to allow any branch.
+				{#if trigger === 'pr'}
+					Not used — previews-only links never deploy a branch.
+				{:else}
+					Deploys are only accepted from this branch. Leave empty to allow any branch.
+				{/if}
 			</p>
 		</div>
 	</div>

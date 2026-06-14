@@ -1,5 +1,6 @@
 import { test, expect, setMocks, getRequestLog } from './helpers.js'
 
+// 'all' trigger (push to release + PR previews)
 const link = {
 	repositoryId: 812345678,
 	repository: 'acme/web',
@@ -7,11 +8,12 @@ const link = {
 	serviceAccount: 'ci',
 	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
 	productionBranch: 'release',
+	trigger: 'all',
 	createdAt: '2026-01-01T00:00:00Z',
 	createdBy: 'dev@deploys.app'
 }
 
-// linked repo without a production branch — any branch may deploy
+// 'all' trigger without a production branch — any branch may deploy
 const linkAnyBranch = {
 	repositoryId: 812345681,
 	repository: 'acme/mobile',
@@ -19,6 +21,33 @@ const linkAnyBranch = {
 	serviceAccount: 'ci',
 	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
 	productionBranch: '',
+	trigger: 'all',
+	createdAt: '2026-01-01T00:00:00Z',
+	createdBy: 'dev@deploys.app'
+}
+
+// 'pr' trigger — no branch ever deploys, only PR previews
+const linkPR = {
+	repositoryId: 812345682,
+	repository: 'acme/docs',
+	installationId: 77,
+	serviceAccount: 'ci',
+	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
+	productionBranch: '',
+	trigger: 'pr',
+	createdAt: '2026-01-01T00:00:00Z',
+	createdBy: 'dev@deploys.app'
+}
+
+// 'branch' trigger — push to main only, no PR previews
+const linkBranchOnly = {
+	repositoryId: 812345684,
+	repository: 'acme/svc',
+	installationId: 77,
+	serviceAccount: 'ci',
+	serviceAccountEmail: 'ci@test-project.serviceaccount.deploys.app',
+	productionBranch: 'main',
+	trigger: 'branch',
 	createdAt: '2026-01-01T00:00:00Z',
 	createdBy: 'dev@deploys.app'
 }
@@ -114,14 +143,31 @@ test.describe('github repositories page', () => {
 		expect(href).toBe('/github/link?project=test-project')
 	})
 
-	test('renders the production branch per card, "Any branch" when unset', async ({ page }) => {
-		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
+	test('renders each card\'s trigger and production branch', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch, linkPR, linkBranchOnly] } } })
 
 		await page.goto('/github?project=test-project')
 		const main = page.locator('.content-wrapper')
 
-		await expect(main.locator('.repo-card', { hasText: 'acme/web' })).toContainText('release')
-		await expect(main.locator('.repo-card', { hasText: 'acme/mobile' })).toContainText('Any branch')
+		// all + pinned branch
+		const webCard = main.locator('.repo-card', { hasText: 'acme/web' })
+		await expect(webCard).toContainText('Branch + PR previews')
+		await expect(webCard).toContainText('release')
+
+		// all + any branch
+		const mobileCard = main.locator('.repo-card', { hasText: 'acme/mobile' })
+		await expect(mobileCard).toContainText('Branch + PR previews')
+		await expect(mobileCard).toContainText('Any branch')
+
+		// pr → no production branch
+		const docsCard = main.locator('.repo-card', { hasText: 'acme/docs' })
+		await expect(docsCard).toContainText('PR previews only')
+		await expect(docsCard).not.toContainText('Any branch')
+
+		// branch only
+		const svcCard = main.locator('.repo-card', { hasText: 'acme/svc' })
+		await expect(svcCard).toContainText('Branch only')
+		await expect(svcCard).toContainText('main')
 	})
 
 	test('unlinks after confirmation', async ({ page }) => {
@@ -191,6 +237,41 @@ test.describe('github workflow page', () => {
 		await main.locator('#gen-repository').click()
 		await page.getByRole('option', { name: 'acme/mobile' }).click()
 		await expect(yaml).toContainText('branches: [main]')
+	})
+
+	test('a pr trigger drops the push trigger from the generated workflow', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [linkPR, link] } } })
+
+		await page.goto('/github/workflow?project=test-project&repo=acme/docs')
+		const main = page.locator('.content-wrapper')
+
+		// acme/docs has the pr trigger: the workflow triggers on pull_request alone.
+		const yaml = main.locator('.workflow-yaml')
+		await expect(main.locator('#gen-repository')).toContainText('acme/docs')
+		await expect(yaml).toContainText('pull_request:')
+		await expect(yaml).not.toContainText('push:')
+		await expect(yaml).not.toContainText('branches:')
+
+		// Switching to an all-trigger link brings the push trigger back.
+		await main.locator('#gen-repository').click()
+		await page.getByRole('option', { name: 'acme/web' }).click()
+		await expect(yaml).toContainText('branches: [release]')
+		await expect(yaml).toContainText('push:')
+		await expect(yaml).toContainText('pull_request:')
+	})
+
+	test('a branch trigger drops the pull_request trigger from the generated workflow', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [linkBranchOnly, link] } } })
+
+		await page.goto('/github/workflow?project=test-project&repo=acme/svc')
+		const main = page.locator('.content-wrapper')
+
+		// acme/svc is branch-only: push to main, no pull_request previews.
+		const yaml = main.locator('.workflow-yaml')
+		await expect(main.locator('#gen-repository')).toContainText('acme/svc')
+		await expect(yaml).toContainText('push:')
+		await expect(yaml).toContainText('branches: [main]')
+		await expect(yaml).not.toContainText('pull_request:')
 	})
 
 	test('Static build type emits a mode: static workflow with framework/outputDir and no dockerfile/port', async ({ page }) => {
@@ -308,6 +389,43 @@ test.describe('github link page', () => {
 		expect(linkReq.serviceAccount).toBe('ci')
 		expect(linkReq.repository).toBe('acme/api')
 		expect(linkReq.productionBranch).toBe('release')
+	})
+
+	test('selecting the PR trigger disables the branch input and links with trigger=pr and an empty branch', async ({ page }) => {
+		await mocks({ 'github.link': { ok: true, result: {} } })
+
+		await page.goto('/github/link?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Pick a repo (acme/web is already linked, so hidden) + service account.
+		const repoSelect = main.locator('#link-repository')
+		await repoSelect.click()
+		await repoSelect.fill('acme/api')
+		await page.getByRole('option', { name: 'acme/api' }).click()
+		await main.locator('#link-service-account').click()
+		await page.getByRole('option', { name: /ci — CI Deployer/ }).click()
+
+		// Default trigger is 'all', so the production branch input is enabled.
+		const branchInput = main.locator('#link-production-branch')
+		await expect(branchInput).toBeEnabled()
+
+		// Switch the trigger to PR previews only — the production branch input disables.
+		await main.locator('#link-trigger').click()
+		await page.getByRole('option', { name: /PR previews only/ }).click()
+		await expect(branchInput).toBeDisabled()
+
+		await main.getByRole('button', { name: 'Link', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.link')
+		}).toBe(true)
+
+		const log = await getRequestLog()
+		const linkReq = JSON.parse(log.find((r) => r.path === '/github.link')?.body ?? '{}')
+		expect(linkReq.trigger).toBe('pr')
+		// The pr trigger has no production branch — it is cleared on submit.
+		expect(linkReq.productionBranch).toBe('')
 	})
 
 	test('link page with ?installation_id=99 calls github.listRepos with installationId 99', async ({ page }) => {

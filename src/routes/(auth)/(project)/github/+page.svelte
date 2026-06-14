@@ -41,6 +41,13 @@
 	function workflowHref (repository) {
 		return `/github/workflow?project=${project}&repo=${encodeURIComponent(repository)}`
 	}
+
+	/** @param {Api.GithubLink['trigger']} trigger */
+	function triggerLabel (trigger) {
+		if (trigger === 'pr') return 'PR previews only'
+		if (trigger === 'branch') return 'Branch only'
+		return 'Branch + PR previews'
+	}
 </script>
 
 <div class="page-head">
@@ -79,9 +86,17 @@
 						<dd class="font-mono" title={it.serviceAccountEmail}>{it.serviceAccountEmail}</dd>
 					</div>
 					<div>
+						<dt>Deploy trigger</dt>
+						<dd>
+							<span class="branch-pill font-mono"><i class="fa-solid fa-bolt"></i>{triggerLabel(it.trigger)}</span>
+						</dd>
+					</div>
+					<div>
 						<dt>Production branch</dt>
 						<dd>
-							{#if it.productionBranch}
+							{#if it.trigger === 'pr'}
+								<span class="text-content/45" title="Previews-only links never deploy a branch">—</span>
+							{:else if it.productionBranch}
 								<span class="branch-pill font-mono"><i class="fa-solid fa-code-branch"></i>{it.productionBranch}</span>
 							{:else}
 								<span class="text-content/45" title="Any branch can deploy">Any branch</span>

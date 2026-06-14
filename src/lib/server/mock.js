@@ -696,6 +696,8 @@ const githubLinks = [
 		serviceAccount: 'sa_mock_ci',
 		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
 		productionBranch: 'main',
+		// 'all' (default): push to main + PR previews
+		trigger: 'all',
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	},
@@ -705,8 +707,21 @@ const githubLinks = [
 		installationId: 77,
 		serviceAccount: 'sa_mock_ci',
 		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
-		// no productionBranch — any branch can deploy; exercises the "—" / fallback path
+		productionBranch: 'main',
+		// 'branch': push to main only, no PR previews
+		trigger: 'branch',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	},
+	{
+		repositoryId: 812345683,
+		repository: 'fabrikam/docs',
+		installationId: 77,
+		serviceAccount: 'sa_mock_ci',
+		serviceAccountEmail: 'ci@acme.serviceaccount.deploys.app',
 		productionBranch: '',
+		// 'pr': previews only — exercises the "PR previews only" card + push-less workflow
+		trigger: 'pr',
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	}
@@ -1275,6 +1290,7 @@ const handlers = {
 			serviceAccount: args?.serviceAccount,
 			serviceAccountEmail: sa?.email ?? `${args?.serviceAccount}@acme.serviceaccount.deploys.app`,
 			productionBranch: args?.productionBranch ?? '',
+			trigger: args?.trigger ?? 'all',
 			createdAt: CREATED_AT,
 			createdBy: USER_EMAIL
 		})
