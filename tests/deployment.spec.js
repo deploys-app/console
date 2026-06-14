@@ -387,6 +387,27 @@ test.describe('deployment detail — static', () => {
 		await expect(main.getByText('vCPU (second)')).toHaveCount(0)
 		await expect(main.getByText('Memory (bytes)')).toHaveCount(0)
 	})
+
+	test('hides the container-only detail sections', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=website')
+
+		const main = page.locator('.content-wrapper')
+
+		// Whole shells that only make sense for a running container are gone.
+		await expect(main.getByRole('heading', { name: 'Env Groups' })).toHaveCount(0)
+		await expect(main.getByRole('heading', { name: 'Env Vars' })).toHaveCount(0)
+		await expect(main.getByRole('heading', { name: 'Mount Data' })).toHaveCount(0)
+
+		// Individual container-only spec rows are gone too.
+		await expect(main.locator('.spec').filter({ hasText: 'Pull Secret' })).toHaveCount(0)
+		await expect(main.locator('.spec').filter({ hasText: 'Workload Identity' })).toHaveCount(0)
+		await expect(main.locator('.spec').filter({ hasText: 'Allocated Price' })).toHaveCount(0)
+	})
 })
 
 test.describe('deployment detail — non-static keeps pod surface', () => {
@@ -406,6 +427,23 @@ test.describe('deployment detail — non-static keeps pod surface', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('vCPU (second)')).toBeVisible()
 		await expect(main.getByText('Memory (bytes)')).toBeVisible()
+	})
+
+	test('WebService keeps the container-only detail sections', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Env Groups' })).toBeVisible()
+		await expect(main.getByRole('heading', { name: 'Env Vars' })).toBeVisible()
+		await expect(main.getByRole('heading', { name: 'Mount Data' })).toBeVisible()
+		await expect(main.locator('.spec').filter({ hasText: 'Pull Secret' })).toBeVisible()
+		await expect(main.locator('.spec').filter({ hasText: 'Workload Identity' })).toBeVisible()
+		await expect(main.locator('.spec').filter({ hasText: 'Allocated Price' })).toBeVisible()
 	})
 })
 
