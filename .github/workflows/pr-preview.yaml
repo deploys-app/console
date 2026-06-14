@@ -1,0 +1,25 @@
+name: PR Preview
+on:
+  pull_request:
+
+permissions:
+  id-token: write   # required — this is the credential
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: deploys-app/build-deploy-action@v1
+      with:
+        project: deploys-app
+        location: gke.cluster-rcf2
+        name: console
+        port: 8080
+        env: |
+          API_ENDPOINT=https://api.deploys.app
+          OAUTH2_CLIENT_ID=deploys-console-dev
+          OAUTH2_CLIENT_SECRET=${{ secrets.OAUTH2_CLIENT_SECRET_DEV }}
+          PUBLIC_API_ENDPOINT=https://api.deploys.app
+        pullSecret: default
