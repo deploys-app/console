@@ -287,13 +287,16 @@
 		const wd = gen.workingDirectory.trim()
 		if (wd && wd !== '.') out.push(`        workingDirectory: ${wd}`)
 
-		const envLines = gen.env.split('\n').map((l) => l.trim()).filter(Boolean)
-		if (envLines.length) {
-			out.push('        env: |')
-			for (const l of envLines) out.push(`          ${l}`)
-		}
+		// env / envGroups are container-only — static has no pod.
+		if (gen.buildType === 'dockerfile') {
+			const envLines = gen.env.split('\n').map((l) => l.trim()).filter(Boolean)
+			if (envLines.length) {
+				out.push('        env: |')
+				for (const l of envLines) out.push(`          ${l}`)
+			}
 
-		if (gen.envGroups.length) out.push(`        envGroups: ${gen.envGroups.join(',')}`)
+			if (gen.envGroups.length) out.push(`        envGroups: ${gen.envGroups.join(',')}`)
+		}
 
 		// Pull secret only applies to container deploys — static has no pod.
 		if (gen.buildType === 'dockerfile' && gen.pullSecret) {
@@ -469,6 +472,9 @@ ${withBlock()}
 			</div>
 		</div>
 
+		<!-- env, env groups, and pull secret are container-only; static has no
+		     pod, so the whole block is hidden and omitted from the workflow. -->
+		{#if gen.buildType === 'dockerfile'}
 		<div class="grid gap-4 lg:grid-cols-2">
 			<div class="field">
 				<label for="gen-env">Environment variables</label>
@@ -504,44 +510,43 @@ ${withBlock()}
 				<p class="text-content/50 text-sm mt-1">Each group must already exist in this project.</p>
 			</div>
 
-			{#if gen.buildType === 'dockerfile'}
-				<div class="field">
-					<label for="gen-pull-secret">Pull secret</label>
-					<div class="flex items-center gap-2">
-						<div class="flex-1">
-							<Select id="gen-pull-secret" bind:value={gen.pullSecret} options={pullSecretOptions} />
-						</div>
-						{#if canProvisionPullSecret}
-							<button
-								class="button is-variant-secondary"
-								class:is-loading={creatingPullSecret}
-								disabled={creatingPullSecret || !gen.location}
-								onclick={createPullSecret}
-								title="Create a dedicated pull-only service account and pull secret in this location"
-								type="button">
+			<div class="field">
+				<label for="gen-pull-secret">Pull secret</label>
+				<div class="flex items-center gap-2">
+					<div class="flex-1">
+						<Select id="gen-pull-secret" bind:value={gen.pullSecret} options={pullSecretOptions} />
+					</div>
+					{#if canProvisionPullSecret}
+						<button
+							class="button is-variant-secondary"
+							class:is-loading={creatingPullSecret}
+							disabled={creatingPullSecret || !gen.location}
+							onclick={createPullSecret}
+							title="Create a dedicated pull-only service account and pull secret in this location"
+							type="button">
+							<i class="fa-solid fa-plus mr-2"></i>
+							New
+						</button>
+					{:else}
+						<span class="inline-flex" title={denyTooltip('pullsecret.create')}>
+							<button class="button is-variant-secondary" type="button" disabled aria-disabled="true">
 								<i class="fa-solid fa-plus mr-2"></i>
 								New
 							</button>
-						{:else}
-							<span class="inline-flex" title={denyTooltip('pullsecret.create')}>
-								<button class="button is-variant-secondary" type="button" disabled aria-disabled="true">
-									<i class="fa-solid fa-plus mr-2"></i>
-									New
-								</button>
-							</span>
-						{/if}
-					</div>
-					{#if pullSecretError}
-						<p class="text-negative text-sm mt-1">{pullSecretError}</p>
-					{:else}
-						<p class="text-content/50 text-sm mt-1">
-							For a private image registry. <strong>New</strong> provisions a dedicated
-							pull-only service account and secret for <span class="font-mono">registry.deploys.app</span>.
-						</p>
+						</span>
 					{/if}
 				</div>
-			{/if}
+				{#if pullSecretError}
+					<p class="text-negative text-sm mt-1">{pullSecretError}</p>
+				{:else}
+					<p class="text-content/50 text-sm mt-1">
+						For a private image registry. <strong>New</strong> provisions a dedicated
+						pull-only service account and secret for <span class="font-mono">registry.deploys.app</span>.
+					</p>
+				{/if}
+			</div>
 		</div>
+		{/if}
 
 		<pre class="workflow-yaml font-mono text-sm">{workflowYaml}</pre>
 
