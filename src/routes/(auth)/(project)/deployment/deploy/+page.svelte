@@ -78,6 +78,17 @@
 		// unit in seconds; '0' means no auto-delete
 		ttlUnit: '0'
 	})
+
+	// Access (Google-login gate) is kept OUTSIDE `form` on purpose: save() spreads
+	// `...form` into the deploy payload, so flat access keys living in `form` would
+	// leak as top-level request fields. We assemble a single nested `access` object
+	// after the spread instead. nil/false => public.
+	let requireGoogleLogin = $state(false)
+	/** @type {string[]} */
+	let allowedEmails = $state([])
+	/** @type {string[]} */
+	let allowedDomains = $state([])
+
 	if (deployment) {
 		form.location = deployment.location
 		form.name = deployment.name
@@ -118,6 +129,9 @@
 				cloudSqlProxy: { instance: '', port: null, credentials: '' }
 			}
 		})
+		requireGoogleLogin = deployment.access?.requireGoogleLogin ?? false
+		allowedEmails = [...(deployment.access?.allowedEmails || [])]
+		allowedDomains = [...(deployment.access?.allowedDomains || [])]
 		if (deployment.ttl > 0) {
 			if (deployment.ttl % 86400 === 0) {
 				form.ttlUnit = '86400'
@@ -328,7 +342,16 @@
 				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
 				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
 				sidecars: convertSidecars(),
-				ttl: ttlSeconds
+				ttl: ttlSeconds,
+				// Set after the spread so it can never be clobbered by `...form`.
+				// Toggle OFF => null (public); the server lowercases/dedupes/validates.
+				access: requireGoogleLogin
+					? {
+						requireGoogleLogin: true,
+						allowedEmails: allowedEmails.map((s) => s.trim()).filter(Boolean),
+						allowedDomains: allowedDomains.map((s) => s.trim()).filter(Boolean)
+					}
+					: null
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
@@ -503,6 +526,68 @@
 					<label for="input-internal">Internal Service</label>
 				</div>
 			</div>
+		{/if}
+
+		{#if ['WebService', 'Static'].includes(form.type)}
+			<div class="form-section">
+				<h6 class="form-section-title">Access</h6>
+				<span class="form-section-hint">Restrict who can reach this deployment over the web.</span>
+			</div>
+			<div class="field">
+				<div class="checkbox">
+					<input id="input-require_google_login" type="checkbox" bind:checked={requireGoogleLogin}>
+					<label for="input-require_google_login">Require Google login</label>
+				</div>
+				<small class="helper">Programmatic/API clients cannot bypass this.</small>
+				{#if requireGoogleLogin && allowedEmails.length === 0 && allowedDomains.length === 0}
+					<small class="helper">Any signed-in Google account can access — add emails or domains to restrict.</small>
+				{/if}
+				{#if requireGoogleLogin && form.type === 'Static'}
+					<small class="helper">Enabling login forfeits edge caching for this site.</small>
+				{/if}
+			</div>
+
+			{#if requireGoogleLogin}
+				<div class="field">
+					<label for="div-allowed_emails">Allowed Emails</label>
+					<div id="div-allowed_emails" class="pb-2">
+						{#each allowedEmails as _, i (i)}
+							<div class="input -has-icon-right mb-2">
+								<input bind:value={allowedEmails[i]} placeholder="user@example.com">
+								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed email"
+									onclick={() => { allowedEmails = allowedEmails.filter((_, k) => k !== i) }}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</div>
+						{/each}
+					</div>
+					<button class="button is-variant-secondary m-auto" type="button"
+							onclick={() => { allowedEmails = [...allowedEmails, ''] }}>
+						<i class="fa-solid fa-plus mr-3"></i>
+						<span>Add Email</span>
+					</button>
+				</div>
+
+				<div class="field">
+					<label for="div-allowed_domains">Allowed Domains</label>
+					<div id="div-allowed_domains" class="pb-2">
+						{#each allowedDomains as _, i (i)}
+							<div class="input -has-icon-right mb-2">
+								<input bind:value={allowedDomains[i]} placeholder="example.com">
+								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed domain"
+									onclick={() => { allowedDomains = allowedDomains.filter((_, k) => k !== i) }}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</div>
+						{/each}
+					</div>
+					<button class="button is-variant-secondary m-auto" type="button"
+							onclick={() => { allowedDomains = [...allowedDomains, ''] }}>
+						<i class="fa-solid fa-plus mr-3"></i>
+						<span>Add Domain</span>
+					</button>
+				</div>
+			{/if}
 		{/if}
 
 		<div class="field">
