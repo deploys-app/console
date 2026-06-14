@@ -76,7 +76,7 @@
 				{ prefix: 'Allocated', lines: resp.result.memory ?? [] },
 				{ prefix: 'Limit', lines: resp.result.memoryLimit ?? [], dashStyle: 'LongDash', color: 'red' }
 			]
-			if (deployment.type === 'WebService') {
+			if (deployment.type === 'WebService' || deployment.type === 'Static') {
 				request = [{ prefix: 'Requests', lines: resp.result.requests ?? [] }]
 			}
 			egress = [{ prefix: 'Egress', lines: resp.result.egress ?? [] }]
@@ -315,7 +315,9 @@
 		<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
 		<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
 	{/if}
-	{#if deployment.type === 'WebService'}
+	<!-- Static deployments have no pods, but the static-gateway reports their
+	     per-site request rate, so Requests applies to them too. -->
+	{#if deployment.type === 'WebService' || deployment.type === 'Static'}
 		<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
 	{/if}
 	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />

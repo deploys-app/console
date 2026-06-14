@@ -373,7 +373,7 @@ test.describe('deployment detail — static', () => {
 		await expect(tabs.getByRole('link', { name: 'Events' })).toHaveCount(0)
 	})
 
-	test('metrics tab hides the CPU and Memory charts but keeps Egress', async ({ page }) => {
+	test('metrics tab hides CPU and Memory but keeps Requests and Egress', async ({ page }) => {
 		await setMocks({
 			'deployment.get': { ok: true, result: sampleStaticDeployment },
 			'location.get': { ok: true, result: defaultLocation },
@@ -383,6 +383,9 @@ test.describe('deployment detail — static', () => {
 		await page.goto('/deployment/metrics?project=test-project&location=gke&name=website')
 
 		const main = page.locator('.content-wrapper')
+		// The static-gateway reports per-site request rate, so Requests applies;
+		// CPU/Memory don't (no pods). Egress stays.
+		await expect(main.getByText('Request (rps)')).toBeVisible()
 		await expect(main.getByText('Egress (bytes)')).toBeVisible()
 		await expect(main.getByText('vCPU (second)')).toHaveCount(0)
 		await expect(main.getByText('Memory (bytes)')).toHaveCount(0)
