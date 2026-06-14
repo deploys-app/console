@@ -57,16 +57,98 @@ function mocks (overrides = {}) {
 	})
 }
 
-test.describe('github', () => {
-	test('lists linked repositories and renders the workflow generator', async ({ page }) => {
+test.describe('github repositories page', () => {
+	test('lists linked repositories as cards with a workflow link', async ({ page }) => {
 		await mocks()
 
 		await page.goto('/github?project=test-project')
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('heading', { name: 'GitHub' })).toBeVisible()
-		await expect(main.getByRole('link', { name: /acme\/web/ })).toBeVisible()
-		await expect(main.getByText(link.serviceAccountEmail)).toBeVisible()
+
+		const card = main.locator('.repo-card', { hasText: 'acme/web' })
+		await expect(card.getByRole('link', { name: /acme\/web/ })).toBeVisible()
+		await expect(card.getByText(link.serviceAccountEmail)).toBeVisible()
+
+		// Each card links to the standalone workflow page, preselecting its repo.
+		const wfHref = await card.getByRole('link', { name: /Set up workflow/ }).getAttribute('href')
+		expect(wfHref).toBe('/github/workflow?project=test-project&repo=acme%2Fweb')
+
+		// The workflow generator does NOT live on this page anymore.
+		await expect(main.locator('.workflow-yaml')).toHaveCount(0)
+	})
+
+	test('Workflow tab navigates to the standalone generator', async ({ page }) => {
+		await mocks()
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// Scope to the sub-nav so we don't also match the per-card "Set up workflow" links.
+		const wfTab = main.locator('.github-nav').getByRole('link', { name: 'Workflow' })
+		await expect(wfTab).toHaveAttribute('href', '/github/workflow?project=test-project')
+		await wfTab.click()
+
+		await expect(page).toHaveURL(/\/github\/workflow\?project=test-project/)
+		await expect(main.locator('.workflow-yaml')).toBeVisible()
+	})
+
+	test('empty state shows a link CTA and no cards', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [] } } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('No repositories linked yet')).toBeVisible()
+		await expect(main.locator('.repo-card')).toHaveCount(0)
+	})
+
+	test('shows a "Link repository" button pointing at /github/link', async ({ page }) => {
+		await mocks()
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		const linkBtn = main.getByRole('link', { name: /Link repository/ })
+		await expect(linkBtn.first()).toBeVisible()
+		const href = await linkBtn.first().getAttribute('href')
+		expect(href).toBe('/github/link?project=test-project')
+	})
+
+	test('renders the production branch per card, "Any branch" when unset', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await expect(main.locator('.repo-card', { hasText: 'acme/web' })).toContainText('release')
+		await expect(main.locator('.repo-card', { hasText: 'acme/mobile' })).toContainText('Any branch')
+	})
+
+	test('unlinks after confirmation', async ({ page }) => {
+		await mocks({ 'github.unlink': { ok: true, result: {} } })
+
+		await page.goto('/github?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		await main.getByRole('button', { name: /Unlink/ }).click()
+		await page.getByRole('button', { name: 'Unlink', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.unlink')
+		}).toBe(true)
+
+		const req = JSON.parse((await getRequestLog()).find((r) => r.path === '/github.unlink')?.body ?? '{}')
+		expect(req.repositoryId).toBe(link.repositoryId)
+	})
+})
+
+test.describe('github workflow page', () => {
+	test('renders the generator carrying project/location and reacts to edits', async ({ page }) => {
+		await mocks()
+
+		await page.goto('/github/workflow?project=test-project')
+		const main = page.locator('.content-wrapper')
 
 		// The generated workflow carries the project and the action pin.
 		const yaml = main.locator('.workflow-yaml')
@@ -84,42 +166,21 @@ test.describe('github', () => {
 		expect(decodeURIComponent(href ?? '')).toContain('name: api')
 	})
 
-	test('empty state hides the workflow generator', async ({ page }) => {
-		await mocks({ 'github.list': { ok: true, result: { items: [] } } })
-
-		await page.goto('/github?project=test-project')
-		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('Nothing here yet')).toBeVisible()
-		await expect(main.locator('.workflow-yaml')).toHaveCount(0)
-	})
-
-	test('shows a "Link repository" button pointing at /github/link', async ({ page }) => {
-		await mocks()
-
-		await page.goto('/github?project=test-project')
-		const main = page.locator('.content-wrapper')
-
-		const linkBtn = main.getByRole('link', { name: /Link repository/ })
-		await expect(linkBtn).toBeVisible()
-		const href = await linkBtn.getAttribute('href')
-		expect(href).toBe('/github/link?project=test-project')
-	})
-
-	test('renders the production branch per row, with "—" when unset', async ({ page }) => {
+	test('preselects the repository named in ?repo=', async ({ page }) => {
 		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
 
-		await page.goto('/github?project=test-project')
+		await page.goto('/github/workflow?project=test-project&repo=acme/mobile')
 		const main = page.locator('.content-wrapper')
 
-		await expect(main.getByRole('columnheader', { name: 'Branch' })).toBeVisible()
-		await expect(main.locator('tr', { hasText: 'acme/web' })).toContainText('release')
-		await expect(main.locator('tr', { hasText: 'acme/mobile' })).toContainText('—')
+		// acme/mobile is selected, and it has no production branch → falls back to main.
+		await expect(main.locator('#gen-repository')).toContainText('acme/mobile')
+		await expect(main.locator('.workflow-yaml')).toContainText('branches: [main]')
 	})
 
-	test('workflow generator uses the link production branch, falling back to main', async ({ page }) => {
+	test('uses the link production branch, falling back to main', async ({ page }) => {
 		await mocks({ 'github.list': { ok: true, result: { items: [link, linkAnyBranch] } } })
 
-		await page.goto('/github?project=test-project')
+		await page.goto('/github/workflow?project=test-project')
 		const main = page.locator('.content-wrapper')
 
 		// Default selection is acme/web, which restricts production to "release".
@@ -135,7 +196,7 @@ test.describe('github', () => {
 	test('Static build type emits a mode: static workflow with framework/outputDir and no dockerfile/port', async ({ page }) => {
 		await mocks()
 
-		await page.goto('/github?project=test-project')
+		await page.goto('/github/workflow?project=test-project')
 		const main = page.locator('.content-wrapper')
 		const yaml = main.locator('.workflow-yaml')
 
@@ -143,9 +204,8 @@ test.describe('github', () => {
 		await expect(yaml).toContainText('port:')
 		await expect(yaml).not.toContainText('mode: static')
 
-		// Switch the build type to Static.
-		await main.locator('#gen-build-type').click()
-		await page.getByRole('option', { name: 'Static' }).click()
+		// Switch the build type to Static via the segmented control.
+		await main.getByRole('button', { name: 'Static' }).click()
 
 		// The static workflow carries mode: static + framework/outputDir/spa/notFound,
 		// and the production branch filter is preserved.
@@ -181,22 +241,14 @@ test.describe('github', () => {
 		expect(decodeURIComponent(href ?? '')).toContain('framework: hugo')
 	})
 
-	test('unlinks after confirmation', async ({ page }) => {
-		await mocks({ 'github.unlink': { ok: true, result: {} } })
+	test('with no linked repositories prompts to link one first', async ({ page }) => {
+		await mocks({ 'github.list': { ok: true, result: { items: [] } } })
 
-		await page.goto('/github?project=test-project')
+		await page.goto('/github/workflow?project=test-project')
 		const main = page.locator('.content-wrapper')
 
-		await main.getByRole('button', { name: 'Unlink repository' }).click()
-		await page.getByRole('button', { name: 'Unlink', exact: true }).click()
-
-		await expect.poll(async () => {
-			const log = await getRequestLog()
-			return log.some((r) => r.path === '/github.unlink')
-		}).toBe(true)
-
-		const req = JSON.parse((await getRequestLog()).find((r) => r.path === '/github.unlink')?.body ?? '{}')
-		expect(req.repositoryId).toBe(link.repositoryId)
+		await expect(main.getByText('Link a repository first')).toBeVisible()
+		await expect(main.locator('.workflow-yaml')).toHaveCount(0)
 	})
 })
 
