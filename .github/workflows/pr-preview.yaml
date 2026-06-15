@@ -1,4 +1,4 @@
-name: PR Preview
+name: Deploy
 on:
   pull_request:
 
@@ -17,9 +17,7 @@ jobs:
         location: gke.cluster-rcf2
         name: console
         port: 8080
+        protocol: h2c
         env: |
-          API_ENDPOINT=https://api.deploys.app
-          OAUTH2_CLIENT_ID=deploys-console-dev
-          OAUTH2_CLIENT_SECRET=${{ secrets.OAUTH2_CLIENT_SECRET_DEV }}
-          PUBLIC_API_ENDPOINT=https://api.deploys.app
+          OAUTH2_CLIENT_ID=console-pr
         pullSecret: default
