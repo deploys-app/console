@@ -320,6 +320,11 @@ test.describe('github workflow page', () => {
 		const href = await main.getByRole('link', { name: 'Create on GitHub' }).getAttribute('href')
 		expect(href).toContain('https://github.com/acme/web/new/main?filename=.github/workflows/deploy.yaml&value=')
 		expect(decodeURIComponent(href ?? '')).toContain('name: api')
+
+		// Edit-on-GitHub opens the existing file (no value pre-fill — pairs with Copy)
+		// so users can update a workflow that already exists in the repo.
+		const editHref = await main.getByRole('link', { name: 'Edit on GitHub' }).getAttribute('href')
+		expect(editHref).toBe('https://github.com/acme/web/edit/main/.github/workflows/deploy.yaml')
 	})
 
 	test('preselects the repository named in ?repo=', async ({ page }) => {
