@@ -25,15 +25,22 @@ export async function GET ({ cookies, url }) {
 	})
 
 	// exchange token
+	const body = new URLSearchParams({
+		grant_type: 'authorization_code',
+		code,
+		client_id: env.OAUTH2_CLIENT_ID,
+		code_verifier: codeVerifier
+	})
+	// Confidential clients (e.g. production) authenticate with a secret; public
+	// clients — local/contributor setups with no secret — rely on PKCE alone, so
+	// only send client_secret when one is configured.
+	if (env.OAUTH2_CLIENT_SECRET) {
+		body.set('client_secret', env.OAUTH2_CLIENT_SECRET)
+	}
+
 	const resp = await fetch(`${authEndpoint}/token`, {
 		method: 'POST',
-		body: new URLSearchParams({
-			grant_type: 'authorization_code',
-			code,
-			client_id: env.OAUTH2_CLIENT_ID,
-			client_secret: env.OAUTH2_CLIENT_SECRET,
-			code_verifier: codeVerifier
-		}),
+		body,
 		headers: {
 			'content-type': 'application/x-www-form-urlencoded'
 		}
