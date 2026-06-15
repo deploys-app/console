@@ -52,7 +52,7 @@ Never commit screenshots into the source tree on `main` just to embed them.
 
 ## Architecture
 
-This is a **SvelteKit 2** console for deploys.app, a deployment platform. It uses **Svelte 5** runes (`$state`, `$derived`, `$props`) and is deployed on Cloudflare (default) or Node.js via env-controlled adapter selection.
+This is a **SvelteKit 2** console for deploys.app, a deployment platform. It uses **Svelte 5** runes (`$state`, `$derived`, `$props`) and is deployed on Node.js via `@sveltejs/adapter-node` (served over h2c by the custom `server.js` entrypoint — see the Dockerfile).
 
 ### Route layout
 

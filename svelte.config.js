@@ -1,4 +1,3 @@
-import adapterCloudflare from '@sveltejs/adapter-cloudflare'
 import adapterNode from '@sveltejs/adapter-node'
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 
@@ -6,7 +5,7 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 const config = {
 	preprocess: [vitePreprocess()],
 	kit: {
-		adapter: process.env.ADAPTER === 'cloudflare' ? adapterCloudflare() : adapterNode(),
+		adapter: adapterNode(),
 		alias: {
 			$style: './src/style',
 			$types: './src/types'
