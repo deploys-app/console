@@ -339,8 +339,16 @@ jobs:
 ${withBlock()}
 `)
 
+	// Create opens a brand-new file pre-filled with the YAML; Edit opens the file
+	// already in the repo. Both target the default branch (where the workflow file
+	// lives), independent of the deploy trigger's branch. GitHub's /new flow errors
+	// if the path already exists, and /edit can't pre-fill content — so editing
+	// pairs with the Copy button (copy here, then paste over the existing file there).
 	const createOnGitHubURL = $derived(gen.repository
 		? `https://github.com/${gen.repository}/new/main?filename=.github/workflows/deploy.yaml&value=${encodeURIComponent(workflowYaml)}`
+		: '')
+	const editOnGitHubURL = $derived(gen.repository
+		? `https://github.com/${gen.repository}/edit/main/.github/workflows/deploy.yaml`
 		: '')
 
 	onMount(() => setupCopy('.copy-workflow'))
@@ -645,11 +653,15 @@ ${withBlock()}
 			</div>
 
 			<div class="wf-actions">
-				<a class="button is-icon-left wf-create" href={createOnGitHubURL} target="_blank" rel="noreferrer">
+				<a class="button is-icon-left wf-action" href={createOnGitHubURL} target="_blank" rel="noreferrer">
 					<i class="fa-brands fa-github"></i>
 					Create on GitHub
 				</a>
-				<span class="helper">Opens GitHub's file editor pre-filled with this workflow — review and commit it there.</span>
+				<a class="button is-variant-secondary is-icon-left wf-action" href={editOnGitHubURL} target="_blank" rel="noreferrer">
+					<i class="fa-brands fa-github"></i>
+					Edit on GitHub
+				</a>
+				<span class="helper">First time? <strong>Create on GitHub</strong> opens a new file pre-filled with this workflow. Updating an existing workflow? <strong>Copy</strong> it above, then <strong>Edit on GitHub</strong> opens the current file to paste over.</span>
 			</div>
 		</aside>
 	</div>
@@ -853,7 +865,7 @@ ${withBlock()}
 		font-size: 0.8125rem;
 	}
 
-	.wf-create { width: 100%; }
+	.wf-action { width: 100%; }
 
 	.env-group-chip {
 		display: inline-flex;
