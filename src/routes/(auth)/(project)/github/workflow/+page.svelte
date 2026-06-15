@@ -31,38 +31,74 @@
 			.replace(/^-+|-+$/g, '')
 	}
 
+	// Default generator state for a repository with no saved config.
+	/** @param {string | undefined} repository */
+	function defaultGen (repository) {
+		return {
+			repository,
+			location: data.locations[0]?.id ?? '',
+			name: repoToName(repository) || 'web',
+			buildType: 'dockerfile',
+			port: 8080,
+			framework: 'auto',
+			buildCommand: '',
+			outputDir: 'public',
+			spa: false,
+			notFound: '404.html',
+			workingDirectory: '',
+			env: '',
+			/** @type {string[]} */
+			envGroups: [],
+			pullSecret: '',
+			protocol: 'http',
+			requireGoogleLogin: false,
+			allowedEmails: '',
+			allowedDomains: ''
+		}
+	}
+
+	/** @param {string | undefined} repository */
+	function savedConfigFor (repository) {
+		return data.links.find((l) => l.repository === repository)?.workflowConfig
+	}
+
+	// Merge a link's saved workflow config (github.setWorkflowConfig) over the
+	// defaults so the generator pre-fills the user's last-saved inputs. Missing
+	// or empty fields fall back to defaults.
+	/**
+	 * @param {string | undefined} repository
+	 * @param {Api.GitHubWorkflowConfig | undefined} cfg
+	 */
+	function genFromConfig (repository, cfg) {
+		const d = defaultGen(repository)
+		if (!cfg) return d
+		return {
+			repository,
+			location: cfg.location || d.location,
+			name: cfg.name || d.name,
+			buildType: cfg.buildType || d.buildType,
+			port: cfg.port || d.port,
+			framework: cfg.framework || d.framework,
+			buildCommand: cfg.buildCommand ?? d.buildCommand,
+			outputDir: cfg.outputDir || d.outputDir,
+			spa: cfg.spa ?? d.spa,
+			notFound: cfg.notFound || d.notFound,
+			workingDirectory: cfg.workingDirectory ?? d.workingDirectory,
+			env: cfg.env ?? d.env,
+			envGroups: cfg.envGroups ? [...cfg.envGroups] : d.envGroups,
+			pullSecret: cfg.pullSecret ?? d.pullSecret,
+			protocol: cfg.protocol || d.protocol,
+			requireGoogleLogin: cfg.requireGoogleLogin ?? d.requireGoogleLogin,
+			allowedEmails: cfg.allowedEmails ?? d.allowedEmails,
+			allowedDomains: cfg.allowedDomains ?? d.allowedDomains
+		}
+	}
+
 	// workflow generator — seed the repository from ?repo= (validated in the
 	// loader against the linked set) so jumping in from a repository card lands
-	// on the right repo.
-	const gen = $state(untrack(() => ({
-		repository: data.initialRepo,
-		location: data.locations[0]?.id ?? '',
-		name: repoToName(data.initialRepo) || 'web',
-		// 'dockerfile' (default) emits today's container workflow; 'static' emits
-		// a bucket-native static-web workflow (mode: static).
-		buildType: 'dockerfile',
-		port: 8080,
-		// static fields — only used when buildType === 'static'
-		framework: 'auto',
-		buildCommand: '',
-		outputDir: 'public',
-		spa: false,
-		notFound: '404.html',
-		// shared config
-		workingDirectory: '',
-		env: '',
-		/** @type {string[]} */
-		envGroups: [],
-		// container-only
-		pullSecret: '',
-		// WebService protocol (dockerfile only): http (default) | https | h2c
-		protocol: 'http',
-		// access (deployment access) — applies to both container and static.
-		// Allow-lists are free text (one entry per line or comma-separated).
-		requireGoogleLogin: false,
-		allowedEmails: '',
-		allowedDomains: ''
-	})))
+	// on the right repo, and pre-fill the build settings from that repo's saved
+	// workflow config so users edit their current workflow instead of defaults.
+	const gen = $state(untrack(() => genFromConfig(data.initialRepo, savedConfigFor(data.initialRepo))))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
 	const genLink = $derived(links.find((l) => l.repository === gen.repository))
 	const genBranch = $derived(genLink?.productionBranch || 'main')
@@ -71,10 +107,25 @@
 
 	// Keep the deployment name defaulting to the selected repository's name until
 	// the user edits it — switching repos then re-fills with the new repo name.
-	let nameTouched = $state(false)
+	// A saved config carries an explicit name, so treat the name as already set —
+	// don't let the repo-name default overwrite it.
+	let nameTouched = $state(untrack(() => !!savedConfigFor(data.initialRepo)?.name))
 	$effect(() => {
 		const derivedName = repoToName(gen.repository)
 		if (!nameTouched && derivedName) gen.name = derivedName
+	})
+
+	// When the selected repository changes, pre-fill the generator from that
+	// repo's saved workflow config (or reset to defaults). The initial load is
+	// already seeded above, so this only fires on an actual switch.
+	let configLoadedRepo = untrack(() => data.initialRepo)
+	$effect(() => {
+		const repo = gen.repository
+		if (repo === configLoadedRepo) return
+		configLoadedRepo = repo
+		const cfg = savedConfigFor(repo)
+		Object.assign(gen, genFromConfig(repo, cfg))
+		nameTouched = !!cfg?.name
 	})
 
 	const buildTypeOptions = [
@@ -350,6 +401,37 @@ ${withBlock()}
 	const editOnGitHubURL = $derived(gen.repository
 		? `https://github.com/${gen.repository}/edit/main/.github/workflows/deploy.yaml`
 		: '')
+
+	// Persist the current generator inputs to the link so the next visit pre-fills
+	// them. Fired (fire-and-forget) when the user clicks Create/Edit on GitHub —
+	// it never blocks opening GitHub, and failures (e.g. no github.update
+	// permission) are ignored.
+	function saveWorkflowConfig () {
+		const link = genLink
+		if (!link) return
+		const workflowConfig = {
+			name: gen.name,
+			location: gen.location,
+			buildType: gen.buildType,
+			port: gen.port,
+			protocol: gen.protocol,
+			framework: gen.framework,
+			buildCommand: gen.buildCommand,
+			outputDir: gen.outputDir,
+			spa: gen.spa,
+			notFound: gen.notFound,
+			workingDirectory: gen.workingDirectory,
+			env: gen.env,
+			envGroups: [...gen.envGroups],
+			pullSecret: gen.pullSecret,
+			requireGoogleLogin: gen.requireGoogleLogin,
+			allowedEmails: gen.allowedEmails,
+			allowedDomains: gen.allowedDomains
+		}
+		Promise.resolve(api.invoke('github.setWorkflowConfig', {
+			project, repositoryId: link.repositoryId, workflowConfig
+		}, fetch)).catch(() => {})
+	}
 
 	onMount(() => setupCopy('.copy-workflow'))
 </script>
@@ -653,11 +735,11 @@ ${withBlock()}
 			</div>
 
 			<div class="wf-actions">
-				<a class="button is-icon-left wf-action" href={createOnGitHubURL} target="_blank" rel="noreferrer">
+				<a class="button is-icon-left wf-action" href={createOnGitHubURL} target="_blank" rel="noreferrer" onclick={saveWorkflowConfig}>
 					<i class="fa-brands fa-github"></i>
 					Create on GitHub
 				</a>
-				<a class="button is-variant-secondary is-icon-left wf-action" href={editOnGitHubURL} target="_blank" rel="noreferrer">
+				<a class="button is-variant-secondary is-icon-left wf-action" href={editOnGitHubURL} target="_blank" rel="noreferrer" onclick={saveWorkflowConfig}>
 					<i class="fa-brands fa-github"></i>
 					Edit on GitHub
 				</a>

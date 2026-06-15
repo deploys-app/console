@@ -383,6 +383,32 @@ declare namespace Api {
         trigger?: 'all' | 'branch' | 'pr'
         createdAt: string
         createdBy: string
+        // saved workflow-generator inputs, so the generator can pre-fill them;
+        // absent until the user saves (on Create/Edit on GitHub).
+        workflowConfig?: GitHubWorkflowConfig
+    }
+
+    // GitHubWorkflowConfig is the console workflow-generator's saved inputs for a
+    // linked repository (api.GitHubWorkflowConfig). Persisted via
+    // github.setWorkflowConfig and returned on github.list for pre-fill.
+    export type GitHubWorkflowConfig = {
+        name?: string
+        location?: string
+        buildType?: 'dockerfile' | 'static'
+        port?: number
+        protocol?: 'http' | 'https' | 'h2c'
+        framework?: 'auto' | 'hugo' | 'node'
+        buildCommand?: string
+        outputDir?: string
+        spa?: boolean
+        notFound?: string
+        workingDirectory?: string
+        env?: string
+        envGroups?: string[]
+        pullSecret?: string
+        requireGoogleLogin?: boolean
+        allowedEmails?: string
+        allowedDomains?: string
     }
 
     export type GithubLookupRepoResult = {

@@ -707,6 +707,26 @@ const githubLinks = [
 		productionBranch: 'main',
 		// 'all' (default): push to main + PR previews
 		trigger: 'all',
+		// Saved workflow-generator inputs so the generator pre-fills them offline.
+		workflowConfig: {
+			name: 'web',
+			location: '',
+			buildType: 'dockerfile',
+			port: 3000,
+			protocol: 'h2c',
+			framework: 'auto',
+			buildCommand: '',
+			outputDir: 'public',
+			spa: false,
+			notFound: '404.html',
+			workingDirectory: 'app',
+			env: 'NODE_ENV=production\nLOG_LEVEL=info',
+			envGroups: ['shared'],
+			pullSecret: '',
+			requireGoogleLogin: true,
+			allowedEmails: 'owner@acme.io',
+			allowedDomains: 'acme.io'
+		},
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	},
@@ -1319,6 +1339,12 @@ const handlers = {
 		l.serviceAccountEmail = sa?.email ?? l.serviceAccountEmail
 		l.trigger = args?.trigger ?? 'all'
 		l.productionBranch = l.trigger === 'pr' ? '' : (args?.productionBranch ?? '')
+		return ok({})
+	},
+	'github.setWorkflowConfig': (args) => {
+		const l = githubLinks.find((x) => x.repositoryId === args?.repositoryId)
+		if (!l) return err('api: github repository link not found')
+		l.workflowConfig = args?.workflowConfig ?? null
 		return ok({})
 	},
 	'serviceAccount.list': () => list(serviceAccounts),

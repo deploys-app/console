@@ -446,6 +446,65 @@ test.describe('github workflow page', () => {
 		await expect(main.getByText('Link a repository first')).toBeVisible()
 		await expect(main.locator('.workflow-yaml')).toHaveCount(0)
 	})
+
+	test('pre-fills the generator from the link\'s saved workflow config', async ({ page }) => {
+		const linkWithConfig = {
+			...link,
+			workflowConfig: {
+				name: 'web-prod',
+				location: 'gke',
+				buildType: 'static',
+				framework: 'hugo',
+				buildCommand: 'hugo --minify',
+				outputDir: 'dist',
+				spa: true,
+				notFound: 'not-found.html',
+				workingDirectory: 'site',
+				env: 'NODE_ENV=production',
+				envGroups: [],
+				requireGoogleLogin: true,
+				allowedEmails: 'owner@acme.io',
+				allowedDomains: 'acme.io'
+			}
+		}
+		await mocks({ 'github.list': { ok: true, result: { items: [linkWithConfig] } } })
+
+		await page.goto('/github/workflow?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		// The saved settings pre-fill instead of the defaults, so the user edits
+		// their current workflow rather than starting over.
+		await expect(main.locator('#gen-name')).toHaveValue('web-prod')
+		const yaml = main.locator('.workflow-yaml')
+		await expect(yaml).toContainText('mode: static')
+		await expect(yaml).toContainText('framework: hugo')
+		await expect(yaml).toContainText('outputDir: dist')
+	})
+
+	test('saves the workflow config when opening it on GitHub', async ({ page, context }) => {
+		await mocks({ 'github.setWorkflowConfig': { ok: true, result: {} } })
+		// The Create/Edit links open github.com in a new tab — block that so the
+		// test never hits the network, and close the popup it spawns.
+		await context.route('https://github.com/**', (r) => r.abort())
+		page.on('popup', (p) => { p.close().catch(() => {}) })
+
+		await page.goto('/github/workflow?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await main.locator('#gen-name').fill('api')
+
+		await main.getByRole('link', { name: 'Create on GitHub' }).click()
+
+		// Clicking persists the current generator inputs via github.setWorkflowConfig.
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/github.setWorkflowConfig')
+		}).toBe(true)
+
+		const req = (await getRequestLog()).find((r) => r.path === '/github.setWorkflowConfig')
+		const body = JSON.parse(req?.body ?? '{}')
+		expect(body.repositoryId).toBe(812345678)
+		expect(body.workflowConfig.name).toBe('api')
+	})
 })
 
 test.describe('github link page', () => {
