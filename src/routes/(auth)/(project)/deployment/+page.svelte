@@ -52,6 +52,8 @@
 		color: hsl(var(--hsl-content) / 0.75);
 	}
 	.resources .sep { color: hsl(var(--hsl-content) / 0.3); }
+	/* Static deployments have no configurable resources — show a muted placeholder. */
+	.resources-none { color: hsl(var(--hsl-content) / 0.35); }
 
 	/* CronJob schedule on the meta line. */
 	.schedule {
@@ -123,11 +125,15 @@
 							</div>
 						</td>
 						<td>
-							<span class="resources">
-								{format.cpuLimited(it.resources.limits.cpu)}
-								<span class="sep">·</span>
-								{format.memory(it.resources.requests.memory)}
-							</span>
+							{#if it.type === 'Static'}
+								<span class="resources-none" title="Static sites have no configurable resources">—</span>
+							{:else}
+								<span class="resources">
+									{format.cpuLimited(it.resources.limits.cpu)}
+									<span class="sep">·</span>
+									{format.memory(it.resources.requests.memory)}
+								</span>
+							{/if}
 						</td>
 						<td>
 							{#if it.minReplicas > 0}
