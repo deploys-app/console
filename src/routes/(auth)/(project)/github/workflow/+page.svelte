@@ -54,7 +54,14 @@
 		/** @type {string[]} */
 		envGroups: [],
 		// container-only
-		pullSecret: ''
+		pullSecret: '',
+		// WebService protocol (dockerfile only): http (default) | https | h2c
+		protocol: 'http',
+		// access (deployment access) — applies to both container and static.
+		// Allow-lists are free text (one entry per line or comma-separated).
+		requireGoogleLogin: false,
+		allowedEmails: '',
+		allowedDomains: ''
 	})))
 	const genRepoOptions = $derived(links.map((l) => ({ value: l.repository, label: l.repository })))
 	const genLink = $derived(links.find((l) => l.repository === gen.repository))
@@ -79,6 +86,19 @@
 		{ value: 'hugo', label: 'Hugo' },
 		{ value: 'node', label: 'Node' }
 	]
+	const protocolOptions = [
+		{ value: 'http', label: 'http' },
+		{ value: 'https', label: 'https' },
+		{ value: 'h2c', label: 'h2c' }
+	]
+
+	// Allow-list text -> trimmed entries (split on newline or comma, blanks dropped).
+	/** @param {string} text */
+	function splitList (text) {
+		return text.split(/[\n,]/).map((s) => s.trim()).filter(Boolean)
+	}
+	const allowedEmailsList = $derived(splitList(gen.allowedEmails))
+	const allowedDomainsList = $derived(splitList(gen.allowedDomains))
 
 	// --- env groups (multi-select) ---
 	const envGroupOptions = $derived(
@@ -259,6 +279,8 @@
 			out.push(`        notFound: ${gen.notFound || '404.html'}`)
 		} else {
 			out.push(`        port: ${Number(gen.port) || 8080}`)
+			// http is the server default, so only emit a non-default protocol.
+			if (gen.protocol && gen.protocol !== 'http') out.push(`        protocol: ${gen.protocol}`)
 		}
 
 		const wd = gen.workingDirectory.trim()
@@ -278,6 +300,15 @@
 		// Pull secret only applies to container deploys — static has no pod.
 		if (gen.buildType === 'dockerfile' && gen.pullSecret) {
 			out.push(`        pullSecret: ${gen.pullSecret}`)
+		}
+
+		// Access (deployment access) applies to both container and static. Only
+		// emit when the gate is on; empty allow-lists = any signed-in Google
+		// account, so omit them rather than emitting empty keys.
+		if (gen.requireGoogleLogin) {
+			out.push('        requireGoogleLogin: true')
+			if (allowedEmailsList.length) out.push(`        allowedEmails: ${allowedEmailsList.join(',')}`)
+			if (allowedDomainsList.length) out.push(`        allowedDomains: ${allowedDomainsList.join(',')}`)
 		}
 
 		return out.join('\n')
@@ -425,6 +456,11 @@ ${withBlock()}
 							<span class="helper">The port your container listens on.</span>
 						</div>
 						<div class="field">
+							<label for="gen-protocol">Protocol</label>
+							<Select id="gen-protocol" bind:value={gen.protocol} options={protocolOptions} />
+							<span class="helper">Use <span class="font-mono">h2c</span> for gRPC / HTTP/2 cleartext.</span>
+						</div>
+						<div class="field">
 							<label for="gen-working-directory">Root folder</label>
 							<div class="input">
 								<input id="gen-working-directory" class="font-mono" bind:value={gen.workingDirectory} placeholder=". (monorepo: apps/web)">
@@ -547,6 +583,46 @@ ${withBlock()}
 								pull-only service account and secret for <span class="font-mono">registry.deploys.app</span>.
 							</span>
 						{/if}
+					</div>
+				{/if}
+
+				<!-- Access (deployment access) applies to both container and static
+				     deployments, so it lives outside the dockerfile-only block. -->
+				<div class="form-section">
+					<h6 class="form-section-title">Access</h6>
+					<span class="form-section-hint">Restrict who can reach the deployment over the web.</span>
+				</div>
+
+				<div class="field">
+					<div class="checkbox">
+						<input id="gen-require-google-login" type="checkbox" bind:checked={gen.requireGoogleLogin}>
+						<label for="gen-require-google-login">Require Google login</label>
+					</div>
+					<span class="helper">When off, the deployment is public. Programmatic/API clients cannot bypass the gate.</span>
+					{#if gen.requireGoogleLogin && allowedEmailsList.length === 0 && allowedDomainsList.length === 0}
+						<span class="helper">Any signed-in Google account can access — add emails or domains to restrict.</span>
+					{/if}
+					{#if gen.requireGoogleLogin && gen.buildType === 'static'}
+						<span class="helper">Enabling login forfeits edge caching for this site.</span>
+					{/if}
+				</div>
+
+				{#if gen.requireGoogleLogin}
+					<div class="grid gap-4 sm:grid-cols-2">
+						<div class="field">
+							<label for="gen-allowed-emails">Allowed emails</label>
+							<div class="textarea">
+								<textarea id="gen-allowed-emails" class="font-mono" rows="3" bind:value={gen.allowedEmails} placeholder="alice@example.com&#10;bob@example.com"></textarea>
+							</div>
+							<span class="helper">One per line or comma-separated.</span>
+						</div>
+						<div class="field">
+							<label for="gen-allowed-domains">Allowed domains</label>
+							<div class="textarea">
+								<textarea id="gen-allowed-domains" class="font-mono" rows="3" bind:value={gen.allowedDomains} placeholder="example.com&#10;corp.example.com"></textarea>
+							</div>
+							<span class="helper">Email domains. Empty = any Google account.</span>
+						</div>
 					</div>
 				{/if}
 			</div>
