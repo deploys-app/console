@@ -37,6 +37,10 @@
 	const isStatic = $derived(deployment.type === 'Static')
 	const release = $derived(format.releaseSha(deployment))
 
+	// Access (Google-login gate): nil/false access => public.
+	const isGated = $derived(!!deployment.access?.requireGoogleLogin)
+	const isWebAccess = $derived(deployment.type === 'WebService' || deployment.type === 'Static')
+
 	onMount(() => setupCopy('.copy'))
 
 	function deleteItem () {
@@ -244,6 +248,14 @@
 
 	.spec__inline-tag.is-warning { background: hsl(var(--hsl-warning) / 0.13); color: hsl(var(--hsl-warning)); }
 	.spec__inline-tag.is-negative { background: hsl(var(--hsl-negative) / 0.13); color: hsl(var(--hsl-negative)); }
+
+	.access-note {
+		display: block;
+		margin-top: 0.5rem;
+		font-family: var(--ffml-primary);
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
 
 	/* ─── env-group chips ─── */
 	.chips {
@@ -471,6 +483,55 @@
 				{/if}
 			</div>
 		</section>
+
+		<!-- ─── Access ─── (web-reachable types only) -->
+		{#if isWebAccess}
+		<section class="section">
+			<div class="section__head">
+				<span class="section__title">Access</span>
+				<span class="section__rule"></span>
+			</div>
+			<div class="spec-grid is-full">
+				<div class="spec">
+					<span class="spec__label">Visibility</span>
+					<span class="spec__value">
+						{#if isGated}
+							<span class="spec__inline-tag is-warning">
+								<i class="fa-solid fa-lock"></i> Google login required
+							</span>
+						{:else}
+							<span class="spec__value is-dim">Public</span>
+						{/if}
+					</span>
+					<span></span>
+				</div>
+				{#if isGated}
+					<div class="spec">
+						<span class="spec__label">Allowed Emails</span>
+						{#if deployment.access?.allowedEmails?.length}
+							<span class="spec__value is-mono">{deployment.access.allowedEmails.join(', ')}</span>
+						{:else}
+							<span class="spec__value is-dim">Any signed-in Google account</span>
+						{/if}
+						<span></span>
+					</div>
+					<div class="spec">
+						<span class="spec__label">Allowed Domains</span>
+						{#if deployment.access?.allowedDomains?.length}
+							<span class="spec__value is-mono">{deployment.access.allowedDomains.join(', ')}</span>
+						{:else}
+							<span class="spec__value is-dim">—</span>
+						{/if}
+						<span></span>
+					</div>
+				{/if}
+			</div>
+			<small class="access-note">Programmatic/API clients cannot bypass this.</small>
+			{#if isGated && isStatic}
+				<small class="access-note">Login is enabled — edge caching is forfeited for this site.</small>
+			{/if}
+		</section>
+		{/if}
 
 		<!-- ─── Runtime ─── -->
 		<section class="section">

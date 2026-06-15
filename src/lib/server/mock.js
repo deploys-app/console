@@ -160,6 +160,12 @@ function deployment (project = 'acme') {
 			limits: { cpu: '500m', memory: '512Mi' }
 		},
 		sidecars: [],
+		// Per-deployment Google-login gate so the Access section renders offline.
+		access: {
+			requireGoogleLogin: true,
+			allowedEmails: ['owner@acme.io'],
+			allowedDomains: ['acme.io']
+		},
 		// Hostnames only — both the Detail and Deployment pages prepend the
 		// scheme themselves.
 		url: 'web.acme.rcf2.deploys.app',
@@ -202,6 +208,9 @@ function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
 		...deployment(project),
 		name: 'website',
 		type: 'Static',
+		// Public static site (no login gate) so the Access section shows the
+		// public path; static + login forfeits edge caching.
+		access: null,
 		image: '',
 		site: `site://deploys-static/${project}/website@${releaseSha}`,
 		siteManifestDigest: releaseSha,
