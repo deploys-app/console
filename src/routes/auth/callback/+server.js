@@ -12,15 +12,35 @@ export async function GET ({ cookies, url }) {
 		return new Response('invalid state', { status: 400 })
 	}
 
+	// PKCE: replay the verifier minted at /auth/signin so auth can bind this code
+	// to the client that started the flow (it stays a confidential exchange — the
+	// client_secret is still sent). Clear it up front so it's dropped on every
+	// exit path — success, a non-2xx /token relay, or a throw — not just success.
+	const codeVerifier = cookies.get('code_verifier') ?? ''
+	cookies.delete('code_verifier', {
+		httpOnly: true,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
+
 	// exchange token
+	const body = new URLSearchParams({
+		grant_type: 'authorization_code',
+		code,
+		client_id: env.OAUTH2_CLIENT_ID,
+		code_verifier: codeVerifier
+	})
+	// Confidential clients (e.g. production) authenticate with a secret; public
+	// clients — local/contributor setups with no secret — rely on PKCE alone, so
+	// only send client_secret when one is configured.
+	if (env.OAUTH2_CLIENT_SECRET) {
+		body.set('client_secret', env.OAUTH2_CLIENT_SECRET)
+	}
+
 	const resp = await fetch(`${authEndpoint}/token`, {
 		method: 'POST',
-		body: new URLSearchParams({
-			grant_type: 'authorization_code',
-			code,
-			client_id: env.OAUTH2_CLIENT_ID,
-			client_secret: env.OAUTH2_CLIENT_SECRET
-		}),
+		body,
 		headers: {
 			'content-type': 'application/x-www-form-urlencoded'
 		}
@@ -29,7 +49,9 @@ export async function GET ({ cookies, url }) {
 		return resp
 	}
 	const respBody = await resp.json()
-	const token = respBody.refresh_token
+	// OAuth 2.1 returns the bearer as access_token; refresh_token is the legacy
+	// alias auth still sets, kept as a fallback during the rollout.
+	const token = respBody.access_token || respBody.refresh_token
 	if (!token) {
 		return new Response('unknown error', { status: 500 })
 	}

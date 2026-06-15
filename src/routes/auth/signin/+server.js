@@ -15,9 +15,51 @@ function randomState () {
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
 }
 
+/**
+ * base64url encodes bytes without padding (RFC 4648 §5) — the encoding PKCE uses.
+ * @param {Uint8Array} bytes
+ * @returns {string}
+ */
+function base64url (bytes) {
+	let s = ''
+	for (const b of bytes) {
+		s += String.fromCharCode(b)
+	}
+	return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+/**
+ * randomCodeVerifier returns a high-entropy PKCE code_verifier (RFC 7636):
+ * base64url of 32 random bytes (43 chars, within the 43–128 range).
+ * @returns {string}
+ */
+function randomCodeVerifier () {
+	const x = new Uint8Array(32)
+	webcrypto.getRandomValues(x)
+	return base64url(x)
+}
+
+/**
+ * codeChallengeS256 derives the S256 PKCE code_challenge from a verifier:
+ * base64url(SHA-256(verifier)), no padding (RFC 7636 §4.2). auth verifies this
+ * at /token against the code_verifier we present in the callback.
+ * @param {string} verifier
+ * @returns {Promise<string>}
+ */
+async function codeChallengeS256 (verifier) {
+	const digest = await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+	return base64url(new Uint8Array(digest))
+}
+
 /** @type {import('@sveltejs/kit').RequestHandler} */
 export async function GET ({ cookies, url }) {
 	const state = randomState()
+
+	// PKCE (OAuth 2.1): console stays a confidential client (it still sends its
+	// client_secret at /token), but we add a code_challenge so an intercepted
+	// authorization code can't be redeemed without the verifier held here.
+	const codeVerifier = randomCodeVerifier()
+	const codeChallenge = await codeChallengeS256(codeVerifier)
 
 	const callback = new URL(url.toString())
 	callback.pathname = '/auth/callback'
@@ -30,8 +72,20 @@ export async function GET ({ cookies, url }) {
 	q.set('client_id', env.OAUTH2_CLIENT_ID)
 	q.set('redirect_uri', callback.toString())
 	q.set('state', state)
+	q.set('code_challenge', codeChallenge)
+	q.set('code_challenge_method', 'S256')
 
 	cookies.set('state', state, {
+		httpOnly: true,
+		maxAge: 60 * 60,
+		sameSite: 'lax',
+		path: '/',
+		secure: import.meta.env.PROD
+	})
+
+	// The verifier never leaves us; it is replayed to /token in the callback to
+	// prove this is the same client that started the flow.
+	cookies.set('code_verifier', codeVerifier, {
 		httpOnly: true,
 		maxAge: 60 * 60,
 		sameSite: 'lax',
