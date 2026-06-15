@@ -73,6 +73,12 @@ const repos = [
 
 const savedInstallation = { installationId: 77, createdAt: '2026-01-01T00:00:00Z' }
 
+// Two projects so the project picker can switch between them (#219 test).
+const twoProjects = [
+	{ id: 'p1', project: 'project-a', name: 'Project A' },
+	{ id: 'p2', project: 'project-b', name: 'Project B' }
+]
+
 function mocks (overrides = {}) {
 	return setMocks({
 		'github.list': { ok: true, result: { items: [link] } },
@@ -105,6 +111,35 @@ test.describe('github repositories page', () => {
 
 		// The workflow generator does NOT live on this page anymore.
 		await expect(main.locator('.workflow-yaml')).toHaveCount(0)
+	})
+
+	test('switching project via the modal reloads the repo list (#219)', async ({ page }) => {
+		// Two projects so the picker can switch between them; project-a has one
+		// linked repo.
+		await mocks({
+			'project.list': { ok: true, result: { items: twoProjects } },
+			'github.list': { ok: true, result: { items: [link] } }
+		})
+		await page.goto('/github?project=project-a')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.locator('.repo-card', { hasText: 'acme/web' })).toBeVisible()
+
+		// The next project has a different linked repo.
+		const otherLink = { ...link, repositoryId: 900000001, repository: 'contoso/site' }
+		await setMocks({ 'github.list': { ok: true, result: { items: [otherLink] } } })
+
+		// Switch project through the sidebar modal — a same-route SPA navigation
+		// that reuses this page component (the #219 repro: the loader re-runs but
+		// the locally-held list must follow the new project).
+		await page.locator('.project-box').click()
+		const projectModal = page.locator('.modal.is-active')
+		await projectModal.getByRole('link', { name: 'Project B' }).click()
+
+		await expect(page).toHaveURL(/project=project-b/)
+		// The list must reflect the newly selected project, not the stale one.
+		await expect(main.locator('.repo-card', { hasText: 'contoso/site' })).toBeVisible()
+		await expect(main.locator('.repo-card', { hasText: 'acme/web' })).toHaveCount(0)
 	})
 
 	test('Workflow tab navigates to the standalone generator', async ({ page }) => {

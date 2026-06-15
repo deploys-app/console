@@ -1,5 +1,4 @@
 <script>
-	import { untrack } from 'svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
@@ -13,7 +12,10 @@
 	const error = $derived(data.error)
 	const serviceAccounts = $derived(data.serviceAccounts)
 
-	let links = $state(untrack(() => data.links))
+	// Derived from the loader so switching project (same /github route → this
+	// component is reused, only `data.links` changes) re-syncs the list. Writable
+	// so unlink/edit can update it in place until the next load (fixes #219).
+	let links = $derived(data.links)
 
 	/** @type {EditGithubLinkModal} */
 	let editModal = $state(/** @type {any} */ (undefined))
