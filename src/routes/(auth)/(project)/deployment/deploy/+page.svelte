@@ -528,68 +528,6 @@
 			</div>
 		{/if}
 
-		{#if ['WebService', 'Static'].includes(form.type)}
-			<div class="form-section">
-				<h6 class="form-section-title">Access</h6>
-				<span class="form-section-hint">Restrict who can reach this deployment over the web.</span>
-			</div>
-			<div class="field">
-				<div class="checkbox">
-					<input id="input-require_google_login" type="checkbox" bind:checked={requireGoogleLogin}>
-					<label for="input-require_google_login">Require Google login</label>
-				</div>
-				<small class="helper">Programmatic/API clients cannot bypass this.</small>
-				{#if requireGoogleLogin && allowedEmails.length === 0 && allowedDomains.length === 0}
-					<small class="helper">Any signed-in Google account can access — add emails or domains to restrict.</small>
-				{/if}
-				{#if requireGoogleLogin && form.type === 'Static'}
-					<small class="helper">Enabling login forfeits edge caching for this site.</small>
-				{/if}
-			</div>
-
-			{#if requireGoogleLogin}
-				<div class="field">
-					<label for="div-allowed_emails">Allowed Emails</label>
-					<div id="div-allowed_emails" class="pb-2">
-						{#each allowedEmails as _, i (i)}
-							<div class="input -has-icon-right mb-2">
-								<input bind:value={allowedEmails[i]} placeholder="user@example.com">
-								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed email"
-									onclick={() => { allowedEmails = allowedEmails.filter((_, k) => k !== i) }}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
-							</div>
-						{/each}
-					</div>
-					<button class="button is-variant-secondary m-auto" type="button"
-							onclick={() => { allowedEmails = [...allowedEmails, ''] }}>
-						<i class="fa-solid fa-plus mr-3"></i>
-						<span>Add Email</span>
-					</button>
-				</div>
-
-				<div class="field">
-					<label for="div-allowed_domains">Allowed Domains</label>
-					<div id="div-allowed_domains" class="pb-2">
-						{#each allowedDomains as _, i (i)}
-							<div class="input -has-icon-right mb-2">
-								<input bind:value={allowedDomains[i]} placeholder="example.com">
-								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed domain"
-									onclick={() => { allowedDomains = allowedDomains.filter((_, k) => k !== i) }}>
-									<i class="fa-solid fa-trash-alt"></i>
-								</button>
-							</div>
-						{/each}
-					</div>
-					<button class="button is-variant-secondary m-auto" type="button"
-							onclick={() => { allowedDomains = [...allowedDomains, ''] }}>
-						<i class="fa-solid fa-plus mr-3"></i>
-						<span>Add Domain</span>
-					</button>
-				</div>
-			{/if}
-		{/if}
-
 		<div class="field">
 			<label for="div-command">Command</label>
 			<div id="div-command" class="pb-2">
@@ -1017,6 +955,68 @@
 				</button>
 			{/if}
 		</div>
+
+		{#if ['WebService', 'Static'].includes(form.type)}
+			<div class="form-section">
+				<h6 class="form-section-title">Access</h6>
+				<span class="form-section-hint">Restrict who can reach this deployment over the web.</span>
+			</div>
+			<div class="field">
+				<div class="checkbox">
+					<input id="input-require_google_login" type="checkbox" bind:checked={requireGoogleLogin}>
+					<label for="input-require_google_login">Require Google login</label>
+				</div>
+				<small class="helper">Programmatic/API clients cannot bypass this.</small>
+				{#if requireGoogleLogin && allowedEmails.length === 0 && allowedDomains.length === 0}
+					<small class="helper">Any signed-in Google account can access — add emails or domains to restrict.</small>
+				{/if}
+				{#if requireGoogleLogin && form.type === 'Static'}
+					<small class="helper">Enabling login forfeits edge caching for this site.</small>
+				{/if}
+			</div>
+
+			{#if requireGoogleLogin}
+				<div class="field">
+					<label for="div-allowed_emails">Allowed Emails</label>
+					<div id="div-allowed_emails" class="pb-2">
+						{#each allowedEmails as _, i (i)}
+							<div class="input -has-icon-right mb-2">
+								<input bind:value={allowedEmails[i]} placeholder="user@example.com">
+								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed email"
+									onclick={() => { allowedEmails = allowedEmails.filter((_, k) => k !== i) }}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</div>
+						{/each}
+					</div>
+					<button class="button is-variant-secondary m-auto" type="button"
+							onclick={() => { allowedEmails = [...allowedEmails, ''] }}>
+						<i class="fa-solid fa-plus mr-3"></i>
+						<span>Add Email</span>
+					</button>
+				</div>
+
+				<div class="field">
+					<label for="div-allowed_domains">Allowed Domains</label>
+					<div id="div-allowed_domains" class="pb-2">
+						{#each allowedDomains as _, i (i)}
+							<div class="input -has-icon-right mb-2">
+								<input bind:value={allowedDomains[i]} placeholder="example.com">
+								<button class="icon-button icon -is-right" type="button" aria-label="Remove an allowed domain"
+									onclick={() => { allowedDomains = allowedDomains.filter((_, k) => k !== i) }}>
+									<i class="fa-solid fa-trash-alt"></i>
+								</button>
+							</div>
+						{/each}
+					</div>
+					<button class="button is-variant-secondary m-auto" type="button"
+							onclick={() => { allowedDomains = [...allowedDomains, ''] }}>
+						<i class="fa-solid fa-plus mr-3"></i>
+						<span>Add Domain</span>
+					</button>
+				</div>
+			{/if}
+		{/if}
 
 		<hr>
 
