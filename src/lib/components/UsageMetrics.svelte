@@ -1,6 +1,7 @@
 <script>
 	import { tick, untrack } from 'svelte'
 	import { page } from '$app/stores'
+	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
@@ -51,6 +52,15 @@
 		storage = [{ prefix: 'Storage', lines: resp.result.storage ?? [] }]
 	}
 
+	// Persist the selected range in the URL so it survives reloads and is
+	// shareable, then refetch. Mirrors the cache/WAF metrics pages.
+	function selectRange () {
+		const u = new URL($page.url)
+		u.searchParams.set('range', filter.range)
+		replaceState(u, {})
+		fetchMetrics(true)
+	}
+
 	// Re-fetch whenever the active project (or feature fn) changes. This
 	// component is reused across project switches — same route, new
 	// `?project=` — so `onMount` won't fire again. `fetchMetrics` reads
@@ -66,7 +76,7 @@
 	<Select
 		bind:value={filter.range}
 		options={rangeOptions}
-		onchange={() => fetchMetrics(true)} />
+		onchange={selectRange} />
 </div>
 
 <div class="grid gap-4 mt-4 lg:grid-cols-2">
