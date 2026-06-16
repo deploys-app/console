@@ -54,6 +54,17 @@
 		const r = formatStorage(bytes, 's')
 		return `${r.full} ${r.unit}`
 	}
+	// static_storage is a daily byte gauge summed over the month (byte-days), so
+	// its average level divides by elapsed days — not seconds like the
+	// continuously-integrated memory/disk metrics. Floor at 1 day so the first of
+	// the month (one snapshot) reads as that snapshot, not an inflated number.
+	function billingElapsedDays () {
+		return Math.max(billingElapsedSeconds() / 86400, 1)
+	}
+	function rawStorageDayTooltip (bytes) {
+		const r = formatStorage(bytes, 'd')
+		return `${r.full} ${r.unit}`
+	}
 	const projectInfo = $derived(data.projectInfo)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
@@ -78,6 +89,13 @@
 			label: 'Disk',
 			...formatStorage(usage.disk / billingElapsedSeconds(), ''),
 			tooltip: rawStorageTooltip(usage.disk)
+		},
+		{
+			key: 'staticStorage',
+			icon: 'fa-folder-tree',
+			label: 'Static Storage',
+			...formatStorage(usage.staticStorage / billingElapsedDays(), ''),
+			tooltip: rawStorageDayTooltip(usage.staticStorage)
 		},
 		{
 			key: 'egress',
