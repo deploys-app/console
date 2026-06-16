@@ -92,19 +92,6 @@
 		gap: 0.4rem;
 	}
 
-	/* Marks a feature that's still in preview. */
-	.preview-badge {
-		padding: 0.0625rem 0.375rem;
-		font-size: 0.625rem;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		line-height: 1.4;
-		border-radius: 9999px;
-		color: hsl(var(--hsl-primary));
-		background-color: hsl(var(--hsl-primary) / 0.12);
-	}
-
 	.section-caption {
 		font-size: 0.6875rem;
 		letter-spacing: 0.12em;

@@ -958,7 +958,10 @@
 
 		{#if ['WebService', 'Static'].includes(form.type)}
 			<div class="form-section">
-				<h6 class="form-section-title">Access</h6>
+				<h6 class="form-section-title inline-flex items-center gap-2">
+					Access
+					<span class="preview-badge">Preview</span>
+				</h6>
 				<span class="form-section-hint">Restrict who can reach this deployment over the web.</span>
 			</div>
 			<div class="field">
