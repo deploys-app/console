@@ -4,12 +4,33 @@
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import api from '$lib/api'
+	import { onMount } from 'svelte'
 
 	const { data } = $props()
 
 	const project = $derived(data.project)
 	const deployments = $derived(data.deployments)
 	const error = $derived(data.error)
+
+	// A deploy/delete/pause that's still settling reports `status: 'pending'`, so
+	// the list snapshot goes stale the moment one is in flight (e.g. a row stuck
+	// on "Deleting" until a manual refresh). Poll while any row has pending work
+	// so the table converges on its own; once everything's resolved we stop
+	// re-fetching, with a 2-minute floor as a catch-all for slower drift.
+	const hasPendingAction = $derived(
+		deployments.some((it) => it.status === 'pending' || it.action === 'delete')
+	)
+
+	let lastReload = Date.now()
+
+	onMount(() => api.intervalInvalidate(async () => {
+		if (!hasPendingAction && Date.now() - lastReload < 120000) {
+			return
+		}
+		await api.invalidate('deployment.list')
+		lastReload = Date.now()
+	}, 4000))
 
 	// Per-type glyph + label for the chip on each row's meta line.
 	const typeMeta = {
@@ -23,12 +44,19 @@
 	/**
 	 * Static status label for the pill next to the name. A healthy running
 	 * deployment returns null so its row stays clean — only noteworthy states
-	 * (paused / deploying / failed / cancelled) get a labelled pill, mirroring
-	 * the live icon to its left.
+	 * (deleting / paused / deploying / failed / cancelled) get a labelled pill,
+	 * mirroring the live icon to its left.
+	 *
+	 * A pending delete reuses the same `status: 'pending'` as a fresh deploy, so
+	 * the action has to be checked first — otherwise a deployment being torn down
+	 * would mislabel as "Deploying".
 	 * @param {Api.Deployment} it
 	 * @returns {{ label: string, tone: string } | null}
 	 */
 	function statusPill (it) {
+		if (it.action === 'delete') {
+			return { label: 'Deleting', tone: 'negative' }
+		}
 		if (it.action === 'pause') {
 			return { label: 'Paused', tone: 'warning' }
 		}

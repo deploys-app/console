@@ -259,6 +259,12 @@ const deployments = [
 		address: '',
 		status: 'pending',
 		allocatedPrice: 60
+	},
+	{
+		...deployment('acme'),
+		name: 'web-old',
+		status: 'pending',
+		action: 'delete'
 	}
 ]
 
