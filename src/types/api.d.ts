@@ -721,10 +721,6 @@ declare namespace Api {
         storage: UsageMetricsLine[]
     }
 
-    export type ProjectStorageMetricsResult = {
-        staticStorage: UsageMetricsLine[]
-    }
-
     export type ProjectMetricsResult = {
         cpuUsage: UsageMetricsLine[]
         memory: UsageMetricsLine[]

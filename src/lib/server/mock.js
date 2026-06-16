@@ -1005,9 +1005,6 @@ const handlers = {
 		disk: 10737418240,
 		replica: 4
 	}),
-	'project.storageMetrics': () => ok({
-		staticStorage: dailyMetricLine('static_storage', 1610612736)
-	}),
 	'project.metrics': () => ok({
 		cpuUsage: dailyMetricLine('cpu_usage', 1.5),
 		memory: dailyMetricLine('memory', 805306368),
