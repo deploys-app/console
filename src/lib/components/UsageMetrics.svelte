@@ -1,5 +1,5 @@
 <script>
-	import { onMount, tick } from 'svelte'
+	import { tick, untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
@@ -32,8 +32,11 @@
 	let storage = $state([])
 
 	async function fetchMetrics (clear = false) {
+		// `range` is read untracked so the project-keyed effect below isn't also
+		// triggered by range changes — those refresh via the Select's onchange.
+		const range = untrack(() => filter.range)
 		/** @type {Api.Response<Api.UsageMetricsResult>} */
-		const resp = await api.invoke(fn, { project, timeRange: filter.range }, fetch)
+		const resp = await api.invoke(fn, { project, timeRange: range }, fetch)
 		if (!resp.ok) {
 			return
 		}
@@ -48,8 +51,14 @@
 		storage = [{ prefix: 'Storage', lines: resp.result.storage ?? [] }]
 	}
 
-	onMount(() => {
-		fetchMetrics()
+	// Re-fetch whenever the active project (or feature fn) changes. This
+	// component is reused across project switches — same route, new
+	// `?project=` — so `onMount` won't fire again. `fetchMetrics` reads
+	// `project`/`fn` synchronously when building the request, so the effect
+	// tracks them and re-runs on a project switch; `range` is read untracked,
+	// so it doesn't double-fetch alongside the Select's onchange.
+	$effect(() => {
+		fetchMetrics(true)
 	})
 </script>
 
