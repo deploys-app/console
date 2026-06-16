@@ -1009,7 +1009,8 @@ const handlers = {
 		registryEgress: 268435456,
 		dropboxEgress: 134217728,
 		disk: 10737418240,
-		replica: 4
+		replica: 4,
+		staticStorage: 25769803776
 	}),
 	'project.metrics': () => ok({
 		cpuUsage: dailyMetricLine('cpu_usage', 1.5),
