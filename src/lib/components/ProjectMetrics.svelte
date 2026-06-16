@@ -1,6 +1,7 @@
 <script>
-	import { onMount, tick } from 'svelte'
+	import { tick, untrack } from 'svelte'
 	import { page } from '$app/stores'
+	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
@@ -35,8 +36,11 @@
 	let storage = $state([])
 
 	async function fetchMetrics (clear = false) {
+		// `range` is read untracked so the project-keyed effect below isn't also
+		// triggered by range changes — those refresh via the Select's onchange.
+		const range = untrack(() => filter.range)
 		/** @type {Api.Response<Api.ProjectMetricsResult>} */
-		const resp = await api.invoke('project.metrics', { project, timeRange: filter.range }, fetch)
+		const resp = await api.invoke('project.metrics', { project, timeRange: range }, fetch)
 		if (!resp.ok) {
 			return
 		}
@@ -59,8 +63,23 @@
 		storage = [{ prefix: 'Storage', lines: resp.result.staticStorage ?? [] }]
 	}
 
-	onMount(() => {
-		fetchMetrics()
+	// Persist the selected range in the URL so it survives reloads and is
+	// shareable, then refetch. Mirrors the cache/WAF metrics pages.
+	function selectRange () {
+		const u = new URL($page.url)
+		u.searchParams.set('range', filter.range)
+		replaceState(u, {})
+		fetchMetrics(true)
+	}
+
+	// Re-fetch whenever the active project changes. This component is reused
+	// across project switches — same route, new `?project=` — so `onMount`
+	// won't fire again. `fetchMetrics` reads `project` synchronously when
+	// building the request, so the effect tracks it and re-runs on a project
+	// switch; `range` is read untracked, so it doesn't double-fetch alongside
+	// the Select's onchange.
+	$effect(() => {
+		fetchMetrics(true)
 	})
 </script>
 
@@ -68,7 +87,7 @@
 	<Select
 		bind:value={filter.range}
 		options={rangeOptions}
-		onchange={() => fetchMetrics(true)} />
+		onchange={selectRange} />
 </div>
 
 <div class="grid gap-4 mt-4 lg:grid-cols-2">
