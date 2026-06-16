@@ -13,9 +13,9 @@ export async function GET ({ cookies, url }) {
 	}
 
 	// PKCE: replay the verifier minted at /auth/signin so auth can bind this code
-	// to the client that started the flow (it stays a confidential exchange — the
-	// client_secret is still sent). Clear it up front so it's dropped on every
-	// exit path — success, a non-2xx /token relay, or a throw — not just success.
+	// to the client that started the flow. Clear it up front so it's dropped on
+	// every exit path — success, a non-2xx /token relay, or a throw — not just
+	// success.
 	const codeVerifier = cookies.get('code_verifier') ?? ''
 	cookies.delete('code_verifier', {
 		httpOnly: true,
@@ -24,11 +24,20 @@ export async function GET ({ cookies, url }) {
 		secure: import.meta.env.PROD
 	})
 
+	// Rebuild the exact redirect_uri sent at /auth/signin (same origin, /auth/
+	// callback, no query). RFC 6749 §4.1.3 requires it to be present and identical
+	// at the token exchange, and auth enforces the match for public (secretless)
+	// clients — omitting it fails with invalid_grant "redirect_uri mismatch".
+	const callback = new URL(url.toString())
+	callback.pathname = '/auth/callback'
+	callback.search = ''
+
 	// exchange token
 	const body = new URLSearchParams({
 		grant_type: 'authorization_code',
 		code,
 		client_id: env.OAUTH2_CLIENT_ID,
+		redirect_uri: callback.toString(),
 		code_verifier: codeVerifier
 	})
 	// Confidential clients (e.g. production) authenticate with a secret; public
