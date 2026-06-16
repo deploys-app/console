@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
+	import Chart from '$lib/components/Chart.svelte'
 
 	const { data } = $props()
 
@@ -58,6 +59,11 @@
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
 	const auditLog = $derived(data.auditLog)
+	// Static-web storage is billed per project (shared across all of the project's
+	// static sites), so it lives on the project dashboard rather than per-deployment.
+	// The card is shown only when the project actually has static storage.
+	const staticStorage = $derived(data.staticStorage ?? [])
+	const storageSeries = $derived([{ prefix: 'Storage', lines: staticStorage }])
 	const billing = $derived([
 		{
 			key: 'cpuUsage',
@@ -188,6 +194,10 @@
 			{/each}
 		</div>
 	</div>
+
+	{#if staticStorage.length}
+		<Chart title="Static Storage" unit="bytes" series={storageSeries} range="30d" />
+	{/if}
 
 	<div class="panel is-level-300 gap-6 dashboard-panel">
 		<div class="flex items-center justify-between">

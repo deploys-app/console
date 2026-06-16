@@ -1005,6 +1005,9 @@ const handlers = {
 		disk: 10737418240,
 		replica: 4
 	}),
+	'project.storageMetrics': () => ok({
+		staticStorage: dailyMetricLine('static_storage', 1610612736)
+	}),
 
 	'billing.list': () => list(billingAccounts),
 	'billing.get': (args) => ok(billingAccounts.find((b) => b.id === args?.id) ?? { ...billingAccounts[0], id: args?.id ?? 'ba_mock_1' }),
