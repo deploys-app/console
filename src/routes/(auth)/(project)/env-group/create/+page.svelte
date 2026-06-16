@@ -33,16 +33,17 @@
 	}
 
 	let saving = $state(false)
-
-	// The submit RPC depends on whether we're editing an existing env group
-	// (envGroup.update) or creating a new one (envGroup.create); gate on the one
-	// the save handler will actually call.
-	const savePermission = $derived(envGroup ? 'envgroup.update' : 'envgroup.create')
+	// Which save button is in flight, so only that one shows the spinner:
+	// 'redeploy' (Update and redeploy), 'update' (Update, no redeploy), or
+	// 'create'. Empty when idle.
+	let savingAction = $state('')
 
 	/**
 	 * @param {Event} e
+	 * @param {boolean} [redeploy]  on update, whether to redeploy the deployments
+	 *   that reference this group so they pick up the new values. Ignored on create.
 	 */
-	async function save (e) {
+	async function save (e, redeploy = true) {
 		e.preventDefault()
 
 		if (saving) {
@@ -50,6 +51,7 @@
 		}
 
 		saving = true
+		savingAction = envGroup ? (redeploy ? 'redeploy' : 'update') : 'create'
 		try {
 			const env = form.env.reduce((p, x) => {
 				if (x.k) p[x.k] = x.v
@@ -57,11 +59,11 @@
 			}, {})
 
 			const fn = envGroup ? 'envgroup.update' : 'envgroup.create'
-			const resp = await api.invoke(fn, {
-				project,
-				name: form.name,
-				env
-			}, fetch)
+			const args = { project, name: form.name, env }
+			if (envGroup) {
+				args.redeploy = redeploy
+			}
+			const resp = await api.invoke(fn, args, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
 				return
@@ -69,6 +71,7 @@
 			await goto(`/env-group?project=${project}`)
 		} finally {
 			saving = false
+			savingAction = ''
 		}
 	}
 
@@ -105,7 +108,7 @@
 </div>
 
 <div class="panel is-level-300 grid gap-4">
-	<form class="grid gap-4 w-full" onsubmit={save}>
+	<form class="grid gap-4 w-full" onsubmit={(e) => save(e, true)}>
 		<div class="field">
 			<label for="input-name">Name</label>
 			<div class="input">
@@ -178,10 +181,26 @@
 
 		<hr>
 
-		<div class="flex gap-4">
-			<GuardedButton permission={savePermission} type="submit" class="button" loading={saving}>
-				{#if envGroup}Update{:else}Create{/if}
-			</GuardedButton>
+		<div class="flex gap-4 items-center flex-wrap">
+			{#if envGroup}
+				<GuardedButton permission={['envgroup.update', 'deployment.deploy']} type="submit" class="button"
+					loading={saving && savingAction === 'redeploy'} disabled={saving}>
+					Update and redeploy
+				</GuardedButton>
+				<GuardedButton permission="envgroup.update" type="button" class="button is-variant-secondary"
+					loading={saving && savingAction === 'update'} disabled={saving}
+					onclick={(e) => save(e, false)}>
+					Update
+				</GuardedButton>
+				<p class="text-content/50 text-sm">
+					“Update and redeploy” rolls the new values out to deployments that use this group.
+					“Update” saves them without redeploying.
+				</p>
+			{:else}
+				<GuardedButton permission="envgroup.create" type="submit" class="button" loading={saving}>
+					Create
+				</GuardedButton>
+			{/if}
 		</div>
 	</form>
 </div>

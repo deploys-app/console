@@ -26,9 +26,10 @@ export function hasPermission (permissions, admin, permission) {
 
 /**
  * Default tooltip shown on a denied action control.
- * @param {string} permission  the missing permission, e.g. 'deployment.deploy'
+ * @param {string | undefined} permission  the missing permission, e.g. 'deployment.deploy'
  * @returns {string}
  */
 export function denyTooltip (permission) {
+	if (!permission) return 'You don\'t have permission to do this.'
 	return `You don't have permission to do this (requires ${permission}).`
 }
