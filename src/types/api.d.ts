@@ -720,4 +720,13 @@ declare namespace Api {
         egress: UsageMetricsLine[]
         storage: UsageMetricsLine[]
     }
+
+    export type ProjectMetricsResult = {
+        cpuUsage: UsageMetricsLine[]
+        memory: UsageMetricsLine[]
+        disk: UsageMetricsLine[]
+        egress: UsageMetricsLine[]
+        replica: UsageMetricsLine[]
+        staticStorage: UsageMetricsLine[]
+    }
 }

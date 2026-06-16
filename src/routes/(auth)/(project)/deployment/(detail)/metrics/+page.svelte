@@ -2,7 +2,7 @@
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
-	import { onMount, tick } from 'svelte'
+	import { onMount, tick, untrack } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 
 	const { data } = $props()
@@ -34,15 +34,20 @@
 
 	const validRanges = new Set(RANGES.map((o) => o.value))
 	const initialRange = $page.url.searchParams.get('range')
+	// Static deploys have no live pipeline and their storage gauge is daily, so
+	// default to a longer window where that data is meaningful. One-time read of
+	// the loaded deployment, hence untrack.
+	const defaultRange = untrack(() => data.deployment?.type === 'Static' ? '7dagg' : '1hagg')
 
 	const filter = $state({
-		range: initialRange && validRanges.has(initialRange) ? initialRange : '1hagg'
+		range: initialRange && validRanges.has(initialRange) ? initialRange : defaultRange
 	})
 
 	let cpu = $state([])
 	let memory = $state([])
 	let request = $state([])
 	let egress = $state([])
+	let storage = $state([])
 
 	let reloadTimeout
 	let lastFetchAt = $state(0)
@@ -68,6 +73,7 @@
 				memory = []
 				request = []
 				egress = []
+				storage = []
 				await tick()
 			}
 
@@ -84,6 +90,9 @@
 				request = [{ prefix: 'Requests', lines: resp.result.requests ?? [] }]
 			}
 			egress = [{ prefix: 'Egress', lines: resp.result.egress ?? [] }]
+			if (deployment.type === 'Static') {
+				storage = [{ prefix: 'Storage', lines: resp.result.storage ?? [] }]
+			}
 			lastFetchAt = Date.now()
 		} finally {
 			fetching = false
@@ -327,4 +336,9 @@
 		<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
 	{/if}
 	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
+	<!-- Static deploys serve from object storage; show each site's stored bytes
+	     (project-wide storage is on the project Metrics page). -->
+	{#if deployment.type === 'Static'}
+		<Chart title="Storage (bytes)" unit="bytes" series={storage} range={filter.range} />
+	{/if}
 </div>

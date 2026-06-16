@@ -15,6 +15,7 @@
 /** @type {ProjectMenuItem[]} */
 export const projectMenu = [
 	{ id: 'dashboard', title: 'Dashboard', icon: 'fa-columns', link: '/' },
+	{ id: 'metrics', title: 'Metrics', icon: 'fa-chart-line', link: '/metrics' },
 	{ id: 'deployment', title: 'Deployments', icon: 'fa-rocket', link: '/deployment' },
 	{ id: 'domain', title: 'Domains', icon: 'fa-globe', link: '/domain' },
 	{ id: 'route', title: 'Routes', icon: 'fa-router', link: '/route' },

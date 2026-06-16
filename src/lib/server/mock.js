@@ -1011,6 +1011,14 @@ const handlers = {
 		disk: 10737418240,
 		replica: 4
 	}),
+	'project.metrics': () => ok({
+		cpuUsage: dailyMetricLine('cpu_usage', 1.5),
+		memory: dailyMetricLine('memory', 805306368),
+		disk: dailyMetricLine('disk', 10737418240),
+		egress: dailyMetricLine('egress', 1073741824),
+		replica: dailyMetricLine('replica', 3),
+		staticStorage: dailyMetricLine('static_storage', 1610612736)
+	}),
 
 	'billing.list': () => list(billingAccounts),
 	'billing.get': (args) => ok(billingAccounts.find((b) => b.id === args?.id) ?? { ...billingAccounts[0], id: args?.id ?? 'ba_mock_1' }),
@@ -1144,7 +1152,8 @@ const handlers = {
 		memory: metricPodLines(402653184),
 		memoryLimit: metricPodLines(536870912),
 		requests: metricPodLines(120),
-		egress: metricPodLines(1048576)
+		egress: metricPodLines(1048576),
+		storage: dailyMetricLine('static_storage', 1610612736)
 	}),
 
 	'disk.list': () => list(disks),
