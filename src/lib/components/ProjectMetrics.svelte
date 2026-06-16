@@ -19,6 +19,7 @@
 	const { project } = $props()
 
 	const rangeOptions = [
+		{ value: '1d', label: '1 Day' },
 		{ value: '7d', label: '7 Days' },
 		{ value: '30d', label: '30 Days' },
 		{ value: '90d', label: '90 Days' }
