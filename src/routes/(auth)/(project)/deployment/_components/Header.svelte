@@ -29,6 +29,10 @@
 
 	const canPause = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'deploy')
 	const canResume = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'pause')
+	// Restart re-rolls the current revision (recreating the pods). Only meaningful
+	// for a live deployment — same state as pause; the apiserver rejects static,
+	// paused, and mid-deploy.
+	const canRestart = $derived(canPause)
 
 	const statusTone = $derived(
 		deployment.status === 'success' && deployment.action === 'pause'
@@ -63,6 +67,25 @@
 			yes: 'Pause',
 			callback: async () => {
 				const resp = await api.invoke('deployment.pause', {
+					project: deployment.project,
+					location: deployment.location,
+					name: deployment.name
+				}, fetch)
+				if (!resp.ok) {
+					modal.error({ error: resp.error })
+					return
+				}
+				invalidate?.()
+			}
+		})
+	}
+
+	function restart () {
+		modal.confirm({
+			title: `Restart ${deployment.name} in ${deployment.location}? This recreates the pods.`,
+			yes: 'Restart',
+			callback: async () => {
+				const resp = await api.invoke('deployment.restart', {
 					project: deployment.project,
 					location: deployment.location,
 					name: deployment.name
@@ -317,6 +340,13 @@
 			</div>
 		</div>
 		<div class="masthead__actions">
+			{#if canRestart}
+				<span class="inline-flex" title={can('deployment.deploy') ? null : denyTooltip('deployment.deploy')}>
+					<button class="mast-btn" type="button" disabled={!can('deployment.deploy')} aria-disabled={!can('deployment.deploy')} onclick={restart}>
+						<i class="fa-solid fa-rotate-right"></i> Restart
+					</button>
+				</span>
+			{/if}
 			{#if canPause}
 				<span class="inline-flex" title={can('deployment.deploy') ? null : denyTooltip('deployment.deploy')}>
 					<button class="mast-btn" type="button" disabled={!can('deployment.deploy')} aria-disabled={!can('deployment.deploy')} onclick={pause}>
