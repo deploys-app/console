@@ -15,31 +15,16 @@ const HEALTHY_STATUS_URL =
 	'data:application/json,' +
 	encodeURIComponent(JSON.stringify({ count: 1, ready: 1, succeeded: 0, failed: 0 }))
 
-/**
- * @template T
- * @param {T} [result]
- * @returns {{ ok: true, result: T }}
- */
-const ok = (result = /** @type {T} */ ({})) => ({ ok: true, result })
+const ok = <T>(result: T = ({} as T)): { ok: true, result: T } => ({ ok: true, result })
 
-/**
- * @param {string} message
- * @returns {{ ok: false, error: { message: string } }}
- */
-const err = (message) => ({ ok: false, error: { message } })
+const err = (message: string): { ok: false, error: { message: string } } => ({ ok: false, error: { message } })
 
-/**
- * @template T
- * @param {T[]} items
- */
-const list = (items) => ok({ items })
+const list = <T>(items: T[]) => ok({ items })
 
 /**
  * Synthesize a metric line: a single named series of [unixSeconds, value] points.
- * @param {string} name
- * @param {number} base
  */
-function metricLine (name, base) {
+function metricLine (name: string, base: number) {
 	const now = Math.floor(Date.now() / 1000)
 	const points = Array.from({ length: 30 }, (_, i) => {
 		const wobble = Math.sin(i / 3) * base * 0.25
@@ -54,18 +39,15 @@ function metricLine (name, base) {
 // stripping (only the trailing pod hash should show).
 const MOCK_PODS = ['d128-77-7d8f9b6c5-x2k9p', 'd128-77-7d8f9b6c5-q8m2t']
 
-/** @param {number} base */
-function metricPodLines (base) {
+function metricPodLines (base: number) {
 	return MOCK_PODS.map((name, i) => metricLine(name, base * (i === 0 ? 1 : 0.72))[0])
 }
 
 /**
  * dailyMetricLine builds a single daily series — one [unixSeconds, value] point
  * per day at midnight for the trailing 30 days — for the daily usage charts.
- * @param {string} name
- * @param {number} base
  */
-function dailyMetricLine (name, base) {
+function dailyMetricLine (name: string, base: number) {
 	const day = 86400
 	const now = Math.floor(Date.now() / 1000)
 	const today = now - (now % day)
@@ -131,7 +113,6 @@ const billingAccounts = [
 	}
 ]
 
-/** @param {string} [project] */
 function deployment (project = 'acme') {
 	return {
 		project,
@@ -142,8 +123,8 @@ function deployment (project = 'acme') {
 		image: 'registry.deploys.app/acme/web:latest',
 		env: { NODE_ENV: 'production', PORT: '8080' },
 		envGroups: ['shared'],
-		command: [],
-		args: [],
+		command: [] as string[],
+		args: [] as string[],
 		workloadIdentity: '',
 		pullSecret: '',
 		mountData: {},
@@ -165,7 +146,7 @@ function deployment (project = 'acme') {
 			requireGoogleLogin: true,
 			allowedEmails: ['owner@acme.io'],
 			allowedDomains: ['acme.io']
-		},
+		} as null | { requireGoogleLogin: boolean, allowedEmails: string[], allowedDomains: string[] },
 		// Hostnames only — both the Detail and Deployment pages prepend the
 		// scheme themselves.
 		url: 'web.acme.rcf2.deploys.app',
@@ -199,10 +180,6 @@ function deployment (project = 'acme') {
 // and release-sha rollback offline.
 const STATIC_RELEASE_SHA = 'a1b2c3d4e5f60718293a4b5c6d7e8f90112233445566778899aabbccddeeff00'
 
-/**
- * @param {string} [project]
- * @param {string} [releaseSha]
- */
 function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
 	return {
 		...deployment(project),
@@ -214,8 +191,8 @@ function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
 		image: '',
 		site: `site://deploys-static/${project}/website@${releaseSha}`,
 		siteManifestDigest: releaseSha,
-		command: [],
-		args: [],
+		command: [] as string[],
+		args: [] as string[],
 		minReplicas: 0,
 		maxReplicas: 0,
 		port: 0,
@@ -380,27 +357,18 @@ const wafZone = {
 	createdBy: USER_EMAIL
 }
 
-/** @type {Record<string, number>} */
-const wafRangeSeconds = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
+const wafRangeSeconds: Record<string, number> = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
 
 // Synthetic match metrics for the seed zone, so the firewall index sparkline +
 // total and the metrics page have something to draw. Scatters counts across the
 // requested window per (rule, action), mirroring waf.metrics' shape (sparse
 // buckets, grand total).
-/** @param {string} [timeRange] */
-function wafMetrics (timeRange) {
+function wafMetrics (timeRange?: string) {
 	const now = Math.floor(Date.now() / 1000)
 	const windowSeconds = wafRangeSeconds[timeRange ?? '1d'] ?? wafRangeSeconds['1d']
 
-	/**
-	 * @param {string} ruleId
-	 * @param {Api.WafAction} action
-	 * @param {number} buckets  // how many active samples
-	 * @param {number} scale    // max count per sample
-	 */
-	const makeSeries = (ruleId, action, buckets, scale) => {
-		/** @type {[number, number][]} */
-		const points = []
+	const makeSeries = (ruleId: string, action: Api.WafAction, buckets: number, scale: number) => {
+		const points: [number, number][] = []
 		let total = 0
 		for (let i = 0; i < buckets; i++) {
 			const ts = now - Math.floor(Math.random() * windowSeconds)
@@ -422,32 +390,23 @@ function wafMetrics (timeRange) {
 }
 
 // Bucket widths per range, matching waf.metrics / waf.limitMetrics server-side.
-/** @type {Record<string, number>} */
-const wafBucketSeconds = { '1h': 60, '6h': 300, '12h': 600, '1d': 1200, '7d': 3600, '30d': 14400 }
+const wafBucketSeconds: Record<string, number> = { '1h': 60, '6h': 300, '12h': 600, '1d': 1200, '7d': 3600, '30d': 14400 }
 
 // Synthetic rate-limit metrics for the seed zone's two limits, so the
 // "Rate limit activity" section has a trend to draw. Each limit gets an
 // `allowed` series with large counts and a `limited` series with small counts,
 // tuned so the limited share lands around the limit's target with some
 // time variation across the window.
-/** @param {string} [timeRange] */
-function wafLimitMetrics (timeRange) {
+function wafLimitMetrics (timeRange?: string) {
 	const now = Math.floor(Date.now() / 1000)
 	const range = timeRange ?? '1d'
 	const windowSeconds = wafRangeSeconds[range] ?? wafRangeSeconds['1d']
 	const bucket = wafBucketSeconds[range] ?? wafBucketSeconds['1d']
 	const from = now - windowSeconds
 
-	/**
-	 * @param {string} limitId
-	 * @param {number} base   typical allowed count per bucket
-	 * @param {number} share  typical limited share (0..1)
-	 */
-	const makeLimit = (limitId, base, share) => {
-		/** @type {[number, number][]} */
-		const allowed = []
-		/** @type {[number, number][]} */
-		const limited = []
+	const makeLimit = (limitId: string, base: number, share: number) => {
+		const allowed: [number, number][] = []
+		const limited: [number, number][] = []
 		let allowedTotal = 0
 		let limitedTotal = 0
 		for (let ts = from + bucket; ts <= now; ts += bucket) {
@@ -482,8 +441,7 @@ function wafLimitMetrics (timeRange) {
 // times the zone has been read while pending; the deployer is simulated by
 // flipping the zone from pending → success after the first poll, so the index
 // spinner visibly resolves on its own. Lets create → manage flow work too.
-/** @type {Map<string, { description: string, polls: number }>} */
-const wafConfigured = new Map()
+const wafConfigured = new Map<string, { description: string, polls: number }>()
 
 /**
  * Build a WAF zone for a session-created location. `advance` simulates the
@@ -491,10 +449,8 @@ const wafConfigured = new Map()
  * pending/create and the next list — after the page polls — settles to success,
  * making the spinner resolve on its own. waf.get reads observe the same state
  * without advancing it.
- * @param {string} location
- * @param {boolean} [advance]
  */
-function wafConfiguredZone (location, advance = false) {
+function wafConfiguredZone (location: string, advance = false) {
 	const entry = wafConfigured.get(location) ?? { description: '', polls: 0 }
 	const status = entry.polls > 0 ? 'success' : 'pending'
 	if (advance) {
@@ -560,21 +516,12 @@ const cacheZone = {
 // sparkline + total and the metrics page have something to draw. Scatters
 // counts across the requested window per (override, action, result), mirroring
 // cache.metrics' shape (sparse buckets, grand total). Reuses wafRangeSeconds.
-/** @param {string} [timeRange] */
-function cacheMetrics (timeRange) {
+function cacheMetrics (timeRange?: string) {
 	const now = Math.floor(Date.now() / 1000)
 	const windowSeconds = wafRangeSeconds[timeRange ?? '1d'] ?? wafRangeSeconds['1d']
 
-	/**
-	 * @param {string} overrideId
-	 * @param {Api.CacheAction} action
-	 * @param {Api.CacheMetricsSeries['result']} result
-	 * @param {number} buckets  // how many active samples
-	 * @param {number} scale    // max count per sample
-	 */
-	const makeSeries = (overrideId, action, result, buckets, scale) => {
-		/** @type {[number, number][]} */
-		const points = []
+	const makeSeries = (overrideId: string, action: Api.CacheAction, result: Api.CacheMetricsSeries['result'], buckets: number, scale: number) => {
+		const points: [number, number][] = []
 		let total = 0
 		for (let i = 0; i < buckets; i++) {
 			const ts = now - Math.floor(Math.random() * windowSeconds)
@@ -600,18 +547,15 @@ function cacheMetrics (timeRange) {
 // this dev session, mapped to { description, polls }. Mirrors wafConfigured —
 // the simulated deployer flips a freshly created zone from pending → success
 // after the first list read, so the index spinner resolves on its own.
-/** @type {Map<string, { description: string, polls: number }>} */
-const cacheConfigured = new Map()
+const cacheConfigured = new Map<string, { description: string, polls: number }>()
 
 /**
  * Build a cache zone for a session-created location. `advance` simulates the
  * deployer: set on cache.list reads (the index poll) so the first list shows
  * pending/create and the next list settles to success. cache.get reads observe
  * the same state without advancing it.
- * @param {string} location
- * @param {boolean} [advance]
  */
-function cacheConfiguredZone (location, advance = false) {
+function cacheConfiguredZone (location: string, advance = false) {
 	const entry = cacheConfigured.get(location) ?? { description: '', polls: 0 }
 	const status = entry.polls > 0 ? 'success' : 'pending'
 	if (advance) {
@@ -691,7 +635,16 @@ const permissions = [
 	'serviceAccount.list', 'serviceAccount.get', 'serviceAccount.create'
 ]
 
-const serviceAccounts = [
+interface ServiceAccount {
+	sid: string
+	email: string
+	name: string
+	description: string
+	createdAt: string
+	createdBy: string
+}
+
+const serviceAccounts: ServiceAccount[] = [
 	{
 		sid: 'sa_mock_ci',
 		email: 'ci@acme.serviceaccount.deploys.app',
@@ -702,8 +655,21 @@ const serviceAccounts = [
 	}
 ]
 
+interface GithubLink {
+	repositoryId: number
+	repository: string
+	installationId: number
+	serviceAccount: string
+	serviceAccountEmail: string
+	productionBranch: string
+	trigger: string
+	workflowConfig?: any
+	createdAt: string
+	createdBy: string
+}
+
 // github repo links — mutated by github.link / github.unlink within a session.
-const githubLinks = [
+const githubLinks: GithubLink[] = [
 	{
 		repositoryId: 812345678,
 		repository: 'acme/web',
@@ -957,8 +923,7 @@ const invoices = [
 	}
 ]
 
-/** @param {(typeof invoices)[number]} inv */
-function invoiceListItem (inv) {
+function invoiceListItem (inv: (typeof invoices)[number]) {
 	return {
 		id: inv.id,
 		number: inv.number,
@@ -987,8 +952,7 @@ const dropboxItems = [
 	}
 ]
 
-/** @type {Record<string, (args: any) => object>} */
-const handlers = {
+const handlers: Record<string, (args: any) => object> = {
 	'me.get': () => ok({ email: USER_EMAIL }),
 	// The mock user is a full-access owner, so every permission probe passes.
 	'me.authorized': () => ok({ authorized: true }),
@@ -1413,11 +1377,8 @@ const handlers = {
 /**
  * Resolve a mock response for an API function. Unknown functions return an
  * empty-but-ok payload so list/get callers degrade gracefully.
- * @param {string} fn
- * @param {object} [args]
- * @returns {object}
  */
-export function mockInvoke (fn, args = {}) {
+export function mockInvoke (fn: string, args: object = {}): object {
 	const handler = handlers[fn]
 	if (!handler) {
 		console.warn(`[mock] no fixture for "${fn}" — returning empty ok response`)

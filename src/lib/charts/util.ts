@@ -9,28 +9,29 @@
 /**
  * A single (x, y) sample. `x` is unix-ms on a time axis, or the category index
  * on a category axis.
- * @typedef {Object} ChartPoint
- * @property {number} x
- * @property {number} y
  */
+export interface ChartPoint {
+	x: number
+	y: number
+}
 
 /**
  * One drawable line for {@link LineChart}.
- * @typedef {Object} LineSeries
- * @property {string} name
- * @property {ChartPoint[]} points
- * @property {string} [color]   CSS color; falls back to the shared palette
- * @property {boolean} [dashed]
- * @property {boolean} [area]   fill a gradient under the line
  */
+export interface LineSeries {
+	name: string
+	points: ChartPoint[]
+	color?: string // CSS color; falls back to the shared palette
+	dashed?: boolean
+	area?: boolean // fill a gradient under the line
+}
 
 /**
  * The default series palette, drawn from the design tokens. Each entry is a CSS
  * color string; setting it via inline `style` (fill/stroke/stop-color) lets the
  * chart recolor instantly when the theme toggles, no re-render needed.
- * @type {string[]}
  */
-export const palette = [
+export const palette: string[] = [
 	'hsl(var(--hsl-primary))',
 	'hsl(var(--hsl-accent))',
 	'hsl(var(--hsl-info))',
@@ -42,10 +43,8 @@ export const palette = [
 /**
  * Round a span up to a "nice" number (1, 2, 5 × 10ⁿ) — the classic axis-tick
  * rounding so gridlines land on readable values.
- * @param {number} range
- * @param {boolean} round  round to nearest nice number vs. ceil
  */
-function niceNum (range, round) {
+function niceNum (range: number, round: boolean): number {
 	const exp = Math.floor(Math.log10(range))
 	const frac = range / Math.pow(10, exp)
 	let nice
@@ -63,12 +62,8 @@ function niceNum (range, round) {
 
 /**
  * Compute a y-axis scale with round tick values covering [min, max].
- * @param {number} min
- * @param {number} max
- * @param {number} [targetTicks]
- * @returns {{ min: number, max: number, ticks: number[] }}
  */
-export function niceScale (min, max, targetTicks = 5) {
+export function niceScale (min: number, max: number, targetTicks = 5): { min: number, max: number, ticks: number[] } {
 	if (!Number.isFinite(min) || !Number.isFinite(max)) {
 		min = 0
 		max = 1
@@ -80,7 +75,7 @@ export function niceScale (min, max, targetTicks = 5) {
 	const step = niceNum((max - min) / Math.max(1, targetTicks - 1), true)
 	const niceMin = Math.floor(min / step) * step
 	const niceMax = Math.ceil(max / step) * step
-	const ticks = []
+	const ticks: number[] = []
 	// Guard against float drift adding a phantom final tick.
 	for (let v = niceMin; v <= niceMax + step * 0.5; v += step) {
 		ticks.push(Math.round(v * 1e6) / 1e6)
@@ -93,16 +88,15 @@ const MIB = KIB * 1024
 const GIB = MIB * 1024
 const TIB = GIB * 1024
 
-/** Trim to at most `digits` decimals, dropping trailing zeros. @param {number} v @param {number} [digits] */
-function trim (v, digits = 2) {
+/** Trim to at most `digits` decimals, dropping trailing zeros. */
+function trim (v: number, digits = 2): string {
 	return Number(v.toFixed(digits)).toString()
 }
 
 /**
  * Binary byte formatting (Ki/Mi/Gi/Ti) for axis labels and tooltips.
- * @param {number} v
  */
-export function formatBytes (v) {
+export function formatBytes (v: number): string {
 	const a = Math.abs(v)
 	if (a >= TIB) return trim(v / TIB) + 'Ti'
 	if (a >= GIB) return trim(v / GIB) + 'Gi'
@@ -113,9 +107,8 @@ export function formatBytes (v) {
 
 /**
  * Compact, locale-aware number for non-byte axes (vCPU-seconds, rps, counts).
- * @param {number} v
  */
-export function formatNumber (v) {
+export function formatNumber (v: number): string {
 	if (!Number.isFinite(v)) return '0'
 	const a = Math.abs(v)
 	if (a >= 1_000_000) return trim(v / 1_000_000) + 'M'
@@ -123,20 +116,17 @@ export function formatNumber (v) {
 	return Number(v.toFixed(2)).toLocaleString()
 }
 
-/**
- * @typedef {Object} Pt
- * @property {number} x  pixel x
- * @property {number} y  pixel y
- */
+interface Pt {
+	x: number // pixel x
+	y: number // pixel y
+}
 
 /**
  * Build an SVG path `d` through the points. With `smooth`, uses a Catmull-Rom
  * spline converted to cubic béziers for organic curves; otherwise straight
  * segments.
- * @param {Pt[]} pts
- * @param {boolean} [smooth]
  */
-export function linePath (pts, smooth = false) {
+export function linePath (pts: Pt[], smooth = false): string {
 	if (pts.length === 0) return ''
 	if (pts.length === 1) return `M${pts[0].x},${pts[0].y}`
 	if (!smooth) {
@@ -160,11 +150,8 @@ export function linePath (pts, smooth = false) {
 /**
  * Build a closed area path: the line across the top, then down to `baseY` and
  * back. Returns '' for fewer than two points (nothing meaningful to fill).
- * @param {Pt[]} pts
- * @param {number} baseY  pixel y of the zero baseline
- * @param {boolean} [smooth]
  */
-export function areaPath (pts, baseY, smooth = false) {
+export function areaPath (pts: Pt[], baseY: number, smooth = false): string {
 	if (pts.length < 2) return ''
 	const top = linePath(pts, smooth)
 	return `${top}L${pts[pts.length - 1].x},${baseY}L${pts[0].x},${baseY}Z`

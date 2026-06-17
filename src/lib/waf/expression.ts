@@ -9,11 +9,10 @@
 // the modal UI stays thin.
 
 /**
- * Escape a JS string for use inside a CEL double-quoted string literal.
- * @param {string} v
- * @returns {string} the inner contents (no surrounding quotes)
+ * Escape a JS string for use inside a CEL double-quoted string literal. Returns
+ * the inner contents (no surrounding quotes).
  */
-export function celString (v) {
+export function celString (v: string): string {
 	return String(v ?? '')
 		.replace(/\\/g, '\\\\')
 		.replace(/"/g, '\\"')
@@ -22,28 +21,23 @@ export function celString (v) {
 		.replace(/\t/g, '\\t')
 }
 
-/** @param {string} v */
-function quote (v) {
+function quote (v: string): string {
 	return `"${celString(v)}"`
 }
 
-/**
- * @typedef {'string' | 'ip' | 'numeric' | 'tls' | 'country' | 'asn'} FieldType
- */
+export type FieldType = 'string' | 'ip' | 'numeric' | 'tls' | 'country' | 'asn'
 
-/**
- * @typedef {Object} FieldMeta
- * @property {string} value         stable key used in the spec
- * @property {string} label         human label shown in the Select
- * @property {FieldType} type       drives which operators/options apply
- * @property {boolean} [hasName]    true → field needs an extra name input (header/arg/cookie)
- * @property {string} [accessor]    fixed CEL accessor (fields without a name)
- * @property {string} [accessorMap] CEL map accessor template, `<name>` replaced (fields with a name)
- * @property {string[]} [suggestions] free-text combobox suggestions (datalist) for equals/not_equals
- */
+export interface FieldMeta {
+	value: string // stable key used in the spec
+	label: string // human label shown in the Select
+	type: FieldType // drives which operators/options apply
+	hasName?: boolean // true → field needs an extra name input (header/arg/cookie)
+	accessor?: string // fixed CEL accessor (fields without a name)
+	accessorMap?: string // CEL map accessor template, `<name>` replaced (fields with a name)
+	suggestions?: string[] // free-text combobox suggestions (datalist) for equals/not_equals
+}
 
-/** @type {FieldMeta[]} */
-export const fields = [
+export const fields: FieldMeta[] = [
 	{ value: 'method', label: 'Method', type: 'string', accessor: 'request.method', suggestions: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] },
 	{ value: 'path', label: 'Path', type: 'string', accessor: 'request.path' },
 	{ value: 'host', label: 'Host', type: 'string', accessor: 'request.host' },
@@ -61,23 +55,19 @@ export const fields = [
 	{ value: 'cookie', label: 'Cookie', type: 'string', hasName: true, accessorMap: 'request.cookies["<name>"]' }
 ]
 
-/** @type {Record<string, FieldMeta>} */
-const fieldByValue = Object.fromEntries(fields.map((f) => [f.value, f]))
+const fieldByValue: Record<string, FieldMeta> = Object.fromEntries(fields.map((f) => [f.value, f]))
 
-/** @param {string} value @returns {FieldMeta | undefined} */
-export function getField (value) {
+export function getField (value: string): FieldMeta | undefined {
 	return fieldByValue[value]
 }
 
-/**
- * @typedef {Object} OperatorMeta
- * @property {string} value
- * @property {string} label
- * @property {boolean} [multi]  true → operand is a list of values (textarea)
- */
+export interface OperatorMeta {
+	value: string
+	label: string
+	multi?: boolean // true → operand is a list of values (textarea)
+}
 
-/** @type {OperatorMeta[]} */
-const stringOperators = [
+const stringOperators: OperatorMeta[] = [
 	{ value: 'equals', label: 'equals' },
 	{ value: 'not_equals', label: 'not equals' },
 	{ value: 'in_list', label: 'is in', multi: true },
@@ -94,9 +84,8 @@ const stringOperators = [
  * String operators backed by a standard CEL string method. `negate` wraps the
  * call in a leading `!`. Single source of truth for both the generator and the
  * inverse parser (`operatorByMethod`).
- * @type {Record<string, { method: 'startsWith' | 'endsWith', negate: boolean }>}
  */
-const methodOperators = {
+const methodOperators: Record<string, { method: 'startsWith' | 'endsWith', negate: boolean }> = {
 	starts_with: { method: 'startsWith', negate: false },
 	not_starts_with: { method: 'startsWith', negate: true },
 	ends_with: { method: 'endsWith', negate: false },
@@ -104,12 +93,11 @@ const methodOperators = {
 }
 
 /** Reverse of `methodOperators`, keyed `"<method>:<negate>"`. */
-const operatorByMethod = Object.fromEntries(
+const operatorByMethod: Record<string, string> = Object.fromEntries(
 	Object.entries(methodOperators).map(([op, m]) => [`${m.method}:${m.negate}`, op])
 )
 
-/** @type {OperatorMeta[]} */
-const ipOperators = [
+const ipOperators: OperatorMeta[] = [
 	{ value: 'in_cidr', label: 'in CIDR' },
 	{ value: 'ip_equals', label: 'equals' }
 ]
@@ -118,17 +106,15 @@ const ipOperators = [
  * Operators for fields matched by exact value or list membership (country code,
  * ASN). `in_list` / `not_in_list` build a CEL `in […]` membership; the field
  * type decides whether operands are quoted (country) or raw ints (asn).
- * @type {OperatorMeta[]}
  */
-const membershipOperators = [
+const membershipOperators: OperatorMeta[] = [
 	{ value: 'equals', label: 'equals' },
 	{ value: 'not_equals', label: 'not equals' },
 	{ value: 'in_list', label: 'is in', multi: true },
 	{ value: 'not_in_list', label: 'is not in', multi: true }
 ]
 
-/** @type {OperatorMeta[]} */
-const numericOperators = [
+const numericOperators: OperatorMeta[] = [
 	{ value: 'num_eq', label: '==' },
 	{ value: 'num_ne', label: '!=' },
 	{ value: 'num_lt', label: '<' },
@@ -137,8 +123,7 @@ const numericOperators = [
 	{ value: 'num_ge', label: '>=' }
 ]
 
-/** @type {Record<string, string>} */
-const numericOps = {
+const numericOps: Record<string, string> = {
 	num_eq: '==',
 	num_ne: '!=',
 	num_lt: '<',
@@ -149,10 +134,8 @@ const numericOps = {
 
 /**
  * Operators available for a given field type.
- * @param {FieldType} type
- * @returns {OperatorMeta[]}
  */
-export function operatorsForType (type) {
+export function operatorsForType (type: FieldType): OperatorMeta[] {
 	switch (type) {
 	case 'ip': return ipOperators
 	case 'numeric': return numericOperators
@@ -168,49 +151,41 @@ export function operatorsForType (type) {
  * fields, but the HTTP method is a closed set of tokens (GET/POST/…), so only
  * exact-match and list membership make sense — prefix/suffix/regex/contains are
  * not offered.
- * @param {FieldMeta | undefined} field
- * @returns {OperatorMeta[]}
  */
-export function operatorsForField (field) {
+export function operatorsForField (field: FieldMeta | undefined): OperatorMeta[] {
 	if (!field) return stringOperators
 	if (field.value === 'method') return membershipOperators
 	return operatorsForType(field.type)
 }
 
-/** @param {string} op */
-export function isMultiOperator (op) {
+export function isMultiOperator (op: string): boolean {
 	return op === 'contains_any' || op === 'in_list' || op === 'not_in_list'
 }
 
 /**
  * Split a multi-value input into a clean list. Accepts newline- or
  * comma-separated values; trims each and drops the empties.
- * @param {string} raw
- * @returns {string[]}
  */
-export function parseList (raw) {
+export function parseList (raw: string): string[] {
 	return String(raw ?? '')
 		.split(/[\n,]/)
 		.map((s) => s.trim())
 		.filter((s) => s.length > 0)
 }
 
-/**
- * @typedef {Object} ExpressionSpec
- * @property {string} field            field key (see `fields`)
- * @property {string} [name]           name for header/arg/cookie fields
- * @property {string} operator         operator key
- * @property {string} [value]          single operand (equals/regex/cidr/numeric)
- * @property {string} [values]         raw multi-value text (any-of operators)
- * @property {boolean} [tls]           TLS on/off for a `'tls'` field (https vs http)
- */
+export interface ExpressionSpec {
+	field: string // field key (see `fields`)
+	name?: string // name for header/arg/cookie fields
+	operator: string // operator key
+	value?: string // single operand (equals/regex/cidr/numeric)
+	values?: string // raw multi-value text (any-of operators)
+	tls?: boolean // TLS on/off for a `'tls'` field (https vs http)
+}
 
 /**
  * Resolve the raw CEL accessor for a spec's field (no transforms applied).
- * @param {ExpressionSpec} spec
- * @returns {string}
  */
-function resolveAccessor (spec) {
+function resolveAccessor (spec: ExpressionSpec): string {
 	const f = fieldByValue[spec.field]
 	if (!f) return ''
 	if (f.hasName) {
@@ -225,11 +200,8 @@ function resolveAccessor (spec) {
  * Returns an empty string when the spec is incomplete (e.g. missing value, an
  * empty any-of list, or a name-bearing field with no name) so the caller can
  * disable Insert.
- *
- * @param {ExpressionSpec} spec
- * @returns {string}
  */
-export function buildExpression (spec) {
+export function buildExpression (spec: ExpressionSpec): string {
 	const f = fieldByValue[spec.field]
 	if (!f) return ''
 	if (f.hasName && !(spec.name ?? '').trim()) return ''
@@ -237,8 +209,7 @@ export function buildExpression (spec) {
 	const accessor = resolveAccessor(spec)
 	if (!accessor) return ''
 
-	/** @type {string} */
-	let snippet
+	let snippet: string
 
 	if (f.type === 'tls') {
 		// TLS on/off toggle — ignore the operator. ON → https, OFF → http.
@@ -325,37 +296,27 @@ export function buildExpression (spec) {
 
 /**
  * Combine a generated snippet with an existing expression.
- * @param {string} existing
- * @param {string} snippet
- * @param {'and' | 'or' | 'replace'} mode
- * @returns {string}
  */
-export function combineExpression (existing, snippet, mode) {
+export function combineExpression (existing: string, snippet: string, mode: 'and' | 'or' | 'replace'): string {
 	const e = (existing ?? '').trim()
 	if (!e || mode === 'replace') return snippet
 	if (mode === 'or') return `${e} || ${snippet}`
 	return `${e} && ${snippet}`
 }
 
-/**
- * @typedef {'and' | 'or'} Combinator
- */
+export type Combinator = 'and' | 'or'
 
-/**
- * @typedef {Object} ExpressionGroup
- * @property {Combinator} combinator
- * @property {ExpressionSpec[]} conditions
- */
+export interface ExpressionGroup {
+	combinator: Combinator
+	conditions: ExpressionSpec[]
+}
 
 /**
  * Build a flat group of conditions joined by a single boolean operator. This is
  * the multi-condition counterpart to `buildExpression` and the exact string
  * `parseExpression` is the inverse of.
- * @param {Combinator} combinator
- * @param {ExpressionSpec[]} conditions
- * @returns {string}
  */
-export function buildGroup (combinator, conditions) {
+export function buildGroup (combinator: Combinator, conditions: ExpressionSpec[]): string {
 	return (conditions ?? [])
 		.map(buildExpression)
 		.filter(Boolean)
@@ -364,11 +325,10 @@ export function buildGroup (combinator, conditions) {
 
 /**
  * Un-escape the inner contents of a CEL double-quoted string literal. Exact
- * inverse of `celString` (reverses `\\ \" \n \r \t`).
- * @param {string} inner  contents between the surrounding quotes
- * @returns {string}
+ * inverse of `celString` (reverses `\\ \" \n \r \t`). `inner` is the contents
+ * between the surrounding quotes.
  */
-function unescapeCelString (inner) {
+function unescapeCelString (inner: string): string {
 	let out = ''
 	for (let i = 0; i < inner.length; i++) {
 		const c = inner[i]
@@ -394,10 +354,8 @@ function unescapeCelString (inner) {
  * Match a single double-quoted CEL string literal at the START of `s`. Returns
  * the decoded value and the index just past the closing quote, or `null` if `s`
  * doesn't begin with a well-formed literal. Honours `\"`/`\\` escapes.
- * @param {string} s
- * @returns {{ value: string, end: number } | null}
  */
-function matchStringLiteral (s) {
+function matchStringLiteral (s: string): { value: string, end: number } | null {
 	if (s[0] !== '"') return null
 	let i = 1
 	let inner = ''
@@ -427,14 +385,10 @@ function matchStringLiteral (s) {
  * Returns `{ parts, op }` where `op` is the single boolean operator seen
  * (`'and'`, `'or'`, or `null` for a single part). Returns `null` when BOTH `&&`
  * and `||` appear at the top level (a "complex" expression).
- * @param {string} s
- * @returns {{ parts: string[], op: Combinator | null } | null}
  */
-function splitTopLevel (s) {
-	/** @type {string[]} */
-	const parts = []
-	/** @type {Combinator | null} */
-	let op = null
+function splitTopLevel (s: string): { parts: string[], op: Combinator | null } | null {
+	const parts: string[] = []
+	let op: Combinator | null = null
 	let depth = 0
 	let start = 0
 	let i = 0
@@ -479,12 +433,12 @@ function splitTopLevel (s) {
 }
 
 /** Map a fixed CEL accessor back to its field key. */
-const fieldByAccessor = Object.fromEntries(
+const fieldByAccessor: Record<string, string> = Object.fromEntries(
 	fields.filter((f) => f.accessor).map((f) => [f.accessor, f.value])
 )
 
 /** Map a named-map field's `request.xxx[` prefix back to its field key. */
-const nameFieldByPrefix = Object.fromEntries(
+const nameFieldByPrefix: Record<string, string> = Object.fromEntries(
 	fields
 		.filter((f) => f.hasName && f.accessorMap)
 		.map((f) => [(f.accessorMap ?? '').split('["<name>"]')[0], f.value])
@@ -494,10 +448,8 @@ const nameFieldByPrefix = Object.fromEntries(
  * Parse a single accessor at the START of `s` (a fixed `request.x` accessor or a
  * named `request.headers["name"]` form). Returns the resolved field key, the
  * optional decoded name, and the index just past the accessor — or `null`.
- * @param {string} s
- * @returns {{ field: string, name?: string, end: number } | null}
  */
-function matchAccessor (s) {
+function matchAccessor (s: string): { field: string, name?: string, end: number } | null {
 	// Named map accessor: `request.headers["..."]` etc. Try these first since the
 	// fixed-accessor table has no overlap with the map prefixes.
 	for (const prefix of Object.keys(nameFieldByPrefix)) {
@@ -510,8 +462,7 @@ function matchAccessor (s) {
 	}
 	// Fixed accessors — pick the longest matching one so e.g. `request.host`
 	// isn't shadowed by a shorter prefix (none currently overlap, but be safe).
-	/** @type {string | null} */
-	let best = null
+	let best: string | null = null
 	for (const accessor of Object.keys(fieldByAccessor)) {
 		if (s.startsWith(accessor) && (!best || accessor.length > best.length)) best = accessor
 	}
@@ -528,14 +479,11 @@ function matchAccessor (s) {
  * Parse the bracketed, comma-separated quoted list at the START of `s`
  * (`["a", "b"]` exactly as the generator emits). Returns the decoded items and
  * the consumed length, or `null` when malformed.
- * @param {string} s
- * @returns {{ items: string[], end: number } | null}
  */
-function matchList (s) {
+function matchList (s: string): { items: string[], end: number } | null {
 	if (s[0] !== '[') return null
 	let i = 1
-	/** @type {string[]} */
-	const items = []
+	const items: string[] = []
 	// Empty list is never emitted (buildExpression returns '' for it).
 	while (true) {
 		const lit = matchStringLiteral(s.slice(i))
@@ -552,14 +500,11 @@ function matchList (s) {
  * Parse the bracketed, comma-separated integer list at the START of `s`
  * (`[13335, 16509]` exactly as the generator emits). Returns the items (as
  * strings) and the consumed length, or `null` when malformed.
- * @param {string} s
- * @returns {{ items: string[], end: number } | null}
  */
-function matchIntList (s) {
+function matchIntList (s: string): { items: string[], end: number } | null {
 	if (s[0] !== '[') return null
 	let i = 1
-	/** @type {string[]} */
-	const items = []
+	const items: string[] = []
 	// Empty list is never emitted (buildExpression returns '' for it).
 	while (true) {
 		const m = /^\d+/.exec(s.slice(i))
@@ -576,10 +521,8 @@ function matchIntList (s) {
  * Parse the `<accessor>.startsWith("v")` / `.endsWith("v")` method forms — each
  * optionally negated with a leading `!` (the "not …" operators). String fields
  * only. Returns the spec or `null`.
- * @param {string} s
- * @returns {ExpressionSpec | null}
  */
-function parseMethodCall (s) {
+function parseMethodCall (s: string): ExpressionSpec | null {
 	let negate = false
 	let body = s
 	if (body.startsWith('!')) {
@@ -591,8 +534,7 @@ function parseMethodCall (s) {
 	const field = getField(acc.field)
 	if (!field || field.type !== 'string') return null
 	const rest = body.slice(acc.end)
-	/** @type {'startsWith' | 'endsWith' | null} */
-	let method = null
+	let method: 'startsWith' | 'endsWith' | null = null
 	if (rest.startsWith('.startsWith(')) method = 'startsWith'
 	else if (rest.startsWith('.endsWith(')) method = 'endsWith'
 	if (!method) return null
@@ -613,10 +555,8 @@ function parseMethodCall (s) {
  * Parse exactly one CEL condition (a single conjunct) back into an
  * `ExpressionSpec`. Strict: only forms `buildExpression` can emit are accepted.
  * Returns `null` for anything else.
- * @param {string} part
- * @returns {ExpressionSpec | null}
  */
-function parseCondition (part) {
+function parseCondition (part: string): ExpressionSpec | null {
 	const s = part.trim()
 	if (!s) return null
 
@@ -761,19 +701,15 @@ function parseCondition (part) {
  * operator, or returns `null` when the string is not EXACTLY representable by
  * the visual builder (mixed `&&`/`||`, grouping, unknown functions, wrappers,
  * malformed input). A false "complex" is acceptable; a wrong parse is not.
- *
- * @param {string} cel
- * @returns {ExpressionGroup | null}
  */
-export function parseExpression (cel) {
+export function parseExpression (cel: string): ExpressionGroup | null {
 	const trimmed = String(cel ?? '').trim()
 	if (trimmed === '') return { combinator: 'and', conditions: [] }
 
 	const split = splitTopLevel(trimmed)
 	if (!split) return null
 
-	/** @type {ExpressionSpec[]} */
-	const conditions = []
+	const conditions: ExpressionSpec[] = []
 	for (const part of split.parts) {
 		const spec = parseCondition(part)
 		if (!spec) return null

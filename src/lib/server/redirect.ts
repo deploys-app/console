@@ -13,11 +13,8 @@
  *  - must not point back at the auth endpoints themselves (avoids a sign-in loop)
  *
  * Returns the safe path, or '' when the input is missing or fails any check.
- *
- * @param {string | null | undefined} value
- * @returns {string}
  */
-export function sanitizeRedirect (value) {
+export function sanitizeRedirect (value: string | null | undefined): string {
 	if (!value) return ''
 	if (!value.startsWith('/')) return ''
 	if (value.startsWith('//')) return ''

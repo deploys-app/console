@@ -3,28 +3,21 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 
 /**
  * Escape a string for safe interpolation into a SweetAlert `html` body.
- * @param {string} s
- * @returns {string}
  */
-function escapeHtml (s) {
+function escapeHtml (s: string): string {
 	return s.replace(/[&<>"']/g, (c) => (
-		{ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] ?? c
+		({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>)[c] ?? c
 	))
 }
 
-/**
- * @typedef {Object} ModalConfirmOptions
- * @property {string} [title]
- * @property {string} [html]
- * @property {string} [yes]
- * @property {function?} [callback]
- */
+interface ModalConfirmOptions {
+	title?: string
+	html?: string
+	yes?: string
+	callback?: (() => void) | null
+}
 
-/**
- * @param {ModalConfirmOptions} options
- * @returns {Promise<boolean>}
- */
-export async function confirm ({ title, html, yes, callback }) {
+export async function confirm ({ title, html, yes, callback }: ModalConfirmOptions): Promise<boolean> {
 	const result = await Swal.fire({
 		title: 'Are you sure?',
 		text: title,
@@ -49,17 +42,12 @@ export async function confirm ({ title, html, yes, callback }) {
 	return true
 }
 
-/**
- * @typedef {Object} ModalErrorOptions
- * @property {string | Api.Error | unknown} [error]
- * @property {Function} [callback]
- */
+interface ModalErrorOptions {
+	error?: string | Api.Error | unknown
+	callback?: (() => void) | null
+}
 
-/**
- * @param {ModalErrorOptions} options
- * @returns {Promise<void>}
- */
-export async function error ({ error, callback }) {
+export async function error ({ error, callback }: ModalErrorOptions): Promise<void> {
 	if (!error) {
 		callback?.()
 		return
@@ -109,16 +97,11 @@ export async function error ({ error, callback }) {
 	callback?.()
 }
 
-/**
- * @typedef {Object} ModalSuccessOptions
- * @property {string} [content]
- */
+interface ModalSuccessOptions {
+	content?: string
+}
 
-/**
- * @param {ModalSuccessOptions} options
- * @returns {Promise<void>}
- */
-export async function success ({ content }) {
+export async function success ({ content }: ModalSuccessOptions): Promise<void> {
 	await Swal.fire({
 		title: 'Success',
 		text: content,

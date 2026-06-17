@@ -1,5 +1,6 @@
-/** @type {import('./$types').RequestHandler} */
-export async function POST ({ locals, request, url }) {
+import type { RequestHandler } from './$types'
+
+export const POST: RequestHandler = async ({ locals, request, url }) => {
 	const token = locals.token
 	const project = url.searchParams.get('project')
 	const filename = url.searchParams.get('filename') ?? ''
@@ -17,8 +18,7 @@ export async function POST ({ locals, request, url }) {
 		})
 	}
 
-	/** @type {Record<string, string>} */
-	const headers = {
+	const headers: Record<string, string> = {
 		accept: 'application/json',
 		'content-type': request.headers.get('content-type') ?? 'application/octet-stream',
 		'param-project': project,

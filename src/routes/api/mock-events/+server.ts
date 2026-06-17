@@ -7,6 +7,7 @@
 // that drift forward as the page sits open so the relative-time column
 // keeps updating naturally.
 
+import type { RequestHandler } from './$types'
 import { env } from '$env/dynamic/private'
 
 // Pod references use full id-named pod names (`d128-77-<rsHash>-<podHash>`) so
@@ -32,9 +33,8 @@ const WARNINGS = [
 /**
  * Build a varied, reasonably-realistic feed where timestamps are anchored to
  * "now" so the events page's relative-time column shows fresh values.
- * @param {number} count
  */
-function buildFeed (count) {
+function buildFeed (count: number) {
 	const now = Date.now()
 	const out = []
 	for (let i = 0; i < count; i++) {
@@ -52,8 +52,7 @@ function buildFeed (count) {
 	return out
 }
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET () {
+export const GET: RequestHandler = async () => {
 	if (!env.MOCK_API) return new Response('not found', { status: 404 })
 
 	const events = buildFeed(12 + (Math.random() * 8 | 0))

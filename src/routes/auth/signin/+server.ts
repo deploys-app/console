@@ -1,3 +1,4 @@
+import type { RequestHandler } from './$types'
 import { env } from '$env/dynamic/private'
 import { sanitizeRedirect } from '$lib/server/redirect'
 
@@ -7,9 +8,8 @@ const webcrypto = crypto
 
 /**
  * randomState generates a random string for OAuth2 state
- * @returns {string}
  */
-function randomState () {
+function randomState (): string {
 	const x = new Uint8Array(16)
 	webcrypto.getRandomValues(x)
 	return Array.from(x, (d) => d.toString(16).padStart(2, '0')).join('')
@@ -17,10 +17,8 @@ function randomState () {
 
 /**
  * base64url encodes bytes without padding (RFC 4648 §5) — the encoding PKCE uses.
- * @param {Uint8Array} bytes
- * @returns {string}
  */
-function base64url (bytes) {
+function base64url (bytes: Uint8Array): string {
 	let s = ''
 	for (const b of bytes) {
 		s += String.fromCharCode(b)
@@ -31,9 +29,8 @@ function base64url (bytes) {
 /**
  * randomCodeVerifier returns a high-entropy PKCE code_verifier (RFC 7636):
  * base64url of 32 random bytes (43 chars, within the 43–128 range).
- * @returns {string}
  */
-function randomCodeVerifier () {
+function randomCodeVerifier (): string {
 	const x = new Uint8Array(32)
 	webcrypto.getRandomValues(x)
 	return base64url(x)
@@ -43,16 +40,13 @@ function randomCodeVerifier () {
  * codeChallengeS256 derives the S256 PKCE code_challenge from a verifier:
  * base64url(SHA-256(verifier)), no padding (RFC 7636 §4.2). auth verifies this
  * at /token against the code_verifier we present in the callback.
- * @param {string} verifier
- * @returns {Promise<string>}
  */
-async function codeChallengeS256 (verifier) {
+async function codeChallengeS256 (verifier: string): Promise<string> {
 	const digest = await webcrypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
 	return base64url(new Uint8Array(digest))
 }
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET ({ cookies, url }) {
+export const GET: RequestHandler = async ({ cookies, url }) => {
 	const state = randomState()
 
 	// PKCE (OAuth 2.1): console stays a confidential client (it still sends its

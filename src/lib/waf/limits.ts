@@ -5,36 +5,34 @@
 /**
  * One characteristic of the bucket key. Header/cookie carry a name; the rest
  * round-trip as a bare keyword ('ip', 'host', 'country', 'asn').
- * @typedef {Object} KeyRow
- * @property {'ip' | 'host' | 'country' | 'asn' | 'header' | 'cookie'} type
- * @property {string} name
  */
+export interface KeyRow {
+	type: 'ip' | 'host' | 'country' | 'asn' | 'header' | 'cookie'
+	name: string
+}
 
-/**
- * @typedef {Object} LimitForm
- * @property {string} id
- * @property {string} description
- * @property {KeyRow[]} key
- * @property {number} rate
- * @property {string} window
- * @property {'fixed' | 'sliding'} algorithm
- * @property {'enforce' | 'shadow'} mode
- * @property {number} status
- * @property {string} message
- * @property {string} filter
- */
+export interface LimitForm {
+	id: string
+	description: string
+	key: KeyRow[]
+	rate: number
+	window: string
+	algorithm: 'fixed' | 'sliding'
+	mode: 'enforce' | 'shadow'
+	status: number
+	message: string
+	filter: string
+}
 
 export const DEFAULT_LIMIT_STATUS = 429
 export const DEFAULT_LIMIT_MESSAGE = 'Too Many Requests'
 
-/** @type {Record<string, string>} */
-export const modeLabels = {
+export const modeLabels: Record<string, string> = {
 	enforce: 'Enforce',
 	shadow: 'Shadow'
 }
 
-/** @type {Record<KeyRow['type'], string>} */
-export const keyTypeLabels = {
+export const keyTypeLabels: Record<KeyRow['type'], string> = {
 	ip: 'IP address',
 	host: 'Host',
 	country: 'Country',
@@ -46,8 +44,7 @@ export const keyTypeLabels = {
 // Window presets covering the API's allowed 1s..1h range. Zones loaded with a
 // window outside this list still render — the edit page appends the loaded
 // value as an extra option.
-/** @type {{ value: string, label: string }[]} */
-export const windowOptions = [
+export const windowOptions: { value: string, label: string }[] = [
 	{ value: '1s', label: '1 second' },
 	{ value: '10s', label: '10 seconds' },
 	{ value: '30s', label: '30 seconds' },
@@ -60,10 +57,8 @@ export const windowOptions = [
 
 /**
  * Parse an API key part ('ip', 'header:x-api-key', …) into a form row.
- * @param {string} part
- * @returns {KeyRow}
  */
-export function parseKeyPart (part) {
+export function parseKeyPart (part: string): KeyRow {
 	if (part.startsWith('header:')) return { type: 'header', name: part.slice('header:'.length) }
 	if (part.startsWith('cookie:')) return { type: 'cookie', name: part.slice('cookie:'.length) }
 	if (part === 'host' || part === 'country' || part === 'asn') return { type: part, name: '' }
@@ -75,10 +70,8 @@ export function parseKeyPart (part) {
  * an empty name are incomplete and yield ''. Header names are normalized to
  * lowercase (HTTP headers are case-insensitive — parapet does the same);
  * cookie names keep their spelling (cookies match case-sensitively).
- * @param {KeyRow} row
- * @returns {string}
  */
-export function keyRowToApi (row) {
+export function keyRowToApi (row: KeyRow): string {
 	if (row.type === 'header' || row.type === 'cookie') {
 		const name = row.name.trim()
 		if (!name) return ''
@@ -90,10 +83,8 @@ export function keyRowToApi (row) {
 /**
  * Human label for an API key, e.g. ['ip', 'header:x-api-key'] →
  * "IP + Header x-api-key".
- * @param {string[]} [key]
- * @returns {string}
  */
-export function describeKey (key) {
+export function describeKey (key?: string[]): string {
 	const parts = (key && key.length > 0 ? key : ['ip']).map((part) => {
 		const row = parseKeyPart(part)
 		if (row.type === 'header' || row.type === 'cookie') {
@@ -104,11 +95,7 @@ export function describeKey (key) {
 	return parts.join(' + ')
 }
 
-/**
- * @param {Api.WafLimit} [limit]
- * @returns {LimitForm}
- */
-export function limitForm (limit) {
+export function limitForm (limit?: Api.WafLimit): LimitForm {
 	return {
 		id: limit?.id ?? '',
 		description: limit?.description ?? '',
@@ -125,10 +112,8 @@ export function limitForm (limit) {
 
 /**
  * Generate a stable, unique limit id that doesn't collide with `taken`.
- * @param {string[]} taken
- * @returns {string}
  */
-export function genLimitId (taken) {
+export function genLimitId (taken: string[]): string {
 	let id
 	do {
 		id = 'limit-' + Math.random().toString(36).slice(2, 8)
@@ -138,12 +123,9 @@ export function genLimitId (taken) {
 
 /**
  * Map API limits to form rows, giving every row a unique id.
- * @param {Api.WafLimit[]} [apiLimits]
- * @returns {LimitForm[]}
  */
-export function normalizeLimits (apiLimits) {
-	/** @type {string[]} */
-	const taken = []
+export function normalizeLimits (apiLimits?: Api.WafLimit[]): LimitForm[] {
+	const taken: string[] = []
 	return (apiLimits ?? []).map((l) => {
 		const f = limitForm(l)
 		if (!f.id || taken.includes(f.id)) f.id = genLimitId(taken)
@@ -156,13 +138,10 @@ export function normalizeLimits (apiLimits) {
  * Map form rows back to the API limit shape. Key rows are deduped (and
  * incomplete header/cookie rows dropped), falling back to ['ip'] when nothing
  * valid remains.
- * @param {LimitForm[]} limits
- * @returns {Api.WafLimit[]}
  */
-export function toApiLimits (limits) {
+export function toApiLimits (limits: LimitForm[]): Api.WafLimit[] {
 	return limits.map((l) => {
-		/** @type {string[]} */
-		const key = []
+		const key: string[] = []
 		for (const row of l.key) {
 			const part = keyRowToApi(row)
 			if (part && !key.includes(part)) key.push(part)

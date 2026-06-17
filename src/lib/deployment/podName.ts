@@ -7,8 +7,7 @@
 // helpers strip that prefix wherever it appears, leaving just the pod-specific
 // suffix (`<replicaSetHash>-<podHash>`).
 
-/** @param {string} s */
-function escapeRegExp (s) {
+function escapeRegExp (s: string): string {
 	return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
@@ -16,13 +15,10 @@ function escapeRegExp (s) {
  * Build a function that strips the deployment's `<kubeName>-<projectID>-` prefix
  * from any text — a bare pod name (logs) or pod references embedded in free-text
  * event messages.
- *
- * @param {{ internalAddress?: string }} [deployment]
- * @returns {(text?: string) => string}
  */
-export function podPrefixStripper (deployment) {
+export function podPrefixStripper (deployment?: { internalAddress?: string }): (text?: string) => string {
 	const addr = (deployment?.internalAddress ?? '').trim()
-	const alts = []
+	const alts: string[] = []
 	// Primary: the exact service name (`<kubeName>-<projectID>`). Guard against
 	// the field ever being an IP or empty by requiring the `<name>-<digits>`
 	// shape so we never build a prefix that matches arbitrary text.
