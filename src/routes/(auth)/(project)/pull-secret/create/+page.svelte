@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	// @ts-expect-error workaround for missing type
 	import validUrl from 'valid-url'
 	import type { PageData } from './$types'
 	import * as modal from '$lib/modal'

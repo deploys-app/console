@@ -27,6 +27,18 @@ export interface LineSeries {
 }
 
 /**
+ * The platform metric-input shape consumed by {@link Chart}: one or more named
+ * lines grouped under a label, optionally styled. Distinct from {@link LineSeries},
+ * which is the flattened draw model LineChart renders directly.
+ */
+export interface MetricSeries {
+	prefix: string
+	lines: Api.UsageMetricsLine[]
+	dashStyle?: string // any value → rendered dashed (e.g. limits)
+	color?: string // 'red' maps to the danger token
+}
+
+/**
  * The default series palette, drawn from the design tokens. Each entry is a CSS
  * color string; setting it via inline `style` (fill/stroke/stop-color) lets the
  * chart recolor instantly when the theme toggles, no re-render needed.

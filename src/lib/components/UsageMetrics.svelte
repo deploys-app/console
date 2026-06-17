@@ -5,6 +5,7 @@
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
+	import type { MetricSeries } from '$lib/charts/util'
 
 	/**
 	 * Daily egress + storage usage charts for a project-level feature (Dropbox,
@@ -15,11 +16,6 @@
 	interface Props {
 		project: string
 		fn: string // api function, e.g. 'dropbox.metrics'
-	}
-
-	interface Series {
-		prefix: string
-		lines: Api.UsageMetricsLine[]
 	}
 
 	const { project, fn }: Props = $props()
@@ -34,8 +30,8 @@
 		range: $page.url.searchParams.get('range') || '30d'
 	})
 
-	let egress = $state<Series[]>([])
-	let storage = $state<Series[]>([])
+	let egress = $state<MetricSeries[]>([])
+	let storage = $state<MetricSeries[]>([])
 
 	async function fetchMetrics (clear = false) {
 		// `range` is read untracked so the project-keyed effect below isn't also

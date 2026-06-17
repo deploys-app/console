@@ -2,9 +2,9 @@
 	import type { LayoutData } from './$types'
 	import type { Snippet } from 'svelte'
 	import Cookie from 'js-cookie'
-	import { onMount, setContext } from 'svelte'
+	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { hasPermission } from '$lib/permission'
+	import { hasPermission, setPermissionContext } from '$lib/permission'
 
 	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
@@ -21,7 +21,7 @@
 	// correct even if the permission fields were ever moved to a different load
 	// level. `can` reads $page.data at call time, so it always reflects the
 	// current project's permissions after navigation.
-	setContext('permission', {
+	setPermissionContext({
 		can: (p: string) => hasPermission($page.data.permissions, $page.data.permissionsAdmin, p)
 	})
 

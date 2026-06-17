@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte'
+	import { onMount } from 'svelte'
 	import * as format from '$lib/format'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 	import type { PageData } from './$types'
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	const { data }: { data: PageData } = $props()
 	const deployment = $derived(data.deployment)

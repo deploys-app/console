@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { getContext } from 'svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -14,7 +13,7 @@
 	const disks = $derived(data.disks)
 	const error = $derived(data.error)
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 </script>
 
 <div class="page-head">

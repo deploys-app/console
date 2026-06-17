@@ -262,14 +262,6 @@ export const countries: Country[] = [
 const nameByCode: Record<string, string> = Object.fromEntries(countries.map((c) => [c.code, c.name]))
 
 /**
- * Human-readable name for a country code, or the code itself when unknown (so an
- * out-of-list value loaded from an existing rule still renders).
- */
-export function countryName (code: string): string {
-	return nameByCode[String(code ?? '').toUpperCase()] ?? code
-}
-
-/**
  * Label combining code and name, e.g. `"TH — Thailand"`. Falls back to the bare
  * code for unknown values.
  */

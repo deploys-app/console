@@ -5,13 +5,7 @@
 	import { onMount, tick, untrack } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 	import type { PageData } from './$types'
-
-	interface MetricSeries {
-		prefix: string
-		lines: Api.UsageMetricsLine[]
-		dashStyle?: string
-		color?: string
-	}
+	import type { MetricSeries } from '$lib/charts/util'
 
 	const { data }: { data: PageData } = $props()
 

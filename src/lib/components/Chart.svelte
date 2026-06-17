@@ -1,7 +1,7 @@
 <script lang="ts">
 	import LineChart from '$lib/components/LineChart.svelte'
 	import { formatBytes, formatNumber } from '$lib/charts/util'
-	import type { LineSeries } from '$lib/charts/util'
+	import type { LineSeries, MetricSeries } from '$lib/charts/util'
 
 	/**
 	 * Metric time-series panel: a titled card wrapping {@link LineChart}. Accepts
@@ -9,22 +9,10 @@
 	 * more lines of `[unixSeconds, value]` points — and flattens it for drawing.
 	 */
 
-	interface Line {
-		name: string
-		points: [number, number][] // [unixSeconds, value]
-	}
-
-	interface Series {
-		prefix: string
-		lines: Line[]
-		dashStyle?: string // any value → rendered dashed (e.g. limits)
-		color?: string // 'red' maps to the danger token
-	}
-
 	interface Props {
 		title: string
 		unit: string // 'bytes' formats Ki/Mi/Gi; else plain number
-		series: Series[]
+		series: MetricSeries[]
 		type?: 'line' | 'spline'
 		range?: string // e.g. '1h', '6hagg' — sizes the time window
 	}

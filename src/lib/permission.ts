@@ -1,3 +1,5 @@
+import { getContext, setContext } from 'svelte'
+
 // Permission matching mirrors the server's effective-grant check exactly.
 // `permissions` is the caller's effective grant set and may contain the
 // wildcards '*' (all) and '<resource>.*' (all actions on a resource). `admin`
@@ -29,4 +31,21 @@ export function hasPermission (permissions: string[] | undefined, admin: boolean
 export function denyTooltip (permission: string | undefined): string {
 	if (!permission) return 'You don\'t have permission to do this.'
 	return `You don't have permission to do this (requires ${permission}).`
+}
+
+// The reactive permission gate provided by the (project) layout to every
+// descendant via Svelte context. `can(permission)` answers whether the current
+// user may perform an action — used by GuardedButton and page-level guards.
+export interface PermissionContext {
+	can: (permission: string) => boolean
+}
+
+const PERMISSION_KEY = Symbol('permission')
+
+export function setPermissionContext (ctx: PermissionContext): void {
+	setContext(PERMISSION_KEY, ctx)
+}
+
+export function getPermissionContext (): PermissionContext {
+	return getContext(PERMISSION_KEY)
 }

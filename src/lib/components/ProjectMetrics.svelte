@@ -5,6 +5,7 @@
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
+	import type { MetricSeries } from '$lib/charts/util'
 
 	/**
 	 * Daily project-level usage charts read from the project.metrics RPC. CPU,
@@ -14,11 +15,6 @@
 
 	interface Props {
 		project: string
-	}
-
-	interface Series {
-		prefix: string
-		lines: Api.UsageMetricsLine[]
 	}
 
 	const { project }: Props = $props()
@@ -33,12 +29,12 @@
 		range: $page.url.searchParams.get('range') || '30d'
 	})
 
-	let cpu = $state<Series[]>([])
-	let memory = $state<Series[]>([])
-	let egress = $state<Series[]>([])
-	let replica = $state<Series[]>([])
-	let disk = $state<Series[]>([])
-	let storage = $state<Series[]>([])
+	let cpu = $state<MetricSeries[]>([])
+	let memory = $state<MetricSeries[]>([])
+	let egress = $state<MetricSeries[]>([])
+	let replica = $state<MetricSeries[]>([])
+	let disk = $state<MetricSeries[]>([])
+	let storage = $state<MetricSeries[]>([])
 
 	async function fetchMetrics (clear = false) {
 		// `range` is read untracked so the project-keyed effect below isn't also
