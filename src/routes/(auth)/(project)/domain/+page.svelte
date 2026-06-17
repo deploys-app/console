@@ -1,9 +1,8 @@
 <script lang="ts">
-	import NoDataRow from '$lib/components/NoDataRow.svelte'
+	import ListTable from '$lib/components/ListTable.svelte'
 	import * as modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
-	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import type { PageData } from './$types'
 
@@ -32,60 +31,38 @@
 	}
 </script>
 
-<div class="page-head">
-	<div>
-		<h4><strong>Domains</strong></h4>
-		<p class="page-sub">{domains.length} {domains.length === 1 ? 'domain' : 'domains'}</p>
-	</div>
-	<GuardedButton permission="domain.create" class="button is-icon-left" href={`/domain/create?project=${project}`}>
-		<i class="fa-solid fa-plus"></i>
-		Create
-	</GuardedButton>
-</div>
-<div class="panel is-level-300">
-	<div class="table-container">
-		<table class="table is-variant-compact">
-			<thead>
-			<tr>
-				<th>Domain</th>
-				<th>Location</th>
-<!--				<th>Created at</th>-->
-<!--				<th>Created by</th>-->
-				<th class="is-collapse is-align-right"></th>
-			</tr>
-			</thead>
-			<tbody>
-				{#each domains as it (`${it.domain}-${it.location}`)}
-					{@const dnsHasErrors = (it.verification?.dns?.errors?.length ?? 0) > 0}
-					<tr>
-						<td>
-							<StatusIcon status={it.status} />
-							<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link cell-name">{it.domain}</a>
-							{#if it.wildcard}
-								<span class="meta-chip is-accent ml-2" title="Wildcard domain — matches all subdomains">
-									<i class="fa-solid fa-asterisk" aria-hidden="true"></i> Wildcard
-								</span>
-							{/if}
-							{#if dnsHasErrors}
-								<i class="fa-solid fa-triangle-exclamation text-warning ml-2"
-									title="DNS verification is failing. Open the domain to see details."></i>
-							{/if}
-						</td>
-						<td>
-							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
-						</td>
-<!--						<td>{format.datetime(it.createdAt)}</td>-->
-<!--						<td>{it.createdBy}</td>-->
-						<td>
-							<GuardedButton permission="domain.delete" class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
-								<i class="fa-solid fa-trash-alt"></i>
-							</GuardedButton>
-						</td>
-					</tr>
-				{/each}
-				<NoDataRow span={3} list={domains} />
-				<ErrorRow span={3} {error} />
-			</tbody>
-		</table>
-	</div>
-</div>
+<ListTable
+	title="Domains"
+	items={domains}
+	{error}
+	noun="domain"
+	createPermission="domain.create"
+	createHref={`/domain/create?project=${project}`}
+	columns={['Domain', 'Location']}
+	actions
+	key={(it) => `${it.domain}-${it.location}`}>
+	{#snippet row(it)}
+		{@const dnsHasErrors = (it.verification?.dns?.errors?.length ?? 0) > 0}
+		<td>
+			<StatusIcon status={it.status} />
+			<a href={`/domain/detail?project=${project}&domain=${it.domain}`} class="link cell-name">{it.domain}</a>
+			{#if it.wildcard}
+				<span class="meta-chip is-accent ml-2" title="Wildcard domain — matches all subdomains">
+					<i class="fa-solid fa-asterisk" aria-hidden="true"></i> Wildcard
+				</span>
+			{/if}
+			{#if dnsHasErrors}
+				<i class="fa-solid fa-triangle-exclamation text-warning ml-2"
+					title="DNS verification is failing. Open the domain to see details."></i>
+			{/if}
+		</td>
+		<td>
+			<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
+		</td>
+		<td>
+			<GuardedButton permission="domain.delete" class="icon-button" aria-label="Remove" onclick={() => deleteDomain(it)}>
+				<i class="fa-solid fa-trash-alt"></i>
+			</GuardedButton>
+		</td>
+	{/snippet}
+</ListTable>
