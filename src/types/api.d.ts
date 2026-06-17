@@ -356,6 +356,13 @@ declare namespace Api {
         ttl: number
     }
 
+    export type ServiceAccountKey = {
+        createdAt: string
+        // The key secret. serviceAccount.get returns it for the account's keys;
+        // serviceAccount.createKey does not echo it back (re-read to obtain it).
+        secret: string
+    }
+
     export type ServiceAccount = {
         sid: string
         email: string
@@ -363,6 +370,8 @@ declare namespace Api {
         description: string
         createdAt: string
         createdBy: string
+        // Populated by serviceAccount.get; omitted from serviceAccount.list.
+        keys?: ServiceAccountKey[]
     }
 
     export type GithubLink = {
@@ -726,5 +735,53 @@ declare namespace Api {
         egress: UsageMetricsLine[]
         replica: UsageMetricsLine[]
         staticStorage: UsageMetricsLine[]
+    }
+
+    // Result of deployment.metrics. Every series is optional — the backend only
+    // returns the metrics relevant to the deployment type (e.g. requests for
+    // WebService/Static, storage for Static).
+    export type DeploymentMetricsResult = {
+        cpuUsage?: UsageMetricsLine[]
+        cpuLimit?: UsageMetricsLine[]
+        memoryUsage?: UsageMetricsLine[]
+        memory?: UsageMetricsLine[]
+        memoryLimit?: UsageMetricsLine[]
+        requests?: UsageMetricsLine[]
+        egress?: UsageMetricsLine[]
+        storage?: UsageMetricsLine[]
+    }
+
+    // Result of disk.metrics.
+    export type DiskMetricsResult = {
+        usage?: UsageMetricsLine[]
+        size?: UsageMetricsLine[]
+    }
+
+    export type BillingReportProject = {
+        sid: string
+        name: string
+    }
+
+    export type BillingReportRow = {
+        projectSid: string
+        name: string
+        usageValue: number
+        billingValue: number
+    }
+
+    export type BillingReportChartSeries = {
+        name: string
+        data: number[]
+    }
+
+    // Result of billing.report.
+    export type BillingReport = {
+        projectList: BillingReportProject[]
+        projectSids: string[]
+        list: BillingReportRow[]
+        chart: {
+            categories: string[]
+            series: BillingReportChartSeries[]
+        }
     }
 }

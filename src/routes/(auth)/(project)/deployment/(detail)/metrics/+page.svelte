@@ -6,27 +6,11 @@
 	import Chart from '$lib/components/Chart.svelte'
 	import type { PageData } from './$types'
 
-	interface MetricLine {
-		name: string
-		points: [number, number][]
-	}
-
 	interface MetricSeries {
 		prefix: string
-		lines: MetricLine[]
+		lines: Api.UsageMetricsLine[]
 		dashStyle?: string
 		color?: string
-	}
-
-	interface DeploymentMetricsResult {
-		cpuUsage?: MetricLine[]
-		cpuLimit?: MetricLine[]
-		memoryUsage?: MetricLine[]
-		memory?: MetricLine[]
-		memoryLimit?: MetricLine[]
-		requests?: MetricLine[]
-		egress?: MetricLine[]
-		storage?: MetricLine[]
 	}
 
 	const { data }: { data: PageData } = $props()
@@ -84,7 +68,7 @@
 		fetching = true
 
 		try {
-			const resp = await api.invoke<DeploymentMetricsResult>('deployment.metrics', {
+			const resp = await api.invoke<Api.DeploymentMetricsResult>('deployment.metrics', {
 				project: deployment.project,
 				location: deployment.location,
 				name: deployment.name,

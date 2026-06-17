@@ -205,12 +205,6 @@
 	let creatingPullSecret = $state(false)
 	let pullSecretError = $state('')
 
-	// serviceAccount.get returns the account plus its keys (with the one-time
-	// secret on a freshly minted key) — wider than Api.ServiceAccount.
-	type ServiceAccountWithKeys = Api.ServiceAccount & {
-		keys?: Array<{ createdAt: string, secret?: string }>
-	}
-
 	// Provision a dedicated pull-only service account (registry.pull), mint a
 	// key, and create a pull secret for it in the selected location — then select
 	// it in the generator. Idempotent: reuses an existing github-pull secret,
@@ -241,7 +235,7 @@
 			}
 
 			// 2. Resolve the SA email + existing keys.
-			let getResp = await api.invoke<ServiceAccountWithKeys>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
+			let getResp = await api.invoke<Api.ServiceAccount>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
 			if (!getResp.ok) {
 				pullSecretError = getResp.error?.message ?? 'Failed to read the pull service account.'
 				return
@@ -281,7 +275,7 @@
 					pullSecretError = keyResp.error?.message ?? 'Failed to create a service account key.'
 					return
 				}
-				getResp = await api.invoke<ServiceAccountWithKeys>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
+				getResp = await api.invoke<Api.ServiceAccount>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
 				if (!getResp.ok) {
 					pullSecretError = getResp.error?.message ?? 'Failed to read the new key.'
 					return

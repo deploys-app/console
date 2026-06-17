@@ -9,33 +9,6 @@
 
 	const { data }: { data: PageData } = $props()
 
-	interface ReportProject {
-		sid: string
-		name: string
-	}
-
-	interface ReportRow {
-		projectSid: string
-		name: string
-		usageValue: number
-		billingValue: number
-	}
-
-	interface ReportChartSeries {
-		name: string
-		data: number[]
-	}
-
-	interface Report {
-		projectList: ReportProject[]
-		projectSids: string[]
-		list: ReportRow[]
-		chart: {
-			categories: string[]
-			series: ReportChartSeries[]
-		}
-	}
-
 	const billingAccount = $derived(data.billingAccount)
 
 	const filter = $state<{ range: string, projectSids: string[] }>({
@@ -43,7 +16,7 @@
 		projectSids: []
 	})
 
-	let report = $state<Report | undefined>()
+	let report = $state<Api.BillingReport | undefined>()
 	let loading = $state(false)
 	let bootstrapped = false
 
@@ -149,7 +122,7 @@
 
 		loading = true
 		try {
-			const resp = await api.invoke<Report>('billing.report', {
+			const resp = await api.invoke<Api.BillingReport>('billing.report', {
 				id: billingAccount.id,
 				range: filter.range,
 				projectSids: filter.projectSids ?? []
