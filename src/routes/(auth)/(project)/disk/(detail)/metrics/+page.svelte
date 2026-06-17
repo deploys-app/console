@@ -13,11 +13,6 @@
 		color?: string
 	}
 
-	interface DiskMetricsResult {
-		usage?: Api.UsageMetricsLine[]
-		size?: Api.UsageMetricsLine[]
-	}
-
 	const { data }: { data: PageData } = $props()
 
 	const disk = $derived(data.disk)
@@ -47,7 +42,7 @@
 		reloadTimeout = null
 
 		try {
-			const resp = await api.invoke<DiskMetricsResult>('disk.metrics', {
+			const resp = await api.invoke<Api.DiskMetricsResult>('disk.metrics', {
 				project: disk.project,
 				location: disk.location,
 				name: disk.name,

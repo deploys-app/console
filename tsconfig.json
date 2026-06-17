@@ -1,13 +1,10 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		// All of src/ is TypeScript. allowJs remains only because the generated
-		// SvelteKit tsconfig pulls in the root tooling configs (vite.config.js,
-		// svelte.config.js, etc.); checkJs stays off so those un-typed configs
-		// don't have to satisfy strict checking. Everything under src/ is fully
-		// strict.
-		"allowJs": true,
-		"checkJs": false,
+		// Every file the type-checker sees is TypeScript — no allowJs. The only
+		// remaining .js (svelte.config.js, server.js) are loaded outside Vite /
+		// run directly at runtime and aren't part of this program.
+		"allowJs": false,
 		"strict": true,
 		// don't type-check third-party .d.ts files (e.g. type-fest internals,
 		// @svelte-plugins/datepicker) — our own sources stay fully strict.

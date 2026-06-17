@@ -10,7 +10,6 @@ const useBuild = !!process.env.PLAYWRIGHT_USE_BUILD
 const devCommand = `bun run dev --port ${PORT} --strictPort --host 127.0.0.1`
 const buildCommand = 'bun ./build'
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
 export default defineConfig({
 	testDir: './tests',
 	testMatch: '**/*.spec.js',

@@ -18,11 +18,7 @@
 
 	const project = $derived(data.project)
 	const id = $derived(data.id)
-	// serviceAccount.get returns the account plus its issued keys; the keys array
-	// isn't part of the shared Api.ServiceAccount shape, so widen it locally.
-	const serviceAccount = $derived(
-		data.serviceAccount as Api.ServiceAccount & { keys?: { secret: string }[] }
-	)
+	const serviceAccount = $derived(data.serviceAccount)
 
 	function deleteItem () {
 		modal.confirm({
