@@ -4,7 +4,8 @@
 
 	/**
 	 * @typedef {Object} Props
-	 * @property {string} permission  required permission, e.g. 'deployment.deploy'
+	 * @property {string | string[]} permission  required permission(s), e.g. 'deployment.deploy'
+	 *   or ['envgroup.update', 'deployment.deploy']. When an array, ALL are required.
 	 * @property {string} [href]  when set AND allowed, renders an <a> instead of a <button>
 	 * @property {(e: MouseEvent) => void} [onclick]
 	 * @property {'button' | 'submit' | 'reset'} [type]  button type (ignored for <a>); default 'button'
@@ -32,7 +33,11 @@
 	/** @type {{ can: (p: string) => boolean }} */
 	const { can } = getContext('permission')
 
-	const allowed = $derived(can(permission))
+	const required = $derived(Array.isArray(permission) ? permission : [permission])
+	// First permission the caller is missing — drives the deny tooltip so the
+	// user sees exactly which grant is needed.
+	const missing = $derived(required.find((p) => !can(p)))
+	const allowed = $derived(missing === undefined)
 </script>
 
 {#if !allowed}
@@ -43,7 +48,7 @@
 		hover — a bare disabled button does not fire hover tooltips consistently
 		across browsers.
 	-->
-	<span class="inline-flex" title={denyTooltip(permission)}>
+	<span class="inline-flex" title={denyTooltip(missing)}>
 		<button class={klass} type="button" disabled aria-disabled="true" {...rest}>
 			{@render children?.()}
 		</button>
