@@ -32,5 +32,6 @@ export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'dropbox', title: 'Dropbox', icon: 'fa-box-open', link: '/dropbox' },
 	{ id: 'registry', title: 'Registry', icon: 'fa-warehouse-full', link: '/registry' },
 	{ id: 'github', title: 'GitHub', icon: 'fa-code-branch', link: '/github', preview: true },
+	{ id: 'scheduler', title: 'Scheduler', icon: 'fa-clock', link: '/scheduler', preview: true },
 	{ id: 'audit-log', title: 'Audit Logs', icon: 'fa-clipboard-list', link: '/audit-log' }
 ]

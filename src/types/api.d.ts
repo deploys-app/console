@@ -694,6 +694,55 @@ declare namespace Api {
         items: CacheZone[]
     }
 
+    // Scheduler — cron-driven outbound HTTP requests (project-scoped,
+    // location-less). The auth secret is write-only: never present in responses.
+    export type SchedulerAuth = {
+        type: '' | 'none' | 'basic' | 'bearer'
+        username?: string
+        // accepted on create/update, never returned by get/list.
+        secret?: string
+    }
+
+    export type SchedulerJob = {
+        project: string
+        name: string
+        schedule: string
+        timezone: string
+        method: string
+        url: string
+        headers?: Record<string, string>
+        body?: string
+        auth: SchedulerAuth
+        insecureSkipVerify: boolean
+        paused: boolean
+        // denormalized last-run state. lastResult is '' before the first run.
+        lastResult: '' | 'success' | 'failed'
+        lastRunAt?: string | null
+        lastLatencyMs: number
+        lastHttpStatus: number
+        lastError: string
+        nextRunAt?: string | null
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+        updatedBy: string
+    }
+
+    export type SchedulerInvocation = {
+        id: string
+        startedAt: string
+        result: 'success' | 'failed'
+        httpStatus: number
+        latencyMs: number
+        error: string
+    }
+
+    export type SchedulerLogsResult = {
+        project: string
+        name: string
+        items: SchedulerInvocation[]
+    }
+
     // cache.metrics reuses WafMetricsTimeRange.
     export type CacheMetricsSeries = {
         overrideId: string
