@@ -447,6 +447,9 @@ test.describe('deployment detail — non-static keeps pod surface', () => {
 		await expect(main.locator('.spec').filter({ hasText: 'Pull Secret' })).toBeVisible()
 		await expect(main.locator('.spec').filter({ hasText: 'Workload Identity' })).toBeVisible()
 		await expect(main.locator('.spec').filter({ hasText: 'Allocated Price' })).toBeVisible()
+		// A live (success + deploy) non-static deployment offers Restart and Pause.
+		await expect(page.getByRole('button', { name: 'Restart' })).toBeVisible()
+		await expect(page.getByRole('button', { name: 'Pause' })).toBeVisible()
 	})
 })
 

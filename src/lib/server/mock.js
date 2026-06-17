@@ -1119,6 +1119,7 @@ const handlers = {
 	'deployment.delete': () => ok({}),
 	'deployment.pause': () => ok({}),
 	'deployment.resume': () => ok({}),
+	'deployment.restart': () => ok({}),
 	'deployment.rollback': () => ok({}),
 	'deployment.revisions': (args) => {
 		// Static deployment: per-revision release-shas, no image.
