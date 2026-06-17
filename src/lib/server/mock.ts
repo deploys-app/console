@@ -609,6 +609,61 @@ const envGroups = [
 	}
 ]
 
+const schedulerJobs = [
+	{
+		project: 'acme',
+		name: 'daily-health-check',
+		schedule: '0 9 * * *',
+		timezone: 'Asia/Bangkok',
+		method: 'POST',
+		url: 'https://api.example.com/health',
+		headers: { 'Content-Type': 'application/json' },
+		body: '{"check":true}',
+		auth: { type: 'bearer' },
+		insecureSkipVerify: false,
+		paused: false,
+		lastResult: 'success',
+		lastRunAt: CREATED_AT,
+		lastLatencyMs: 142,
+		lastHttpStatus: 200,
+		lastError: '',
+		nextRunAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'cache-warmer',
+		schedule: '*/15 * * * *',
+		timezone: 'UTC',
+		method: 'GET',
+		url: 'https://example.com/warm',
+		headers: {},
+		body: '',
+		auth: { type: 'none' },
+		insecureSkipVerify: false,
+		paused: true,
+		lastResult: 'failed',
+		lastRunAt: CREATED_AT,
+		lastLatencyMs: 30021,
+		lastHttpStatus: 0,
+		lastError: 'context deadline exceeded',
+		nextRunAt: null,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	}
+]
+
+const schedulerInvocations = [
+	{ id: '3', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 142, error: '' },
+	{ id: '2', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 158, error: '' },
+	{ id: '1', startedAt: CREATED_AT, result: 'failed', httpStatus: 500, latencyMs: 88, error: 'unexpected status 500' }
+]
+
 const roles = [
 	{
 		role: 'viewer',
@@ -1249,6 +1304,16 @@ const handlers: Record<string, (args: any) => object> = {
 	'envGroup.create': () => ok({}),
 	'envGroup.update': () => ok({}),
 	'envGroup.delete': () => ok({}),
+
+	'scheduler.list': () => list(schedulerJobs),
+	'scheduler.get': (args) => ok(schedulerJobs.find((j) => j.name === args?.name) ?? { ...schedulerJobs[0], name: args?.name ?? 'daily-health-check' }),
+	'scheduler.create': () => ok({}),
+	'scheduler.update': () => ok({}),
+	'scheduler.delete': () => ok({}),
+	'scheduler.pause': () => ok({}),
+	'scheduler.resume': () => ok({}),
+	'scheduler.trigger': () => ok({ id: '99', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 134, error: '' }),
+	'scheduler.logs': () => list(schedulerInvocations),
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
 
