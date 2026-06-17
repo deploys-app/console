@@ -2,21 +2,19 @@ import { invalidate } from '$app/navigation'
 
 const endpoint = '/api'
 
-/** @type {Function} */
-let onUnauth
+let onUnauth: (() => void) | undefined
 
-/**
- * @template T
- * @param {string} fn
- * @param {Object} args
- * @param {fetch} fetch
- * @param {{ silent?: boolean }} [opts] when `silent`, an unauthorized response
- *   is flagged on the result but the global `onUnauth` handler is NOT fired.
- *   Use it for best-effort / background fan-outs (e.g. the search palette) where
- *   a single transient unauthorized must not reload the whole app.
- * @returns {Promise<Api.Response<T>>}
- */
-async function invoke (fn, args, fetch, opts) {
+interface InvokeOptions {
+	/**
+	 * when `silent`, an unauthorized response is flagged on the result but the
+	 * global `onUnauth` handler is NOT fired. Use it for best-effort / background
+	 * fan-outs (e.g. the search palette) where a single transient unauthorized
+	 * must not reload the whole app.
+	 */
+	silent?: boolean
+}
+
+async function invoke<T> (fn: string, args: unknown, fetch: typeof globalThis.fetch, opts?: InvokeOptions): Promise<Api.Response<T>> {
 	const resp = await fetch(`${endpoint}/${fn}`, {
 		method: 'POST',
 		body: JSON.stringify(args || {}),
@@ -29,7 +27,7 @@ async function invoke (fn, args, fetch, opts) {
 	// e.g. a gateway/ingress HTML error page on a 5xx. Parsing then throws, which
 	// would escape every caller. Fall back to a synthesized error envelope so the
 	// result shape is always `Api.Response`.
-	let body
+	let body: any
 	try {
 		body = await resp.json()
 	} catch {
@@ -69,7 +67,7 @@ async function invoke (fn, args, fetch, opts) {
 					body.error.routes = m[1]
 						.replace(/\s*\(\+\d+ more\)\s*$/, '')
 						.split(', ')
-						.map((s) => s.trim())
+						.map((s: string) => s.trim())
 						.filter(Boolean)
 				} else {
 					body.error.routes = []
@@ -84,18 +82,11 @@ async function invoke (fn, args, fetch, opts) {
 	return body
 }
 
-/**
- * @param {Function} callback
- */
-function setOnUnauth (callback) {
+function setOnUnauth (callback: () => void): void {
 	onUnauth = callback
 }
 
-/**
- * @param {string} fn
- * @returns {Promise<void>}
- */
-function wrapInvalidate (fn) {
+function wrapInvalidate (fn: string): Promise<void> {
 	return invalidate(`${endpoint}/${fn}`)
 }
 
@@ -103,12 +94,9 @@ function wrapInvalidate (fn) {
  * intervalInvalidate calls callback every interval milliseconds
  * must be called in onMount
  * callback can return a number to override the interval for only the next call
- * @param {() => Promise<number | void>} callback
- * @param {number} interval
- * @returns {() => void}
  */
-function intervalInvalidate (callback, interval) {
-	let p
+function intervalInvalidate (callback: () => Promise<number | void>, interval: number): () => void {
+	let p: ReturnType<typeof setTimeout>
 
 	const f = async () => {
 		let newInterval = await callback()

@@ -1,6 +1,8 @@
 import js from '@eslint/js'
 import svelte from 'eslint-plugin-svelte'
 import globals from 'globals'
+import tsParser from '@typescript-eslint/parser'
+import tsPlugin from '@typescript-eslint/eslint-plugin'
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
@@ -199,6 +201,45 @@ export default [
 			'wrap-iife': ['error', 'any', { functionPrototypeMethods: true }],
 			'yield-star-spacing': ['error', 'both'],
 			yoda: ['error', 'never']
+		}
+	},
+	{
+		// TypeScript sources. Wire the TS parser and defer identifier/type-aware
+		// checks to typescript-eslint; the stylistic rules above still apply.
+		files: ['**/*.ts'],
+		languageOptions: {
+			parser: tsParser
+		},
+		plugins: {
+			'@typescript-eslint': tsPlugin
+		},
+		rules: {
+			// core no-unused-vars can't see type-only references; defer to the
+			// TS-aware version for .ts files.
+			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': ['error', {
+				args: 'none',
+				caughtErrors: 'none',
+				ignoreRestSiblings: true,
+				vars: 'all'
+			}],
+			// TypeScript resolves identifiers and types itself; core no-undef
+			// gives false positives on type names and ambient globals.
+			'no-undef': 'off'
+		}
+	},
+	{
+		// Parse <script lang="ts"> blocks in Svelte components with the TS parser.
+		files: ['**/*.svelte'],
+		languageOptions: {
+			parserOptions: {
+				parser: tsParser
+			}
+		},
+		rules: {
+			// svelte-check type-checks components; core no-undef otherwise flags
+			// ambient type names (e.g. the global `Api` namespace) in lang="ts".
+			'no-undef': 'off'
 		}
 	}
 ]

@@ -1,22 +1,31 @@
-<script>
-	import { getContext } from 'svelte'
+<script lang="ts">
+	import { getContext, type Snippet } from 'svelte'
 	import { denyTooltip } from '$lib/permission'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string | string[]} permission  required permission(s), e.g. 'deployment.deploy'
-	 *   or ['envgroup.update', 'deployment.deploy']. When an array, ALL are required.
-	 * @property {string} [href]  when set AND allowed, renders an <a> instead of a <button>
-	 * @property {(e: MouseEvent) => void} [onclick]
-	 * @property {'button' | 'submit' | 'reset'} [type]  button type (ignored for <a>); default 'button'
-	 * @property {boolean} [loading]  adds the is-loading state
-	 * @property {boolean} [disabled]  an ADDITIONAL disable, independent of permission
-	 * @property {string} [class]  control class; default 'button'
-	 * @property {string} [title]  overrides the allowed-state title; ignored when denied
-	 * @property {import('svelte').Snippet} [children]
-	 */
+	interface Props {
+		/**
+		 * required permission(s), e.g. 'deployment.deploy' or
+		 * ['envgroup.update', 'deployment.deploy']. When an array, ALL are required.
+		 */
+		permission: string | string[]
+		/** when set AND allowed, renders an <a> instead of a <button> */
+		href?: string
+		onclick?: (e: MouseEvent) => void
+		/** button type (ignored for <a>); default 'button' */
+		type?: 'button' | 'submit' | 'reset'
+		/** adds the is-loading state */
+		loading?: boolean
+		/** an ADDITIONAL disable, independent of permission */
+		disabled?: boolean
+		/** control class; default 'button' */
+		class?: string
+		/** overrides the allowed-state title; ignored when denied */
+		title?: string
+		children?: Snippet
+		// passthrough attributes spread onto the rendered control
+		[key: string]: any
+	}
 
-	/** @type {Props & Record<string, any>} */
 	const {
 		permission,
 		href,
@@ -28,10 +37,9 @@
 		title,
 		children,
 		...rest
-	} = $props()
+	}: Props = $props()
 
-	/** @type {{ can: (p: string) => boolean }} */
-	const { can } = getContext('permission')
+	const { can } = getContext('permission') as { can: (p: string) => boolean }
 
 	const required = $derived(Array.isArray(permission) ? permission : [permission])
 	// First permission the caller is missing — drives the deny tooltip so the

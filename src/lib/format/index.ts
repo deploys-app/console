@@ -3,33 +3,21 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 
-/**
- * @param {string} v
- * @returns {string}
- */
-export function cpu (v) {
+export function cpu (v: string): string {
 	if (v === '0') {
 		return 'Shared'
 	}
 	return `${v} vCPU`
 }
 
-/**
- * @param {string} v
- * @returns {string}
- */
-export function cpuLimited (v) {
+export function cpuLimited (v: string): string {
 	if (v === '0' || !v) {
 		return 'Default'
 	}
 	return `${v} vCPU`
 }
 
-/**
- * @param {string} v
- * @returns {string}
- */
-export function memory (v) {
+export function memory (v: string): string {
 	if (v === '0') {
 		return 'Shared'
 	}
@@ -40,11 +28,7 @@ export function memory (v) {
 	return `${m[1]} ${m[2]}B`
 }
 
-/**
- * @param {number} v
- * @returns {string}
- */
-export function storage (v) {
+export function storage (v: number): string {
 	return (v / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
 }
 
@@ -52,32 +36,19 @@ const compactNumber = new Intl.NumberFormat(undefined, { notation: 'compact', ma
 
 /**
  * Compact count, e.g. 950, 1.2K, 3.4M. Used for hit/match totals.
- * @param {number} v
- * @returns {string}
  */
-export function count (v) {
+export function count (v: number): string {
 	return compactNumber.format(v ?? 0)
 }
 
-/**
- * @param {string | undefined | null} v
- * @returns {string}
- */
-export function datetime (v) {
+export function datetime (v: string | undefined | null): string {
 	if (!v || v.startsWith('0001-01-01')) {
 		return ''
 	}
 	return dayjs(v).format('YYYY-MM-DD HH:mm:ss')
 }
 
-/**
- * @param {string} project
- * @param {string} name
- * @param {string} gsa
- * @param {string} locationProject
- * @returns {string}
- */
-export function gsaBinding (project, name, gsa, locationProject) {
+export function gsaBinding (project: string, name: string, gsa: string, locationProject: string): string {
 	const namespace = 'deploys'
 	const matched = gsa.match(/^.*@([^.]+)\.iam.gserviceaccount.com$/) ?? []
 	const googleProject = matched.length > 1 ? `\n    --project ${matched[1]} \\` : ''
@@ -87,11 +58,7 @@ export function gsaBinding (project, name, gsa, locationProject) {
     ${gsa}`
 }
 
-/**
- * @param {Api.DeploymentType} t
- * @returns {string}
- */
-export function deploymentType (t) {
+export function deploymentType (t: Api.DeploymentType): string {
 	return {
 		WebService: 'Web Service',
 		TCPService: 'TCP Service',
@@ -102,11 +69,7 @@ export function deploymentType (t) {
 	}[t] || t
 }
 
-/**
- * @param {string} s
- * @returns {string}
- */
-export function shortDigest (s) {
+export function shortDigest (s: string): string {
 	return s.replace(/^sha256:/, '').slice(0, 12)
 }
 
@@ -116,21 +79,15 @@ export function shortDigest (s) {
  * URI (the `site` field) or as a bare digest (`siteManifestDigest`). Pass both;
  * the URI's trailing `@<sha>` wins, falling back to the bare digest, then to the
  * raw site string.
- * @param {{ site?: string, siteManifestDigest?: string }} [d]
- * @returns {string}
  */
-export function releaseSha (d) {
+export function releaseSha (d?: { site?: string, siteManifestDigest?: string }): string {
 	const site = d?.site ?? ''
 	const at = site.lastIndexOf('@')
 	if (at >= 0) return site.slice(at + 1)
 	return d?.siteManifestDigest || site
 }
 
-/**
- * @param {number} seconds
- * @returns {string}
- */
-export function duration (seconds) {
+export function duration (seconds: number): string {
 	if (!seconds || seconds <= 0) {
 		return ''
 	}
@@ -138,7 +95,7 @@ export function duration (seconds) {
 	const h = Math.floor((seconds % 86400) / 3600)
 	const m = Math.floor((seconds % 3600) / 60)
 	const s = Math.floor(seconds % 60)
-	const parts = []
+	const parts: string[] = []
 	if (d) parts.push(`${d}d`)
 	if (h) parts.push(`${h}h`)
 	if (m) parts.push(`${m}m`)
@@ -146,11 +103,7 @@ export function duration (seconds) {
 	return parts.join(' ') || '0s'
 }
 
-/**
- * @param {number} ttlSeconds
- * @returns {string}
- */
-export function ttlExpireAt (ttlSeconds) {
+export function ttlExpireAt (ttlSeconds: number): string {
 	if (!ttlSeconds || ttlSeconds <= 0) {
 		return ''
 	}
@@ -159,10 +112,8 @@ export function ttlExpireAt (ttlSeconds) {
 
 /**
  * Human-friendly relative time, e.g. "3 days ago". Empty for zero/unset dates.
- * @param {string | undefined | null} v
- * @returns {string}
  */
-export function fromNow (v) {
+export function fromNow (v: string | undefined | null): string {
 	if (!v || v.startsWith('0001-01-01')) {
 		return ''
 	}

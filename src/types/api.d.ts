@@ -238,11 +238,8 @@ declare namespace Api {
     }
 
     export enum DeploymentProtocol {
-        // eslint-disable-next-line no-unused-vars
         HTTP = 'http',
-        // eslint-disable-next-line no-unused-vars
         HTTPS = 'https',
-        // eslint-disable-next-line no-unused-vars
         H2C = 'h2c'
     }
 

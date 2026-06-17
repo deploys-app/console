@@ -1,16 +1,15 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {number} [span]
-	 * @property {any} [list]
-	 * @property {string} [icon] FontAwesome class, e.g. 'fa-box-open'
-	 * @property {string} [message]
-	 * @property {string} [hint]
-	 * @property {string} [ctaLabel]
-	 * @property {string} [ctaHref]
-	 */
+<script lang="ts">
+	interface Props {
+		span?: number
+		list?: unknown[]
+		/** FontAwesome class, e.g. 'fa-box-open' */
+		icon?: string
+		message?: string
+		hint?: string
+		ctaLabel?: string
+		ctaHref?: string
+	}
 
-	/** @type {Props} */
 	const {
 		span = 1,
 		list = [],
@@ -19,7 +18,7 @@
 		hint = '',
 		ctaLabel = '',
 		ctaHref = ''
-	} = $props()
+	}: Props = $props()
 </script>
 
 {#if !list?.length}

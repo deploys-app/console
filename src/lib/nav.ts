@@ -3,17 +3,18 @@
  *
  * Single source of truth shared by the sidebar (`Sidebar.svelte`) and the
  * global search palette (`lib/search`) so the two never drift apart.
- *
- * @typedef {Object} ProjectMenuItem
- * @property {string} id
- * @property {string} title
- * @property {string} icon     Font Awesome class, e.g. `fa-rocket`
- * @property {string} link     route path, without the `?project=` query
- * @property {boolean} [preview]
  */
+export interface ProjectMenuItem {
+	id: string
+	title: string
+	/** Font Awesome class, e.g. `fa-rocket` */
+	icon: string
+	/** route path, without the `?project=` query */
+	link: string
+	preview?: boolean
+}
 
-/** @type {ProjectMenuItem[]} */
-export const projectMenu = [
+export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'dashboard', title: 'Dashboard', icon: 'fa-columns', link: '/' },
 	{ id: 'metrics', title: 'Metrics', icon: 'fa-chart-line', link: '/metrics' },
 	{ id: 'deployment', title: 'Deployments', icon: 'fa-rocket', link: '/deployment' },

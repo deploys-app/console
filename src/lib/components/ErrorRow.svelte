@@ -1,12 +1,12 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {number} [span]
-	 * @property {any} error
-	 */
+<script lang="ts">
+	interface Props {
+		span?: number
+		// error is an Api.Error, a thrown Error, or a bare string — accessed
+		// loosely in the template, so it stays untyped.
+		error: any
+	}
 
-	/** @type {Props} */
-	const { span = 1, error } = $props()
+	const { span = 1, error }: Props = $props()
 </script>
 
 {#if error}
