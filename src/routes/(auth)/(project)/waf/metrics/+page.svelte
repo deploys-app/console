@@ -9,6 +9,8 @@
 	import * as format from '$lib/format'
 	import { actionLabels } from '$lib/waf/rules'
 	import { describeKey, modeLabels } from '$lib/waf/limits'
+	import { RANGE_SECONDS, RANGE_LABEL, BUCKET_SECONDS } from '$lib/metrics'
+	import RangeSwitch from '$lib/components/RangeSwitch.svelte'
 	import WafActivityChart from '$lib/components/WafActivityChart.svelte'
 	import LineChart from '$lib/components/LineChart.svelte'
 
@@ -31,26 +33,6 @@
 	// Stacks render block on top of log on top of allow — most-severe last so it
 	// sits at the top of the column.
 	const ACTION_ORDER: Api.WafAction[] = ['allow', 'log', 'block']
-
-	const RANGE_OPTIONS = [
-		{ value: '1h', label: '1H' },
-		{ value: '6h', label: '6H' },
-		{ value: '12h', label: '12H' },
-		{ value: '1d', label: '24H' },
-		{ value: '7d', label: '7D' },
-		{ value: '30d', label: '30D' }
-	]
-	const RANGE_SECONDS: Record<string, number> = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
-	const RANGE_LABEL: Record<string, string> = {
-		'1h': 'last hour',
-		'6h': 'last 6 hours',
-		'12h': 'last 12 hours',
-		'1d': 'last 24 hours',
-		'7d': 'last 7 days',
-		'30d': 'last 30 days'
-	}
-	// Bucket width per range — kept around 48–72 columns so bars stay legible.
-	const BUCKET_SECONDS: Record<string, number> = { '1h': 60, '6h': 300, '12h': 600, '1d': 1800, '7d': 10800, '30d': 43200 }
 
 	const initialRange = $page.url.searchParams.get('range')
 	let range = $state(initialRange && RANGE_SECONDS[initialRange] ? initialRange : '1d')
@@ -270,16 +252,7 @@
 		</p>
 	</div>
 	<div class="head-actions">
-		<div class="range-switch" role="group" aria-label="Time range">
-			{#each RANGE_OPTIONS as opt (opt.value)}
-				<button
-					type="button"
-					class="range-btn"
-					class:is-active={range === opt.value}
-					aria-pressed={range === opt.value}
-					onclick={() => selectRange(opt.value)}>{opt.label}</button>
-			{/each}
-		</div>
+		<RangeSwitch value={range} onselect={selectRange} />
 		<a class="button is-variant-secondary is-icon-left" href={managePath}>
 			<i class="fa-solid fa-sliders"></i>
 			Manage rules
@@ -495,34 +468,6 @@
 	}
 
 	/* Segmented time-range control. */
-	.range-switch {
-		display: inline-flex;
-		padding: 0.1875rem;
-		gap: 0.125rem;
-		border-radius: 0.625rem;
-		background: hsl(var(--hsl-base-200));
-		border: 1px solid hsl(var(--hsl-line) / 0.7);
-	}
-
-	.range-btn {
-		padding: 0.3125rem 0.6875rem;
-		border-radius: 0.4375rem;
-		font-size: 0.75rem;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-		color: hsl(var(--hsl-content) / 0.6);
-		transition: color var(--timing-fastest) ease, background var(--timing-fastest) ease;
-	}
-
-	.range-btn:hover {
-		color: hsl(var(--hsl-content) / 0.9);
-	}
-
-	.range-btn.is-active {
-		color: hsl(var(--hsl-primary-content));
-		background: hsl(var(--hsl-primary));
-	}
-
 	/* KPI tiles — colored by what the firewall decided. */
 	.stat-grid {
 		display: grid;

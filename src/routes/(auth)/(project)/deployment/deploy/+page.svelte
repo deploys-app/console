@@ -7,6 +7,7 @@
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import EnvVarEditor from '$lib/components/EnvVarEditor.svelte'
 	import type { PageData } from './$types'
 
 	// Editable sidecar shape used by the form. Mirrors Api.SidecarForm but keeps
@@ -230,22 +231,6 @@
 		fetchDisks()
 	}
 
-	let showEnvText = $state(false)
-	let envText = $state('')
-
-	function parseEnvText () {
-		form.env = envText
-			.split('\n')
-			.map((t) => t.split('='))
-			.map(([k, ...v]) => ({ k, v: v.join('=') }))
-	}
-
-	function parseEnvValue () {
-		envText = form.env
-			.map(({ k, v }) => `${k}=${v}`)
-			.join('\n')
-	}
-
 	let envGroupInput = $state('')
 
 	function addEnvGroup (name: string) {
@@ -352,7 +337,6 @@
 
 	onMount(() => {
 		changeLocation()
-		parseEnvValue()
 		fetchEnvGroups()
 	})
 </script>
@@ -782,63 +766,7 @@
 		<div class="form-section">
 			<h6 class="form-section-title">Environment Variables</h6>
 		</div>
-		<div>
-			<div class="table-container">
-				<table class="table">
-					<thead>
-						<tr>
-							<th>Key</th>
-							<th class="is-collapse p-0"></th>
-							<th>Value</th>
-							<th class="is-collapse is-align-right"></th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each form.env as it, i (i)}
-							<tr>
-								<td>
-									<div class="input">
-										<input bind:value={it.k} placeholder="Variable name" onchange={parseEnvValue}>
-									</div>
-								</td>
-								<td class="p-0 pl-3">:</td>
-								<td class="pl-3">
-									<div class="input">
-										<input bind:value={it.v} placeholder="Value" onchange={parseEnvValue}>
-									</div>
-								</td>
-								<td style="padding: 19px 12px;">
-									<button class="icon-button" type="button" aria-label="Remove an environment variable"
-										onclick={() => { form.env = form.env.filter((_, k) => k !== i); parseEnvValue() }}>
-										<i class="fa-solid fa-trash-alt"></i>
-									</button>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-					<tfoot>
-						<tr>
-							<td colspan="4">
-								<button class="button is-variant-secondary flex m-auto" type="button"
-									onclick={() => { form.env = [...form.env, { k: '', v: '' }]; parseEnvValue() }}>
-									<i class="fa-solid fa-plus mr-3"></i>
-									<span>Add Variable</span>
-								</button>
-							</td>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-
-			<button class="button is-variant-secondary flex m-auto" type="button" onclick={() => showEnvText = !showEnvText}>
-				{#if showEnvText}Hide{:else}Show{/if}&nbsp;Text Editor
-			</button>
-			{#if showEnvText}
-				<div class="textarea mt-3">
-					<textarea rows="20" bind:value={envText} onchange={parseEnvText}></textarea>
-				</div>
-			{/if}
-		</div>
+		<EnvVarEditor bind:entries={form.env} />
 
 		<div class="form-section">
 			<h6 class="form-section-title">Mount Data</h6>
