@@ -3,6 +3,8 @@
 // logs/metrics as rule_id), so they must survive reordering. Order = execution
 // order, with `priority` derived from index on every whole-zone write.
 
+import { makeGenId, withStableIds } from '$lib/form/ids'
+
 export interface RuleForm {
 	id: string
 	description: string
@@ -35,25 +37,13 @@ export function ruleForm (rule?: Api.WafRule): RuleForm {
 /**
  * Generate a stable, unique rule id that doesn't collide with `taken`.
  */
-export function genId (taken: string[]): string {
-	let id
-	do {
-		id = 'rule-' + Math.random().toString(36).slice(2, 8)
-	} while (taken.includes(id))
-	return id
-}
+export const genId = makeGenId('rule-')
 
 // Map API rules to form rows: order by priority (lower runs first) so the
 // visible order is the execution order, and give every row a unique id.
 export function normalizeRules (apiRules?: Api.WafRule[]): RuleForm[] {
 	const sorted = [...(apiRules ?? [])].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
-	const taken: string[] = []
-	return sorted.map((r) => {
-		const f = ruleForm(r)
-		if (!f.id || taken.includes(f.id)) f.id = genId(taken)
-		taken.push(f.id)
-		return f
-	})
+	return withStableIds(sorted, ruleForm, genId)
 }
 
 // Map form rows back to the API rule shape. Priority follows row order — the

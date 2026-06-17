@@ -1,12 +1,3 @@
-import api from '$lib/api'
-import type { PageLoad } from './$types'
+import { listLoad } from '$lib/loaders'
 
-export const load: PageLoad = async ({ parent, fetch }) => {
-	const { project } = await parent()
-
-	const res = await api.invoke<Api.List<Api.EnvGroup>>('envGroup.list', { project }, fetch)
-	return {
-		envGroups: res.result?.items ?? [],
-		error: res.error
-	}
-}
+export const load = listLoad<Api.EnvGroup, 'envGroups'>('envGroup.list', 'envGroups')

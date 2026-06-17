@@ -1,12 +1,3 @@
-import api from '$lib/api'
-import type { PageLoad } from './$types'
+import { listLoad } from '$lib/loaders'
 
-export const load: PageLoad = async ({ parent, fetch }) => {
-	const { project } = await parent()
-
-	const res = await api.invoke<Api.List<Api.Route>>('route.list', { project }, fetch)
-	return {
-		routes: res.result?.items ?? [],
-		error: res.error
-	}
-}
+export const load = listLoad<Api.Route, 'routes'>('route.list', 'routes')

@@ -4,6 +4,8 @@
 // Order = match order, with `priority` derived from index on every whole-zone
 // write — first match wins, lower priority first.
 
+import { makeGenId, withStableIds } from '$lib/form/ids'
+
 export interface OverrideForm {
 	id: string
 	description: string
@@ -66,25 +68,13 @@ export function overrideForm (override?: Api.CacheOverride): OverrideForm {
 /**
  * Generate a stable, unique override id that doesn't collide with `taken`.
  */
-export function genId (taken: string[]): string {
-	let id
-	do {
-		id = 'override-' + Math.random().toString(36).slice(2, 8)
-	} while (taken.includes(id))
-	return id
-}
+export const genId = makeGenId('override-')
 
 // Map API overrides to form rows: order by priority (lower matches first) so
 // the visible order is the match order, and give every row a unique id.
 export function normalizeOverrides (apiOverrides?: Api.CacheOverride[]): OverrideForm[] {
 	const sorted = [...(apiOverrides ?? [])].sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
-	const taken: string[] = []
-	return sorted.map((o) => {
-		const f = overrideForm(o)
-		if (!f.id || taken.includes(f.id)) f.id = genId(taken)
-		taken.push(f.id)
-		return f
-	})
+	return withStableIds(sorted, overrideForm, genId)
 }
 
 // Map form rows back to the API override shape. Priority follows row order —

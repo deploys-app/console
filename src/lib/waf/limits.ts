@@ -2,6 +2,8 @@
 // ids are auto-generated and stable for the life of a limit (like rule ids),
 // but limits have no priority — order doesn't matter.
 
+import { makeGenId, withStableIds } from '$lib/form/ids'
+
 /**
  * One characteristic of the bucket key. Header/cookie carry a name; the rest
  * round-trip as a bare keyword ('ip', 'host', 'country', 'asn').
@@ -113,25 +115,13 @@ export function limitForm (limit?: Api.WafLimit): LimitForm {
 /**
  * Generate a stable, unique limit id that doesn't collide with `taken`.
  */
-export function genLimitId (taken: string[]): string {
-	let id
-	do {
-		id = 'limit-' + Math.random().toString(36).slice(2, 8)
-	} while (taken.includes(id))
-	return id
-}
+export const genLimitId = makeGenId('limit-')
 
 /**
  * Map API limits to form rows, giving every row a unique id.
  */
 export function normalizeLimits (apiLimits?: Api.WafLimit[]): LimitForm[] {
-	const taken: string[] = []
-	return (apiLimits ?? []).map((l) => {
-		const f = limitForm(l)
-		if (!f.id || taken.includes(f.id)) f.id = genLimitId(taken)
-		taken.push(f.id)
-		return f
-	})
+	return withStableIds(apiLimits, limitForm, genLimitId)
 }
 
 /**
