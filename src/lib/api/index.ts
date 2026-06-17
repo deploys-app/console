@@ -27,7 +27,7 @@ async function invoke<T> (fn: string, args: unknown, fetch: typeof globalThis.fe
 	// e.g. a gateway/ingress HTML error page on a 5xx. Parsing then throws, which
 	// would escape every caller. Fall back to a synthesized error envelope so the
 	// result shape is always `Api.Response`.
-	let body: any
+	let body: Api.Response<T> | null
 	try {
 		body = await resp.json()
 	} catch {

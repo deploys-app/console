@@ -30,7 +30,6 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const resp = await fetch(`${endpoint}/${params.fn}`, {
 		method: 'POST',
 		body: request.body,
-		// @ts-expect-error workaround for missing type
 		duplex: 'half',
 		headers: {
 			accept: 'application/json',

@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { getContext } from 'svelte'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 	import type { PageData } from './$types'
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	const { data }: { data: PageData } = $props()
 

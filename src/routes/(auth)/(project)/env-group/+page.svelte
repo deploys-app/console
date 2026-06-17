@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { getContext } from 'svelte'
 	import type { PageData } from './$types'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	const { data }: { data: PageData } = $props()
 

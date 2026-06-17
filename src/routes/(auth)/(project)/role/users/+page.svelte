@@ -1,17 +1,16 @@
 <script lang="ts">
 	import type { PageData } from './$types'
-	import { getContext } from 'svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 	import gravatarUrl from 'gravatar-url'
 
 	const { data }: { data: PageData } = $props()
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	const project = $derived(data.project)
 	const users = $derived(data.users)

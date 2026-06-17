@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte'
+	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
@@ -7,10 +7,10 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { setupCopy } from '$lib/clipboard'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 	import type { PageData } from './$types'
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	onMount(() => setupCopy('.copy'))
 

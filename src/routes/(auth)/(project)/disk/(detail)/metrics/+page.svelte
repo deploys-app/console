@@ -5,13 +5,7 @@
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import type { PageData } from './$types'
-
-	interface Series {
-		prefix: string
-		lines: Api.UsageMetricsLine[]
-		dashStyle?: string
-		color?: string
-	}
+	import type { MetricSeries } from '$lib/charts/util'
 
 	const { data }: { data: PageData } = $props()
 
@@ -33,7 +27,7 @@
 		range: $page.url.searchParams.get('range') || '1h'
 	})
 
-	let chart = $state<Series[]>([])
+	let chart = $state<MetricSeries[]>([])
 
 	let reloadTimeout: ReturnType<typeof setTimeout> | null = null
 

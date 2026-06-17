@@ -1,11 +1,10 @@
 <script lang="ts">
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
-	import { getContext } from 'svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
 	import * as format from '$lib/format'
-	import { denyTooltip } from '$lib/permission'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 
 	interface Props {
 		deployment: Api.Deployment
@@ -16,7 +15,7 @@
 
 	const project = $derived($page.data.project)
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	// Static deployments serve a release from the edge and have no container/pods.
 	// The console deploy form is container-image only (a static revision needs a

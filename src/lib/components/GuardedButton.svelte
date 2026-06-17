@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { getContext, type Snippet } from 'svelte'
-	import { denyTooltip } from '$lib/permission'
+	import { type Snippet } from 'svelte'
+	import { denyTooltip, getPermissionContext } from '$lib/permission'
 
 	interface Props {
 		/**
@@ -39,7 +39,7 @@
 		...rest
 	}: Props = $props()
 
-	const { can } = getContext('permission') as { can: (p: string) => boolean }
+	const { can } = getPermissionContext()
 
 	const required = $derived(Array.isArray(permission) ? permission : [permission])
 	// First permission the caller is missing — drives the deny tooltip so the

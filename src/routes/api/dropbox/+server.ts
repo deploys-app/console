@@ -31,7 +31,6 @@ export const POST: RequestHandler = async ({ locals, request, url }) => {
 	const resp = await fetch('https://dropbox.deploys.app/', {
 		method: 'POST',
 		body: request.body,
-		// @ts-expect-error workaround for missing type
 		duplex: 'half',
 		headers
 	})
