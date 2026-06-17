@@ -30,9 +30,10 @@
 	const canPause = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'deploy')
 	const canResume = $derived(!isStatic && deployment.status === 'success' && deployment.action === 'pause')
 	// Restart re-rolls the current revision (recreating the pods). Only meaningful
-	// for a live deployment — same state as pause; the apiserver rejects static,
-	// paused, and mid-deploy.
-	const canRestart = $derived(canPause)
+	// for a live deployment that keeps standing pods — so, unlike pause, it also
+	// excludes CronJob (no standing pods; it spawns Jobs on a schedule). The
+	// apiserver rejects static, cronjob, paused, and mid-deploy.
+	const canRestart = $derived(canPause && deployment.type !== 'CronJob')
 
 	const statusTone = $derived(
 		deployment.status === 'success' && deployment.action === 'pause'
