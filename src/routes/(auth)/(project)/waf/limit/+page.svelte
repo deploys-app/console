@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -8,6 +9,7 @@
 	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
 	import { parseExpression } from '$lib/waf/expression'
 	import { normalizeRules, toApiRules } from '$lib/waf/rules'
+	import type { KeyRow } from '$lib/waf/limits'
 	import {
 		DEFAULT_LIMIT_MESSAGE,
 		keyTypeLabels,
@@ -18,7 +20,7 @@
 		windowOptions
 	} from '$lib/waf/limits'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -68,9 +70,9 @@
 	// textarea), same pattern as the rule editor. The filter is optional: empty
 	// means the limit applies to every request.
 	const canUseVisual = $derived(parseExpression(draft.filter) !== null)
-	let filterMode = $state(/** @type {'visual' | 'raw'} */ (
+	let filterMode = $state<'visual' | 'raw'>(
 		untrack(() => (parseExpression(draft.filter) !== null ? 'visual' : 'raw'))
-	))
+	)
 
 	// If we're in Visual but the filter becomes non-representable, fall back to
 	// raw so the disabled Visual tab can't show stale rows.
@@ -78,8 +80,7 @@
 		if (filterMode === 'visual' && !canUseVisual) filterMode = 'raw'
 	})
 
-	/** @type {{ clearExpression: () => void } | undefined} */
-	let filterBuilder = $state()
+	let filterBuilder = $state<{ clearExpression:() => void }>()
 
 	function clearFilter () {
 		if (filterMode === 'visual' && filterBuilder) filterBuilder.clearExpression()
@@ -103,11 +104,10 @@
 	const canSave = $derived(Number(draft.rate) >= 1 && !!draft.window && keysComplete)
 
 	function addKeyRow () {
-		draft.key = [...draft.key, /** @type {import('$lib/waf/limits').KeyRow} */ ({ type: 'ip', name: '' })]
+		draft.key = [...draft.key, ({ type: 'ip', name: '' } as KeyRow)]
 	}
 
-	/** @param {number} i */
-	function removeKeyRow (i) {
+	function removeKeyRow (i: number) {
 		draft.key = draft.key.filter((_, idx) => idx !== i)
 	}
 
@@ -115,8 +115,7 @@
 		return goto(`/waf/manage?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
-	/** @param {Event} e */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 		if (saving || !canSave) return
 
@@ -155,10 +154,8 @@
 	// Enter inside a text field (description/rate/message, the key name inputs)
 	// must not implicitly submit the limit. Saving is deliberate, via the Save
 	// button (a <button>, where Enter still works).
-	/** @param {HTMLFormElement} node */
-	function blockEnterSubmit (node) {
-		/** @param {KeyboardEvent} e */
-		function onKeydown (e) {
+	function blockEnterSubmit (node: HTMLFormElement) {
+		function onKeydown (e: KeyboardEvent) {
 			if (e.key === 'Enter' && e.target instanceof HTMLInputElement) e.preventDefault()
 		}
 		node.addEventListener('keydown', onKeydown)

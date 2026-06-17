@@ -1,18 +1,19 @@
-<script>
+<script lang="ts">
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import api from '$lib/api'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const domains = $derived(data.domains)
 	const error = $derived(data.error)
 
-	function deleteDomain (domain) {
+	function deleteDomain (domain: Api.Domain) {
 		modal.confirm({
 			title: `Delete domain "${domain.domain}"?`,
 			yes: 'Delete',

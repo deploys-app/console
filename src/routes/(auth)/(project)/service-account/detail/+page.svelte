@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount, getContext } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as format from '$lib/format'
@@ -8,17 +8,21 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { setupCopy } from '$lib/clipboard'
 	import { denyTooltip } from '$lib/permission'
+	import type { PageData } from './$types'
 
-	/** @type {{ can: (p: string) => boolean }} */
-	const { can } = getContext('permission')
+	const { can } = getContext('permission') as { can: (p: string) => boolean }
 
 	onMount(() => setupCopy('.copy'))
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const id = $derived(data.id)
-	const serviceAccount = $derived(data.serviceAccount)
+	// serviceAccount.get returns the account plus its issued keys; the keys array
+	// isn't part of the shared Api.ServiceAccount shape, so widen it locally.
+	const serviceAccount = $derived(
+		data.serviceAccount as Api.ServiceAccount & { keys?: { secret: string }[] }
+	)
 
 	function deleteItem () {
 		modal.confirm({
@@ -57,7 +61,7 @@
 		}
 	}
 
-	function deleteKey (secret) {
+	function deleteKey (secret: string) {
 		modal.confirm({
 			title: 'Confirm delete key?',
 			yes: 'Delete',

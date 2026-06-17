@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
@@ -6,8 +6,9 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import api from '$lib/api'
 	import { onMount } from 'svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const deployments = $derived(data.deployments)
@@ -33,7 +34,7 @@
 	}, 4000))
 
 	// Per-type glyph + label for the chip on each row's meta line.
-	const typeMeta = {
+	const typeMeta: Record<string, { icon: string, label: string }> = {
 		WebService: { icon: 'fa-globe', label: 'Web Service' },
 		TCPService: { icon: 'fa-ethernet', label: 'TCP Service' },
 		InternalTCPService: { icon: 'fa-network-wired', label: 'Internal TCP' },
@@ -50,10 +51,8 @@
 	 * A pending delete reuses the same `status: 'pending'` as a fresh deploy, so
 	 * the action has to be checked first — otherwise a deployment being torn down
 	 * would mislabel as "Deploying".
-	 * @param {Api.Deployment} it
-	 * @returns {{ label: string, tone: string } | null}
 	 */
-	function statusPill (it) {
+	function statusPill (it: Api.Deployment): { label: string, tone: string } | null {
 		if (it.action === 'delete') {
 			return { label: 'Deleting', tone: 'negative' }
 		}

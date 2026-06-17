@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const domains = $derived(data.domains)
 	const error = $derived(data.error)

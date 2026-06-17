@@ -1,10 +1,11 @@
-<script>
-	import { onMount } from 'svelte'
+<script lang="ts">
+	import { onMount, type Snippet } from 'svelte'
 	import api from '$lib/api'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { page } from '$app/stores'
+	import type { LayoutData } from './$types'
 
-	const { data, children } = $props()
+	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
 	const project = $derived(data.project)
 	const disk = $derived(data.disk)

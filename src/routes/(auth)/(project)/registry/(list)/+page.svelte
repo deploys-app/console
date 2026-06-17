@@ -1,17 +1,18 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const repositories = $derived(data.repositories)
 	const error = $derived(data.error)
 
-	function deleteRepository (name) {
+	function deleteRepository (name: string) {
 		modal.confirm({
 			title: `Delete "${name}"?`,
 			yes: 'Delete',

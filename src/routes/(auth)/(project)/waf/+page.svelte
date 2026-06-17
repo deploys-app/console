@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import Sparkline from '$lib/components/Sparkline.svelte'
@@ -7,13 +8,13 @@
 	import api from '$lib/api'
 	import * as format from '$lib/format'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const firewalls = $derived(data.firewalls)
 	const error = $derived(data.error)
 
-	const hasPending = $derived(firewalls.some((/** @type {Api.WafZone} */ fw) => fw.status === 'pending'))
+	const hasPending = $derived(firewalls.some((fw: Api.WafZone) => fw.status === 'pending'))
 
 	// While any zone is still being applied/removed by the deployer, poll waf.list
 	// so the spinner resolves to its settled state on its own. Mirrors the
@@ -26,14 +27,12 @@
 	// Last 24h of match activity per location, shown as an inline sparkline +
 	// total. Fetched client-side (one waf.metrics per zone, in parallel) so the
 	// table renders immediately and the charts fill in.
-	/**
-	 * @typedef {Object} Metrics
-	 * @property {boolean} loading
-	 * @property {number} total
-	 * @property {[number, number][]} points
-	 */
-	/** @type {Record<string, Metrics>} */
-	const metrics = $state({})
+	interface Metrics {
+		loading: boolean
+		total: number
+		points: [number, number][]
+	}
+	const metrics = $state<Record<string, Metrics>>({})
 
 	// Fixed 24h x-domain so bars sit at the right time-of-day even when the zone
 	// only has a few active minutes.
@@ -41,11 +40,10 @@
 	const from = to - 24 * 60 * 60
 
 	onMount(() => {
-		Promise.all(firewalls.map(async (/** @type {Api.WafZone} */ fw) => {
+		Promise.all(firewalls.map(async (fw: Api.WafZone) => {
 			metrics[fw.location] = { loading: true, total: 0, points: [] }
 
-			/** @type {Api.Response<Api.WafMetricsResult>} */
-			const res = await api.invoke('waf.metrics',
+			const res = await api.invoke<Api.WafMetricsResult>('waf.metrics',
 				{ project, location: fw.location, timeRange: '1d' }, fetch)
 
 			metrics[fw.location] = {
@@ -58,20 +56,15 @@
 
 	// Collapse the per-(rule, action) series into one total-matches line: sum
 	// every series' value at each timestamp, then sort by time.
-	/**
-	 * @param {Api.WafMetricsSeries[]} series
-	 * @returns {[number, number][]}
-	 */
-	function aggregate (series) {
-		/** @type {Record<number, number>} */
-		const byTs = {}
+	function aggregate (series: Api.WafMetricsSeries[]): [number, number][] {
+		const byTs: Record<number, number> = {}
 		for (const s of series) {
 			for (const [ts, v] of s.points ?? []) {
 				byTs[ts] = (byTs[ts] ?? 0) + v
 			}
 		}
 		return Object.entries(byTs)
-			.map(([ts, v]) => /** @type {[number, number]} */ ([Number(ts), v]))
+			.map(([ts, v]) => ([Number(ts), v] as [number, number]))
 			.sort((a, b) => a[0] - b[0])
 	}
 </script>

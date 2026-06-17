@@ -1,24 +1,23 @@
-<script>
+<script lang="ts">
 	import ClipboardJS from 'clipboard'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const items = $derived(data.items)
 	const loadError = $derived(data.error)
 
-	/** @type {HTMLInputElement} */
-	let elFile
+	let elFile = $state<HTMLInputElement | null>(null)
 	let uploading = $state(false)
 	let dragOver = $state(false)
 	let error = $state('')
 	let justCopied = $state('')
 
-	/** @type {File | null} */
-	let selectedFile = $state(null)
+	let selectedFile = $state<File | null>(null)
 
 	onMount(() => {
 		const clip = new ClipboardJS('.copy-url')
@@ -32,11 +31,7 @@
 		return () => clip?.destroy()
 	})
 
-	/**
-	 * @param {number} bytes
-	 * @returns {string}
-	 */
-	function formatSize (bytes) {
+	function formatSize (bytes: number): string {
 		if (bytes < 1024) return `${bytes} B`
 		if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(1)} KB`
 		if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(1)} MB`
@@ -44,18 +39,15 @@
 	}
 
 	function onFileChange () {
-		selectedFile = elFile.files?.[0] ?? null
+		selectedFile = elFile?.files?.[0] ?? null
 		error = ''
 	}
 
-	/**
-	 * @param {DragEvent} e
-	 */
-	function onDrop (e) {
+	function onDrop (e: DragEvent) {
 		e.preventDefault()
 		dragOver = false
 		const file = e.dataTransfer?.files?.[0]
-		if (!file) return
+		if (!file || !elFile) return
 		const dt = new DataTransfer()
 		dt.items.add(file)
 		elFile.files = dt.files
@@ -63,10 +55,7 @@
 		error = ''
 	}
 
-	/**
-	 * @param {DragEvent} e
-	 */
-	function onDragOver (e) {
+	function onDragOver (e: DragEvent) {
 		e.preventDefault()
 		dragOver = true
 	}
@@ -82,10 +71,7 @@
 		error = ''
 	}
 
-	/**
-	 * @param {Event} e
-	 */
-	async function upload (e) {
+	async function upload (e: Event) {
 		e.preventDefault()
 		if (uploading || !selectedFile) return
 

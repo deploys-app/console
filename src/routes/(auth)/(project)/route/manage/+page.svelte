@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import * as format from '$lib/format'
 	import { goto } from '$app/navigation'
 	import { onMount } from 'svelte'
@@ -7,8 +7,9 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const route = $derived(data.route)
@@ -23,8 +24,7 @@
 	// Known target schemes (mirrors api.RouteTargetPrefix).
 	const targetPrefixes = ['deployment://', 'redirect://', 'http://', 'ipfs://', 'ipns://', 'dnslink://']
 
-	/** @param {string | undefined} target */
-	function splitTarget (target) {
+	function splitTarget (target: string | undefined) {
 		for (const p of targetPrefixes) {
 			if (target?.startsWith(p)) return { prefix: p, value: target.slice(p.length) }
 		}
@@ -33,24 +33,24 @@
 
 	const parsed = $derived(splitTarget(route.target))
 	const typeLabel = $derived(
-		{
+		({
 			'deployment://': 'Deployment',
 			'redirect://': 'Redirect',
 			'http://': 'External server (HTTP)',
 			'ipfs://': 'IPFS',
 			'ipns://': 'IPNS',
 			'dnslink://': 'DNSLink'
-		}[parsed.prefix] ?? parsed.prefix
+		} as Record<string, string>)[parsed.prefix] ?? parsed.prefix
 	)
 	const targetIcon = $derived(
-		{
+		({
 			'deployment://': 'fa-cube',
 			'redirect://': 'fa-arrow-right-arrow-left',
 			'http://': 'fa-server',
 			'ipfs://': 'fa-cubes',
 			'ipns://': 'fa-cubes',
 			'dnslink://': 'fa-link'
-		}[parsed.prefix] ?? 'fa-cube'
+		} as Record<string, string>)[parsed.prefix] ?? 'fa-cube'
 	)
 
 	// deployment:// targets resolve to a deployment in the same location; link

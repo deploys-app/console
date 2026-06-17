@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
@@ -8,7 +9,7 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const workloadIdentity = $derived(data.workloadIdentity)
 	const project = $derived(data.project)

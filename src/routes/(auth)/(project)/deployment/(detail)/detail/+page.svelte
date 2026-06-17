@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
 	import * as format from '$lib/format'
@@ -9,19 +9,18 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const deployment = $derived(data.deployment)
 	const location = $derived(data.location)
 
-	/** @type {?EnvGroupModal} */
-	let envGroupModal = $state(null)
+	let envGroupModal = $state<EnvGroupModal | null>(null)
 	let showAllEnv = $state(false)
 
-	/** @param {string} name */
-	async function viewEnvGroup (name) {
-		const resp = await api.invoke('envGroup.get', { project: deployment.project, name }, fetch)
+	async function viewEnvGroup (name: string) {
+		const resp = await api.invoke<Api.EnvGroup>('envGroup.get', { project: deployment.project, name }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
 			return

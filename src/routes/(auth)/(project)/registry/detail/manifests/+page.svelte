@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
@@ -6,13 +7,13 @@
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const manifests = $derived(data.manifests)
 	const error = $derived(data.error)
 
-	function deleteManifest (digest) {
+	function deleteManifest (digest: string) {
 		modal.confirm({
 			title: `Delete manifest "${format.shortDigest(digest)}"?`,
 			yes: 'Delete',

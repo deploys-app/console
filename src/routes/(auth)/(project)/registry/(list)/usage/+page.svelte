@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import UsageMetrics from '$lib/components/UsageMetrics.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 </script>

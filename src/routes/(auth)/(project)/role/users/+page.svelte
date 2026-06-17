@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { getContext } from 'svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as modal from '$lib/modal'
@@ -8,20 +9,16 @@
 	import { denyTooltip } from '$lib/permission'
 	import gravatarUrl from 'gravatar-url'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
-	/** @type {{ can: (p: string) => boolean }} */
-	const { can } = getContext('permission')
+	const { can } = getContext('permission') as { can: (p: string) => boolean }
 
 	const project = $derived(data.project)
 	const users = $derived(data.users)
 	const error = $derived(data.error)
 	const myEmail = $derived(data.profile?.email ?? '')
 
-	/**
-	 * @param {string} email
-	 */
-	function deleteUser (email) {
+	function deleteUser (email: string) {
 		modal.confirm({
 			title: `Delete user ${email} from project ${project}?`,
 			yes: 'Delete',

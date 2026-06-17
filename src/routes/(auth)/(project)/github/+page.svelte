@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
@@ -6,7 +7,7 @@
 	import * as format from '$lib/format'
 	import GitHubNav from './_components/GitHubNav.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const error = $derived(data.error)
@@ -17,21 +18,18 @@
 	// so unlink/edit can update it in place until the next load (fixes #219).
 	let links = $derived(data.links)
 
-	/** @type {EditGithubLinkModal} */
-	let editModal = $state(/** @type {any} */ (undefined))
+	let editModal = $state<EditGithubLinkModal | null>(null)
 
 	async function reloadLinks () {
-		const resp = await api.invoke('github.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.GithubLink>>('github.list', { project }, fetch)
 		if (resp.ok) links = resp.result?.items ?? []
 	}
 
-	/** @param {Api.GithubLink} it */
-	function edit (it) {
-		editModal.open(it)
+	function edit (it: Api.GithubLink) {
+		editModal?.open(it)
 	}
 
-	/** @param {Api.GithubLink} it */
-	function unlink (it) {
+	function unlink (it: Api.GithubLink) {
 		modal.confirm({
 			title: `Unlink ${it.repository}? Workflows from this repository will no longer be able to deploy. Existing deployments are not affected.`,
 			yes: 'Unlink',
@@ -49,13 +47,11 @@
 		})
 	}
 
-	/** @param {string} repository */
-	function workflowHref (repository) {
+	function workflowHref (repository: string) {
 		return `/github/workflow?project=${project}&repo=${encodeURIComponent(repository)}`
 	}
 
-	/** @param {Api.GithubLink['trigger']} trigger */
-	function triggerLabel (trigger) {
+	function triggerLabel (trigger: Api.GithubLink['trigger']) {
 		if (trigger === 'pr') return 'PR previews only'
 		if (trigger === 'branch') return 'Branch only'
 		return 'Branch + PR previews'

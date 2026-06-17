@@ -1,14 +1,17 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { RuleForm } from '$lib/waf/rules'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
+	import type { LimitForm } from '$lib/waf/limits'
 	import { describeKey, keyRowToApi, modeLabels, normalizeLimits, toApiLimits } from '$lib/waf/limits'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -39,8 +42,7 @@
 	let savingDescription = $state(false)
 
 	async function reloadZone () {
-		/** @type {Api.Response<Api.WafZone>} */
-		const resp = await api.invoke('waf.get', { project, location }, fetch)
+		const resp = await api.invoke<Api.WafZone>('waf.get', { project, location }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.notFound) {
 				// The zone disappeared underneath us — back to the index.
@@ -59,11 +61,7 @@
 	// Persist the whole zone (priority follows row order). waf.set replaces the
 	// entire zone, so rules and limits must always travel together. On error,
 	// surface it and reload from the server so the UI matches reality.
-	/**
-	 * @param {import('$lib/waf/rules').RuleForm[]} nextRules
-	 * @param {import('$lib/waf/limits').LimitForm[]} [nextLimits]
-	 */
-	async function persistZone (nextRules, nextLimits = limits) {
+	async function persistZone (nextRules: RuleForm[], nextLimits: LimitForm[] = limits) {
 		const resp = await api.invoke('waf.set', {
 			project,
 			location,
@@ -79,11 +77,7 @@
 		return true
 	}
 
-	/**
-	 * @param {number} i
-	 * @param {-1 | 1} dir
-	 */
-	async function moveRule (i, dir) {
+	async function moveRule (i: number, dir: -1 | 1) {
 		const j = i + dir
 		if (j < 0 || j >= rules.length) return
 		const next = [...rules]
@@ -92,8 +86,7 @@
 		await persistZone(next)
 	}
 
-	/** @param {number} i */
-	function removeRule (i) {
+	function removeRule (i: number) {
 		const rule = rules[i]
 		if (!rule) return
 		modal.confirm({
@@ -107,8 +100,7 @@
 		})
 	}
 
-	/** @param {import('$lib/waf/rules').RuleForm} rule */
-	function editRule (rule) {
+	function editRule (rule: RuleForm) {
 		goto(`/waf/edit?project=${project}&location=${encodeURIComponent(location)}&rule=${encodeURIComponent(rule.id)}`)
 	}
 
@@ -116,8 +108,7 @@
 		goto(`/waf/edit?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
-	/** @param {number} i */
-	function removeLimit (i) {
+	function removeLimit (i: number) {
 		const limit = limits[i]
 		if (!limit) return
 		modal.confirm({
@@ -131,8 +122,7 @@
 		})
 	}
 
-	/** @param {import('$lib/waf/limits').LimitForm} limit */
-	function editLimit (limit) {
+	function editLimit (limit: LimitForm) {
 		goto(`/waf/limit?project=${project}&location=${encodeURIComponent(location)}&limit=${encodeURIComponent(limit.id)}`)
 	}
 

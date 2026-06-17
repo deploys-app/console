@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount, getContext } from 'svelte'
 	import * as format from '$lib/format'
 	import { goto } from '$app/navigation'
@@ -6,11 +6,11 @@
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { denyTooltip } from '$lib/permission'
+	import type { PageData } from './$types'
 
-	/** @type {{ can: (p: string) => boolean }} */
-	const { can } = getContext('permission')
+	const { can } = getContext('permission') as { can: (p: string) => boolean }
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 	const deployment = $derived(data.deployment)
 	const revisions = $derived(data.revisions)
 
@@ -22,10 +22,8 @@
 
 	/**
 	 * Per-revision artifact label: the release-sha for Static, else the image.
-	 * @param {Api.Deployment} it
-	 * @returns {string}
 	 */
-	function artifact (it) {
+	function artifact (it: Api.Deployment): string {
 		return isStatic ? format.releaseSha(it) : it.image
 	}
 
@@ -39,11 +37,7 @@
 		return () => clearInterval(t)
 	})
 
-	/**
-	 * @param {string} ts
-	 * @param {number} nowMs
-	 */
-	function relTime (ts, nowMs) {
+	function relTime (ts: string, nowMs: number): string {
 		const t = Date.parse(ts)
 		if (isNaN(t)) return ''
 		const diff = Math.max(0, nowMs - t)
@@ -62,28 +56,25 @@
 	// and the revision whose image + configuration will be redeployed. Both
 	// carry user-provided content (image refs), which Svelte interpolation
 	// escapes for free.
-	let rollbackTarget = $state(/** @type {?Api.Deployment} */ (null))
+	let rollbackTarget = $state<Api.Deployment | null>(null)
 	let rollingBack = $state(false)
 
 	// Full spec of the rollback target (deployment.get with revision returns
 	// the historical spec), fetched when the modal opens so the diff below the
 	// comparison cards can show exactly which configuration changes hands.
-	let targetSpec = $state(/** @type {?Api.Deployment} */ (null))
+	let targetSpec = $state<Api.Deployment | null>(null)
 	let targetLoading = $state(false)
 
-	/** @param {Api.Deployment} it */
-	function rollback (it) {
+	function rollback (it: Api.Deployment) {
 		rollbackTarget = it
 		loadTargetSpec(it.revision)
 	}
 
-	/** @param {number} revision */
-	async function loadTargetSpec (revision) {
+	async function loadTargetSpec (revision: number) {
 		targetSpec = null
 		targetLoading = true
 		try {
-			/** @type {Api.Response<Api.Deployment>} */
-			const resp = await api.invoke('deployment.get', {
+			const resp = await api.invoke<Api.Deployment>('deployment.get', {
 				project: deployment.project,
 				location: deployment.location,
 				name: deployment.name,
@@ -99,11 +90,7 @@
 		}
 	}
 
-	/**
-	 * @param {string[]} [xs]
-	 * @returns {string}
-	 */
-	function joinOrDash (xs) {
+	function joinOrDash (xs?: string[]): string {
 		return xs?.length ? xs.join(' ') : '—'
 	}
 
@@ -113,14 +100,8 @@
 	const specChanges = $derived.by(() => {
 		const t = targetSpec
 		if (!t) return []
-		/** @type {{ label: string, from: string, to: string }[]} */
-		const rows = []
-		/**
-		 * @param {string} label
-		 * @param {string} from
-		 * @param {string} to
-		 */
-		const add = (label, from, to) => {
+		const rows: { label: string, from: string, to: string }[] = []
+		const add = (label: string, from: string, to: string) => {
 			if (from !== to) rows.push({ label, from, to })
 		}
 		add('Type', deployment.type, t.type)
@@ -146,8 +127,7 @@
 		const from = deployment.env ?? {}
 		const to = t.env ?? {}
 		const keys = [...new Set([...Object.keys(from), ...Object.keys(to)])].sort()
-		/** @type {{ key: string, kind: 'added' | 'removed' | 'changed', from: string, to: string }[]} */
-		const rows = []
+		const rows: { key: string, kind: 'added' | 'removed' | 'changed', from: string, to: string }[] = []
 		for (const key of keys) {
 			const a = from[key]
 			const b = to[key]
@@ -169,9 +149,8 @@
 
 	/**
 	 * Close only on a true backdrop click, not on clicks inside the panel.
-	 * @param {MouseEvent} e
 	 */
-	function onRollbackBackdrop (e) {
+	function onRollbackBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) closeRollback()
 	}
 

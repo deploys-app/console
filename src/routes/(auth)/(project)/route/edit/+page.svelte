@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const route = $derived(data.route)
@@ -22,16 +23,14 @@
 	// the picker. http:// is validated server-side (api.validExternalTarget).
 	const targetPrefixes = ['deployment://', 'redirect://', 'http://', 'ipfs://', 'ipns://', 'dnslink://']
 
-	/** @param {string | undefined} target */
-	function splitTarget (target) {
+	function splitTarget (target: string | undefined) {
 		for (const p of targetPrefixes) {
 			if (target?.startsWith(p)) return { prefix: p, value: target.slice(p.length) }
 		}
 		return { prefix: 'deployment://', value: target ?? '' }
 	}
 
-	/** @param {Api.Route} r */
-	function buildForm (r) {
+	function buildForm (r: Api.Route) {
 		const { prefix, value } = splitTarget(r?.target)
 		const cfg = r?.config ?? {}
 		return {
@@ -52,8 +51,7 @@
 		}
 	}
 
-	/** @param {Api.Route} r */
-	const routeKey = (r) => `${r?.location}|${r?.domain}|${r?.path}`
+	const routeKey = (r: Api.Route) => `${r?.location}|${r?.domain}|${r?.path}`
 
 	let form = $state(untrack(() => buildForm(data.route)))
 	let seededKey = untrack(() => routeKey(data.route))
@@ -86,17 +84,16 @@
 		return base
 	})
 
-	const targetPlaceholder = $derived({
+	const targetPlaceholder = $derived(({
 		'redirect://': 'https://example.com',
 		'http://': '203.0.113.10:8080'
-	}[form.targetPrefix] || '')
+	} as Record<string, string>)[form.targetPrefix] || '')
 
-	const targetHint = $derived({
+	const targetHint = $derived(({
 		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
-	}[form.targetPrefix] || '')
+	} as Record<string, string>)[form.targetPrefix] || '')
 
-	/** @type {{ name: string, paused: boolean }[]} */
-	let deployments = $state([])
+	let deployments = $state<{ name: string, paused: boolean }[]>([])
 
 	// Paused deployments stay selectable so a route can be wired up ahead of a
 	// resume, but the picker flags them and we warn that traffic won't flow until
@@ -104,9 +101,9 @@
 	const deploymentOptions = $derived(deployments.map((d) => ({
 		value: d.name,
 		label: d.name,
-		dot: /** @type {'warning' | 'positive'} */ (d.paused ? 'warning' : 'positive'),
+		dot: (d.paused ? 'warning' : 'positive') as 'warning' | 'positive',
 		badge: d.paused ? 'Paused' : undefined,
-		badgeTone: /** @type {'warning'} */ ('warning')
+		badgeTone: 'warning' as const
 	})))
 
 	const selectedDeploymentPaused = $derived(
@@ -116,17 +113,17 @@
 
 	async function fetchDeployments () {
 		deployments = []
-		const resp = await api.invoke('deployment.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.Deployment>>('deployment.list', { project }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
 			return
 		}
 		const list = resp.result?.items ?? []
 		deployments = list
-			.filter((/** @type {Api.Deployment} */ x) => x.location === route.location)
-			.filter((/** @type {Api.Deployment} */ x) => x.type === 'WebService' || x.type === 'Static')
-			.filter((/** @type {Api.Deployment} */ x) => x.ttl === 0)
-			.map((/** @type {Api.Deployment} */ x) => ({ name: x.name, paused: x.action === 'pause' }))
+			.filter((x) => x.location === route.location)
+			.filter((x) => x.type === 'WebService' || x.type === 'Static')
+			.filter((x) => x.ttl === 0)
+			.map((x) => ({ name: x.name, paused: x.action === 'pause' }))
 	}
 
 	$effect(() => {
@@ -142,15 +139,13 @@
 		if (form.targetPrefix === 'deployment://') fetchDeployments()
 	}
 
-	/** @param {string} s */
-	function splitLines (s) {
+	function splitLines (s: string) {
 		return s.split('\n').map((x) => x.trim()).filter((x) => x !== '')
 	}
 
 	let saving = $state(false)
 
-	/** @param {SubmitEvent} e */
-	async function save (e) {
+	async function save (e: SubmitEvent) {
 		e.preventDefault()
 		if (saving) return
 

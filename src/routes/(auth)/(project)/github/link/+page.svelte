@@ -1,21 +1,20 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
+	import type { PageData } from './$types'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import CreateServiceAccountModal from '$lib/components/CreateServiceAccountModal.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const installUrl = $derived(data.installUrl)
 	const linkedRepoIds = $derived(new Set(data.linkedRepoIds))
 
-	/** @type {Api.GithubRepoItem[]} */
-	let repos = $state([])
-	/** @type {Api.Error | undefined} */
-	let repoError = $state(undefined)
+	let repos = $state<Api.GithubRepoItem[]>([])
+	let repoError = $state<Api.Error | undefined>(undefined)
 	let loadingRepos = $state(false)
 	let loadedOnce = $state(false)
 
@@ -27,12 +26,11 @@
 		loadingRepos = true
 		repoError = undefined
 		try {
-			/** @type {Record<number, Api.GithubRepoItem>} */
-			const repoMap = {}
+			const repoMap: Record<number, Api.GithubRepoItem> = {}
 
 			await Promise.all(
 				data.installationIds.map(async (installationId) => {
-					const resp = await api.invoke('github.listRepos', { project, installationId }, fetch)
+					const resp = await api.invoke<Api.List<Api.GithubRepoItem>>('github.listRepos', { project, installationId }, fetch)
 					if (!resp.ok) {
 						repoError = resp.error
 						return
@@ -76,8 +74,7 @@
 
 	// Service accounts created inline via the modal, merged with the loaded list
 	// so a freshly-created SA is immediately selectable without a full reload.
-	/** @type {{ sid: string, name: string }[]} */
-	let extraServiceAccounts = $state([])
+	let extraServiceAccounts = $state<{ sid: string, name: string }[]>([])
 
 	const serviceAccounts = $derived([...data.serviceAccounts, ...extraServiceAccounts])
 
@@ -86,11 +83,9 @@
 		label: `${sa.sid} — ${sa.name}`
 	})))
 
-	/** @type {CreateServiceAccountModal} */
-	let createServiceAccountModal = $state(/** @type {any} */ (undefined))
+	let createServiceAccountModal = $state<CreateServiceAccountModal | null>(null)
 
-	/** @param {{ sid: string, name: string, email: string }} sa */
-	function onServiceAccountCreated (sa) {
+	function onServiceAccountCreated (sa: { sid: string, name: string, email: string }) {
 		if (!extraServiceAccounts.some((s) => s.sid === sa.sid) &&
 			!data.serviceAccounts.some((s) => s.sid === sa.sid)) {
 			extraServiceAccounts = [...extraServiceAccounts, { sid: sa.sid, name: sa.name }]
@@ -253,7 +248,7 @@
 				<button
 					class="button is-variant-secondary"
 					disabled={!data.canCreateServiceAccount}
-					onclick={() => createServiceAccountModal.open()}
+					onclick={() => createServiceAccountModal?.open()}
 					title={data.canCreateServiceAccount
 						? 'Create a new deploy service account without leaving this page'
 						: 'You need the serviceAccount.create permission to create one here.'}

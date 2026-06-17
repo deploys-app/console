@@ -1,16 +1,15 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores'
 
 	/**
 	 * Shared sub-navigation for the GitHub feature. Repositories is the
 	 * overview/management view; Workflow is the standalone generator.
-	 *
-	 * @typedef {Object} Props
-	 * @property {string | null} project
 	 */
+	interface Props {
+		project: string | null
+	}
 
-	/** @type {Props} */
-	const { project } = $props()
+	const { project }: Props = $props()
 
 	const onWorkflow = $derived($page.url.pathname.startsWith('/github/workflow'))
 	const q = $derived(project ? `?project=${project}` : '')

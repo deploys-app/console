@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
@@ -9,8 +9,9 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import Swal from 'sweetalert2'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const domain = $derived(data.domain)
@@ -55,7 +56,7 @@
 		return setupCopy('.copy')
 	})
 
-	let reloadTimeout
+	let reloadTimeout: ReturnType<typeof setTimeout> | null = null
 	onMount(() => {
 		handleReload()
 		return () => {
@@ -652,7 +653,7 @@
 	</div>
 </div>
 
-{#snippet dnsRecord(type, host, value)}
+{#snippet dnsRecord(type: string, host: string, value: string)}
 	<div class="rec">
 		<span class="rec__type">{type}</span>
 		<div class="rec__body">

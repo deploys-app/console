@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { SvelteSet } from 'svelte/reactivity'
 	import { podPrefixStripper } from '$lib/deployment/podName'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const deployment = $derived(data.deployment)
 
@@ -19,25 +20,22 @@
 	const FLUSH_INTERVAL_MS = 500
 	const THROUGHPUT_WINDOW_MS = 5000
 
-	/**
-	 * @typedef {{
-	 *   id: number,
-	 *   pod: string,
-	 *   timestamp: string,
-	 *   log: string,
-	 *   severity: 'error' | 'warn' | 'debug' | 'plain'
-	 * }} LogLine
-	 */
+	interface LogLine {
+		id: number
+		pod: string
+		timestamp: string
+		log: string
+		severity: 'error' | 'warn' | 'debug' | 'plain'
+	}
 
-	/** @type {LogLine[]} newest first, exactly what is rendered */
-	let lines = $state([])
-	/** @type {LogLine[]} arrival order (oldest → newest); merged on flush */
-	const pending = []
+	// newest first, exactly what is rendered
+	let lines = $state<LogLine[]>([])
+	// arrival order (oldest → newest); merged on flush
+	const pending: LogLine[] = []
 	let nextId = 1
 
 	// Sliding-window arrival times for throughput display, pruned each tick.
-	/** @type {number[]} */
-	const recentArrivals = []
+	const recentArrivals: number[] = []
 
 	let paused = $state(false)
 	let connected = $state(false)
@@ -48,8 +46,7 @@
 	let now = $state(Date.now())
 	let filter = $state('')
 
-	/** @param {string} log */
-	function detectSeverity (log) {
+	function detectSeverity (log: string): LogLine['severity'] {
 		const t = log.toLowerCase()
 		if (/\b(error|fatal|panic|exception|critical|fail(ed|ure)?)\b/.test(t)) return 'error'
 		if (/\b(warn(ing)?|deprecated)\b/.test(t)) return 'warn'
@@ -61,18 +58,14 @@
 	// name into this palette gives every pod a stable, distinguishable
 	// colour so multi-replica streams stay visually separable.
 	const POD_HUES = [355, 28, 48, 142, 175, 205, 260, 312]
-	/** @param {string} s */
-	function podHue (s) {
+	function podHue (s: string): number {
 		let h = 0
 		for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
 		return POD_HUES[Math.abs(h) % POD_HUES.length]
 	}
 
-	/**
-	 * @param {string} ts ISO 8601
-	 * @param {number} nowMs
-	 */
-	function relTime (ts, nowMs) {
+	// ts is ISO 8601
+	function relTime (ts: string, nowMs: number): string {
 		const t = Date.parse(ts)
 		if (isNaN(t)) return ''
 		const diff = Math.max(0, nowMs - t)
@@ -87,7 +80,7 @@
 	const filteredIds = $derived.by(() => {
 		const f = filter.trim().toLowerCase()
 		if (!f) return null
-		const s = new SvelteSet()
+		const s = new SvelteSet<number>()
 		for (const l of lines) {
 			if (l.log.toLowerCase().includes(f) || l.pod.toLowerCase().includes(f)) s.add(l.id)
 		}

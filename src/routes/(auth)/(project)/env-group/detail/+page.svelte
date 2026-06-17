@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation'
+	import type { PageData } from './$types'
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
@@ -7,7 +8,7 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import Secret from '$lib/components/Secret.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const envGroup = $derived(data.envGroup)

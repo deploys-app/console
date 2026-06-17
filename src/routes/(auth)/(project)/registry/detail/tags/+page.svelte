@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import * as format from '$lib/format'
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
@@ -8,7 +9,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const repository = $derived(data.repository)
@@ -19,7 +20,7 @@
 		return setupCopy('.copy')
 	})
 
-	function untagTag (tag) {
+	function untagTag (tag: string) {
 		modal.confirm({
 			title: `Untag "${tag}"?`,
 			yes: 'Untag',

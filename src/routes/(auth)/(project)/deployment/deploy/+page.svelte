@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import * as format from '$lib/format'
 	import { onMount, tick, untrack } from 'svelte'
 	import { goto } from '$app/navigation'
@@ -7,8 +7,21 @@
 	import EnvGroupModal from '$lib/components/EnvGroupModal.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	// Editable sidecar shape used by the form. Mirrors Api.SidecarForm but keeps
+	// `type` as a plain string so the <Select> two-way binding (value:
+	// string | number) type-checks.
+	interface FormSidecar {
+		type: string
+		cloudSqlProxy: {
+			instance: string
+			port: number | null
+			credentials: string
+		}
+	}
+
+	const { data }: { data: PageData } = $props()
 
 	const locations = $derived(data.locations)
 	const quota = $derived(data.projectInfo.quota)
@@ -24,17 +37,13 @@
 		envGroups: true
 	})
 
-	/** @type {Api.PullSecret[]} */
-	let pullSecrets = $state([])
+	let pullSecrets = $state<Api.PullSecret[]>([])
 
-	/** @type {Api.WorkloadIdentity[]} */
-	let workloadIdentities = $state([])
+	let workloadIdentities = $state<Api.WorkloadIdentity[]>([])
 
-	/** @type {Api.Disk[]} */
-	let disks = $state([])
+	let disks = $state<Api.Disk[]>([])
 
-	/** @type {Api.EnvGroup[]} */
-	let envGroups = $state([])
+	let envGroups = $state<Api.EnvGroup[]>([])
 
 	const form = $state({
 		location: deployment?.location || '',
@@ -46,10 +55,8 @@
 		port: 8080,
 		protocol: 'http',
 		internal: false, // default for WebService
-		/** @type {string[]} */
-		command: [],
-		/** @type {string[]} */
-		args: [],
+		command: [] as string[],
+		args: [] as string[],
 		schedule: '',
 		disk: {
 			name: '',
@@ -66,14 +73,10 @@
 				cpu: '0'
 			}
 		},
-		/** @type {{ k: string, v: string }[]} */
-		env: [],
-		/** @type {string[]} */
-		envGroups: [],
-		/** @type {{ k: string, v: string }[]} */
-		mountData: [],
-		/** @type {Api.SidecarForm[]} */
-		sidecars: [],
+		env: [] as { k: string, v: string }[],
+		envGroups: [] as string[],
+		mountData: [] as { k: string, v: string }[],
+		sidecars: [] as FormSidecar[],
 		ttlValue: 0,
 		// unit in seconds; '0' means no auto-delete
 		ttlUnit: '0'
@@ -84,10 +87,8 @@
 	// leak as top-level request fields. We assemble a single nested `access` object
 	// after the spread instead. nil/false => public.
 	let requireGoogleLogin = $state(false)
-	/** @type {string[]} */
-	let allowedEmails = $state([])
-	/** @type {string[]} */
-	let allowedDomains = $state([])
+	let allowedEmails = $state<string[]>([])
+	let allowedDomains = $state<string[]>([])
 
 	if (deployment) {
 		form.location = deployment.location
@@ -113,7 +114,7 @@
 		form.env = Object.entries(deployment.env || {}).map(([k, v]) => ({ k, v }))
 		form.envGroups = [...(deployment.envGroups || [])]
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
-		form.sidecars = (deployment.sidecars || []).map((s) => {
+		form.sidecars = (deployment.sidecars || []).map((s): FormSidecar => {
 			if (s.cloudSqlProxy) {
 				return {
 					type: 'cloudSqlProxy',
@@ -154,7 +155,7 @@
 			return
 		}
 
-		const resp = await api.invoke('pullSecret.list', { project, location: selectedLocation.id }, fetch)
+		const resp = await api.invoke<Api.List<Api.PullSecret>>('pullSecret.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.pullSecrets = false
@@ -172,7 +173,7 @@
 			return
 		}
 
-		const resp = await api.invoke('workloadIdentity.list', { project, location: selectedLocation.id }, fetch)
+		const resp = await api.invoke<Api.List<Api.WorkloadIdentity>>('workloadIdentity.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.workloadIdentities = false
@@ -190,7 +191,7 @@
 			return
 		}
 
-		const resp = await api.invoke('disk.list', { project, location: selectedLocation.id }, fetch)
+		const resp = await api.invoke<Api.List<Api.Disk>>('disk.list', { project, location: selectedLocation.id }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.disks = false
@@ -203,7 +204,7 @@
 	}
 
 	async function fetchEnvGroups () {
-		const resp = await api.invoke('envGroup.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.EnvGroup>>('envGroup.list', { project }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.envGroups = false
@@ -247,10 +248,7 @@
 
 	let envGroupInput = $state('')
 
-	/**
-	 * @param {string} name
-	 */
-	function addEnvGroup (name) {
+	function addEnvGroup (name: string) {
 		const n = name.trim()
 		if (!n || form.envGroups.includes(n)) return
 		form.envGroups = [...form.envGroups, n]
@@ -261,22 +259,15 @@
 		envGroupInput = ''
 	}
 
-	/**
-	 * @param {string} name
-	 */
-	function removeEnvGroup (name) {
+	function removeEnvGroup (name: string) {
 		form.envGroups = form.envGroups.filter((g) => g !== name)
 	}
 
 	const envGroupByName = $derived(new Map(envGroups.map((g) => [g.name, g])))
 
-	/** @type {?EnvGroupModal} */
-	let envGroupModal = $state(null)
+	let envGroupModal = $state<EnvGroupModal | null>(null)
 
-	/**
-	 * @param {string} name
-	 */
-	function viewEnvGroup (name) {
+	function viewEnvGroup (name: string) {
 		const g = envGroupByName.get(name)
 		if (!g) return
 		envGroupModal?.open(g)
@@ -314,17 +305,13 @@
 		]
 	}
 
-	/** @param {number} i */
-	function removeSidecar (i) {
+	function removeSidecar (i: number) {
 		form.sidecars = form.sidecars.filter((_, k) => k !== i)
 	}
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 
 		if (saving) {
@@ -339,8 +326,8 @@
 				project,
 				...form,
 				protocol: form.type === 'WebService' ? form.protocol : '',
-				env: form.env.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
-				mountData: form.mountData.reduce((p, x) => { p[x.k] = x.v; return p }, {}),
+				env: form.env.reduce<Record<string, string>>((p, x) => { p[x.k] = x.v; return p }, {}),
+				mountData: form.mountData.reduce<Record<string, string>>((p, x) => { p[x.k] = x.v; return p }, {}),
 				sidecars: convertSidecars(),
 				ttl: ttlSeconds,
 				// Set after the spread so it can never be clobbered by `...form`.

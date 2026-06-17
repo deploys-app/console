@@ -1,11 +1,35 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
 	import { onMount, tick, untrack } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	interface MetricLine {
+		name: string
+		points: [number, number][]
+	}
+
+	interface MetricSeries {
+		prefix: string
+		lines: MetricLine[]
+		dashStyle?: string
+		color?: string
+	}
+
+	interface DeploymentMetricsResult {
+		cpuUsage?: MetricLine[]
+		cpuLimit?: MetricLine[]
+		memoryUsage?: MetricLine[]
+		memory?: MetricLine[]
+		memoryLimit?: MetricLine[]
+		requests?: MetricLine[]
+		egress?: MetricLine[]
+		storage?: MetricLine[]
+	}
+
+	const { data }: { data: PageData } = $props()
 
 	// Two-row pill bar: top row is the rolling-window options, bottom row is
 	// the aggregate (longer) windows. Aggregate options are tagged so we can
@@ -43,13 +67,13 @@
 		range: initialRange && validRanges.has(initialRange) ? initialRange : defaultRange
 	})
 
-	let cpu = $state([])
-	let memory = $state([])
-	let request = $state([])
-	let egress = $state([])
-	let storage = $state([])
+	let cpu = $state<MetricSeries[]>([])
+	let memory = $state<MetricSeries[]>([])
+	let request = $state<MetricSeries[]>([])
+	let egress = $state<MetricSeries[]>([])
+	let storage = $state<MetricSeries[]>([])
 
-	let reloadTimeout
+	let reloadTimeout: ReturnType<typeof setTimeout> | null = null
 	let lastFetchAt = $state(0)
 	let now = $state(Date.now())
 	let fetching = $state(false)
@@ -60,7 +84,7 @@
 		fetching = true
 
 		try {
-			const resp = await api.invoke('deployment.metrics', {
+			const resp = await api.invoke<DeploymentMetricsResult>('deployment.metrics', {
 				project: deployment.project,
 				location: deployment.location,
 				name: deployment.name,
@@ -101,8 +125,7 @@
 		}
 	}
 
-	/** @param {string} value */
-	function setRange (value) {
+	function setRange (value: string) {
 		if (value === filter.range) return
 		filter.range = value
 		const u = new URL($page.url)
@@ -120,8 +143,7 @@
 		}
 	})
 
-	/** @param {number} t */
-	function relTime (t) {
+	function relTime (t: number): string {
 		if (!t) return '—'
 		const diff = Math.max(0, now - t)
 		if (diff < 60_000) return `${Math.floor(diff / 1000)}s ago`
