@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 
 	/**
@@ -9,35 +9,36 @@
 	 *
 	 * Single mode binds `value` (one value). Multi mode binds `tags` (an array of
 	 * values) and renders the chosen options as chips.
-	 *
-	 * @typedef {Object} Option
-	 * @property {string} value
-	 * @property {string} label        chip + resting display text
-	 * @property {string} [code]       optional mono prefix shown in the row
-	 * @property {string} [name]       row text after the code (e.g. country name)
-	 *
-	 * @typedef {Object} Props
-	 * @property {Option[]} options
-	 * @property {boolean} [multi]      multi-select (chips) vs single value
-	 * @property {string} [value]       single mode — selected value
-	 * @property {string[]} [tags]      multi mode — selected values
-	 * @property {string} [id]          id for the inner input (label association)
-	 * @property {string} [placeholder]
-	 * @property {string} [emptyText]   shown when no option matches the query
-	 * @property {boolean} [allowCustom] offer the typed text as a new value when it
-	 *                                   isn't one of `options` (e.g. an HTTP method
-	 *                                   outside the known set). Off for closed sets
-	 *                                   like country codes.
-	 * @property {(value: string) => void} [onchange] notified with the committed
-	 *                                   value whenever an option (or custom value)
-	 *                                   is picked.
-	 * @property {boolean} [resetOnSelect] single mode — don't rest on the pick:
-	 *                                   clear the field and keep the menu open so the
-	 *                                   next value can be typed right away, turning
-	 *                                   the control into an "add to a list" picker.
 	 */
 
-	/** @type {Props} */
+	interface Option {
+		value: string
+		label: string // chip + resting display text
+		code?: string // optional mono prefix shown in the row
+		name?: string // row text after the code (e.g. country name)
+	}
+
+	interface Props {
+		options: Option[]
+		multi?: boolean // multi-select (chips) vs single value
+		value?: string // single mode — selected value
+		tags?: string[] // multi mode — selected values
+		id?: string // id for the inner input (label association)
+		placeholder?: string
+		emptyText?: string // shown when no option matches the query
+		// offer the typed text as a new value when it isn't one of `options` (e.g.
+		// an HTTP method outside the known set). Off for closed sets like country
+		// codes.
+		allowCustom?: boolean
+		// notified with the committed value whenever an option (or custom value) is
+		// picked.
+		onchange?: (value: string) => void
+		// single mode — don't rest on the pick: clear the field and keep the menu
+		// open so the next value can be typed right away, turning the control into
+		// an "add to a list" picker.
+		resetOnSelect?: boolean
+	}
+
 	let {
 		options,
 		multi = false,
@@ -49,10 +50,10 @@
 		allowCustom = false,
 		onchange,
 		resetOnSelect = false
-	} = $props()
+	}: Props = $props()
 
 	/** Resting/chip label for a stored value (falls back to the bare value). */
-	function labelOf (/** @type {string} */ v) {
+	function labelOf (v: string) {
 		return options.find((o) => o.value === v)?.label ?? v
 	}
 
@@ -64,10 +65,8 @@
 
 	const listboxId = $derived(`${id ?? 'opt'}-listbox`)
 
-	/** @type {HTMLInputElement | undefined} */
-	let inputEl = $state()
-	/** @type {HTMLDivElement | undefined} */
-	let listEl = $state()
+	let inputEl = $state<HTMLInputElement | undefined>()
+	let listEl = $state<HTMLDivElement | undefined>()
 
 	// In single mode the resting input text is the selected label; treat it as an
 	// empty query so opening the menu shows the whole list rather than filtering
@@ -116,8 +115,7 @@
 		})
 	})
 
-	/** @param {Option} o */
-	function commit (o) {
+	function commit (o: Option) {
 		if (multi) {
 			if (!tags.includes(o.value)) tags = [...tags, o.value]
 			query = ''
@@ -158,8 +156,7 @@
 		onchange?.(v)
 	}
 
-	/** @param {number} i */
-	function removeTag (i) {
+	function removeTag (i: number) {
 		tags = tags.filter((_, idx) => idx !== i)
 		inputEl?.focus()
 	}
@@ -186,8 +183,7 @@
 		activeIndex = matches.length > 0 ? 0 : -1
 	}
 
-	/** @param {number} dir */
-	function moveActive (dir) {
+	function moveActive (dir: number) {
 		if (matches.length === 0) return
 		let i = activeIndex + dir
 		if (i < 0) i = matches.length - 1
@@ -195,8 +191,7 @@
 		activeIndex = i
 	}
 
-	/** @param {KeyboardEvent} e */
-	function onKeydown (e) {
+	function onKeydown (e: KeyboardEvent) {
 		switch (e.key) {
 		case 'ArrowDown':
 			e.preventDefault()
@@ -231,12 +226,10 @@
 		}
 	}
 
-	const optionId = (/** @type {number} */ i) => `${id ?? 'opt'}-opt-${i}`
+	const optionId = (i: number) => `${id ?? 'opt'}-opt-${i}`
 
-	/** @type {(node: HTMLElement, handler: () => void) => { destroy(): void }} */
-	function clickOutside (node, handler) {
-		/** @param {MouseEvent} e */
-		function onDown (e) {
+	function clickOutside (node: HTMLElement, handler: () => void): { destroy(): void } {
+		function onDown (e: MouseEvent) {
 			if (e.target instanceof Node && !node.contains(e.target)) handler()
 		}
 		document.addEventListener('mousedown', onDown)

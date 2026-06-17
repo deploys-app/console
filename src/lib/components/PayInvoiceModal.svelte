@@ -1,27 +1,23 @@
-<script>
+<script lang="ts">
 	// Max upload size, mirrors api.MaxTransferSlipSize (10 MiB). The server
 	// enforces this too; checking here gives instant feedback.
 	const MAX_SIZE = 10 * 1024 * 1024
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {() => void} [onuploaded] called after a slip is accepted
-	 */
+	interface Props {
+		/** called after a slip is accepted */
+		onuploaded?: () => void
+	}
 
-	/** @type {Props} */
-	const { onuploaded } = $props()
+	const { onuploaded }: Props = $props()
 
-	let invoice = $state(/** @type {?Api.Invoice} */ (null))
+	let invoice = $state<Api.Invoice | null>(null)
 	let isActive = $state(false)
 	let uploading = $state(false)
 	let error = $state('')
-	let selectedFile = $state(/** @type {?File} */ (null))
-	let elFile = $state(/** @type {?HTMLInputElement} */ (null))
+	let selectedFile = $state<File | null>(null)
+	let elFile = $state<HTMLInputElement | null>(null)
 
-	/**
-	 * @param {Api.Invoice} inv
-	 */
-	export function open (inv) {
+	export function open (inv: Api.Invoice): void {
 		invoice = inv
 		selectedFile = null
 		error = ''
@@ -38,17 +34,13 @@
 	 * Close only when the backdrop itself is clicked, not when a click inside
 	 * the panel bubbles up — otherwise interacting with the form would dismiss
 	 * the modal.
-	 * @param {MouseEvent} e
 	 */
-	function onBackdrop (e) {
+	function onBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) close()
 	}
 
-	/**
-	 * @param {Event} e
-	 */
-	function onFileChange (e) {
-		const input = /** @type {HTMLInputElement} */ (e.currentTarget)
+	function onFileChange (e: Event) {
+		const input = e.currentTarget as HTMLInputElement
 		const f = input.files?.[0] ?? null
 		error = ''
 		if (f && f.size > MAX_SIZE) {
@@ -86,10 +78,7 @@
 		}
 	}
 
-	/**
-	 * @param {number} n
-	 */
-	function fileSize (n) {
+	function fileSize (n: number): string {
 		if (n < 1024) return `${n} B`
 		if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
 		return `${(n / 1024 / 1024).toFixed(1)} MB`

@@ -1,35 +1,30 @@
-<script>
-	/**
-	 * @typedef {'positive' | 'warning' | 'negative' | 'muted'} Tone
-	 */
+<script lang="ts">
+	type Tone = 'positive' | 'warning' | 'negative' | 'muted'
 
-	/**
-	 * @typedef {Object} Option
-	 * @property {string | number} [value]
-	 * @property {string} [label]
-	 * @property {boolean} [disabled]
-	 * @property {boolean} [separator]
-	 * @property {Tone} [dot] leading status dot, colored by tone
-	 * @property {string} [badge] trailing pill text
-	 * @property {Tone} [badgeTone] pill color (defaults to muted)
-	 */
+	interface Option {
+		value?: string | number
+		label?: string
+		disabled?: boolean
+		separator?: boolean
+		dot?: Tone // leading status dot, colored by tone
+		badge?: string // trailing pill text
+		badgeTone?: Tone // pill color (defaults to muted)
+	}
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string | number} [value]
-	 * @property {Option[]} options
-	 * @property {string} [placeholder]
-	 * @property {boolean} [required]
-	 * @property {boolean} [disabled]
-	 * @property {boolean} [editable] free-text combobox mode: a typed value is allowed alongside picking an option
-	 * @property {string} [id]
-	 * @property {string} [name]
-	 * @property {(value: string | number) => void} [onchange]
-	 * @property {boolean} [resetOnSelect]
-	 * @property {string} [class]
-	 */
+	interface Props {
+		value?: string | number
+		options: Option[]
+		placeholder?: string
+		required?: boolean
+		disabled?: boolean
+		editable?: boolean // free-text combobox mode: a typed value is allowed alongside picking an option
+		id?: string
+		name?: string
+		onchange?: (value: string | number) => void
+		resetOnSelect?: boolean
+		class?: string
+	}
 
-	/** @type {Props} */
 	let {
 		value = $bindable(''),
 		options,
@@ -42,11 +37,11 @@
 		onchange,
 		resetOnSelect = false,
 		class: className = ''
-	} = $props()
+	}: Props = $props()
 
 	const uid = $props.id()
 	const listboxId = `${uid}-listbox`
-	const optionId = (/** @type {number} */ i) => `${uid}-opt-${i}`
+	const optionId = (i: number) => `${uid}-opt-${i}`
 
 	let open = $state(false)
 	let activeIndex = $state(-1)
@@ -57,12 +52,9 @@
 	// works, and re-arm on blur for the next focus.
 	let autofillGuard = $state(true)
 
-	/** @type {HTMLButtonElement | undefined} */
-	let triggerEl = $state()
-	/** @type {HTMLInputElement | undefined} */
-	let inputEl = $state()
-	/** @type {HTMLDivElement | undefined} */
-	let listEl = $state()
+	let triggerEl = $state<HTMLButtonElement | undefined>()
+	let inputEl = $state<HTMLInputElement | undefined>()
+	let listEl = $state<HTMLDivElement | undefined>()
 
 	// Editable mode filters the visible options by case-insensitive substring of
 	// the typed value. Non-editable mode always shows the full list.
@@ -75,8 +67,7 @@
 	)
 
 	let typeahead = ''
-	/** @type {ReturnType<typeof setTimeout> | undefined} */
-	let typeaheadTimer
+	let typeaheadTimer: ReturnType<typeof setTimeout> | undefined
 
 	const selectedOption = $derived(
 		options.find((o) => !o.separator && (o.value ?? '') === value)
@@ -84,14 +75,12 @@
 	const displayLabel = $derived(selectedOption ? selectedOption.label : placeholder)
 	const hasSelection = $derived(!!selectedOption)
 
-	/** @param {number} i */
-	function isSelectable (i) {
+	function isSelectable (i: number) {
 		const o = visibleOptions[i]
 		return !!o && !o.separator && !o.disabled
 	}
 
-	/** @param {Option} opt */
-	function commit (opt) {
+	function commit (opt: Option) {
 		if (opt.separator || opt.disabled) return
 		const v = opt.value ?? ''
 		value = v
@@ -124,8 +113,7 @@
 		return -1
 	}
 
-	/** @param {number} dir */
-	function moveActive (dir) {
+	function moveActive (dir: number) {
 		let i = activeIndex
 		for (let step = 0; step < visibleOptions.length; step++) {
 			i += dir
@@ -138,8 +126,7 @@
 		}
 	}
 
-	/** @param {string} char */
-	function typeaheadSearch (char) {
+	function typeaheadSearch (char: string) {
 		clearTimeout(typeaheadTimer)
 		typeahead += char.toLowerCase()
 		typeaheadTimer = setTimeout(() => { typeahead = '' }, 500)
@@ -149,8 +136,7 @@
 		if (match >= 0) activeIndex = match
 	}
 
-	/** @param {KeyboardEvent} e */
-	function onKeydown (e) {
+	function onKeydown (e: KeyboardEvent) {
 		if (disabled) return
 		switch (e.key) {
 		case 'ArrowDown':
@@ -193,8 +179,7 @@
 
 	// Keydown handler for the editable (free-text) trigger input. Printable keys
 	// fall through to edit the input; only navigation/commit keys are handled.
-	/** @param {KeyboardEvent} e */
-	function onInputKeydown (e) {
+	function onInputKeydown (e: KeyboardEvent) {
 		if (disabled) return
 		switch (e.key) {
 		case 'ArrowDown':
@@ -234,10 +219,8 @@
 		onchange?.(value)
 	}
 
-	/** @type {(node: HTMLElement, handler: () => void) => { destroy(): void }} */
-	function clickOutside (node, handler) {
-		/** @param {MouseEvent} e */
-		function onDown (e) {
+	function clickOutside (node: HTMLElement, handler: () => void): { destroy(): void } {
+		function onDown (e: MouseEvent) {
 			if (e.target instanceof Node && !node.contains(e.target)) handler()
 		}
 		document.addEventListener('mousedown', onDown)

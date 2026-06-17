@@ -1,13 +1,13 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} [title]
-	 * @property {string} [description]
-	 * @property {import('svelte').Snippet} [children]
-	 */
+<script lang="ts">
+	import type { Snippet } from 'svelte'
 
-	/** @type {Props} */
-	const { title = 'Danger zone', description = '', children } = $props()
+	interface Props {
+		title?: string
+		description?: string
+		children?: Snippet
+	}
+
+	const { title = 'Danger zone', description = '', children }: Props = $props()
 </script>
 
 <section class="danger-zone">

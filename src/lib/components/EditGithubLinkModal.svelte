@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 
@@ -7,15 +7,16 @@
 	 * deploy trigger, and production branch. The repository and installation id
 	 * are immutable, so only the mutable fields are editable here. Calls
 	 * github.update.
-	 *
-	 * @typedef {Object} Props
-	 * @property {string} project
-	 * @property {{ sid: string, name: string }[]} serviceAccounts  selectable service accounts in the project
-	 * @property {() => void} onsaved  called after a successful update so the parent can reload the link list
 	 */
+	interface Props {
+		project: string
+		/** selectable service accounts in the project */
+		serviceAccounts: { sid: string, name: string }[]
+		/** called after a successful update so the parent can reload the link list */
+		onsaved: () => void
+	}
 
-	/** @type {Props} */
-	const { project, serviceAccounts, onsaved } = $props()
+	const { project, serviceAccounts, onsaved }: Props = $props()
 
 	let isActive = $state(false)
 	// Identifies the link being edited; repository is display-only.
@@ -49,8 +50,7 @@
 
 	const canSubmit = $derived(serviceAccount !== '' && !submitting)
 
-	/** @param {Api.GithubLink} link */
-	export function open (link) {
+	export function open (link: Api.GithubLink): void {
 		repositoryId = link.repositoryId
 		repository = link.repository
 		serviceAccount = link.serviceAccount
@@ -68,8 +68,7 @@
 		isActive = false
 	}
 
-	/** @param {MouseEvent} e */
-	function onBackdrop (e) {
+	function onBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) close()
 	}
 

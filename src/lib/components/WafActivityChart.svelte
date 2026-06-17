@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import dayjs from 'dayjs'
 	import { niceScale } from '$lib/charts/util'
 
@@ -7,23 +7,23 @@
 	 * (block / log / allow). Data arrives pre-bucketed onto a shared time grid so
 	 * the segments align cleanly. Pure SVG — colors come from the design tokens
 	 * via CSS `var()`, so a theme toggle recolors the bars instantly.
-	 *
-	 * @typedef {Object} ActivitySeries
-	 * @property {Api.WafAction} action
-	 * @property {string} name
-	 * @property {[number, number][]} data   [unixMs, count]
-	 *
-	 * @typedef {Object} Props
-	 * @property {ActivitySeries[]} series   bottom-to-top stacking order
-	 * @property {number} from   x-extreme start, unix ms
-	 * @property {number} to     x-extreme end, unix ms
 	 */
 
-	/** @type {Props} */
-	const { series, from, to } = $props()
+	interface ActivitySeries {
+		action: Api.WafAction
+		name: string
+		data: [number, number][] // [unixMs, count]
+	}
 
-	/** @type {Record<Api.WafAction, string>} */
-	const actionColor = {
+	interface Props {
+		series: ActivitySeries[] // bottom-to-top stacking order
+		from: number // x-extreme start, unix ms
+		to: number // x-extreme end, unix ms
+	}
+
+	const { series, from, to }: Props = $props()
+
+	const actionColor: Record<Api.WafAction, string> = {
 		block: 'hsl(var(--hsl-negative))',
 		log: 'hsl(var(--hsl-warning))',
 		allow: 'hsl(var(--hsl-positive))'
@@ -33,12 +33,10 @@
 	const height = 320
 
 	let width = $state(0)
-	/** @type {SVGSVGElement | undefined} */
-	let svgEl = $state()
-	let hover = $state(/** @type {number | null} */ (null))
+	let svgEl = $state<SVGSVGElement | undefined>()
+	let hover = $state<number | null>(null)
 
-	/** @param {HTMLElement} node */
-	function track (node) {
+	function track (node: HTMLElement) {
 		const ro = new ResizeObserver((entries) => {
 			width = entries[0].contentRect.width
 		})
@@ -74,10 +72,10 @@
 		y1: height - PAD.bottom
 	})
 
-	const xScale = $derived((/** @type {number} */ v) =>
+	const xScale = $derived((v: number) =>
 		plot.x0 + ((v - from) / (to - from || 1)) * (plot.x1 - plot.x0))
 
-	const yScale = $derived((/** @type {number} */ v) =>
+	const yScale = $derived((v: number) =>
 		plot.y1 - ((v - yInfo.min) / (yInfo.max - yInfo.min)) * (plot.y1 - plot.y0))
 
 	const colW = $derived.by(() => {
@@ -102,9 +100,9 @@
 	const timeFmt = $derived.by(() => {
 		const span = to - from
 		const day = 86400000
-		if (span <= 2 * day) return (/** @type {number} */ v) => dayjs(v).format('HH:mm')
-		if (span <= 8 * day) return (/** @type {number} */ v) => dayjs(v).format('ddd HH:mm')
-		return (/** @type {number} */ v) => dayjs(v).format('MMM D')
+		if (span <= 2 * day) return (v: number) => dayjs(v).format('HH:mm')
+		if (span <= 8 * day) return (v: number) => dayjs(v).format('ddd HH:mm')
+		return (v: number) => dayjs(v).format('MMM D')
 	})
 
 	const xTicks = $derived.by(() => {
@@ -123,8 +121,7 @@
 		return { px: col.cx, header: dayjs(col.x).format('MMM D, HH:mm'), total: col.total, rows }
 	})
 
-	/** @param {PointerEvent} e */
-	function onMove (e) {
+	function onMove (e: PointerEvent) {
 		if (!columns.length || !svgEl) return
 		const rect = svgEl.getBoundingClientRect()
 		const px = e.clientX - rect.left
@@ -141,14 +138,12 @@
 	// columns even when the finger strays outside the SVG, and reveal the nearest
 	// column on a plain tap. `touch-action: pan-y` leaves vertical page scroll to
 	// the browser, which fires pointercancel and clears the readout on a scroll.
-	/** @param {PointerEvent} e */
-	function onDown (e) {
+	function onDown (e: PointerEvent) {
 		if (e.pointerType !== 'mouse') svgEl?.setPointerCapture?.(e.pointerId)
 		onMove(e)
 	}
 
-	/** @param {PointerEvent} e */
-	function onUp (e) {
+	function onUp (e: PointerEvent) {
 		if (e.pointerType !== 'mouse') hover = null
 	}
 </script>

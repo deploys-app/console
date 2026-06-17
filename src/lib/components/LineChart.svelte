@@ -1,29 +1,28 @@
-<script>
+<script lang="ts">
 	import dayjs from 'dayjs'
 	import { palette, niceScale, linePath, areaPath } from '$lib/charts/util'
+	import type { LineSeries } from '$lib/charts/util'
 
 	/**
 	 * A responsive, theme-reactive SVG line/area chart. Drives both the metric
 	 * charts (time x-axis) and the billing report (category x-axis). Colors are
 	 * CSS-var strings applied via inline `style`, so a theme toggle recolors the
 	 * chart with no re-render and no canvas redraw.
-	 *
-	 * @typedef {import('$lib/charts/util').LineSeries} LineSeries
-	 *
-	 * @typedef {Object} Props
-	 * @property {LineSeries[]} series
-	 * @property {'time' | 'category'} [xType]
-	 * @property {string[]} [categories]      labels when xType is 'category'
-	 * @property {[number, number] | null} [xDomain]  explicit [min,max] for time
-	 * @property {boolean} [smooth]           spline vs. straight segments
-	 * @property {number} [height]
-	 * @property {(v: number) => string} [formatY]
-	 * @property {(v: number) => string} [formatValue]  tooltip value (defaults to formatY)
-	 * @property {string} [valueSuffix]       appended in the tooltip
-	 * @property {boolean} [legend]
 	 */
 
-	/** @type {Props} */
+	interface Props {
+		series: LineSeries[]
+		xType?: 'time' | 'category'
+		categories?: string[] // labels when xType is 'category'
+		xDomain?: [number, number] | null // explicit [min,max] for time
+		smooth?: boolean // spline vs. straight segments
+		height?: number
+		formatY?: (v: number) => string
+		formatValue?: (v: number) => string // tooltip value (defaults to formatY)
+		valueSuffix?: string // appended in the tooltip
+		legend?: boolean
+	}
+
 	const {
 		series,
 		xType = 'time',
@@ -35,18 +34,16 @@
 		formatValue,
 		valueSuffix = '',
 		legend = false
-	} = $props()
+	}: Props = $props()
 
 	const PAD = { top: 14, right: 16, bottom: 26, left: 52 }
 
 	let width = $state(0)
-	/** @type {SVGSVGElement | undefined} */
-	let svgEl = $state()
-	/** index into `frame`, or null when not hovering */
-	let hover = $state(/** @type {number | null} */ (null))
+	let svgEl = $state<SVGSVGElement | undefined>()
+	// index into `frame`, or null when not hovering
+	let hover = $state<number | null>(null)
 
-	/** @param {HTMLElement} node */
-	function track (node) {
+	function track (node: HTMLElement) {
 		const ro = new ResizeObserver((entries) => {
 			width = entries[0].contentRect.width
 		})
@@ -54,14 +51,14 @@
 		return { destroy: () => ro.disconnect() }
 	}
 
-	const colorOf = (/** @type {LineSeries} */ s, /** @type {number} */ i) =>
+	const colorOf = (s: LineSeries, i: number): string =>
 		s.color ?? palette[i % palette.length]
 
 	// ── Domains ────────────────────────────────────────────────────────────
 	const allY = $derived(series.flatMap((s) => s.points.map((p) => p.y)))
 	const yScaleInfo = $derived(niceScale(0, allY.length ? Math.max(...allY) : 0, 5))
 
-	const xExtent = $derived.by(() => {
+	const xExtent = $derived.by((): [number, number] => {
 		if (xType === 'category') return [0, Math.max(0, categories.length - 1)]
 		if (xDomain) return xDomain
 		const xs = series.flatMap((s) => s.points.map((p) => p.x))
@@ -79,13 +76,13 @@
 		y1: height - PAD.bottom
 	})
 
-	const xScale = $derived((/** @type {number} */ v) => {
+	const xScale = $derived((v: number) => {
 		const [lo, hi] = xExtent
 		if (xType === 'category' && hi === lo) return (plot.x0 + plot.x1) / 2
 		return plot.x0 + ((v - lo) / (hi - lo)) * (plot.x1 - plot.x0)
 	})
 
-	const yScale = $derived((/** @type {number} */ v) => {
+	const yScale = $derived((v: number) => {
 		const { min, max } = yScaleInfo
 		return plot.y1 - ((v - min) / (max - min)) * (plot.y1 - plot.y0)
 	})
@@ -117,9 +114,9 @@
 		const [lo, hi] = xExtent
 		const span = hi - lo
 		const day = 86400000
-		if (span <= 2 * day) return (/** @type {number} */ v) => dayjs(v).format('HH:mm')
-		if (span <= 8 * day) return (/** @type {number} */ v) => dayjs(v).format('ddd HH:mm')
-		return (/** @type {number} */ v) => dayjs(v).format('MMM D')
+		if (span <= 2 * day) return (v: number) => dayjs(v).format('HH:mm')
+		if (span <= 8 * day) return (v: number) => dayjs(v).format('ddd HH:mm')
+		return (v: number) => dayjs(v).format('MMM D')
 	})
 
 	const xTicks = $derived.by(() => {
@@ -127,8 +124,7 @@
 			const n = categories.length
 			if (n === 0) return []
 			const stride = n <= 8 ? 1 : Math.ceil(n / 6)
-			/** @type {{ px: number, label: string, anchor: string }[]} */
-			const out = []
+			const out: { px: number, label: string, anchor: string }[] = []
 			for (let i = 0; i < n; i += stride) {
 				out.push({ px: xScale(i), label: categories[i], anchor: i === 0 ? 'start' : i >= n - 1 ? 'end' : 'middle' })
 			}
@@ -158,8 +154,7 @@
 		return { px: f.px, header, rows }
 	})
 
-	/** @param {PointerEvent} e */
-	function onMove (e) {
+	function onMove (e: PointerEvent) {
 		if (!frame.length || !svgEl) return
 		const rect = svgEl.getBoundingClientRect()
 		const px = e.clientX - rect.left
@@ -176,14 +171,12 @@
 	// points even when the finger strays outside the SVG, and reveal the nearest
 	// point on a plain tap. `touch-action: pan-y` leaves vertical page scroll to
 	// the browser, which fires pointercancel and clears the readout on a scroll.
-	/** @param {PointerEvent} e */
-	function onDown (e) {
+	function onDown (e: PointerEvent) {
 		if (e.pointerType !== 'mouse') svgEl?.setPointerCapture?.(e.pointerId)
 		onMove(e)
 	}
 
-	/** @param {PointerEvent} e */
-	function onUp (e) {
+	function onUp (e: PointerEvent) {
 		if (e.pointerType !== 'mouse') hover = null
 	}
 </script>
@@ -245,7 +238,7 @@
 			{#if tip}
 				<line class="crosshair" x1={tip.px} x2={tip.px} y1={plot.y0} y2={plot.y1} />
 				{#each drawn as d (d.name)}
-					{@const yv = d.byX.get(frame[/** @type {number} */ (hover)].x)}
+					{@const yv = d.byX.get(frame[hover as number].x)}
 					{#if yv != null}
 						<circle class="marker" cx={tip.px} cy={yScale(yv)} r="3.5" style:fill={d.color} />
 					{/if}
@@ -264,7 +257,7 @@
 					<div class="tip-row">
 						<span class="tip-dot" style:background={row.color}></span>
 						<span class="tip-name">{row.name}</span>
-						<span class="tip-val">{fmtVal(/** @type {number} */ (row.y))}{valueSuffix}</span>
+						<span class="tip-val">{fmtVal(row.y as number)}{valueSuffix}</span>
 					</div>
 				{/each}
 			</div>

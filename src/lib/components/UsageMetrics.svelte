@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { tick, untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
@@ -10,14 +10,19 @@
 	 * Daily egress + storage usage charts for a project-level feature (Dropbox,
 	 * Registry). Data comes from a `*.metrics` RPC returning `{ egress, storage }`
 	 * series of `[unixSeconds, value]` points, one point per day.
-	 *
-	 * @typedef {Object} Props
-	 * @property {string} project
-	 * @property {string} fn         api function, e.g. 'dropbox.metrics'
 	 */
 
-	/** @type {Props} */
-	const { project, fn } = $props()
+	interface Props {
+		project: string
+		fn: string // api function, e.g. 'dropbox.metrics'
+	}
+
+	interface Series {
+		prefix: string
+		lines: Api.UsageMetricsLine[]
+	}
+
+	const { project, fn }: Props = $props()
 
 	const rangeOptions = [
 		{ value: '7d', label: '7 Days' },
@@ -29,15 +34,14 @@
 		range: $page.url.searchParams.get('range') || '30d'
 	})
 
-	let egress = $state([])
-	let storage = $state([])
+	let egress = $state<Series[]>([])
+	let storage = $state<Series[]>([])
 
 	async function fetchMetrics (clear = false) {
 		// `range` is read untracked so the project-keyed effect below isn't also
 		// triggered by range changes — those refresh via the Select's onchange.
 		const range = untrack(() => filter.range)
-		/** @type {Api.Response<Api.UsageMetricsResult>} */
-		const resp = await api.invoke(fn, { project, timeRange: range }, fetch)
+		const resp: Api.Response<Api.UsageMetricsResult> = await api.invoke(fn, { project, timeRange: range }, fetch)
 		if (!resp.ok) {
 			return
 		}
