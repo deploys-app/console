@@ -481,6 +481,10 @@ declare namespace Api {
 
     export type AuditOutcome = 'success' | 'failure'
 
+    // The client surface a write action came through. Empty string on legacy
+    // rows recorded before the channel column existed.
+    export type AuditChannel = 'api' | 'console' | 'cli' | 'mcp' | ''
+
     export type AuditLogActor = {
         email: string
         type: AuditActorType
@@ -497,6 +501,7 @@ declare namespace Api {
         id: number
         resource: AuditLogResource
         actor: AuditLogActor
+        channel: AuditChannel
         action: string
         outcome: AuditOutcome
         detail: string

@@ -9,6 +9,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import OutcomeBadge from '$lib/components/OutcomeBadge.svelte'
+	import ChannelBadge from '$lib/components/ChannelBadge.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import * as format from '$lib/format'
 
@@ -31,6 +32,13 @@
 		{ value: 'serviceAccount', label: 'Service Account' }
 	]
 
+	const CHANNELS = [
+		{ value: 'api', label: 'API' },
+		{ value: 'console', label: 'Console' },
+		{ value: 'cli', label: 'CLI' },
+		{ value: 'mcp', label: 'MCP' }
+	]
+
 	function parseDate (v: string): Date | null {
 		if (!v) return null
 		const d = new Date(v)
@@ -40,6 +48,7 @@
 	const form = $state(untrack(() => ({
 		resourceType: data.filters.resourceType,
 		actor: data.filters.actor,
+		channel: data.filters.channel,
 		outcome: data.filters.outcome,
 		startDate: parseDate(data.filters.after),
 		endDate: parseDate(data.filters.before)
@@ -104,6 +113,7 @@
 				project,
 				resourceType: data.filters.resourceType,
 				actor: data.filters.actor,
+				channel: data.filters.channel,
 				outcome: data.filters.outcome,
 				after: toRFC3339(data.filters.after),
 				before: cursor,
@@ -155,6 +165,7 @@
 			q.set('project', project)
 			if (form.resourceType) q.set('resourceType', form.resourceType)
 			if (form.actor) q.set('actor', form.actor)
+			if (form.channel) q.set('channel', form.channel)
 			if (form.outcome) q.set('outcome', form.outcome)
 			if (form.startDate) q.set('after', new Date(form.startDate).toISOString())
 			if (form.endDate) q.set('before', new Date(form.endDate).toISOString())
@@ -170,6 +181,7 @@
 		try {
 			form.resourceType = ''
 			form.actor = ''
+			form.channel = ''
 			form.outcome = ''
 			form.startDate = null
 			form.endDate = null
@@ -426,6 +438,13 @@
 					</button>
 				</DatePicker>
 			</div>
+			<div class="field">
+				<label class="label" for="filter-channel">Channel</label>
+				<Select
+					id="filter-channel"
+					bind:value={form.channel}
+					options={[{ value: '', label: 'All' }, ...CHANNELS]} />
+			</div>
 		</div>
 		<div class="actor-row">
 			<div class="field">
@@ -451,6 +470,7 @@
 					<th>Time</th>
 					<th>Outcome</th>
 					<th>Actor</th>
+					<th>Channel</th>
 					<th>Action</th>
 					<th>Resource</th>
 					<th>Detail</th>
@@ -467,6 +487,7 @@
 								<span class="actor-tag">service account</span>
 							{/if}
 						</td>
+						<td><ChannelBadge channel={it.channel} /></td>
 						<td><span class="action-cell">{it.action}</span></td>
 						<td>
 							{#if it.resource.type}
@@ -486,11 +507,11 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={6} list={items} />
-				<ErrorRow span={6} {error} />
+				<NoDataRow span={7} list={items} />
+				<ErrorRow span={7} {error} />
 				{#if hasMore || loadingMore || loadMoreError}
 					<tr class="loadmore-row">
-						<td colspan="6">
+						<td colspan="7">
 							<div bind:this={sentinel} class="loadmore-sentinel">
 								{#if loadingMore}
 									<i class="fa-solid fa-circle-notch fa-spin"></i>

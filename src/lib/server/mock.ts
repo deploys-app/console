@@ -740,6 +740,9 @@ const auditLogItems = (() => {
 		{ resource: { type: 'PullSecret', id: 'ghcr', name: 'ghcr' }, action: 'pullSecret.create', detail: 'Added pull secret' },
 		{ resource: { type: 'EnvGroup', id: 'web-env', name: 'web-env' }, action: 'envGroup.update', detail: 'Updated env group' }
 	]
+	// cycle through the channels (plus one legacy '' row) so the badge column
+	// and the channel filter have varied data offline.
+	const channels = ['console', 'cli', 'mcp', 'api', 'console', '']
 	const t0 = new Date(CREATED_AT).getTime()
 	const items = []
 	for (let i = 0; i < 137; i++) {
@@ -748,6 +751,7 @@ const auditLogItems = (() => {
 			id: 1042 - i,
 			resource: { ...s.resource, locationId: LOCATION_ID },
 			actor: { email: USER_EMAIL, type: 'User' },
+			channel: channels[i % channels.length],
 			action: s.action,
 			outcome: i % 11 === 0 ? 'failure' : 'success',
 			detail: `${s.detail} (#${1042 - i})`,
@@ -1046,6 +1050,7 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 		if (args?.resourceType) arr = arr.filter((it) => it.resource.type.toLowerCase() === String(args.resourceType).toLowerCase())
 		if (args?.actor) arr = arr.filter((it) => it.actor.email === args.actor)
+		if (args?.channel) arr = arr.filter((it) => it.channel === args.channel)
 		if (args?.outcome) arr = arr.filter((it) => it.outcome === args.outcome)
 		return list(arr.slice(0, args?.limit ?? arr.length))
 	},
