@@ -1,7 +1,7 @@
+import type { Handle } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
 
-/** @type {import('@sveltejs/kit').Handle} */
-async function theme ({ event, resolve }) {
+const theme: Handle = async ({ event, resolve }) => {
 	// Only force a class for an explicit choice. With no cookie the default is
 	// the OS preference, which is unknown server-side — the inline script in
 	// app.html applies it before first paint.
@@ -11,8 +11,7 @@ async function theme ({ event, resolve }) {
 	})
 }
 
-/** @type {import('@sveltejs/kit').Handle} */
-async function handleCookie ({ event, resolve }) {
+const handleCookie: Handle = async ({ event, resolve }) => {
 	const { cookies, locals } = event
 
 	locals.token = cookies.get('token') || ''
@@ -21,8 +20,7 @@ async function handleCookie ({ event, resolve }) {
 	return resolve(event)
 }
 
-/** @type {import('@sveltejs/kit').Handle} */
-function storeProject ({ event, resolve }) {
+const storeProject: Handle = ({ event, resolve }) => {
 	const { url, locals } = event
 
 	if (url.pathname.startsWith('/api/')) {

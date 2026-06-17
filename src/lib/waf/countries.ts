@@ -2,14 +2,12 @@
 // by the WAF country field so the picker can show both the code (what the rule
 // stores / what edge geo-IP emits) and the human-readable name.
 
-/**
- * @typedef {Object} Country
- * @property {string} code  ISO 3166-1 alpha-2 code (uppercase)
- * @property {string} name  English short name
- */
+export interface Country {
+	code: string // ISO 3166-1 alpha-2 code (uppercase)
+	name: string // English short name
+}
 
-/** @type {Country[]} */
-export const countries = [
+export const countries: Country[] = [
 	{ code: 'AD', name: 'Andorra' },
 	{ code: 'AE', name: 'United Arab Emirates' },
 	{ code: 'AF', name: 'Afghanistan' },
@@ -261,26 +259,21 @@ export const countries = [
 	{ code: 'ZW', name: 'Zimbabwe' }
 ]
 
-/** @type {Record<string, string>} */
-const nameByCode = Object.fromEntries(countries.map((c) => [c.code, c.name]))
+const nameByCode: Record<string, string> = Object.fromEntries(countries.map((c) => [c.code, c.name]))
 
 /**
  * Human-readable name for a country code, or the code itself when unknown (so an
  * out-of-list value loaded from an existing rule still renders).
- * @param {string} code
- * @returns {string}
  */
-export function countryName (code) {
+export function countryName (code: string): string {
 	return nameByCode[String(code ?? '').toUpperCase()] ?? code
 }
 
 /**
  * Label combining code and name, e.g. `"TH — Thailand"`. Falls back to the bare
  * code for unknown values.
- * @param {string} code
- * @returns {string}
  */
-export function countryLabel (code) {
+export function countryLabel (code: string): string {
 	const c = String(code ?? '').toUpperCase()
 	const name = nameByCode[c]
 	return name ? `${c} — ${name}` : code

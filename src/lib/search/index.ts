@@ -3,16 +3,16 @@ import { projectMenu } from '$lib/nav'
 
 /**
  * A single searchable item shown in the command palette.
- *
- * @typedef {Object} SearchEntry
- * @property {string} id        stable key, unique across all entries
- * @property {string} group     section heading, e.g. "Deployments" / "Go to"
- * @property {string} icon      Font Awesome class, e.g. `fa-rocket`
- * @property {string} label     primary text (the thing you'd type)
- * @property {string} [sublabel] secondary text (location, target, …)
- * @property {string} [keywords] extra text folded into search only, never shown
- * @property {string} href      navigation target
  */
+export interface SearchEntry {
+	id: string // stable key, unique across all entries
+	group: string // section heading, e.g. "Deployments" / "Go to"
+	icon: string // Font Awesome class, e.g. `fa-rocket`
+	label: string // primary text (the thing you'd type)
+	sublabel?: string // secondary text (location, target, …)
+	keywords?: string // extra text folded into search only, never shown
+	href: string // navigation target
+}
 
 const enc = encodeURIComponent
 
@@ -20,16 +20,15 @@ const enc = encodeURIComponent
  * Resource sources fanned out on open. Each calls a project-scoped `*.list`
  * endpoint and maps every item to a {@link SearchEntry}. Keep the labels to the
  * fields a user would actually type to find the resource.
- *
- * @typedef {Object} ResourceSource
- * @property {string} group
- * @property {string} icon
- * @property {string} fn                          api function name
- * @property {(it: any, project: string) => { key: string, label: string, sublabel?: string, href: string }} map
  */
+interface ResourceSource {
+	group: string
+	icon: string
+	fn: string // api function name
+	map: (it: any, project: string) => { key: string, label: string, sublabel?: string, href: string }
+}
 
-/** @type {ResourceSource[]} */
-const resourceSources = [
+const resourceSources: ResourceSource[] = [
 	{
 		group: 'Deployments',
 		icon: 'fa-rocket',
@@ -159,20 +158,15 @@ const resourceSources = [
  *
  * The current project is excluded — switching to where you already are is a
  * no-op and would just be visual noise in the palette.
- *
- * @param {Api.Project[]} projects
- * @param {string} currentProject
- * @param {{ url: { search: string }, data: { overrideRedirect?: string } }} page
- * @returns {SearchEntry[]}
  */
-export function projectEntries (projects, currentProject, page) {
+export function projectEntries (projects: Api.Project[], currentProject: string, page: { url: { search: string }, data: { overrideRedirect?: string } }): SearchEntry[] {
 	const overrideRedirect = page.data?.overrideRedirect || ''
 	return projects
 		.filter((p) => p.project !== currentProject)
 		.map((p) => {
 			const q = new URLSearchParams(page.url.search)
 			q.set('project', p.project)
-			return /** @type {SearchEntry} */ ({
+			return ({
 				id: `project:${p.project}`,
 				group: 'Switch project',
 				icon: 'fa-folder-open',
@@ -181,18 +175,15 @@ export function projectEntries (projects, currentProject, page) {
 				// `p.id` is the numeric project number — searchable but not shown.
 				keywords: p.id,
 				href: `${overrideRedirect}?${q.toString()}`
-			})
+			} as SearchEntry)
 		})
 }
 
 /**
  * Navigation entries — the sidebar sections, jumpable by name. Always available
  * (no fetch) so the palette is useful the instant it opens.
- *
- * @param {string} project
- * @returns {SearchEntry[]}
  */
-export function navEntries (project) {
+export function navEntries (project: string): SearchEntry[] {
 	return projectMenu.map((m) => ({
 		id: `nav:${m.id}`,
 		group: 'Go to',
@@ -211,30 +202,25 @@ export function navEntries (project) {
  * background fan-out, so a single transient `api: unauthorized` (e.g. one of the
  * parallel requests hitting a momentary backend/DB blip) must NOT fire the
  * global `onUnauth` handler and reload the whole app out from under the user.
- *
- * @param {string} project
- * @param {typeof fetch} fetch
- * @returns {Promise<SearchEntry[]>}
  */
-export async function fetchResourceEntries (project, fetch) {
+export async function fetchResourceEntries (project: string, fetch: typeof globalThis.fetch): Promise<SearchEntry[]> {
 	const settled = await Promise.all(resourceSources.map(async (src) => {
 		try {
-			/** @type {Api.Response<Api.List<any>>} */
-			const res = await api.invoke(src.fn, { project }, fetch, { silent: true })
+			const res = await api.invoke<Api.List<any>>(src.fn, { project }, fetch, { silent: true })
 			const items = res.result?.items ?? []
 			return items.map((it) => {
 				const m = src.map(it, project)
-				return /** @type {SearchEntry} */ ({
+				return ({
 					id: `${src.fn}:${m.key}`,
 					group: src.group,
 					icon: src.icon,
 					label: m.label,
 					sublabel: m.sublabel,
 					href: m.href
-				})
+				} as SearchEntry)
 			})
 		} catch {
-			return /** @type {SearchEntry[]} */ ([])
+			return ([] as SearchEntry[])
 		}
 	}))
 	return settled.flat()
@@ -243,12 +229,8 @@ export async function fetchResourceEntries (project, fetch) {
 /**
  * Token AND-match over label + sublabel + group, mirroring the project picker:
  * every whitespace-separated token must appear somewhere in the haystack.
- *
- * @param {SearchEntry[]} entries
- * @param {string} query
- * @returns {SearchEntry[]}
  */
-export function filterEntries (entries, query) {
+export function filterEntries (entries: SearchEntry[], query: string): SearchEntry[] {
 	const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
 	if (!tokens.length) return entries
 	return entries.filter((e) => {

@@ -1,10 +1,10 @@
+import type { RequestHandler } from './$types'
 import { env } from '$env/dynamic/private'
 
 const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 const landing = 'https://www.deploys.app/'
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function POST ({ locals }) {
+export const POST: RequestHandler = async ({ locals }) => {
 	const token = locals.token
 
 	if (token) {

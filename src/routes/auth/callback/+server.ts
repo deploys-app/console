@@ -1,10 +1,10 @@
+import type { RequestHandler } from './$types'
 import { env } from '$env/dynamic/private'
 import { sanitizeRedirect } from '$lib/server/redirect'
 
 const authEndpoint = env.AUTH_ENDPOINT || 'https://auth.deploys.app'
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET ({ cookies, url }) {
+export const GET: RequestHandler = async ({ cookies, url }) => {
 	const state = url.searchParams.get('state') ?? ''
 	const code = url.searchParams.get('code') ?? ''
 

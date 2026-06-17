@@ -10,6 +10,7 @@
 // (severity colouring, pod chips, throughput meter, buffer fill, …) can be
 // exercised against something realistic via `bun dev:mock`.
 
+import type { RequestHandler } from './$types'
 import { env } from '$env/dynamic/private'
 
 // Full pod names (`<kubeName>-<projectID>-<rsHash>-<podHash>`) for an id-named
@@ -60,15 +61,13 @@ function nextEntry () {
 	}
 }
 
-/** @type {import('@sveltejs/kit').RequestHandler} */
-export async function GET ({ url }) {
+export const GET: RequestHandler = async ({ url }) => {
 	if (!env.MOCK_API) return new Response('not found', { status: 404 })
 
 	const wantsText = url.searchParams.get('type') === 'text' || url.searchParams.get('raw') === '1'
 
 	const enc = new TextEncoder()
-	/** @type {ReturnType<typeof setTimeout> | undefined} */
-	let timer
+	let timer: ReturnType<typeof setTimeout> | undefined
 	let closed = false
 
 	const stream = new ReadableStream({
