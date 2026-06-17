@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
 	import { onMount, untrack } from 'svelte'
+	import type { PageData } from './$types'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
@@ -7,7 +8,7 @@
 	import { setupCopy } from '$lib/clipboard'
 	import GitHubNav from '../_components/GitHubNav.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const locations = $derived(data.locations)
@@ -16,14 +17,13 @@
 
 	const links = $derived(data.links)
 	// Mutable so a freshly-provisioned pull secret is selectable without a reload.
-	let pullSecrets = $state(untrack(() => data.pullSecrets))
+	let pullSecrets = $state<Array<Pick<Api.PullSecret, 'name' | 'location'>>>(untrack(() => data.pullSecrets))
 
 	const locationOptions = $derived(locations.map((l) => ({ value: l.id, label: l.id })))
 
 	// Derive a sensible deployment name from a `owner/name` repository: the repo
 	// name, lowercased with anything outside [a-z0-9-] folded to a hyphen.
-	/** @param {string | undefined} repository */
-	function repoToName (repository) {
+	function repoToName (repository: string | undefined) {
 		const short = (repository ?? '').split('/').pop() ?? ''
 		return short
 			.toLowerCase()
@@ -31,9 +31,29 @@
 			.replace(/^-+|-+$/g, '')
 	}
 
+	interface GenState {
+		repository: string | undefined
+		location: string
+		name: string
+		buildType: string
+		port: number
+		framework: string
+		buildCommand: string
+		outputDir: string
+		spa: boolean
+		notFound: string
+		workingDirectory: string
+		env: string
+		envGroups: string[]
+		pullSecret: string
+		protocol: string
+		requireGoogleLogin: boolean
+		allowedEmails: string
+		allowedDomains: string
+	}
+
 	// Default generator state for a repository with no saved config.
-	/** @param {string | undefined} repository */
-	function defaultGen (repository) {
+	function defaultGen (repository: string | undefined): GenState {
 		return {
 			repository,
 			location: data.locations[0]?.id ?? '',
@@ -47,7 +67,6 @@
 			notFound: '404.html',
 			workingDirectory: '',
 			env: '',
-			/** @type {string[]} */
 			envGroups: [],
 			pullSecret: '',
 			protocol: 'http',
@@ -57,19 +76,14 @@
 		}
 	}
 
-	/** @param {string | undefined} repository */
-	function savedConfigFor (repository) {
+	function savedConfigFor (repository: string | undefined) {
 		return data.links.find((l) => l.repository === repository)?.workflowConfig
 	}
 
 	// Merge a link's saved workflow config (github.setWorkflowConfig) over the
 	// defaults so the generator pre-fills the user's last-saved inputs. Missing
 	// or empty fields fall back to defaults.
-	/**
-	 * @param {string | undefined} repository
-	 * @param {Api.GitHubWorkflowConfig | undefined} cfg
-	 */
-	function genFromConfig (repository, cfg) {
+	function genFromConfig (repository: string | undefined, cfg: Api.GitHubWorkflowConfig | undefined): GenState {
 		const d = defaultGen(repository)
 		if (!cfg) return d
 		return {
@@ -118,7 +132,7 @@
 	// When the selected repository changes, pre-fill the generator from that
 	// repo's saved workflow config (or reset to defaults). The initial load is
 	// already seeded above, so this only fires on an actual switch.
-	let configLoadedRepo = untrack(() => data.initialRepo)
+	let configLoadedRepo: string | undefined = untrack(() => data.initialRepo)
 	$effect(() => {
 		const repo = gen.repository
 		if (repo === configLoadedRepo) return
@@ -144,8 +158,7 @@
 	]
 
 	// Allow-list text -> trimmed entries (split on newline or comma, blanks dropped).
-	/** @param {string} text */
-	function splitList (text) {
+	function splitList (text: string) {
 		return text.split(/[\n,]/).map((s) => s.trim()).filter(Boolean)
 	}
 	const allowedEmailsList = $derived(splitList(gen.allowedEmails))
@@ -158,15 +171,13 @@
 			.map((g) => ({ value: g.name, label: g.name }))
 	)
 
-	/** @param {string} name */
-	function addEnvGroup (name) {
+	function addEnvGroup (name: string) {
 		const n = name.trim()
 		if (!n || gen.envGroups.includes(n)) return
 		gen.envGroups = [...gen.envGroups, n]
 	}
 
-	/** @param {string} name */
-	function removeEnvGroup (name) {
+	function removeEnvGroup (name: string) {
 		gen.envGroups = gen.envGroups.filter((g) => g !== name)
 	}
 
@@ -193,6 +204,12 @@
 
 	let creatingPullSecret = $state(false)
 	let pullSecretError = $state('')
+
+	// serviceAccount.get returns the account plus its keys (with the one-time
+	// secret on a freshly minted key) — wider than Api.ServiceAccount.
+	type ServiceAccountWithKeys = Api.ServiceAccount & {
+		keys?: Array<{ createdAt: string, secret?: string }>
+	}
 
 	// Provision a dedicated pull-only service account (registry.pull), mint a
 	// key, and create a pull secret for it in the selected location — then select
@@ -224,7 +241,7 @@
 			}
 
 			// 2. Resolve the SA email + existing keys.
-			let getResp = await api.invoke('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
+			let getResp = await api.invoke<ServiceAccountWithKeys>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
 			if (!getResp.ok) {
 				pullSecretError = getResp.error?.message ?? 'Failed to read the pull service account.'
 				return
@@ -264,7 +281,7 @@
 					pullSecretError = keyResp.error?.message ?? 'Failed to create a service account key.'
 					return
 				}
-				getResp = await api.invoke('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
+				getResp = await api.invoke<ServiceAccountWithKeys>('serviceAccount.get', { project, id: PULL_SA_SID }, fetch)
 				if (!getResp.ok) {
 					pullSecretError = getResp.error?.message ?? 'Failed to read the new key.'
 					return
@@ -316,7 +333,7 @@
 	// Build the action's `with:` block, emitting only the keys the user set so
 	// the generated workflow stays minimal.
 	function withBlock () {
-		const out = []
+		const out: string[] = []
 		out.push(`        project: ${project}`)
 		out.push(`        location: ${gen.location}`)
 		out.push(`        name: ${gen.name || 'web'}`)

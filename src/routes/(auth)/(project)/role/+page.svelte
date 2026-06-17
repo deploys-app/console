@@ -1,19 +1,17 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const roles = $derived(data.roles)
 	const error = $derived(data.error)
 
-	/**
-	 * @param {string} sid
-	 */
-	function roleCanUpdate (sid) {
+	function roleCanUpdate (sid: string) {
 		return sid !== 'owner'
 	}
 </script>

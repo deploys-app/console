@@ -15,8 +15,8 @@ export const load: PageLoad = async ({ parent, fetch }) => {
 	])
 	return {
 		menu: 'dashboard',
-		usage: usage.result ?? {},
-		price: price.result ?? {},
+		usage: usage.result ?? ({} as Api.ProjectUsage),
+		price: price.result ?? ({} as Api.BillingProject),
 		auditLog: {
 			items: auditLog.result?.items ?? [],
 			error: auditLog.error

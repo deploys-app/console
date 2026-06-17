@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -15,7 +16,7 @@
 		ttlOptions
 	} from '$lib/cache/overrides'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -65,9 +66,9 @@
 	// textarea), same pattern as the WAF editors. The filter is optional: empty
 	// means the override applies to every request.
 	const canUseVisual = $derived(parseExpression(draft.filter) !== null)
-	let filterMode = $state(/** @type {'visual' | 'raw'} */ (
+	let filterMode = $state<'visual' | 'raw'>(
 		untrack(() => (parseExpression(draft.filter) !== null ? 'visual' : 'raw'))
-	))
+	)
 
 	// If we're in Visual but the filter becomes non-representable, fall back to
 	// raw so the disabled Visual tab can't show stale rows.
@@ -75,8 +76,7 @@
 		if (filterMode === 'visual' && !canUseVisual) filterMode = 'raw'
 	})
 
-	/** @type {{ clearExpression: () => void } | undefined} */
-	let filterBuilder = $state()
+	let filterBuilder = $state<{ clearExpression:() => void } | undefined>()
 
 	function clearFilter () {
 		if (filterMode === 'visual' && filterBuilder) filterBuilder.clearExpression()
@@ -98,14 +98,12 @@
 		return goto(`/cache/manage?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
-	/** @param {Event} e */
-	async function save (e) {
+	async function save (e: SubmitEvent) {
 		e.preventDefault()
 		if (saving || !canSave) return
 
 		// Parse the comma-separated status list into positive integers (cache only).
-		/** @type {number[]} */
-		const status = statusText
+		const status: number[] = statusText
 			.split(',')
 			.map((s) => Number(s.trim()))
 			.filter((s) => Number.isInteger(s) && s > 0)
@@ -116,7 +114,7 @@
 		try {
 			// Rebuild the zone's override list with the edited override replaced by
 			// id (or appended for create), then write the whole zone.
-			let nextOverrides
+			let nextOverrides: typeof overrides
 			if (isCreate) {
 				nextOverrides = [...overrides, edited]
 			} else {
@@ -146,10 +144,8 @@
 	// Enter inside a text field (description, ttl/stale inputs, status list) must
 	// not implicitly submit the override. Saving is deliberate, via the Save
 	// button (a <button>, where Enter still works) and the raw-CEL <textarea>.
-	/** @param {HTMLFormElement} node */
-	function blockEnterSubmit (node) {
-		/** @param {KeyboardEvent} e */
-		function onKeydown (e) {
+	function blockEnterSubmit (node: HTMLFormElement) {
+		function onKeydown (e: KeyboardEvent) {
 			if (e.key === 'Enter' && e.target instanceof HTMLInputElement) e.preventDefault()
 		}
 		node.addEventListener('keydown', onKeydown)

@@ -1,8 +1,16 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { podPrefixStripper } from '$lib/deployment/podName'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	interface DeploymentEvent {
+		type: string
+		reason: string
+		message: string
+		lastSeen: string
+	}
+
+	const { data }: { data: PageData } = $props()
 
 	const deployment = $derived(data.deployment)
 
@@ -13,8 +21,7 @@
 
 	const POLL_INTERVAL_MS = 5000
 
-	/** @type {Array<{type: string, reason: string, message: string, lastSeen: string}>} */
-	let events = $state([])
+	let events = $state<DeploymentEvent[]>([])
 	let lastFetchOk = $state(false)
 	let lastFetchAt = $state(0)
 	let now = $state(Date.now())
@@ -47,22 +54,15 @@
 		}
 	}
 
-	/**
-	 * @param {string} type
-	 * @returns {'warn' | 'error' | 'normal'}
-	 */
-	function severityOf (type) {
+	function severityOf (type: string): 'warn' | 'error' | 'normal' {
 		const t = type.toLowerCase()
 		if (t === 'normal') return 'normal'
 		if (t === 'warning' || t === 'warn') return 'warn'
 		return 'error'
 	}
 
-	/**
-	 * @param {string | number} ts ISO 8601 or unix ms
-	 * @param {number} nowMs
-	 */
-	function relTime (ts, nowMs) {
+	// ts is ISO 8601 or unix ms
+	function relTime (ts: string | number, nowMs: number): string {
 		const t = typeof ts === 'number' ? ts : Date.parse(ts)
 		if (isNaN(t)) return ''
 		const diff = Math.max(0, nowMs - t)

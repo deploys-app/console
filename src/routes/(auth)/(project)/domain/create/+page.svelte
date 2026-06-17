@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 	const project = $derived(data.project)
 	const locations = $derived(data.locations)
 
@@ -17,10 +18,7 @@
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 
 		if (saving) {

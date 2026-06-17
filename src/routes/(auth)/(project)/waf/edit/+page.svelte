@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -17,7 +18,7 @@
 	} from '$lib/waf/rules'
 	import { normalizeLimits, toApiLimits } from '$lib/waf/limits'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -64,9 +65,9 @@
 	// CEL textarea). Both edit the same `draft.expression` string, so switching
 	// preserves whatever is there. Start in Visual only when the seed expression
 	// is representable; otherwise open straight into raw/Expression mode.
-	let mode = $state(/** @type {'visual' | 'raw'} */ (
+	let mode = $state<'visual' | 'raw'>(
 		untrack(() => (parseExpression(draft.expression) !== null ? 'visual' : 'raw'))
-	))
+	)
 
 	// If we're in Visual but the expression becomes non-representable, fall back
 	// to raw so the disabled Visual tab can't show stale rows. (Visual edits stay
@@ -75,8 +76,7 @@
 		if (mode === 'visual' && !canUseVisual) mode = 'raw'
 	})
 
-	/** @type {{ clearExpression: () => void } | undefined} */
-	let builder = $state()
+	let builder = $state<{ clearExpression:() => void }>()
 
 	function clearExpression () {
 		if (mode === 'visual' && builder) builder.clearExpression()
@@ -87,8 +87,7 @@
 		return goto(`/waf/manage?project=${project}&location=${encodeURIComponent(location)}`)
 	}
 
-	/** @param {Event} e */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 		if (saving || !hasCondition) return
 
@@ -129,10 +128,8 @@
 	// value widgets it means "pick/add this value", elsewhere nothing. Saving is
 	// deliberate, via the Save button. Enter still works on the button itself
 	// (a <button>, not an <input>) and in the raw-CEL <textarea>.
-	/** @param {HTMLFormElement} node */
-	function blockEnterSubmit (node) {
-		/** @param {KeyboardEvent} e */
-		function onKeydown (e) {
+	function blockEnterSubmit (node: HTMLFormElement) {
+		function onKeydown (e: KeyboardEvent) {
 			if (e.key === 'Enter' && e.target instanceof HTMLInputElement) e.preventDefault()
 		}
 		node.addEventListener('keydown', onKeydown)

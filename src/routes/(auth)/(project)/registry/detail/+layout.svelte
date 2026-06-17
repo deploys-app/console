@@ -1,8 +1,10 @@
-<script>
+<script lang="ts">
+	import type { LayoutData } from './$types'
+	import type { Snippet } from 'svelte'
 	import * as format from '$lib/format'
 	import { page } from '$app/stores'
 
-	const { data, children } = $props()
+	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
 	const project = $derived(data.project)
 	const repository = $derived(data.repository)

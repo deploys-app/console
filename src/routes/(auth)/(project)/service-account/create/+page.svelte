@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 	const id = $derived(data.id)
 	const serviceAccount = $derived(data.serviceAccount)
 
@@ -16,10 +17,7 @@
 	let desc = $state(untrack(() => serviceAccount?.description))
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: SubmitEvent) {
 		e.preventDefault()
 
 		if (saving) {
@@ -47,7 +45,7 @@
 <div class="breadcrumb">
 	{#if id}
 		<div class="breadcrumb-item">
-			<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount.sid}</h6></a>
+			<a href={`/service-account?project=${project}&id=${id}`} class="link"><h6>{serviceAccount?.sid}</h6></a>
 		</div>
 	{:else}
 		<div class="breadcrumb-item">
@@ -80,7 +78,7 @@
 			<div class="field">
 				<label for="input-email">Email</label>
 				<div class="input">
-					<input id="input-email" value={serviceAccount.email} readonly>
+					<input id="input-email" value={serviceAccount?.email} readonly>
 				</div>
 			</div>
 		{:else}

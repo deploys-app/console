@@ -1,10 +1,12 @@
-<script>
+<script lang="ts">
+	import type { LayoutData } from './$types'
+	import type { Snippet } from 'svelte'
 	import Cookie from 'js-cookie'
 	import { onMount, setContext } from 'svelte'
 	import { page } from '$app/stores'
 	import { hasPermission } from '$lib/permission'
 
-	const { data, children } = $props()
+	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
 	const project = $derived(data.project)
 
@@ -20,8 +22,7 @@
 	// level. `can` reads $page.data at call time, so it always reflects the
 	// current project's permissions after navigation.
 	setContext('permission', {
-		/** @param {string} p */
-		can: (p) => hasPermission($page.data.permissions, $page.data.permissionsAdmin, p)
+		can: (p: string) => hasPermission($page.data.permissions, $page.data.permissionsAdmin, p)
 	})
 
 	onMount(() => {

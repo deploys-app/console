@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const locations = $derived(data.locations)
@@ -27,19 +28,17 @@
 		}
 	})
 
-	const targetPlaceholder = $derived({
+	const targetPlaceholder = $derived(({
 		'redirect://': 'https://example.com',
 		'http://': '203.0.113.10:8080'
-	}[form.targetPrefix] || '')
+	} as Record<string, string>)[form.targetPrefix] || '')
 
-	const targetHint = $derived({
+	const targetHint = $derived(({
 		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
-	}[form.targetPrefix] || '')
+	} as Record<string, string>)[form.targetPrefix] || '')
 
-	/** @type {Api.Domain[]} */
-	let domains = $state([])
-	/** @type {{ name: string, paused: boolean }[]} */
-	let deployments = $state([])
+	let domains = $state<Api.Domain[]>([])
+	let deployments = $state<{ name: string, paused: boolean }[]>([])
 
 	const selectedDomain = $derived(domains.find((x) => x.domain === form.domain))
 
@@ -49,9 +48,9 @@
 	const deploymentOptions = $derived(deployments.map((d) => ({
 		value: d.name,
 		label: d.name,
-		dot: /** @type {'warning' | 'positive'} */ (d.paused ? 'warning' : 'positive'),
+		dot: (d.paused ? 'warning' : 'positive') as 'warning' | 'positive',
 		badge: d.paused ? 'Paused' : undefined,
-		badgeTone: /** @type {'warning'} */ ('warning')
+		badgeTone: 'warning' as const
 	})))
 
 	const selectedDeploymentPaused = $derived(
@@ -63,8 +62,7 @@
 		domains = []
 		form.domain = ''
 
-		/** @type {Api.Response<Api.List<Api.Domain>>} */
-		const resp = await api.invoke('domain.list', { project, location: form.location }, fetch)
+		const resp = await api.invoke<Api.List<Api.Domain>>('domain.list', { project, location: form.location }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
 			return
@@ -78,12 +76,12 @@
 		deployments = []
 		form.targetValue = ''
 
-		const resp = await api.invoke('deployment.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.Deployment>>('deployment.list', { project }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
 			return
 		}
-		const list = resp.result.items ?? []
+		const list = resp.result?.items ?? []
 		deployments = list
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.type === 'WebService' || x.type === 'Static')
@@ -98,10 +96,7 @@
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: SubmitEvent) {
 		e.preventDefault()
 
 		if (saving) {

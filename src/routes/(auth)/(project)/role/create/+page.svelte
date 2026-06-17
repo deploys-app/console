@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
@@ -7,7 +8,7 @@
 	import OptionSelect from '$lib/components/OptionSelect.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 	const role = $derived(data.role)
 	const permissions = $derived(data.permissions)
 
@@ -19,10 +20,7 @@
 		permissions: role?.permissions ?? []
 	})))
 
-	/**
-	 * @param {string} permission
-	*/
-	function addPermission (permission) {
+	function addPermission (permission: string) {
 		if (!permission || form.permissions.includes(permission)) {
 			return
 		}
@@ -32,16 +30,13 @@
 		]
 	}
 
-	function removePermission (permission) {
+	function removePermission (permission: string) {
 		form.permissions = form.permissions.filter((x) => x !== permission)
 	}
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 
 		if (saving) {

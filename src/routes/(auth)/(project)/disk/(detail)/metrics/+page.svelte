@@ -1,11 +1,24 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import { onMount, tick } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	interface Series {
+		prefix: string
+		lines: Api.UsageMetricsLine[]
+		dashStyle?: string
+		color?: string
+	}
+
+	interface DiskMetricsResult {
+		usage?: Api.UsageMetricsLine[]
+		size?: Api.UsageMetricsLine[]
+	}
+
+	const { data }: { data: PageData } = $props()
 
 	const disk = $derived(data.disk)
 
@@ -25,16 +38,16 @@
 		range: $page.url.searchParams.get('range') || '1h'
 	})
 
-	let chart = $state([])
+	let chart = $state<Series[]>([])
 
-	let reloadTimeout
+	let reloadTimeout: ReturnType<typeof setTimeout> | null = null
 
 	async function fetchMetrics (clear = false) {
 		reloadTimeout && clearTimeout(reloadTimeout)
 		reloadTimeout = null
 
 		try {
-			const resp = await api.invoke('disk.metrics', {
+			const resp = await api.invoke<DiskMetricsResult>('disk.metrics', {
 				project: disk.project,
 				location: disk.location,
 				name: disk.name,

@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
+	import type { LineSeries } from '$lib/charts/util'
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
@@ -8,7 +10,7 @@
 	import { actionLabels, describeOverride, modeLabels, normalizeOverrides } from '$lib/cache/overrides'
 	import LineChart from '$lib/components/LineChart.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -21,12 +23,9 @@
 	))
 
 	// The three caching results, in chart stacking/legend order.
-	/** @type {Api.CacheMetricsSeries['result'][]} */
-	const RESULT_ORDER = ['applied', 'shadow', 'error']
-	/** @type {Record<string, string>} */
-	const RESULT_LABEL = { applied: 'Applied', shadow: 'Shadow', error: 'Error' }
-	/** @type {Record<string, string>} */
-	const RESULT_COLOR = {
+	const RESULT_ORDER: Api.CacheMetricsSeries['result'][] = ['applied', 'shadow', 'error']
+	const RESULT_LABEL: Record<string, string> = { applied: 'Applied', shadow: 'Shadow', error: 'Error' }
+	const RESULT_COLOR: Record<string, string> = {
 		applied: 'hsl(var(--hsl-positive))',
 		shadow: 'hsl(var(--hsl-content) / 0.45)',
 		error: 'hsl(var(--hsl-negative))'
@@ -40,10 +39,8 @@
 		{ value: '7d', label: '7D' },
 		{ value: '30d', label: '30D' }
 	]
-	/** @type {Record<string, number>} */
-	const RANGE_SECONDS = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
-	/** @type {Record<string, string>} */
-	const RANGE_LABEL = {
+	const RANGE_SECONDS: Record<string, number> = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
+	const RANGE_LABEL: Record<string, string> = {
 		'1h': 'last hour',
 		'6h': 'last 6 hours',
 		'12h': 'last 12 hours',
@@ -52,26 +49,23 @@
 		'30d': 'last 30 days'
 	}
 	// Bucket width per range — kept around 48–72 columns so lines stay legible.
-	/** @type {Record<string, number>} */
-	const BUCKET_SECONDS = { '1h': 60, '6h': 300, '12h': 600, '1d': 1800, '7d': 10800, '30d': 43200 }
+	const BUCKET_SECONDS: Record<string, number> = { '1h': 60, '6h': 300, '12h': 600, '1d': 1800, '7d': 10800, '30d': 43200 }
 
 	const initialRange = $page.url.searchParams.get('range')
 	let range = $state(initialRange && RANGE_SECONDS[initialRange] ? initialRange : '1d')
 
 	let loading = $state(true)
-	let result = $state(/** @type {Api.CacheMetricsResult | null} */ (null))
+	let result = $state<Api.CacheMetricsResult | null>(null)
 	// Anchor the time window to the moment of the latest fetch so the chart grid
 	// and "as of" line agree.
 	let fetchedAt = $state(Math.floor(Date.now() / 1000))
 
-	/** @type {ReturnType<typeof setTimeout> | undefined} */
-	let refreshTimer
+	let refreshTimer: ReturnType<typeof setTimeout> | undefined
 
 	async function fetchMetrics () {
 		loading = true
 		try {
-			/** @type {Api.Response<Api.CacheMetricsResult>} */
-			const res = await api.invoke('cache.metrics', { project, location, timeRange: range }, fetch)
+			const res = await api.invoke<Api.CacheMetricsResult>('cache.metrics', { project, location, timeRange: range }, fetch)
 			if (!res.ok) {
 				modal.error({ error: res.error })
 				return
@@ -93,8 +87,7 @@
 		}
 	}
 
-	/** @param {string} r */
-	function selectRange (r) {
+	function selectRange (r: string) {
 		if (r === range) return
 		range = r
 		const u = new URL($page.url)
@@ -113,8 +106,7 @@
 
 	// Totals per result, for the KPI tiles.
 	const byResult = $derived.by(() => {
-		/** @type {Record<string, number>} */
-		const acc = { applied: 0, shadow: 0, error: 0 }
+		const acc: Record<string, number> = { applied: 0, shadow: 0, error: 0 }
 		for (const s of result?.series ?? []) {
 			acc[s.result] = (acc[s.result] ?? 0) + s.total
 		}
@@ -138,8 +130,7 @@
 		const to = fetchedAt
 		const n = Math.max(1, Math.ceil((to - from) / bucket))
 
-		/** @type {Record<string, number[]>} */
-		const grids = { applied: new Array(n).fill(0), shadow: new Array(n).fill(0), error: new Array(n).fill(0) }
+		const grids: Record<string, number[]> = { applied: new Array(n).fill(0), shadow: new Array(n).fill(0), error: new Array(n).fill(0) }
 		for (const s of result?.series ?? []) {
 			const g = grids[s.result]
 			if (!g) continue
@@ -149,8 +140,7 @@
 			}
 		}
 
-		/** @type {import('$lib/charts/util').LineSeries[]} */
-		return RESULT_ORDER
+		const out: LineSeries[] = RESULT_ORDER
 			.filter((res) => byResult[res] > 0)
 			.map((res) => ({
 				name: RESULT_LABEL[res],
@@ -158,13 +148,13 @@
 				dashed: res === 'shadow',
 				points: grids[res].map((v, i) => ({ x: (from + i * bucket) * 1000, y: v }))
 			}))
+		return out
 	})
 
 	// Rank overrides by decision volume. Each (override, action, result) series
 	// collapses onto its override; the action of its largest series wins the badge.
 	const topOverrides = $derived.by(() => {
-		/** @type {Record<string, { overrideId: string, total: number, action: Api.CacheAction, top: number }>} */
-		const byOverride = {}
+		const byOverride: Record<string, { overrideId: string, total: number, action: Api.CacheAction, top: number }> = {}
 		for (const s of result?.series ?? []) {
 			const cur = byOverride[s.overrideId]
 			if (cur) {
@@ -182,12 +172,10 @@
 			.sort((a, b) => b.total - a.total)
 	})
 
-	/** @param {number} v */
-	function share (v) {
+	function share (v: number): number {
 		return total > 0 ? v / total : 0
 	}
-	/** @param {number} v */
-	function pct (v) {
+	function pct (v: number): string {
 		return total > 0 ? `${Math.round((v / total) * 100)}%` : '—'
 	}
 

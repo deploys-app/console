@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import { goto } from '$app/navigation'
@@ -15,7 +16,7 @@
 	// rows are available on the server.
 	const PAGE_SIZE = 50
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const error = $derived(data.error)
@@ -30,11 +31,7 @@
 		{ value: 'serviceAccount', label: 'Service Account' }
 	]
 
-	/**
-	 * @param {string} v
-	 * @returns {Date | null}
-	 */
-	function parseDate (v) {
+	function parseDate (v: string): Date | null {
 		if (!v) return null
 		const d = new Date(v)
 		return isNaN(d.getTime()) ? null : d
@@ -54,8 +51,7 @@
 	// Infinite-scroll state. `data.items` from the loader is just the first
 	// page; we mirror it locally so we can append on scroll, and re-sync it
 	// whenever the loader runs again (filter / project change).
-	/** @type {Api.AuditLogItem[]} */
-	let items = $state([])
+	let items = $state<Api.AuditLogItem[]>([])
 	let hasMore = $state(false)
 	let loadingMore = $state(false)
 	let loadMoreError = $state('')
@@ -81,8 +77,7 @@
 		loadingMore = false
 	})
 
-	/** @type {HTMLElement | null} */
-	let sentinel = $state(null)
+	let sentinel = $state<HTMLElement | null>(null)
 	$effect(() => {
 		if (!sentinel) return
 		const io = new IntersectionObserver((entries) => {
@@ -92,11 +87,7 @@
 		return () => io.disconnect()
 	})
 
-	/**
-	 * @param {string} v
-	 * @returns {string | undefined}
-	 */
-	function toRFC3339 (v) {
+	function toRFC3339 (v: string): string | undefined {
 		if (!v) return undefined
 		const d = new Date(v)
 		if (isNaN(d.getTime())) return undefined
@@ -109,8 +100,7 @@
 		loadingMore = true
 		loadMoreError = ''
 		try {
-			/** @type {Api.Response<Api.List<Api.AuditLogItem>>} */
-			const res = await api.invoke('auditLog.list', {
+			const res = await api.invoke<Api.List<Api.AuditLogItem>>('auditLog.list', {
 				project,
 				resourceType: data.filters.resourceType,
 				actor: data.filters.actor,
@@ -150,16 +140,13 @@
 		isDatePickerOpen = !isDatePickerOpen
 	}
 
-	function clearDateRange (e) {
+	function clearDateRange (e: Event) {
 		e.stopPropagation()
 		form.startDate = null
 		form.endDate = null
 	}
 
-	/**
-	 * @param {Event} e
-	 */
-	async function apply (e) {
+	async function apply (e: SubmitEvent) {
 		e.preventDefault()
 		if (applying) return
 		applying = true

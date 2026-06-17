@@ -1,4 +1,5 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -7,7 +8,7 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import Select from '$lib/components/Select.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 	const roles = $derived(data.roles)
 	const email = $derived(data.email)
 	const selected = $derived(data.selected)
@@ -23,7 +24,7 @@
 		roles: selected
 	})))
 
-	function addRole (role) {
+	function addRole (role: string) {
 		if (!role || form.roles.includes(role)) {
 			return
 		}
@@ -31,16 +32,13 @@
 		form.roles = [...form.roles, role]
 	}
 
-	function removeRole (role) {
+	function removeRole (role: string) {
 		form.roles = form.roles.filter((x) => x !== role)
 	}
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 
 		if (saving) {

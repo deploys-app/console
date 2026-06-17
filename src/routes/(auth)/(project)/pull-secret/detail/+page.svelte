@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
 	import { setupCopy } from '$lib/clipboard'
 	import { onMount } from 'svelte'
 	import { goto } from '$app/navigation'
+	import type { PageData } from './$types'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)

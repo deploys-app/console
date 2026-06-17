@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { getContext } from 'svelte'
 	import { goto } from '$app/navigation'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
@@ -7,31 +7,24 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { denyTooltip } from '$lib/permission'
+	import type { PageData } from './$types'
 
-	/** @type {{ can: (p: string) => boolean }} */
-	const { can } = getContext('permission')
+	const { can } = getContext('permission') as { can: (p: string) => boolean }
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const routes = $derived(data.routes)
 	const error = $derived(data.error)
 
-	/**
-	 * @param {Api.Route} route
-	 */
-	function openRoute (route) {
+	function openRoute (route: Api.Route) {
 		goto(`/route/manage?project=${project}` +
 			`&location=${encodeURIComponent(route.location)}` +
 			`&domain=${encodeURIComponent(route.domain)}` +
 			`&path=${encodeURIComponent(route.path)}`)
 	}
 
-	/**
-	 * @param {KeyboardEvent} e
-	 * @param {Api.Route} route
-	 */
-	function onRowKey (e, route) {
+	function onRowKey (e: KeyboardEvent, route: Api.Route) {
 		// Only the row itself drives navigation; inner buttons handle their own keys.
 		if (e.target !== e.currentTarget) return
 		if (e.key === 'Enter' || e.key === ' ') {
@@ -40,10 +33,7 @@
 		}
 	}
 
-	/**
-	 * @param {Api.Route} route
-	 */
-	function deleteRoute (route) {
+	function deleteRoute (route: Api.Route) {
 		modal.confirm({
 			title: `Delete route ${route.domain}${route.path} in ${route.location}?`,
 			yes: 'Delete',

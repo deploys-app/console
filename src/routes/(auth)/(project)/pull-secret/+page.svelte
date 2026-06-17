@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import * as format from '$lib/format'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const pullSecrets = $derived(data.pullSecrets)

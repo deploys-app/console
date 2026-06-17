@@ -1,10 +1,12 @@
-<script>
+<script lang="ts">
 	import Header from '../_components/Header.svelte'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import type { LayoutData } from './$types'
+	import type { Snippet } from 'svelte'
 
-	const { data, children } = $props()
+	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
 	const project = $derived(data.project)
 	const deployment = $derived(data.deployment)
@@ -23,8 +25,7 @@
 			])
 	])
 
-	/** @param {string} path */
-	function tabHref (path) {
+	function tabHref (path: string): string {
 		return `${path}?project=${project}&location=${deployment.location}&name=${deployment.name}`
 	}
 

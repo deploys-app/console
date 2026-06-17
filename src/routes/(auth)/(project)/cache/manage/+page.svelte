@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
+	import type { OverrideForm } from '$lib/cache/overrides'
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
@@ -13,7 +15,7 @@
 		toApiOverrides
 	} from '$lib/cache/overrides'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -42,8 +44,7 @@
 	let savingDescription = $state(false)
 
 	async function reloadZone () {
-		/** @type {Api.Response<Api.CacheZone>} */
-		const resp = await api.invoke('cache.get', { project, location }, fetch)
+		const resp = await api.invoke<Api.CacheZone>('cache.get', { project, location }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.notFound) {
 				// The zone disappeared underneath us — back to the index.
@@ -61,10 +62,7 @@
 	// Persist the whole zone (priority follows row order). cache.set replaces the
 	// entire zone, so every override must always travel together. On error,
 	// surface it and reload from the server so the UI matches reality.
-	/**
-	 * @param {import('$lib/cache/overrides').OverrideForm[]} nextOverrides
-	 */
-	async function persistZone (nextOverrides) {
+	async function persistZone (nextOverrides: OverrideForm[]) {
 		const resp = await api.invoke('cache.set', {
 			project,
 			location,
@@ -79,11 +77,7 @@
 		return true
 	}
 
-	/**
-	 * @param {number} i
-	 * @param {-1 | 1} dir
-	 */
-	async function moveOverride (i, dir) {
+	async function moveOverride (i: number, dir: -1 | 1) {
 		const j = i + dir
 		if (j < 0 || j >= overrides.length) return
 		const next = [...overrides]
@@ -92,8 +86,7 @@
 		await persistZone(next)
 	}
 
-	/** @param {number} i */
-	function removeOverride (i) {
+	function removeOverride (i: number) {
 		const override = overrides[i]
 		if (!override) return
 		modal.confirm({
@@ -107,8 +100,7 @@
 		})
 	}
 
-	/** @param {import('$lib/cache/overrides').OverrideForm} override */
-	function editOverride (override) {
+	function editOverride (override: OverrideForm) {
 		goto(`/cache/edit?project=${project}&location=${encodeURIComponent(location)}&override=${encodeURIComponent(override.id)}`)
 	}
 

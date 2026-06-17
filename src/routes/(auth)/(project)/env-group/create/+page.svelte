@@ -1,11 +1,12 @@
-<script>
+<script lang="ts">
 	import { onMount, untrack } from 'svelte'
 	import { goto } from '$app/navigation'
+	import type { PageData } from './$types'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const envGroup = $derived(data.envGroup)
@@ -38,12 +39,9 @@
 	// 'create'. Empty when idle.
 	let savingAction = $state('')
 
-	/**
-	 * @param {Event} e
-	 * @param {boolean} [redeploy]  on update, whether to redeploy the deployments
-	 *   that reference this group so they pick up the new values. Ignored on create.
-	 */
-	async function save (e, redeploy = true) {
+	// redeploy: on update, whether to redeploy the deployments that reference this
+	// group so they pick up the new values. Ignored on create.
+	async function save (e: Event, redeploy = true) {
 		e.preventDefault()
 
 		if (saving) {
@@ -53,13 +51,13 @@
 		saving = true
 		savingAction = envGroup ? (redeploy ? 'redeploy' : 'update') : 'create'
 		try {
-			const env = form.env.reduce((p, x) => {
+			const env = form.env.reduce<Record<string, string>>((p, x) => {
 				if (x.k) p[x.k] = x.v
 				return p
 			}, {})
 
 			const fn = envGroup ? 'envgroup.update' : 'envgroup.create'
-			const args = { project, name: form.name, env }
+			const args: { project: string, name: string, env: Record<string, string>, redeploy?: boolean } = { project, name: form.name, env }
 			if (envGroup) {
 				args.redeploy = redeploy
 			}

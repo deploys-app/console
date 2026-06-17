@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
+	import type { LineSeries } from '$lib/charts/util'
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
@@ -10,7 +12,7 @@
 	import WafActivityChart from '$lib/components/WafActivityChart.svelte'
 	import LineChart from '$lib/components/LineChart.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
@@ -19,17 +21,16 @@
 	// Rule id → its configured description/action, so the top-rules table reads
 	// in human terms rather than raw ids.
 	const ruleMeta = $derived(new Map(
-		(data.zone?.rules ?? []).map((/** @type {Api.WafRule} */ r) => [r.id, r])
+		(data.zone?.rules ?? []).map((r: Api.WafRule) => [r.id, r])
 	))
 
 	// Configured limits drive the rate-limit section: no limits, no section.
-	const limits = $derived(/** @type {Api.WafLimit[]} */ (data.zone?.limits ?? []))
+	const limits = $derived((data.zone?.limits ?? []) as Api.WafLimit[])
 	const hasLimits = $derived(limits.length > 0)
 
 	// Stacks render block on top of log on top of allow — most-severe last so it
 	// sits at the top of the column.
-	/** @type {Api.WafAction[]} */
-	const ACTION_ORDER = ['allow', 'log', 'block']
+	const ACTION_ORDER: Api.WafAction[] = ['allow', 'log', 'block']
 
 	const RANGE_OPTIONS = [
 		{ value: '1h', label: '1H' },
@@ -39,10 +40,8 @@
 		{ value: '7d', label: '7D' },
 		{ value: '30d', label: '30D' }
 	]
-	/** @type {Record<string, number>} */
-	const RANGE_SECONDS = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
-	/** @type {Record<string, string>} */
-	const RANGE_LABEL = {
+	const RANGE_SECONDS: Record<string, number> = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
+	const RANGE_LABEL: Record<string, string> = {
 		'1h': 'last hour',
 		'6h': 'last 6 hours',
 		'12h': 'last 12 hours',
@@ -51,31 +50,29 @@
 		'30d': 'last 30 days'
 	}
 	// Bucket width per range — kept around 48–72 columns so bars stay legible.
-	/** @type {Record<string, number>} */
-	const BUCKET_SECONDS = { '1h': 60, '6h': 300, '12h': 600, '1d': 1800, '7d': 10800, '30d': 43200 }
+	const BUCKET_SECONDS: Record<string, number> = { '1h': 60, '6h': 300, '12h': 600, '1d': 1800, '7d': 10800, '30d': 43200 }
 
 	const initialRange = $page.url.searchParams.get('range')
 	let range = $state(initialRange && RANGE_SECONDS[initialRange] ? initialRange : '1d')
 
 	let loading = $state(true)
-	let result = $state(/** @type {Api.WafMetricsResult | null} */ (null))
-	let limitResult = $state(/** @type {Api.WafLimitMetricsResult | null} */ (null))
+	let result = $state<Api.WafMetricsResult | null>(null)
+	let limitResult = $state<Api.WafLimitMetricsResult | null>(null)
 	// Anchor the time window to the moment of the latest fetch so the chart grid
 	// and "as of" line agree.
 	let fetchedAt = $state(Math.floor(Date.now() / 1000))
 
-	/** @type {ReturnType<typeof setTimeout> | undefined} */
-	let refreshTimer
+	let refreshTimer: ReturnType<typeof setTimeout> | undefined
 
 	async function fetchMetrics () {
 		loading = true
 		try {
 			const args = { project, location, timeRange: range }
 			const [res, limitRes] = await Promise.all([
-				/** @type {Promise<Api.Response<Api.WafMetricsResult>>} */ (api.invoke('waf.metrics', args, fetch)),
+				api.invoke<Api.WafMetricsResult>('waf.metrics', args, fetch),
 				hasLimits
-					? /** @type {Promise<Api.Response<Api.WafLimitMetricsResult>>} */ (api.invoke('waf.limitMetrics', args, fetch))
-					: Promise.resolve(/** @type {Api.Response<Api.WafLimitMetricsResult>} */ ({ ok: true, result: { series: [], total: 0 } }))
+					? api.invoke<Api.WafLimitMetricsResult>('waf.limitMetrics', args, fetch)
+					: Promise.resolve({ ok: true, result: { series: [], total: 0 } } as Api.Response<Api.WafLimitMetricsResult>)
 			])
 			if (!res.ok) {
 				modal.error({ error: res.error })
@@ -99,8 +96,7 @@
 		}
 	}
 
-	/** @param {string} r */
-	function selectRange (r) {
+	function selectRange (r: string) {
 		if (r === range) return
 		range = r
 		const u = new URL($page.url)
@@ -120,8 +116,7 @@
 
 	// Totals per action, for the KPI tiles.
 	const byAction = $derived.by(() => {
-		/** @type {Record<Api.WafAction, number>} */
-		const acc = { block: 0, log: 0, allow: 0 }
+		const acc: Record<Api.WafAction, number> = { block: 0, log: 0, allow: 0 }
 		for (const s of result?.series ?? []) {
 			acc[s.action] = (acc[s.action] ?? 0) + s.total
 		}
@@ -146,8 +141,7 @@
 		const to = fetchedAt
 		const n = Math.max(1, Math.ceil((to - from) / bucket))
 
-		/** @type {Record<Api.WafAction, number[]>} */
-		const grids = { block: new Array(n).fill(0), log: new Array(n).fill(0), allow: new Array(n).fill(0) }
+		const grids: Record<Api.WafAction, number[]> = { block: new Array(n).fill(0), log: new Array(n).fill(0), allow: new Array(n).fill(0) }
 		for (const s of result?.series ?? []) {
 			const g = grids[s.action]
 			if (!g) continue
@@ -162,16 +156,14 @@
 			.map((action) => ({
 				action,
 				name: actionLabels[action] ?? action,
-				/** @type {[number, number][]} */
-				data: grids[action].map((v, i) => [(from + i * bucket) * 1000, v])
+				data: grids[action].map((v, i) => [(from + i * bucket) * 1000, v]) as [number, number][]
 			}))
 	})
 
 	// Rank rules by match volume. Each (rule, action) series collapses onto its
 	// rule; the action of its largest series wins the badge.
 	const topRules = $derived.by(() => {
-		/** @type {Record<string, { ruleId: string, total: number, action: Api.WafAction, top: number }>} */
-		const byRule = {}
+		const byRule: Record<string, { ruleId: string, total: number, action: Api.WafAction, top: number }> = {}
 		for (const s of result?.series ?? []) {
 			const cur = byRule[s.ruleId]
 			if (cur) {
@@ -189,19 +181,16 @@
 			.sort((a, b) => b.total - a.total)
 	})
 
-	/** @param {number} v */
-	function share (v) {
+	function share (v: number) {
 		return total > 0 ? v / total : 0
 	}
-	/** @param {number} v */
-	function pct (v) {
+	function pct (v: number) {
 		return total > 0 ? `${Math.round((v / total) * 100)}%` : '—'
 	}
 
 	// Per-limit (allowed, limited) bucket counts, joined from the sparse series.
 	const limitBuckets = $derived.by(() => {
-		/** @type {Record<string, { allowed: Record<number, number>, limited: Record<number, number> }>} */
-		const byLimit = {}
+		const byLimit: Record<string, { allowed: Record<number, number>, limited: Record<number, number> }> = {}
 		for (const s of limitResult?.series ?? []) {
 			const entry = byLimit[s.limitId] ??= { allowed: {}, limited: {} }
 			const m = entry[s.result]
@@ -217,8 +206,7 @@
 	// percentage, over the union of that limit's bucket timestamps. A missing
 	// series counts as 0, so a bucket with only limited traffic reads 100%.
 	const limitShareSeries = $derived.by(() => {
-		/** @type {import('$lib/charts/util').LineSeries[]} */
-		const out = []
+		const out: LineSeries[] = []
 		for (const limit of limits) {
 			const entry = limitBuckets[limit.id]
 			if (!entry) continue
@@ -245,7 +233,7 @@
 	// traffic in the window.
 	const limitRows = $derived(limits.map((limit) => {
 		const entry = limitBuckets[limit.id]
-		const sum = (/** @type {Record<number, number> | undefined} */ m) =>
+		const sum = (m: Record<number, number> | undefined) =>
 			Object.values(m ?? {}).reduce((acc, v) => acc + v, 0)
 		const allowed = sum(entry?.allowed)
 		const limited = sum(entry?.limited)
@@ -253,8 +241,7 @@
 		return { limit, allowed, limited, traffic, share: traffic > 0 ? (limited / traffic) * 100 : null }
 	}))
 
-	/** @param {number} v */
-	function sharePct (v) {
+	function sharePct (v: number) {
 		return `${v >= 10 ? v.toFixed(1) : v.toFixed(2)}%`
 	}
 

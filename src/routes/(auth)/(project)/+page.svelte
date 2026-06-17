@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 
 	const unitGiB = 1024 * 1024 * 1024
@@ -18,18 +19,18 @@
 		}
 	})
 
-	function formatNumber (v) {
+	function formatNumber (v: number): string {
 		if (v == null || Number.isNaN(v)) return '?'
 		return v.toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
-	function formatCompact (v) {
+	function formatCompact (v: number): string {
 		if (v == null || Number.isNaN(v)) return '?'
 		return v.toLocaleString(undefined, {
 			notation: 'compact',
 			maximumFractionDigits: 2
 		})
 	}
-	function formatStorage (bytes, unitSuffix) {
+	function formatStorage (bytes: number, unitSuffix: string) {
 		const gib = bytes / unitGiB
 		if (gib >= 1024) {
 			const tib = gib / 1024
@@ -41,16 +42,16 @@
 		const full = formatNumber(gib)
 		return { value: formatCompact(gib), full, unit, tooltip: `${full} ${unit}` }
 	}
-	function billingElapsedSeconds () {
+	function billingElapsedSeconds (): number {
 		const now = new Date()
 		const start = new Date(now.getFullYear(), now.getMonth(), 1)
 		return Math.max((now.getTime() - start.getTime()) / 1000, 1)
 	}
-	function formatAvgCount (seconds, unit, rawUnit) {
+	function formatAvgCount (seconds: number, unit: string, rawUnit: string) {
 		const avg = seconds / billingElapsedSeconds()
 		return { value: formatCompact(avg), full: formatNumber(avg), unit, tooltip: `${formatNumber(seconds)} ${rawUnit}` }
 	}
-	function rawStorageTooltip (bytes) {
+	function rawStorageTooltip (bytes: number): string {
 		const r = formatStorage(bytes, 's')
 		return `${r.full} ${r.unit}`
 	}
@@ -58,10 +59,10 @@
 	// its average level divides by elapsed days — not seconds like the
 	// continuously-integrated memory/disk metrics. Floor at 1 day so the first of
 	// the month (one snapshot) reads as that snapshot, not an inflated number.
-	function billingElapsedDays () {
+	function billingElapsedDays (): number {
 		return Math.max(billingElapsedSeconds() / 86400, 1)
 	}
-	function rawStorageDayTooltip (bytes) {
+	function rawStorageDayTooltip (bytes: number): string {
 		const r = formatStorage(bytes, 'd')
 		return `${r.full} ${r.unit}`
 	}
