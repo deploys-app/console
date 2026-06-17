@@ -6,12 +6,10 @@
 // (and vice versa).
 
 /**
- * @param {string[] | undefined} permissions  effective grants (may include '*' and '<resource>.*')
- * @param {boolean} admin
- * @param {string} permission  e.g. 'deployment.deploy'
- * @returns {boolean}
+ * @param permissions effective grants (may include '*' and '<resource>.*')
+ * @param permission e.g. 'deployment.deploy'
  */
-export function hasPermission (permissions, admin, permission) {
+export function hasPermission (permissions: string[] | undefined, admin: boolean, permission: string): boolean {
 	if (admin) return true
 	if (!permissions || permissions.length === 0) return false
 	if (permissions.includes('*')) return true
@@ -26,10 +24,9 @@ export function hasPermission (permissions, admin, permission) {
 
 /**
  * Default tooltip shown on a denied action control.
- * @param {string | undefined} permission  the missing permission, e.g. 'deployment.deploy'
- * @returns {string}
+ * @param permission the missing permission, e.g. 'deployment.deploy'
  */
-export function denyTooltip (permission) {
+export function denyTooltip (permission: string | undefined): string {
 	if (!permission) return 'You don\'t have permission to do this.'
 	return `You don't have permission to do this (requires ${permission}).`
 }

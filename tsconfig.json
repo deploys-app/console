@@ -1,0 +1,16 @@
+{
+	"extends": "./.svelte-kit/tsconfig.json",
+	"compilerOptions": {
+		// allowJs/checkJs let the not-yet-migrated .js files keep compiling
+		// during the incremental TypeScript migration. checkJs is off so legacy
+		// JS doesn't have to satisfy strict type-checking yet; converted .ts /
+		// lang="ts" files are fully strict. Drop allowJs/checkJs once every file
+		// is on TypeScript.
+		"allowJs": true,
+		"checkJs": false,
+		"strict": true,
+		// don't type-check third-party .d.ts files (e.g. type-fest internals,
+		// @svelte-plugins/datepicker) — our own sources stay fully strict.
+		"skipLibCheck": true
+	}
+}

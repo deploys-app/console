@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 bun dev          # start dev server
 bun build        # production build
 bun preview      # preview production build
-bun check        # type-check via svelte-check + jsconfig.json
+bun check        # type-check via svelte-check + tsconfig.json
 bun check:watch  # type-check in watch mode
 bun lint         # ESLint
 bun test         # Playwright e2e tests
@@ -121,7 +121,13 @@ Two complementary patterns:
 
 ### Language note
 
-The codebase uses **JavaScript with JSDoc** type annotations (not TypeScript `.ts` files), checked via `svelte-check` against `jsconfig.json`. Keep new files in `.js`/`.svelte` with JSDoc types.
+The codebase is **migrating from JavaScript-with-JSDoc to TypeScript**, checked via `svelte-check` against `tsconfig.json` (fully strict: `strict` + `noImplicitAny`). The migration is incremental — `allowJs`/`checkJs:false` let not-yet-converted `.js` files keep compiling while converted files are strictly typed.
+
+- **Write new code in TypeScript**: `.ts` modules and `.svelte` components with `<script lang="ts">`, typing props via an `interface Props` + `const { … }: Props = $props()`.
+- Type SvelteKit `load` functions with `PageLoad` / `LayoutLoad` (etc.) imported from `./$types`.
+- Shared API types live in `src/types/api.d.ts` under the global `Api` namespace (no import needed).
+- When converting an existing file, lift its JSDoc `@type`/`@typedef` annotations into real TS types and delete the JSDoc.
+- ESLint parses `.ts` and `lang="ts"` blocks via `@typescript-eslint/parser` (see `eslint.config.js`); `bun lint` and `bun check` must both stay green.
 
 ## Charts
 

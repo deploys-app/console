@@ -1,35 +1,31 @@
-<script>
+<script lang="ts">
 	import { browser } from '$app/environment'
 	import { onDestroy } from 'svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.DeploymentAction} action
-	 * @property {Api.DeploymentStatus} status
-	 * @property {string} url
-	 * @property {Api.DeploymentType} type
-	 */
+	interface Props {
+		action: Api.DeploymentAction
+		status: Api.DeploymentStatus
+		url: string
+		type: Api.DeploymentType
+	}
 
-	/** @type {Props} */
 	const {
 		action,
 		status,
 		url,
 		type
-	} = $props()
+	}: Props = $props()
 
-	const statusIconClass = {
+	const statusIconClass: Record<Api.DeploymentStatus, string> = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
 		success: 'fa-solid fa-check-circle text-positive/80',
 		error: 'fa-solid fa-times text-negative/80',
 		cancelled: 'fa-solid fa-ban text-negative/80'
 	}
 
-	/** @type {Api.PodStatus | null} */
-	let podStatus = $state(null)
+	let podStatus = $state<Api.PodStatus | null>(null)
 
-	/** @type {?HTMLElement} */
-	let el = $state(null)
+	let el = $state<HTMLElement | null>(null)
 	let visible = $state(false)
 	let hasBeenVisible = $state(false)
 
@@ -39,10 +35,7 @@
 	// the static-gateway, no statusUrl), so they never poll either.
 	const needsPodStatus = $derived(status === 'success' && action !== 'pause' && type !== 'Static')
 
-	/**
-	 * @returns {string}
-	 */
-	function getIconClass () {
+	function getIconClass (): string {
 		if (status !== 'success') {
 			return statusIconClass[status] || 'fa-solid fa-minus text-content/40'
 		}
@@ -75,7 +68,7 @@
 
 	const iconClass = $derived(getIconClass())
 
-	let timer
+	let timer: ReturnType<typeof setTimeout> | null = null
 	let destroyed = false
 
 	function clearTimer () {

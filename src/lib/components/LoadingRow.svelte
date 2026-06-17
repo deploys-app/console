@@ -1,11 +1,9 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {number} [span]
-	 */
+<script lang="ts">
+	interface Props {
+		span?: number
+	}
 
-	/** @type {Props} */
-	const { span = 1 } = $props()
+	const { span = 1 }: Props = $props()
 </script>
 
 <td colspan={span} class="text-center">
