@@ -16,6 +16,7 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 	const filters = {
 		resourceType: url.searchParams.get('resourceType') ?? '',
 		actor: url.searchParams.get('actor') ?? '',
+		channel: url.searchParams.get('channel') ?? '',
 		outcome: url.searchParams.get('outcome') ?? '',
 		after: url.searchParams.get('after') ?? '',
 		before: url.searchParams.get('before') ?? ''
@@ -25,6 +26,7 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 		project,
 		resourceType: filters.resourceType,
 		actor: filters.actor,
+		channel: filters.channel,
 		outcome: filters.outcome,
 		after: toRFC3339(filters.after),
 		before: toRFC3339(filters.before),

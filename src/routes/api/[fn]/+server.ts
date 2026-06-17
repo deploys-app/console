@@ -34,7 +34,8 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		headers: {
 			accept: 'application/json',
 			'content-type': request.headers.get('content-type') ?? 'application/json',
-			authorization: `bearer ${token}`
+			authorization: `bearer ${token}`,
+			'x-deploys-channel': 'console'
 		}
 	})
 	return new Response(resp.body, {
