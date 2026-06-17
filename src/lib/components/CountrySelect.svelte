@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import OptionSelect from '$lib/components/OptionSelect.svelte'
 	import { countries, countryLabel } from '$lib/waf/countries'
 
@@ -9,23 +9,26 @@
 	 *
 	 * Single mode binds `value` (one code). Multi mode binds `tags` (an array of
 	 * codes) and renders the chosen countries as chips.
-	 *
-	 * @typedef {Object} Props
-	 * @property {boolean} [multi]      multi-select (chips) vs single value
-	 * @property {string} [value]       single mode — selected code
-	 * @property {string[]} [tags]      multi mode — selected codes
-	 * @property {string} [id]          id for the inner input (label association)
-	 * @property {string} [placeholder]
 	 */
+	interface Props {
+		/** multi-select (chips) vs single value */
+		multi?: boolean
+		/** single mode — selected code */
+		value?: string
+		/** multi mode — selected codes */
+		tags?: string[]
+		/** id for the inner input (label association) */
+		id?: string
+		placeholder?: string
+	}
 
-	/** @type {Props} */
 	let {
 		multi = false,
 		value = $bindable(''),
 		tags = $bindable([]),
 		id,
 		placeholder = 'Search country or code'
-	} = $props()
+	}: Props = $props()
 
 	// Code in mono (`code`), name as the row text (`name`), and "CODE — Name" as
 	// the resting/chip label — matching the prior bespoke rendering.

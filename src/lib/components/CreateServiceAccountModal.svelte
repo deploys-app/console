@@ -1,15 +1,14 @@
-<script>
+<script lang="ts">
 	import api from '$lib/api'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} project
-	 * @property {boolean} [canGrantRole] Whether the current user may grant the deploy role (needs role.bind, plus role.create when the github-deploy role doesn't exist). Defaults to true for safety.
-	 * @property {(sa: { sid: string, name: string, email: string }) => void} oncreated
-	 */
+	interface Props {
+		project: string
+		/** Whether the current user may grant the deploy role (needs role.bind, plus role.create when the github-deploy role doesn't exist). Defaults to true for safety. */
+		canGrantRole?: boolean
+		oncreated: (sa: { sid: string, name: string, email: string }) => void
+	}
 
-	/** @type {Props} */
-	const { project, canGrantRole = true, oncreated } = $props()
+	const { project, canGrantRole = true, oncreated }: Props = $props()
 
 	let isActive = $state(false)
 	let sid = $state('github-deploy')
@@ -18,12 +17,11 @@
 	// open() runs, so the initial value here is never user-visible.
 	let grantRole = $state(true)
 	let submitting = $state(false)
-	/** @type {string} */
 	let errorMessage = $state('')
 
 	const canSubmit = $derived(sid.trim() !== '' && name.trim() !== '' && !submitting)
 
-	export function open () {
+	export function open (): void {
 		sid = 'github-deploy'
 		name = 'GitHub Deploy'
 		// Default the checkbox on, but keep it off when the user can't grant roles.
@@ -37,8 +35,7 @@
 		isActive = false
 	}
 
-	/** @param {MouseEvent} e */
-	function onBackdrop (e) {
+	function onBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) close()
 	}
 
@@ -84,7 +81,7 @@
 
 			// Re-fetch to resolve the real service account email.
 			let email = `${cleanSid}@${project}.serviceaccount.deploys.app`
-			const listResp = await api.invoke('serviceAccount.list', { project }, fetch)
+			const listResp = await api.invoke<Api.List<Api.ServiceAccount>>('serviceAccount.list', { project }, fetch)
 			if (listResp.ok) {
 				const found = (listResp.result?.items ?? []).find((s) => s.sid === cleanSid)
 				if (found?.email) email = found.email

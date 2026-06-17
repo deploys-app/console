@@ -1,11 +1,9 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.AuditOutcome} outcome
-	 */
+<script lang="ts">
+	interface Props {
+		outcome: Api.AuditOutcome
+	}
 
-	/** @type {Props} */
-	const { outcome } = $props()
+	const { outcome }: Props = $props()
 
 	const badge = $derived.by(() => {
 		if (outcome === 'success') return { icon: 'fa-circle-check', cls: 'is-positive', label: 'Success' }

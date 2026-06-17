@@ -1,24 +1,18 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 	import WafConditionRow from '$lib/components/WafConditionRow.svelte'
 	import { buildGroup, parseExpression } from '$lib/waf/expression'
+	import type { ExpressionSpec, Combinator } from '$lib/waf/expression'
 
-	/**
-	 * @typedef {import('$lib/waf/expression').ExpressionSpec} ExpressionSpec
-	 * @typedef {import('$lib/waf/expression').Combinator} Combinator
-	 */
+	interface Props {
+		expression?: string // bindable CEL expression — kept in two-way sync with the rows
+	}
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} expression  bindable CEL expression — kept in two-way sync with the rows
-	 */
-
-	/** @type {Props} */
-	let { expression = $bindable('') } = $props()
+	let { expression = $bindable('') }: Props = $props()
 
 	/** A fresh blank condition row. */
-	function blankCondition () {
-		return /** @type {ExpressionSpec} */ ({ field: 'path', operator: 'equals', value: '' })
+	function blankCondition (): ExpressionSpec {
+		return { field: 'path', operator: 'equals', value: '' }
 	}
 
 	// Seed the rows + combinator from the incoming expression. A non-parseable
@@ -26,10 +20,8 @@
 	// `canUseVisual`), but fall back to empty if it does.
 	const seed = untrack(() => parseExpression(expression)) ?? { combinator: 'and', conditions: [] }
 
-	/** @type {ExpressionSpec[]} */
-	let conditions = $state(seed.conditions)
-	/** @type {Combinator} */
-	let combinator = $state(seed.combinator)
+	let conditions = $state<ExpressionSpec[]>(seed.conditions)
+	let combinator = $state<Combinator>(seed.combinator)
 
 	// The CEL string this builder's current rows generate.
 	const generated = $derived(buildGroup(combinator, conditions))
@@ -61,8 +53,7 @@
 		conditions = [...conditions, blankCondition()]
 	}
 
-	/** @param {number} i */
-	function removeCondition (i) {
+	function removeCondition (i: number) {
 		conditions = conditions.filter((_, idx) => idx !== i)
 	}
 

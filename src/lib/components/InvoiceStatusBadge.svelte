@@ -1,11 +1,9 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.InvoiceStatus} status
-	 */
+<script lang="ts">
+	interface Props {
+		status: Api.InvoiceStatus
+	}
 
-	/** @type {Props} */
-	const { status } = $props()
+	const { status }: Props = $props()
 
 	const badge = $derived.by(() => {
 		if (status === 'paid') return { icon: 'fa-circle-check', cls: 'is-positive', label: 'Paid' }

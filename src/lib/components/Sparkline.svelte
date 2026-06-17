@@ -1,20 +1,18 @@
-<script>
+<script lang="ts">
 	// Tiny inline bar chart for sparse time-series (e.g. WAF matches per minute).
 	// Bars are positioned by timestamp across [from, to] so quiet periods read as
 	// gaps rather than being collapsed, and heights are normalized to the window's
 	// peak. Cheap enough to render one per table row (plain SVG, no chart lib).
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {[number, number][]} points  // [unixSeconds, value], time-ordered
-	 * @property {number} [from]   // x-domain start (unix seconds); defaults to first point
-	 * @property {number} [to]     // x-domain end (unix seconds); defaults to last point
-	 * @property {number} [width]
-	 * @property {number} [height]
-	 */
+	interface Props {
+		points?: [number, number][] // [unixSeconds, value], time-ordered
+		from?: number // x-domain start (unix seconds); defaults to first point
+		to?: number // x-domain end (unix seconds); defaults to last point
+		width?: number
+		height?: number
+	}
 
-	/** @type {Props} */
-	const { points = [], from, to, width = 96, height = 28 } = $props()
+	const { points = [], from, to, width = 96, height = 28 }: Props = $props()
 
 	const start = $derived(from ?? points[0]?.[0] ?? 0)
 	const end = $derived(to ?? points[points.length - 1]?.[0] ?? 1)

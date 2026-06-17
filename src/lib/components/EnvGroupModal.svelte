@@ -1,15 +1,12 @@
-<script>
+<script lang="ts">
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	let group = $state(/** @type {?Api.EnvGroup} */ (null))
+	let group = $state<Api.EnvGroup | null>(null)
 	let isActive = $state(false)
 
 	const entries = $derived(Object.entries(group?.env ?? {}))
 
-	/**
-	 * @param {Api.EnvGroup} g
-	 */
-	export function open (g) {
+	export function open (g: Api.EnvGroup): void {
 		group = g
 		isActive = true
 	}

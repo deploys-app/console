@@ -1,13 +1,11 @@
-<script>
+<script lang="ts">
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} value
-	 * @property {boolean} [show]
-	 */
+	interface Props {
+		value: string
+		show?: boolean
+	}
 
-	/** @type {Props} */
-	const { value, show = false } = $props()
+	const { value, show = false }: Props = $props()
 
 	let isHidden = $derived(!show)
 

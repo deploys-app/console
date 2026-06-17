@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { tick, untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
@@ -10,13 +10,18 @@
 	 * Daily project-level usage charts read from the project.metrics RPC. CPU,
 	 * memory, disk and replicas are per-day average levels; egress is the day's
 	 * total bytes (pod + cache + WAF); static storage is the day's gauge.
-	 *
-	 * @typedef {Object} Props
-	 * @property {string} project
 	 */
 
-	/** @type {Props} */
-	const { project } = $props()
+	interface Props {
+		project: string
+	}
+
+	interface Series {
+		prefix: string
+		lines: Api.UsageMetricsLine[]
+	}
+
+	const { project }: Props = $props()
 
 	const rangeOptions = [
 		{ value: '7d', label: '7 Days' },
@@ -28,19 +33,18 @@
 		range: $page.url.searchParams.get('range') || '30d'
 	})
 
-	let cpu = $state([])
-	let memory = $state([])
-	let egress = $state([])
-	let replica = $state([])
-	let disk = $state([])
-	let storage = $state([])
+	let cpu = $state<Series[]>([])
+	let memory = $state<Series[]>([])
+	let egress = $state<Series[]>([])
+	let replica = $state<Series[]>([])
+	let disk = $state<Series[]>([])
+	let storage = $state<Series[]>([])
 
 	async function fetchMetrics (clear = false) {
 		// `range` is read untracked so the project-keyed effect below isn't also
 		// triggered by range changes — those refresh via the Select's onchange.
 		const range = untrack(() => filter.range)
-		/** @type {Api.Response<Api.ProjectMetricsResult>} */
-		const resp = await api.invoke('project.metrics', { project, timeRange: range }, fetch)
+		const resp: Api.Response<Api.ProjectMetricsResult> = await api.invoke('project.metrics', { project, timeRange: range }, fetch)
 		if (!resp.ok) {
 			return
 		}

@@ -1,18 +1,18 @@
-<script>
-	/**
-	 * @typedef {Object} Props
-	 * @property {string[]} tags        bindable list of committed chips
-	 * @property {string} [placeholder] placeholder for the text input
-	 * @property {string} [id]          id for the inner input (label association)
-	 */
+<script lang="ts">
+	interface Props {
+		/** bindable list of committed chips */
+		tags?: string[]
+		/** placeholder for the text input */
+		placeholder?: string
+		/** id for the inner input (label association) */
+		id?: string
+	}
 
-	/** @type {Props} */
-	let { tags = $bindable([]), placeholder = '', id } = $props()
+	let { tags = $bindable([]), placeholder = '', id }: Props = $props()
 
 	let draft = $state('')
 
-	/** @type {HTMLInputElement | undefined} */
-	let inputEl = $state()
+	let inputEl = $state<HTMLInputElement | undefined>()
 
 	// Commit the current draft as a chip: trim, ignore empties, de-dupe.
 	function commit () {
@@ -23,14 +23,12 @@
 		tags = [...tags, v]
 	}
 
-	/** @param {number} i */
-	function remove (i) {
+	function remove (i: number) {
 		tags = tags.filter((_, idx) => idx !== i)
 		inputEl?.focus()
 	}
 
-	/** @param {KeyboardEvent} e */
-	function onkeydown (e) {
+	function onkeydown (e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			commit()

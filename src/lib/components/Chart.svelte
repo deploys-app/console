@@ -1,42 +1,44 @@
-<script>
+<script lang="ts">
 	import LineChart from '$lib/components/LineChart.svelte'
 	import { formatBytes, formatNumber } from '$lib/charts/util'
+	import type { LineSeries } from '$lib/charts/util'
 
 	/**
 	 * Metric time-series panel: a titled card wrapping {@link LineChart}. Accepts
 	 * the platform's metric shape — a set of named series, each carrying one or
 	 * more lines of `[unixSeconds, value]` points — and flattens it for drawing.
-	 *
-	 * @typedef {Object} Line
-	 * @property {string} name
-	 * @property {[number, number][]} points   [unixSeconds, value]
-	 *
-	 * @typedef {Object} Series
-	 * @property {string} prefix
-	 * @property {Line[]} lines
-	 * @property {string} [dashStyle]   any value → rendered dashed (e.g. limits)
-	 * @property {string} [color]       'red' maps to the danger token
-	 *
-	 * @typedef {Object} Props
-	 * @property {string} title
-	 * @property {string} unit          'bytes' formats Ki/Mi/Gi; else plain number
-	 * @property {Series[]} series
-	 * @property {'line' | 'spline'} [type]
-	 * @property {string} [range]       e.g. '1h', '6hagg' — sizes the time window
 	 */
 
-	/** @type {Props} */
-	const { title, unit, series, type = 'line', range = '' } = $props()
+	interface Line {
+		name: string
+		points: [number, number][] // [unixSeconds, value]
+	}
 
-	/** @param {string} [c] */
-	function resolveColor (c) {
+	interface Series {
+		prefix: string
+		lines: Line[]
+		dashStyle?: string // any value → rendered dashed (e.g. limits)
+		color?: string // 'red' maps to the danger token
+	}
+
+	interface Props {
+		title: string
+		unit: string // 'bytes' formats Ki/Mi/Gi; else plain number
+		series: Series[]
+		type?: 'line' | 'spline'
+		range?: string // e.g. '1h', '6hagg' — sizes the time window
+	}
+
+	const { title, unit, series, type = 'line', range = '' }: Props = $props()
+
+	function resolveColor (c?: string): string | undefined {
 		if (!c) return undefined
 		if (c === 'red') return 'hsl(var(--hsl-negative))'
 		return c
 	}
 
 	/** Turn the range token ('6hagg', '1d', …) into a window length in ms. */
-	function rangeToMs (/** @type {string} */ r) {
+	function rangeToMs (r: string): number | null {
 		if (!r) return null
 		const base = r.replace('agg', '')
 		const num = parseInt(base)
@@ -56,8 +58,7 @@
 	// '-' boundary so whole name segments are removed (never a hash mid-token).
 	// This also hides the otherwise-opaque `0d<id>` resource name.
 	const podPrefixLen = $derived.by(() => {
-		/** @type {string[]} */
-		const names = []
+		const names: string[] = []
 		for (const s of series ?? []) {
 			for (const l of (s.lines ?? [])) names.push(l.name ?? '')
 		}
@@ -73,8 +74,7 @@
 		return cut >= 0 ? cut + 1 : 0
 	})
 
-	/** @param {string} name */
-	function podLabel (name) {
+	function podLabel (name: string): string {
 		return name.slice(podPrefixLen) || name
 	}
 
@@ -85,8 +85,7 @@
 	// layered over it.
 	const flat = $derived.by(() => {
 		let areaUsed = false
-		/** @type {import('$lib/charts/util').LineSeries[]} */
-		const out = []
+		const out: LineSeries[] = []
 		for (const s of series ?? []) {
 			const lines = s.lines ?? []
 			for (const l of lines) {
@@ -118,7 +117,7 @@
 
 	const xDomain = $derived.by(() => {
 		const ms = rangeToMs(range)
-		return ms ? /** @type {[number, number]} */ ([lastTs - ms, lastTs]) : null
+		return ms ? ([lastTs - ms, lastTs] as [number, number]) : null
 	})
 </script>
 

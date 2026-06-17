@@ -1,14 +1,12 @@
-<script>
+<script lang="ts">
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} status
-	 */
+	interface Props {
+		status: string
+	}
 
-	/** @type {Props} */
-	const { status } = $props()
+	const { status }: Props = $props()
 
-	const iconClassByStatus = {
+	const iconClassByStatus: Record<string, string> = {
 		pending: 'fa-solid fa-spinner-third fa-spin',
 		success: 'fa-solid fa-check-circle text-positive/80',
 		error: 'fa-solid fa-times text-negative/80',

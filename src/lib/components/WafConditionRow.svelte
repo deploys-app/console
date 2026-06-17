@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Select from '$lib/components/Select.svelte'
 	import TagInput from '$lib/components/TagInput.svelte'
 	import CountrySelect from '$lib/components/CountrySelect.svelte'
@@ -10,20 +10,15 @@
 		isMultiOperator,
 		parseList
 	} from '$lib/waf/expression'
+	import type { ExpressionSpec } from '$lib/waf/expression'
 
-	/**
-	 * @typedef {import('$lib/waf/expression').ExpressionSpec} ExpressionSpec
-	 */
+	interface Props {
+		condition: ExpressionSpec // bindable structured condition
+		onremove: () => void // remove this row
+		removable?: boolean // show the remove button (default true)
+	}
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {ExpressionSpec} condition  bindable structured condition
-	 * @property {() => void} onremove       remove this row
-	 * @property {boolean} [removable]       show the remove button (default true)
-	 */
-
-	/** @type {Props} */
-	let { condition = $bindable(), onremove, removable = true } = $props()
+	let { condition = $bindable(), onremove, removable = true }: Props = $props()
 
 	const fieldMeta = $derived(getField(condition.field))
 	const fieldType = $derived(fieldMeta?.type ?? 'string')
