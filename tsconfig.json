@@ -1,11 +1,11 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
-		// allowJs/checkJs let the not-yet-migrated .js files keep compiling
-		// during the incremental TypeScript migration. checkJs is off so legacy
-		// JS doesn't have to satisfy strict type-checking yet; converted .ts /
-		// lang="ts" files are fully strict. Drop allowJs/checkJs once every file
-		// is on TypeScript.
+		// All of src/ is TypeScript. allowJs remains only because the generated
+		// SvelteKit tsconfig pulls in the root tooling configs (vite.config.js,
+		// svelte.config.js, etc.); checkJs stays off so those un-typed configs
+		// don't have to satisfy strict checking. Everything under src/ is fully
+		// strict.
 		"allowJs": true,
 		"checkJs": false,
 		"strict": true,

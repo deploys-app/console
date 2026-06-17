@@ -1,28 +1,27 @@
-<script>
+<script lang="ts">
+	import type { SearchEntry } from '$lib/search'
 	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import { navEntries, projectEntries, fetchResourceEntries, filterEntries } from '$lib/search'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.Project[]} [projects]
-	 */
+	interface Props {
+		projects?: Api.Project[]
+	}
 
-	/** @type {Props} */
-	const { projects = [] } = $props()
+	const { projects = [] }: Props = $props()
 
 	const project = $derived($page.url.searchParams.get('project'))
 
 	let isActive = $state(false)
 	let search = $state('')
-	let elSearch = $state(/** @type {?HTMLInputElement} */ (null))
+	let elSearch = $state<HTMLInputElement | null>(null)
 	let highlighted = $state(0)
-	const rowEls = $state(/** @type {HTMLElement[]} */ ([]))
+	const rowEls = $state<HTMLElement[]>([])
 
 	let loading = $state(false)
-	let loadedProject = $state(/** @type {?string} */ (null))
-	let resources = $state(/** @type {import('$lib/search').SearchEntry[]} */ ([]))
+	let loadedProject = $state<string | null>(null)
+	let resources = $state<SearchEntry[]>([])
 
 	// Project entries are first so typing a project name highlights the switch
 	// row before any nav/resource match (intent: "I'm trying to switch project").
@@ -39,8 +38,7 @@
 	// Group consecutive entries by section for display while keeping the flat
 	// index that drives keyboard highlighting.
 	const grouped = $derived.by(() => {
-		/** @type {{ group: string, items: { entry: import('$lib/search').SearchEntry, index: number }[] }[]} */
-		const out = []
+		const out: { group: string, items: { entry: SearchEntry, index: number }[] }[] = []
 		filtered.forEach((entry, index) => {
 			let g = out.at(-1)
 			if (!g || g.group !== entry.group) {
@@ -82,10 +80,7 @@
 		elSearch?.blur()
 	}
 
-	/**
-	 * @param {import('$lib/search').SearchEntry} entry
-	 */
-	function navigate (entry) {
+	function navigate (entry: SearchEntry) {
 		close()
 		goto(entry.href)
 	}
@@ -93,17 +88,15 @@
 	/**
 	 * Close only when the backdrop itself is clicked, not when a click inside the
 	 * panel bubbles up.
-	 * @param {MouseEvent} e
 	 */
-	function onBackdrop (e) {
+	function onBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) close()
 	}
 
 	/**
 	 * Arrow Up/Down move the highlighted row; Enter opens it; Escape closes.
-	 * @param {KeyboardEvent} e
 	 */
-	function onSearchKeydown (e) {
+	function onSearchKeydown (e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			close()
 			return

@@ -75,24 +75,24 @@ The `(auth)` and `(project)` parentheses are SvelteKit route groups — they sha
 
 All API calls go through a single proxy: `POST /api/{fnName}`.
 
-- **Client side**: `src/lib/api/index.js` — `api.invoke(fnName, args, fetch)` posts to the local proxy.
-- **Server side**: `src/routes/api/[fn]/+server.js` — reads token from cookies, forwards to `env.API_ENDPOINT` (https://api.deploys.app) with `Authorization: bearer {token}`.
+- **Client side**: `src/lib/api/index.ts` — `api.invoke(fnName, args, fetch)` posts to the local proxy.
+- **Server side**: `src/routes/api/[fn]/+server.ts` — reads token from cookies, forwards to `env.API_ENDPOINT` (https://api.deploys.app) with `Authorization: bearer {token}`.
 - **Cache invalidation**: `api.invalidate(fn)` / `api.intervalInvalidate(cb, interval)` for polling.
 - **Error handling**: `api: unauthorized` → reloads page; `api: forbidden` → `error.forbidden`; `api: validate error` → `error.validate[]`; `api: * not found` → `error.notFound`.
-- **Mock mode (offline dev)**: `bun dev:mock` (sets `MOCK_API=1`). Both proxies (`api/[fn]` and `api/registry/[fn]`) short-circuit to static fixtures in `src/lib/server/mock.js`, skipping the token check — no real backend or OAuth sign-in needed. Add/adjust a fixture in `mock.js` (`handlers` map) when adding a new API call; unknown functions log a warning and return an empty `ok` response.
+- **Mock mode (offline dev)**: `bun dev:mock` (sets `MOCK_API=1`). Both proxies (`api/[fn]` and `api/registry/[fn]`) short-circuit to static fixtures in `src/lib/server/mock.ts`, skipping the token check — no real backend or OAuth sign-in needed. Add/adjust a fixture in `mock.ts` (`handlers` map) when adding a new API call; unknown functions log a warning and return an empty `ok` response.
 
 All API types are defined in `src/types/api.d.ts` using TypeScript namespaces (`Api.Profile`, `Api.Response<T>`, `Api.Deployment`, etc.).
 
 ### State management
 
 No global store. Data flows via SvelteKit's `load()` functions:
-- `+layout.server.js` for server-loaded data (auth token, user profile)
-- `+page.js` / `+layout.js` for client-side data fetching
+- `+layout.server.ts` for server-loaded data (auth token, user profile)
+- `+page.ts` / `+layout.ts` for client-side data fetching
 - Svelte 5 runes (`$state`, `$derived`) for component-local state
 
 ### Auth
 
-OAuth2 against `auth.deploys.app`. Token stored in httpOnly cookies. `src/hooks.server.js` injects the token into every `/api/*` request and persists the selected project + theme in cookies. The theme cookie (`dark` | `light`) is rendered into the `<html class="…">` placeholder via `transformPageChunk` so the first paint already matches.
+OAuth2 against `auth.deploys.app`. Token stored in httpOnly cookies. `src/hooks.server.ts` injects the token into every `/api/*` request and persists the selected project + theme in cookies. The theme cookie (`dark` | `light`) is rendered into the `<html class="…">` placeholder via `transformPageChunk` so the first paint already matches.
 
 ### Styling
 
@@ -116,12 +116,12 @@ Tailwind CSS v4 via `@tailwindcss/vite`. The single entry stylesheet is `src/sty
 
 Two complementary patterns:
 
-- **`src/lib/modal/index.js`** — wraps SweetAlert2 (`confirm` / `error` / `success`). Use for transient alerts, confirmations, and simple prompts rather than inline `alert`/`confirm`.
+- **`src/lib/modal/index.ts`** — wraps SweetAlert2 (`confirm` / `error` / `success`). Use for transient alerts, confirmations, and simple prompts rather than inline `alert`/`confirm`.
 - **In-page Svelte modal components** — for showing structured or user-provided content, build a small component using the `modal` / `modal-panel` / `modal-close` classes with an exported `open()` and local state (see `ModalSelectProject.svelte`, `EnvGroupModal.svelte`). Prefer this over SweetAlert's `html` option so values render through Svelte interpolation (auto-escaped) instead of hand-built/escaped HTML strings. Bind `aria-hidden` to the open state so the dialog is exposed to assistive tech only while open.
 
 ### Language note
 
-The codebase is **migrating from JavaScript-with-JSDoc to TypeScript**, checked via `svelte-check` against `tsconfig.json` (fully strict: `strict` + `noImplicitAny`). The migration is incremental — `allowJs`/`checkJs:false` let not-yet-converted `.js` files keep compiling while converted files are strictly typed.
+The codebase is **TypeScript** (fully strict: `strict` + `noImplicitAny`), checked via `svelte-check` against `tsconfig.json`. The JS-with-JSDoc → TS migration is complete: every file under `src/` is `.ts` or a `.svelte` with `<script lang="ts">`. (`allowJs` stays on only for the root tooling configs like `vite.config.js`/`svelte.config.js`; `checkJs` is off so those don't need strict typing.)
 
 - **Write new code in TypeScript**: `.ts` modules and `.svelte` components with `<script lang="ts">`, typing props via an `interface Props` + `const { … }: Props = $props()`.
 - Type SvelteKit `load` functions with `PageLoad` / `LayoutLoad` (etc.) imported from `./$types`.
@@ -133,7 +133,7 @@ The codebase is **migrating from JavaScript-with-JSDoc to TypeScript**, checked 
 
 Charts are rendered in-house as plain SVG — there is no charting dependency (Highcharts was removed). The pieces live under `src/lib/charts/` and `src/lib/components/`:
 
-- **`src/lib/charts/util.js`** — pure helpers shared by the chart components: `niceScale` (round axis ticks), `formatBytes` (binary Ki/Mi/Gi), `formatNumber`, `linePath`/`areaPath` (straight + Catmull-Rom spline), and the `palette` of token-based colors.
+- **`src/lib/charts/util.ts`** — pure helpers shared by the chart components: `niceScale` (round axis ticks), `formatBytes` (binary Ki/Mi/Gi), `formatNumber`, `linePath`/`areaPath` (straight + Catmull-Rom spline), and the `palette` of token-based colors.
 - **`LineChart.svelte`** — responsive SVG line/area engine with a time **or** category x-axis, crosshair + floating tooltip, optional legend, and a draw-in animation. Used by `Chart.svelte` (metric panels) and the billing report.
 - **`Chart.svelte`** — titled metric panel wrapping `LineChart`; takes the platform metric shape (`{prefix, lines:[{name, points:[[unixSec, val]]}], dashStyle?, color?}`).
 - **`WafActivityChart.svelte`** — stacked-column engine for WAF activity (per-action segments over time).

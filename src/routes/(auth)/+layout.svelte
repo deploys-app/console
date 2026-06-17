@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+	import type { LayoutData } from './$types'
+	import type { Snippet } from 'svelte'
 	import '$style/app.css'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
@@ -8,7 +10,7 @@
 	import ModalSelectProject from './ModalSelectProject.svelte'
 	import SearchModal from './SearchModal.svelte'
 
-	const { data, children } = $props()
+	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
 	const profile = $derived(data.profile)
 	const projects = $derived(data.projects ?? [])
@@ -24,11 +26,9 @@
 		showSidebar = false
 	})
 
-	/** @type {?ModalSelectProject} */
-	let projectModal = $state(null)
+	let projectModal = $state<ModalSelectProject | null>(null)
 
-	/** @type {?SearchModal} */
-	let searchModal = $state(null)
+	let searchModal = $state<SearchModal | null>(null)
 
 	onMount(() => {
 		api.setOnUnauth(() => {
@@ -43,12 +43,11 @@
 	/**
 	 * Open the search palette on "/", unless the user is typing into a field
 	 * (including the palette's own input, so "/" types normally once it's open).
-	 * @param {KeyboardEvent} e
 	 */
-	function onWindowKeydown (e) {
+	function onWindowKeydown (e: KeyboardEvent) {
 		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
 		if (!hasProject) return
-		const el = /** @type {?HTMLElement} */ (e.target)
+		const el = e.target as HTMLElement | null
 		const tag = el?.tagName
 		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el?.isContentEditable) return
 		e.preventDefault()
