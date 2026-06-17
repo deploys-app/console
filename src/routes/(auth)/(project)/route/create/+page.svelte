@@ -4,6 +4,7 @@
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { routeTargetMeta } from '$lib/route'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -28,14 +29,8 @@
 		}
 	})
 
-	const targetPlaceholder = $derived(({
-		'redirect://': 'https://example.com',
-		'http://': '203.0.113.10:8080'
-	} as Record<string, string>)[form.targetPrefix] || '')
-
-	const targetHint = $derived(({
-		'http://': 'Your server’s public IP address, with an optional port (defaults to 80). Private, loopback, and link-local addresses are not allowed.'
-	} as Record<string, string>)[form.targetPrefix] || '')
+	const targetPlaceholder = $derived(routeTargetMeta[form.targetPrefix]?.placeholder ?? '')
+	const targetHint = $derived(routeTargetMeta[form.targetPrefix]?.hint ?? '')
 
 	let domains = $state<Api.Domain[]>([])
 	let deployments = $state<{ name: string, paused: boolean }[]>([])

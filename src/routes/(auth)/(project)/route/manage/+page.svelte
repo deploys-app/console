@@ -7,6 +7,7 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { routeTargetMeta } from '$lib/route'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -32,26 +33,8 @@
 	}
 
 	const parsed = $derived(splitTarget(route.target))
-	const typeLabel = $derived(
-		({
-			'deployment://': 'Deployment',
-			'redirect://': 'Redirect',
-			'http://': 'External server (HTTP)',
-			'ipfs://': 'IPFS',
-			'ipns://': 'IPNS',
-			'dnslink://': 'DNSLink'
-		} as Record<string, string>)[parsed.prefix] ?? parsed.prefix
-	)
-	const targetIcon = $derived(
-		({
-			'deployment://': 'fa-cube',
-			'redirect://': 'fa-arrow-right-arrow-left',
-			'http://': 'fa-server',
-			'ipfs://': 'fa-cubes',
-			'ipns://': 'fa-cubes',
-			'dnslink://': 'fa-link'
-		} as Record<string, string>)[parsed.prefix] ?? 'fa-cube'
-	)
+	const typeLabel = $derived(routeTargetMeta[parsed.prefix]?.label ?? parsed.prefix)
+	const targetIcon = $derived(routeTargetMeta[parsed.prefix]?.icon ?? 'fa-cube')
 
 	// deployment:// targets resolve to a deployment in the same location; link
 	// straight to its detail page so the route is navigable. Derive the name from
