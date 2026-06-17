@@ -1,20 +1,49 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import LineChart from '$lib/components/LineChart.svelte'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import type { PageData } from './$types'
+	import type { LineSeries } from '$lib/charts/util'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
+
+	interface ReportProject {
+		sid: string
+		name: string
+	}
+
+	interface ReportRow {
+		projectSid: string
+		name: string
+		usageValue: number
+		billingValue: number
+	}
+
+	interface ReportChartSeries {
+		name: string
+		data: number[]
+	}
+
+	interface Report {
+		projectList: ReportProject[]
+		projectSids: string[]
+		list: ReportRow[]
+		chart: {
+			categories: string[]
+			series: ReportChartSeries[]
+		}
+	}
 
 	const billingAccount = $derived(data.billingAccount)
 
-	const filter = $state({
+	const filter = $state<{ range: string, projectSids: string[] }>({
 		range: $page.url.searchParams.get('range') || 'this_month',
 		projectSids: []
 	})
 
-	let report = $state()
+	let report = $state<Report | undefined>()
 	let loading = $state(false)
 	let bootstrapped = false
 
@@ -42,8 +71,7 @@
 		)
 	})
 
-	/** @type {ReturnType<typeof setTimeout> | undefined} */
-	let fetchTimer
+	let fetchTimer: ReturnType<typeof setTimeout> | undefined
 	function scheduleFetch () {
 		if (fetchTimer) clearTimeout(fetchTimer)
 		fetchTimer = setTimeout(() => {
@@ -62,10 +90,8 @@
 		scheduleFetch()
 	}
 
-	/** @param {HTMLElement} node @param {() => void} handler */
-	function clickOutside (node, handler) {
-		/** @param {MouseEvent} e */
-		function onDown (e) {
+	function clickOutside (node: HTMLElement, handler: () => void) {
+		function onDown (e: MouseEvent) {
 			if (e.target instanceof Node && !node.contains(e.target)) {
 				handler()
 			}
@@ -78,8 +104,7 @@
 		}
 	}
 
-	/** @param {HTMLElement} node */
-	function autofocus (node) {
+	function autofocus (node: HTMLElement) {
 		queueMicrotask(() => node.focus())
 	}
 
@@ -96,21 +121,18 @@
 	)
 
 	const projectNameBySid = $derived.by(() => {
-		/** @type {Record<string, string>} */
-		const map = {}
+		const map: Record<string, string> = {}
 		for (const it of (report?.projectList ?? [])) {
 			map[it.sid] = it.name
 		}
 		return map
 	})
 
-	/** @param {number} v */
-	function money (v) {
+	function money (v: number) {
 		return v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 	}
 
-	/** @param {number} v */
-	function num (v) {
+	function num (v: number) {
 		return v.toLocaleString(undefined, { maximumFractionDigits: 2 })
 	}
 
@@ -127,7 +149,7 @@
 
 		loading = true
 		try {
-			const resp = await api.invoke('billing.report', {
+			const resp = await api.invoke<Report>('billing.report', {
 				id: billingAccount.id,
 				range: filter.range,
 				projectSids: filter.projectSids ?? []
@@ -150,18 +172,17 @@
 	// LineChart's category x-axis: each project becomes a smoothed line, x is the
 	// category index, y the cost.
 	const chartCategories = $derived(report?.chart?.categories ?? [])
-	const chartSeries = $derived((report?.chart?.series ?? []).map((/** @type {{name:string, data:number[]}} */ s) => ({
+	const chartSeries: LineSeries[] = $derived((report?.chart?.series ?? []).map((s) => ({
 		name: s.name,
 		points: (s.data ?? []).map((y, i) => ({ x: i, y: +y }))
 	})))
 
-	/** @param {number} v axis label — whole THB, no decimals */
-	function axisMoney (v) {
+	// axis label — whole THB, no decimals
+	function axisMoney (v: number) {
 		return v.toLocaleString(undefined, { maximumFractionDigits: 0 })
 	}
 
-	/** @param {string} v */
-	function selectRange (v) {
+	function selectRange (v: string) {
 		filter.range = v
 		fetchReport()
 	}

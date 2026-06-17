@@ -1,21 +1,18 @@
-<script>
+<script lang="ts">
 	import dayjs from 'dayjs'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import InvoiceStatusBadge from '$lib/components/InvoiceStatusBadge.svelte'
 	import * as format from '$lib/format'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const billingAccount = $derived(data.billingAccount)
 	const invoices = $derived(data.invoices)
 	const error = $derived(data.error)
 
-	/**
-	 * @param {string} periodStart
-	 * @param {string} periodEnd
-	 */
-	function period (periodStart, periodEnd) {
+	function period (periodStart: string, periodEnd: string) {
 		const s = dayjs(periodStart)
 		const e = dayjs(periodEnd).subtract(1, 'day')
 		if (s.isSame(e, 'month')) {
@@ -24,11 +21,7 @@
 		return `${s.format('YYYY-MM-DD')} → ${e.format('YYYY-MM-DD')}`
 	}
 
-	/**
-	 * @param {number} v
-	 * @param {string} currency
-	 */
-	function money (v, currency) {
+	function money (v: number, currency: string) {
 		return `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
 	}
 </script>

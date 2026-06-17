@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const billingAccounts = $derived(data.billingAccounts)
 	const error = $derived(data.error)

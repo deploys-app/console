@@ -1,14 +1,10 @@
-<script>
+<script lang="ts">
+	import type { Snippet } from 'svelte'
 	import { browser } from '$app/environment'
 	import { beforeNavigate } from '$app/navigation'
 	import { updated } from '$app/stores'
-	/**
-	 * @typedef {Object} Props
-	 * @property {import('svelte').Snippet} [children]
-	 */
 
-	/** @type {Props} */
-	const { children } = $props()
+	const { children }: { children: Snippet } = $props()
 
 	if (browser) {
 		beforeNavigate(({ willUnload, to }) => {

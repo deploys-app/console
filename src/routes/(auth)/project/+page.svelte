@@ -1,21 +1,20 @@
-<script>
+<script lang="ts">
+	import type { PageData } from './$types'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import Swal from 'sweetalert2'
 	import * as modal from '$lib/modal'
 	import ModalSelectProject from '../ModalSelectProject.svelte'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const projects = $derived(data.projects)
 
-	/** @type {?ModalSelectProject} */
-	let projectModal = $state(null)
+	let projectModal = $state<ModalSelectProject | null>(null)
 
 	// Press "/" anywhere on the page (unless typing in a field) to open the
 	// project search modal.
-	/** @param {KeyboardEvent} e */
-	function onKeydown (e) {
+	function onKeydown (e: KeyboardEvent) {
 		if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return
 		const el = e.target
 		if (el instanceof HTMLElement && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || el.isContentEditable)) {
@@ -30,11 +29,7 @@
 		return () => window.removeEventListener('keydown', onKeydown)
 	})
 
-	/**
-	 * @param {string} project
-	 * @returns {Promise<void>}
-	 */
-	async function deleteItem (project) {
+	async function deleteItem (project: string): Promise<void> {
 		const result = await Swal.fire({
 			title: 'Are you sure?',
 			text: `Type "${project}" to confirm!`,

@@ -1,9 +1,10 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const billingAccount = $derived(data.billingAccount)
 

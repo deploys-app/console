@@ -1,15 +1,13 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/stores'
 	import { projectMenu as projectMenuList } from '$lib/nav'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.Project[]} projects
-	 * @property {() => void} openProjectModal
-	 */
+	interface Props {
+		projects: Api.Project[]
+		openProjectModal: () => void
+	}
 
-	/** @type {Props} */
-	const { projects, openProjectModal } = $props()
+	const { projects, openProjectModal }: Props = $props()
 
 	const pageMenu = $derived($page.data.menu || '')
 	const project = $derived($page.url.searchParams.get('project'))

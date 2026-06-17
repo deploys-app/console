@@ -1,19 +1,20 @@
-<script>
+<script lang="ts">
 	import dayjs from 'dayjs'
 	import InvoiceStatusBadge from '$lib/components/InvoiceStatusBadge.svelte'
 	import PayInvoiceModal from '$lib/components/PayInvoiceModal.svelte'
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const invoice = $derived(data.invoice)
 	const billingAccount = $derived(data.billingAccount)
 
 	let downloading = $state(false)
 	let downloadingReceipt = $state(false)
-	let payModal = $state(/** @type {?ReturnType<typeof PayInvoiceModal>} */ (null))
+	let payModal = $state<ReturnType<typeof PayInvoiceModal> | null>(null)
 
 	function onSlipUploaded () {
 		modal.success({ content: 'Payment slip uploaded. We\'ll verify it and mark the invoice as paid.' })
@@ -21,13 +22,12 @@
 
 	/**
 	 * Shared download flow for the invoice and receipt PDFs.
-	 * @param {string} fn api function name
-	 * @param {string} fallbackError message when the API returns a blank error
+	 * fn is the api function name; fallbackError is the message shown when the
+	 * API returns a blank error.
 	 */
-	async function download (fn, fallbackError) {
+	async function download (fn: string, fallbackError: string) {
 		try {
-			/** @type {Api.Response<Api.InvoiceDownloadResult>} */
-			const resp = await api.invoke(fn, { invoiceId: invoice.id }, fetch)
+			const resp = await api.invoke<Api.InvoiceDownloadResult>(fn, { invoiceId: invoice.id }, fetch)
 			if (!resp.ok || !resp.result) {
 				// Show the API's message when present (e.g. the PDF-unavailable
 				// error), else a clear fallback — arpc returns a blank `{}` for
@@ -74,10 +74,7 @@
 		return `${s.format('YYYY-MM-DD')} → ${e.format('YYYY-MM-DD')}`
 	})
 
-	/**
-	 * @param {number} v
-	 */
-	function money (v) {
+	function money (v: number) {
 		return `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${invoice.currency}`
 	}
 

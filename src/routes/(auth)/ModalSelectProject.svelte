@@ -1,24 +1,22 @@
-<script>
+<script lang="ts">
 	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	import { SvelteURLSearchParams } from 'svelte/reactivity'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.Project[]} projects
-	 */
+	interface Props {
+		projects: Api.Project[]
+	}
 
-	/** @type {Props} */
-	const { projects } = $props()
+	const { projects }: Props = $props()
 
 	const project = $derived($page.url.searchParams.get('project'))
 	let isActive = $state(false)
 	let search = $state('')
-	let elSearch = $state(/** @type {?HTMLInputElement} */ (null))
+	let elSearch = $state<HTMLInputElement | null>(null)
 	let highlighted = $state(0)
-	const rowEls = $state(/** @type {HTMLElement[]} */ ([]))
+	const rowEls = $state<HTMLElement[]>([])
 
 	const filtered = $derived.by(() => {
 		const tokens = search.trim().toLowerCase().split(/\s+/).filter(Boolean)
@@ -35,10 +33,7 @@
 		rowEls[highlighted]?.scrollIntoView({ block: 'nearest' })
 	})
 
-	/**
-	 * @param {string} sid
-	 */
-	function setProject (sid) {
+	function setProject (sid: string) {
 		close()
 
 		const q = new SvelteURLSearchParams($page.url.search)
@@ -71,17 +66,15 @@
 	 * Close only when the backdrop itself is clicked, not when a click inside
 	 * the panel bubbles up — otherwise interacting with the search would dismiss
 	 * the modal.
-	 * @param {MouseEvent} e
 	 */
-	function onBackdrop (e) {
+	function onBackdrop (e: MouseEvent) {
 		if (e.target === e.currentTarget) close()
 	}
 
 	/**
 	 * Arrow Up/Down move the highlighted row; Enter selects it.
-	 * @param {KeyboardEvent} e
 	 */
-	function onSearchKeydown (e) {
+	function onSearchKeydown (e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			close()
 			return

@@ -1,28 +1,24 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 	import { browser } from '$app/environment'
 	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {Api.Profile | null} [profile]
-	 * @property {() => void} toggleSidebar
-	 * @property {() => void} [openSearch]
-	 */
+	interface Props {
+		profile?: Api.Profile | null
+		toggleSidebar: () => void
+		openSearch?: () => void
+	}
 
-	/** @type {Props} */
-	const { profile = null, toggleSidebar, openSearch } = $props()
+	const { profile = null, toggleSidebar, openSearch }: Props = $props()
 
 	let active = $state(false)
 
-	/** @type {'system' | 'light' | 'dark'} */
-	let theme = $state(browser ? (/** @type {any} */ (Cookie.get('theme')) ?? 'system') : 'system')
+	let theme = $state<'system' | 'light' | 'dark'>(browser ? ((Cookie.get('theme') as any) ?? 'system') : 'system')
 	const themeIndex = $derived(theme === 'light' ? 1 : theme === 'dark' ? 2 : 0)
 
-	/** @type {?HTMLFormElement} */
-	let signOut = $state(null)
+	let signOut = $state<HTMLFormElement | null>(null)
 
 	export function open () {
 		active = true
@@ -32,10 +28,7 @@
 		active = false
 	}
 
-	/**
-	 * @param {Event} e
-	 */
-	export function toggle (e) {
+	export function toggle (e: Event) {
 		e.stopPropagation()
 
 		active = !active
@@ -49,8 +42,7 @@
 		document.documentElement.classList.toggle('dark', window.matchMedia('(prefers-color-scheme: dark)').matches)
 	}
 
-	/** @param {'system' | 'light' | 'dark'} value */
-	function setTheme (value) {
+	function setTheme (value: 'system' | 'light' | 'dark') {
 		theme = value
 		if (value === 'system') {
 			Cookie.remove('theme')
@@ -64,7 +56,7 @@
 	onMount(() => {
 		const mq = window.matchMedia('(prefers-color-scheme: dark)')
 		// Follow OS changes live only while no explicit choice is stored.
-		const onChange = (e) => {
+		const onChange = (e: MediaQueryListEvent) => {
 			if (!Cookie.get('theme')) {
 				document.documentElement.classList.toggle('dark', e.matches)
 			}

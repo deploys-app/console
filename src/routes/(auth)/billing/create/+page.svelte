@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
 	import { untrack } from 'svelte'
 	import { goto } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import type { PageData } from './$types'
 
-	const { data } = $props()
+	const { data }: { data: PageData } = $props()
 
 	const billingAccount = $derived(data.billingAccount)
 
@@ -17,10 +18,7 @@
 
 	let saving = $state(false)
 
-	/**
-	 * @param {Event} e
-	 */
-	async function save (e) {
+	async function save (e: Event) {
 		e.preventDefault()
 
 		if (saving) {
