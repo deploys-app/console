@@ -169,6 +169,8 @@ declare namespace Api {
             cname: string[]
         }
         status: 'pending' | 'success' | 'error' | 'verify'
+        certStatus: 'none' | 'pendingCreate' | 'created' | 'pendingDelete'
+        certPendingSince?: string
         createdAt: string
         createdBy: string
     }

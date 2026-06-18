@@ -304,6 +304,35 @@ const domains = [
 			cname: ['rcf2.deploys.app.']
 		},
 		status: 'success',
+		certStatus: 'created',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		location: LOCATION_ID,
+		domain: 'stuck.example.com',
+		wildcard: false,
+		verification: {
+			ownership: { type: 'TXT', name: '_deploys.stuck.example.com', value: 'verify=mock', errors: [] },
+			ssl: {
+				pending: true,
+				dcv: { name: '_acme-challenge.stuck.example.com', value: 'mock-dcv' },
+				records: [],
+				errors: []
+			},
+			dns: { verifiedAt: CREATED_AT, lastCheckedAt: CREATED_AT, errors: [] }
+		},
+		dnsConfig: {
+			ipv4: ['203.0.113.10'],
+			ipv6: ['2001:db8::10'],
+			cname: ['rcf2.deploys.app.']
+		},
+		status: 'success',
+		// DNS verified but the cert never issued — pending since long ago, so the
+		// console shows the "taking longer than expected" banner + Issuing chip.
+		certStatus: 'pendingCreate',
+		certPendingSince: CREATED_AT,
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	}
@@ -1220,7 +1249,10 @@ const handlers: Record<string, (args: any) => object> = {
 	}),
 
 	'domain.list': () => list(domains),
-	'domain.get': (args) => ok({ ...domains[0], domain: args?.domain ?? 'acme.example.com', location: args?.location ?? LOCATION_ID }),
+	'domain.get': (args) => {
+		const d = domains.find((x) => x.domain === args?.domain) ?? { ...domains[0], domain: args?.domain ?? 'acme.example.com' }
+		return ok({ ...d, location: args?.location ?? LOCATION_ID })
+	},
 	'domain.create': () => ok({}),
 	'domain.delete': () => ok({}),
 	'domain.purgeCache': () => ok({}),

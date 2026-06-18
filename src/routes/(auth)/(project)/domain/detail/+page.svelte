@@ -43,11 +43,30 @@
 	const hasSsl = $derived(sslRecords.length > 0 || !!ssl?.dcv?.name)
 	const hasAnyRecord = $derived(showConnect || hasOwnership || hasSsl)
 
+	// ─── Certificate status ───
+	// A cert normally issues in a minute or two; if it sits in pendingCreate for
+	// over an hour something is wrong (Let's Encrypt rate-limit, a CAA record, or
+	// a missing DCV CNAME) and it's heading toward the 24h reclaim — surface it.
+	const certPendingLong = $derived(
+		domain.certStatus === 'pendingCreate' &&
+		!!domain.certPendingSince &&
+		Date.now() - new Date(domain.certPendingSince).getTime() > 60 * 60 * 1000
+	)
+	const cert = $derived.by(() => {
+		switch (domain.certStatus) {
+		case 'created': return { show: true, tone: 'positive', icon: 'fa-solid fa-lock', label: 'Active' }
+		case 'pendingCreate': return { show: true, tone: certPendingLong ? 'warning' : 'info', icon: 'fa-solid fa-certificate', label: 'Issuing' }
+		case 'pendingDelete': return { show: true, tone: 'muted', icon: 'fa-solid fa-lock-open', label: 'Removing' }
+		default: return { show: false, tone: 'muted', icon: '', label: '' }
+		}
+	})
+
 	// ─── Status banner ───
 	const banner = $derived.by(() => {
 		if (domain.status === 'error') return { tone: 'negative', icon: 'fa-solid fa-circle-exclamation', title: 'DNS verification failed' }
 		if (domain.status !== 'success') return { tone: 'warning', icon: 'fa-solid fa-clock', title: domain.wildcard ? 'Waiting for ownership record' : 'Waiting for DNS' }
 		if (hasDnsErrors) return { tone: 'warning', icon: 'fa-solid fa-triangle-exclamation', title: 'DNS needs attention' }
+		if (certPendingLong) return { tone: 'warning', icon: 'fa-solid fa-certificate', title: 'Certificate is taking longer than expected' }
 		return { tone: 'positive', icon: 'fa-solid fa-circle-check', title: 'Domain is active' }
 	})
 	const showDnsMeta = $derived(domain.verification?.dns?.verifiedAt || domain.verification?.dns?.lastCheckedAt)
@@ -273,6 +292,13 @@
 		font-variant-numeric: tabular-nums;
 		font-weight: 600;
 	}
+
+	/* Certificate-status tones for the overview rail value. */
+	.stat__value.cert-positive { color: hsl(var(--hsl-positive)); }
+	.stat__value.cert-warning { color: hsl(var(--hsl-warning)); }
+	.stat__value.cert-info { color: hsl(var(--hsl-info)); }
+	.stat__value.cert-muted { color: hsl(var(--hsl-content) / 0.55); }
+	.stat__value i { font-size: 0.85em; margin-right: 0.15rem; }
 
 	.stat__unit { color: var(--rail-fg-muted); }
 
@@ -555,6 +581,12 @@
 				<span class="stat__unit">Status</span>
 				<span class="stat__value">{headerStatus}</span>
 			</span>
+			{#if cert.show}
+				<span class="stat">
+					<span class="stat__unit">Certificate</span>
+					<span class="stat__value cert-{cert.tone}"><i class={cert.icon}></i> {cert.label}</span>
+				</span>
+			{/if}
 		</div>
 	</header>
 
@@ -592,6 +624,15 @@
 						<p>
 							The domain is verified, but our latest DNS check reported problems.
 							Review the errors below and confirm your records still match.
+						</p>
+					{:else if certPendingLong}
+						<p>
+							The domain is verified, but its TLS certificate hasn't finished
+							issuing. This usually means a Let's Encrypt rate-limit, a
+							<code>CAA</code> record blocking Let's Encrypt, or a missing
+							<code>_acme-challenge</code> record — check the <strong>TLS
+							certificate</strong> records below. If it can't issue within 24 hours
+							we reclaim it and keep re-trying automatically.
 						</p>
 					{:else}
 						<p>Your domain is verified and serving traffic.</p>
