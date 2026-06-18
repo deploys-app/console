@@ -3,6 +3,7 @@
 	import type { PageData } from './$types'
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
+	import EnvVarEditor from '$lib/components/EnvVarEditor.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { denyTooltip } from '$lib/permission'
 	import { setupCopy } from '$lib/clipboard'
@@ -31,6 +32,11 @@
 			.replace(/^-+|-+$/g, '')
 	}
 
+	interface EnvVar {
+		k: string
+		v: string
+	}
+
 	interface GenState {
 		repository: string | undefined
 		location: string
@@ -43,13 +49,31 @@
 		spa: boolean
 		notFound: string
 		workingDirectory: string
-		env: string
+		env: EnvVar[]
 		envGroups: string[]
 		pullSecret: string
 		protocol: string
 		requireGoogleLogin: boolean
 		allowedEmails: string
 		allowedDomains: string
+	}
+
+	// The workflow config persists env as a newline `KEY=VALUE` string; the
+	// EnvVarEditor works in structured rows. Convert at those two boundaries,
+	// mirroring the editor's own parse so the round-trip stays consistent.
+	function parseEnv (text: string): EnvVar[] {
+		return text
+			.split('\n')
+			.filter((t) => t.length > 0)
+			.map((t) => t.split('='))
+			.map(([k, ...v]) => ({ k, v: v.join('=') }))
+	}
+
+	function envToText (entries: EnvVar[]): string {
+		return entries
+			.filter((e) => e.k.trim())
+			.map(({ k, v }) => `${k}=${v}`)
+			.join('\n')
 	}
 
 	// Default generator state for a repository with no saved config.
@@ -66,7 +90,7 @@
 			spa: false,
 			notFound: '404.html',
 			workingDirectory: '',
-			env: '',
+			env: [],
 			envGroups: [],
 			pullSecret: '',
 			protocol: 'http',
@@ -98,7 +122,7 @@
 			spa: cfg.spa ?? d.spa,
 			notFound: cfg.notFound || d.notFound,
 			workingDirectory: cfg.workingDirectory ?? d.workingDirectory,
-			env: cfg.env ?? d.env,
+			env: cfg.env != null ? parseEnv(cfg.env) : d.env,
 			envGroups: cfg.envGroups ? [...cfg.envGroups] : d.envGroups,
 			pullSecret: cfg.pullSecret ?? d.pullSecret,
 			protocol: cfg.protocol || d.protocol,
@@ -350,7 +374,10 @@
 
 		// env / envGroups are container-only — static has no pod.
 		if (gen.buildType === 'dockerfile') {
-			const envLines = gen.env.split('\n').map((l) => l.trim()).filter(Boolean)
+			const envLines = gen.env
+				.map(({ k, v }) => ({ k: k.trim(), v }))
+				.filter((e) => e.k)
+				.map((e) => `${e.k}=${e.v}`)
 			if (envLines.length) {
 				out.push('        env: |')
 				for (const l of envLines) out.push(`          ${l}`)
@@ -432,7 +459,7 @@ ${withBlock()}
 			spa: gen.spa,
 			notFound: gen.notFound,
 			workingDirectory: gen.workingDirectory,
-			env: gen.env,
+			env: envToText(gen.env),
 			envGroups: [...gen.envGroups],
 			pullSecret: gen.pullSecret,
 			requireGoogleLogin: gen.requireGoogleLogin,
@@ -617,11 +644,8 @@ ${withBlock()}
 					</div>
 
 					<div class="field">
-						<label for="gen-env">Environment variables</label>
-						<div class="textarea">
-							<textarea id="gen-env" class="font-mono" rows="4" bind:value={gen.env} placeholder="KEY=value&#10;ANOTHER=thing"></textarea>
-						</div>
-						<span class="helper">One <span class="font-mono">KEY=VALUE</span> per line.</span>
+						<span class="label">Environment variables</span>
+						<EnvVarEditor bind:entries={gen.env} />
 					</div>
 
 					<div class="field">

@@ -24,6 +24,14 @@
 		envText = toText(entries)
 	}
 
+	// Re-snapshot the text mirror when `entries` is replaced from outside (e.g. a
+	// parent form switching to a different record) so opening the text editor
+	// later shows current values, not stale ones. Skip while it's open so we
+	// never clobber in-progress typing.
+	$effect(() => {
+		if (!showText) envText = toText(entries)
+	})
+
 	// Parse the text editor back into rows, dropping blank lines.
 	function parseText () {
 		entries = envText
