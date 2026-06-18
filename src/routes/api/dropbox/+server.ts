@@ -4,6 +4,7 @@ export const POST: RequestHandler = async ({ locals, request, url }) => {
 	const token = locals.token
 	const project = url.searchParams.get('project')
 	const filename = url.searchParams.get('filename') ?? ''
+	const ttl = url.searchParams.get('ttl') ?? ''
 
 	if (!token || !project) {
 		return new Response(JSON.stringify({
@@ -26,6 +27,9 @@ export const POST: RequestHandler = async ({ locals, request, url }) => {
 	}
 	if (filename) {
 		headers['param-filename'] = filename
+	}
+	if (ttl) {
+		headers['param-ttl'] = ttl
 	}
 
 	const resp = await fetch('https://dropbox.deploys.app/', {
