@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { podPrefixStripper } from '$lib/deployment/podName'
+	import DeploymentPodErrors from '$lib/deployment/DeploymentPodErrors.svelte'
 	import type { PageData } from './$types'
 
 	interface DeploymentEvent {
@@ -410,6 +411,13 @@
 		}
 	}
 </style>
+
+<DeploymentPodErrors
+	url={deployment.errorsUrl}
+	status={deployment.status}
+	action={deployment.action}
+	type={deployment.type}
+	internalAddress={deployment.internalAddress} />
 
 <div class="events-shell">
 	<header class="events-rail">
