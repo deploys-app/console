@@ -15,6 +15,12 @@ const HEALTHY_STATUS_URL =
 	'data:application/json,' +
 	encodeURIComponent(JSON.stringify({ count: 1, ready: 1, succeeded: 0, failed: 0 }))
 
+// An unhealthy pod status (no ready pod) for the erroring deployment fixture,
+// so its status icon resolves to the warning state offline.
+const UNHEALTHY_STATUS_URL =
+	'data:application/json,' +
+	encodeURIComponent(JSON.stringify({ count: 2, ready: 0, succeeded: 0, failed: 1 }))
+
 const ok = <T>(result: T = ({} as T)): { ok: true, result: T } => ({ ok: true, result })
 
 const err = (message: string): { ok: false, error: { message: string } } => ({ ok: false, error: { message } })
@@ -160,6 +166,9 @@ function deployment (project = 'acme') {
 		eventUrl: '/api/mock-events?t=mock',
 		podsUrl: '',
 		statusUrl: HEALTHY_STATUS_URL,
+		// Healthy deployments report no error pods; '' means the UI never fetches.
+		// The erroring 'api' fixture below overrides this with a live mock feed.
+		errorsUrl: '',
 		address: '203.0.113.10',
 		// `<kubeName>-<projectID>` (the in-cluster service name); id-named here so
 		// the logs/events pages exercise pod-name prefix stripping.
@@ -205,8 +214,22 @@ function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
 	}
 }
 
+// An erroring WebService: crash-looping, no ready pod. errorsUrl points at the
+// mock /errors feed so the masthead strip + Events Pod Health card render
+// offline; UNHEALTHY_STATUS_URL drives the warning status icon.
+function erroringDeployment (project = 'acme') {
+	return {
+		...deployment(project),
+		name: 'api',
+		status: 'error',
+		statusUrl: UNHEALTHY_STATUS_URL,
+		errorsUrl: '/api/mock-errors?t=mock'
+	}
+}
+
 const deployments = [
 	deployment('acme'),
+	erroringDeployment('acme'),
 	staticDeployment('acme'),
 	{
 		...deployment('acme'),
@@ -1126,6 +1149,9 @@ const handlers: Record<string, (args: any) => object> = {
 			if (!revision || revision >= base.revision) return ok(base)
 			const sha = `${revision}`.repeat(64).slice(0, 64)
 			return ok({ ...base, revision, site: `site://deploys-static/${args?.project ?? 'acme'}/website@${sha}`, siteManifestDigest: sha })
+		}
+		if (args?.name === 'api') {
+			return ok({ ...erroringDeployment(args?.project), location: args?.location ?? LOCATION_ID })
 		}
 		const base = { ...deployment(args?.project), name: args?.name ?? 'web', location: args?.location ?? LOCATION_ID }
 		const revision = Number(args?.revision ?? 0)

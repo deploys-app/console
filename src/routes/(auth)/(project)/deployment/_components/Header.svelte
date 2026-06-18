@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
+	import DeploymentPodErrors from '$lib/deployment/DeploymentPodErrors.svelte'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
@@ -400,4 +401,12 @@
 			<span class="meta__value">#{deployment.revision}</span>
 		</span>
 	</div>
+
+	<DeploymentPodErrors
+		compact
+		url={deployment.errorsUrl}
+		status={deployment.status}
+		action={deployment.action}
+		type={deployment.type}
+		internalAddress={deployment.internalAddress} />
 </div>

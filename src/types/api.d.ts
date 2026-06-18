@@ -80,6 +80,20 @@ declare namespace Api {
         failed: number
     }
 
+    export type PodError = {
+        name: string
+        phase: string
+        ready: boolean
+        restartCount: number
+        waitingReason?: string
+        waitingMessage?: string
+        terminatedReason?: string
+        terminatedExitCode?: number
+        lastTerminatedReason?: string
+        lastTerminatedExitCode?: number
+        message?: string
+    }
+
     export type RouteConfig = {
         basicAuth?: {
             user: string
@@ -345,6 +359,7 @@ declare namespace Api {
         eventUrl: string
         podsUrl: string
         statusUrl: string
+        errorsUrl: string
         address: string
         internalAddress: string
         status: DeploymentStatus
