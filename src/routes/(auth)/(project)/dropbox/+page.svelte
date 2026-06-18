@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
+	import Select from '$lib/components/Select.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -18,6 +19,18 @@
 	let justCopied = $state('')
 
 	let selectedFile = $state<File | null>(null)
+
+	// Download lifetime in days (1-7); the dropbox service defaults to 1.
+	const ttlOptions = [
+		{ value: '1', label: '1 day' },
+		{ value: '2', label: '2 days' },
+		{ value: '3', label: '3 days' },
+		{ value: '4', label: '4 days' },
+		{ value: '5', label: '5 days' },
+		{ value: '6', label: '6 days' },
+		{ value: '7', label: '7 days' }
+	]
+	let ttl = $state('1')
 
 	onMount(() => {
 		const clip = new ClipboardJS('.copy-url')
@@ -79,7 +92,7 @@
 		uploading = true
 		error = ''
 		try {
-			const resp = await fetch(`/api/dropbox?project=${project}&filename=${encodeURIComponent(file.name)}`, {
+			const resp = await fetch(`/api/dropbox?project=${project}&filename=${encodeURIComponent(file.name)}&ttl=${ttl}`, {
 				method: 'POST',
 				body: file
 			})
@@ -331,7 +344,11 @@
 			</div>
 		{/if}
 
-		<div class="flex gap-4 justify-end">
+		<div class="flex gap-4 justify-between items-end flex-wrap">
+			<div class="field mb-0 w-36">
+				<label class="label" for="dropbox-ttl">Expires after</label>
+				<Select id="dropbox-ttl" bind:value={ttl} options={ttlOptions} disabled={uploading} />
+			</div>
 			<button
 				class="button"
 				class:is-loading={uploading}
