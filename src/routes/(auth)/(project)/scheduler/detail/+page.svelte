@@ -14,8 +14,17 @@
 	const job = $derived(data.job)
 	const invocations = $derived(data.invocations)
 	const headerEntries = $derived(Object.entries(job.headers ?? {}))
+	const hasPending = $derived(invocations.some((inv) => inv.result === 'pending'))
 
 	let busy = $state(false)
+
+	// A manual run records a pending invocation and executes asynchronously, so
+	// poll the list while anything is still pending and stop once it resolves.
+	$effect(() => {
+		if (!hasPending) return
+		const t = setTimeout(() => { invalidateAll() }, 3000)
+		return () => clearTimeout(t)
+	})
 
 	async function setPaused (paused: boolean) {
 		if (busy) return
@@ -42,12 +51,9 @@
 				modal.error({ error: resp.error })
 				return
 			}
-			const inv = resp.result
-			if (inv?.result === 'success') {
-				modal.success({ content: `Ran "${job.name}" — HTTP ${inv.httpStatus} in ${inv.latencyMs} ms` })
-			} else {
-				modal.error({ error: `Run failed: ${inv?.error || `HTTP ${inv?.httpStatus ?? ''}`}` })
-			}
+			// The run executes asynchronously — trigger only records a pending
+			// invocation. Reload the log so it shows up; the poll above refreshes it
+			// until it resolves to success/failed.
 			await invalidateAll()
 		} finally {
 			busy = false
@@ -190,14 +196,16 @@
 						<tr>
 							<td><span title={format.datetime(inv.startedAt)}>{format.fromNow(inv.startedAt)}</span></td>
 							<td>
-								{#if inv.result === 'success'}
+								{#if inv.result === 'pending'}
+									<span class="inline-flex items-center text-content/60"><StatusIcon status="pending" />Running</span>
+								{:else if inv.result === 'success'}
 									<span class="inline-flex items-center text-positive/80"><StatusIcon status="success" />Success</span>
 								{:else}
 									<span class="inline-flex items-center text-negative/80"><StatusIcon status="error" />Failed</span>
 								{/if}
 							</td>
 							<td>{inv.httpStatus > 0 ? inv.httpStatus : '—'}</td>
-							<td class="tabular-nums">{inv.latencyMs} ms</td>
+							<td class="tabular-nums">{inv.result === 'pending' ? '—' : `${inv.latencyMs} ms`}</td>
 							<td class="wrap-anywhere text-content/70">{inv.error || ''}</td>
 						</tr>
 					{:else}

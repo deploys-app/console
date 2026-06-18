@@ -736,7 +736,7 @@ declare namespace Api {
     export type SchedulerInvocation = {
         id: string
         startedAt: string
-        result: 'success' | 'failed'
+        result: 'pending' | 'success' | 'failed'
         httpStatus: number
         latencyMs: number
         error: string

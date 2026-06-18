@@ -659,6 +659,7 @@ const schedulerJobs = [
 ]
 
 const schedulerInvocations = [
+	{ id: '4', startedAt: CREATED_AT, result: 'pending', httpStatus: 0, latencyMs: 0, error: '' },
 	{ id: '3', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 142, error: '' },
 	{ id: '2', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 158, error: '' },
 	{ id: '1', startedAt: CREATED_AT, result: 'failed', httpStatus: 500, latencyMs: 88, error: 'unexpected status 500' }
@@ -1317,7 +1318,7 @@ const handlers: Record<string, (args: any) => object> = {
 	'scheduler.delete': () => ok({}),
 	'scheduler.pause': () => ok({}),
 	'scheduler.resume': () => ok({}),
-	'scheduler.trigger': () => ok({ id: '99', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 134, error: '' }),
+	'scheduler.trigger': () => ok({ id: '99', startedAt: CREATED_AT, result: 'pending', httpStatus: 0, latencyMs: 0, error: '' }),
 	'scheduler.logs': () => list(schedulerInvocations),
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
