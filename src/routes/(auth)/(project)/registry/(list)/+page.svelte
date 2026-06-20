@@ -5,6 +5,7 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import RegistryGcModal from '$lib/components/RegistryGcModal.svelte'
 	import * as modal from '$lib/modal'
+	import * as format from '$lib/format'
 	import api from '$lib/api'
 
 	const { data }: { data: PageData } = $props()
@@ -55,6 +56,9 @@
 			<thead>
 				<tr>
 					<th>Repository</th>
+					<th class="is-collapse is-align-right">Manifests</th>
+					<th class="is-collapse is-align-right">Tags</th>
+					<th class="is-collapse is-align-right">Size</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
@@ -67,6 +71,9 @@
 								{repo.name}
 							</a>
 						</td>
+						<td class="is-align-right">{format.count(repo.manifests)}</td>
+						<td class="is-align-right">{format.count(repo.tags)}</td>
+						<td class="is-align-right">{format.storage(repo.size)}</td>
 						<td>
 							<GuardedButton permission="registry.push" class="icon-button" aria-label="Remove" onclick={() => deleteRepository(repo.name)}>
 								<i class="fa-solid fa-trash-alt"></i>
@@ -74,8 +81,8 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={2} list={repositories} />
-				<ErrorRow span={2} {error} />
+				<NoDataRow span={5} list={repositories} />
+				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>
 	</div>

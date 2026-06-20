@@ -29,7 +29,7 @@ export function memory (v: string): string {
 }
 
 export function storage (v: number): string {
-	return (v / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
+	return ((v ?? 0) / 1024 / 1024 / 1024).toLocaleString(undefined, { maximumFractionDigits: 2 }) + ' GiB'
 }
 
 const compactNumber = new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 })

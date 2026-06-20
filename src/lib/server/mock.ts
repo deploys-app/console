@@ -913,8 +913,8 @@ const auditLogItems = (() => {
 })()
 
 const repositories = [
-	{ name: 'acme/web', size: 184320000, createdAt: CREATED_AT },
-	{ name: 'acme/worker', size: 92160000, createdAt: CREATED_AT }
+	{ name: 'acme/web', size: 184320000, manifests: 12, tags: 8, createdAt: CREATED_AT },
+	{ name: 'acme/worker', size: 92160000, manifests: 5, tags: 3, createdAt: CREATED_AT }
 ]
 
 const repositoryTags = [
