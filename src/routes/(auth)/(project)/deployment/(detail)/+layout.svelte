@@ -15,7 +15,12 @@
 	// those tabs (the metrics tab stays but drops the pod-only charts).
 	// Routes only make sense for the deployment types that can be the target
 	// of a `deployment://` route — matches the filter in /route/create.
-	const canHaveRoutes = $derived(deployment.type === 'WebService' || deployment.type === 'Static')
+	// Auto-delete (TTL) deployments are excluded: routes cannot be set on them
+	// (the deploy form says as much), so the tab would only lead to dead ends.
+	// ttl: 0 = none, > 0 = expires after the duration, -1 = expired / pending deletion.
+	const canHaveRoutes = $derived(
+		(deployment.type === 'WebService' || deployment.type === 'Static') && deployment.ttl === 0
+	)
 	const tabs = $derived([
 		{ label: 'Metrics', path: '/deployment/metrics' },
 		{ label: 'Details', path: '/deployment/detail' },
