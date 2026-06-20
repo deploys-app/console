@@ -480,6 +480,7 @@ declare namespace Api {
     export type RepositoryTag = {
         tag: string
         digest: string
+        size: number
         createdAt: string
     }
 
@@ -489,6 +490,7 @@ declare namespace Api {
 
     export type RepositoryManifest = {
         digest: string
+        size: number
         createdAt: string
     }
 

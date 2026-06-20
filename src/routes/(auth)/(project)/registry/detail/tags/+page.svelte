@@ -42,6 +42,7 @@
 		<tr>
 			<th>Tag</th>
 			<th>Digest</th>
+			<th class="is-align-right">Size</th>
 			<th>Created At</th>
 			<th class="is-collapse"></th>
 		</tr>
@@ -61,6 +62,7 @@
 							<i class="fa-light fa-copy"></i>
 						</span>
 					</td>
+					<td class="is-align-right">{format.storage(tag.size)}</td>
 					<td>{format.datetime(tag.createdAt)}</td>
 					<td>
 						<GuardedButton permission="registry.push" class="icon-button" aria-label="Untag" onclick={() => untagTag(tag.tag)}>
@@ -69,8 +71,8 @@
 					</td>
 				</tr>
 			{/each}
-			<NoDataRow span={4} list={tags} />
-			<ErrorRow span={4} {error} />
+			<NoDataRow span={5} list={tags} />
+			<ErrorRow span={5} {error} />
 		</tbody>
 	</table>
 </div>

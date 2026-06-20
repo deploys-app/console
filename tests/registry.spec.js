@@ -44,4 +44,33 @@ test.describe('registry', () => {
 		// api: forbidden flips to a permission message via api.invoke
 		await expect(main.getByText(/don't have permission/i)).toBeVisible()
 	})
+
+	test('tags tab shows per-tag size', async ({ page }) => {
+		await setMocks({
+			'registry.get': { ok: true, result: { ...sampleRepository, name: 'web' } },
+			'registry.getTags': {
+				ok: true,
+				result: { name: 'web', items: [{ tag: 'latest', digest: 'sha256:1111111111111111', size: 184320000, createdAt: sampleRepository.createdAt }] }
+			}
+		})
+		await page.goto('/registry/detail/tags?project=test-project&repository=web')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('columnheader', { name: 'Size' })).toBeVisible()
+		const row = main.getByRole('row').filter({ hasText: 'latest' })
+		await expect(row.getByRole('cell', { name: '0.17 GiB' })).toBeVisible()
+	})
+
+	test('manifests tab shows per-manifest size', async ({ page }) => {
+		await setMocks({
+			'registry.get': { ok: true, result: { ...sampleRepository, name: 'web' } },
+			'registry.getManifests': {
+				ok: true,
+				result: { name: 'web', items: [{ digest: 'sha256:2222222222222222', size: 156237824, createdAt: sampleRepository.createdAt }] }
+			}
+		})
+		await page.goto('/registry/detail/manifests?project=test-project&repository=web')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('columnheader', { name: 'Size' })).toBeVisible()
+		await expect(main.getByRole('cell', { name: '0.15 GiB' })).toBeVisible()
+	})
 })
