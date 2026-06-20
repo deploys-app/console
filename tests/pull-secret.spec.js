@@ -1,4 +1,4 @@
-import { test, expect, setMocks } from './helpers.js'
+import { test, expect, setMocks, pickSelect } from './helpers.js'
 import { samplePullSecret } from './fixtures/mocks.js'
 
 test.describe('pull secrets', () => {
@@ -21,5 +21,74 @@ test.describe('pull secrets', () => {
 		await page.goto('/pull-secret?project=test-project')
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('Nothing here yet')).toBeVisible()
+	})
+
+	test('surfaces an API error in the list', async ({ page }) => {
+		await setMocks({
+			'pullSecret.list': { ok: false, error: { message: 'api: internal error' } }
+		})
+		await page.goto('/pull-secret?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('api: internal error')).toBeVisible()
+	})
+
+	test('shows a permission message when the list is forbidden', async ({ page }) => {
+		await setMocks({
+			'pullSecret.list': { ok: false, error: { message: 'iam: forbidden' } }
+		})
+		await page.goto('/pull-secret?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText("You don't have permission to view data")).toBeVisible()
+	})
+
+	test('gates the create button when the create permission is missing', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['pullsecret.list'], admin: false } }
+		})
+		await page.goto('/pull-secret?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('button', { name: 'Create' })).toBeDisabled()
+		await expect(main.getByRole('link', { name: 'Create' })).toHaveCount(0)
+	})
+})
+
+test.describe('pull secret — create', () => {
+	test('rejects an invalid server URL before calling the API', async ({ page }) => {
+		await page.goto('/pull-secret/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await main.locator('#input-name').fill('gcr')
+		await pickSelect(page, 'input-location', 'gke')
+		// Replace the valid default with a non-URL value to trip client validation.
+		await main.locator('#input-server').fill('not a url')
+		await main.getByRole('button', { name: 'Save' }).click()
+
+		await expect(page.locator('.swal2-popup')).toBeVisible()
+		await expect(page.locator('.swal2-html-container')).toContainText('server must be an url')
+	})
+
+	test('shows the API error in a modal when create fails', async ({ page }) => {
+		await setMocks({
+			'pullSecret.create': { ok: false, error: { message: 'api: pull secret already exists' } }
+		})
+
+		await page.goto('/pull-secret/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await main.locator('#input-name').fill('gcr')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'Save' }).click()
+
+		await expect(page.locator('.swal2-popup')).toBeVisible()
+		await expect(page.locator('.swal2-html-container')).toContainText('api: pull secret already exists')
+	})
+
+	test('disables Save when the create permission is missing', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['pullsecret.list'], admin: false } }
+		})
+		await page.goto('/pull-secret/create?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('button', { name: 'Save' })).toBeDisabled()
 	})
 })
