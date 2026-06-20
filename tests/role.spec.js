@@ -24,6 +24,38 @@ test.describe('roles', () => {
 		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 
+	// Regression: the create page's assignable-permission catalog is returned
+	// under `allPermissions`, not `permissions`, so it no longer shadows the
+	// layout's effective-grants in $page.data. The guarded Create button must
+	// therefore reflect the caller's grants, independent of the catalog contents.
+	test('create button reflects grants, not the permission catalog', async ({ page }) => {
+		// Grants WITHOUT role.create, but a catalog that DOES list it. Pre-fix the
+		// catalog shadowed the grants and the button rendered enabled; now it's
+		// gated by the missing grant.
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['role.list'], admin: false } },
+			'role.permissions': { ok: true, result: ['role.create', 'deployment.list'] }
+		})
+
+		await page.goto('/role/create?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Create role' })).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Create', exact: true })).toBeDisabled()
+	})
+
+	test('create button is enabled with the grant even if the catalog omits it', async ({ page }) => {
+		// Grant present (default '*'); catalog deliberately omits role.create —
+		// proving the button is driven by grants, not catalog membership.
+		await setMocks({
+			'role.permissions': { ok: true, result: ['deployment.list'] }
+		})
+
+		await page.goto('/role/create?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Create role' })).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Create', exact: true })).toBeEnabled()
+	})
+
 	test('searchable permission picker filters, adds, and resets', async ({ page }) => {
 		await setMocks({
 			'role.permissions': {
