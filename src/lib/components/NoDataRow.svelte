@@ -8,6 +8,11 @@
 		hint?: string
 		ctaLabel?: string
 		ctaHref?: string
+		/**
+		 * When the load errored, the paired ErrorRow owns the message — suppress
+		 * the empty-state so the two don't stack ("Nothing here yet" + the error).
+		 */
+		error?: unknown
 	}
 
 	const {
@@ -17,11 +22,12 @@
 		message = 'Nothing here yet',
 		hint = '',
 		ctaLabel = '',
-		ctaHref = ''
+		ctaHref = '',
+		error = undefined
 	}: Props = $props()
 </script>
 
-{#if !list?.length}
+{#if !error && !list?.length}
 	<tr class="no-data-row">
 		<td colspan={span}>
 			<div class="empty">

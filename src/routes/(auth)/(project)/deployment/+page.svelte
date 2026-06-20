@@ -193,7 +193,8 @@
 						message="No deployments yet"
 						hint="Deploy a container image to get started."
 						ctaLabel="Deploy"
-						ctaHref={`/deployment/deploy?project=${project}`} />
+						ctaHref={`/deployment/deploy?project=${project}`}
+						{error} />
 				{/if}
 				<ErrorRow span={5} {error} />
 			</tbody>

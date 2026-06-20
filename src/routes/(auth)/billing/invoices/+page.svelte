@@ -64,7 +64,7 @@
 						<td>{format.datetime(it.issuedAt)}</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={invoices} />
+				<NoDataRow span={5} list={invoices} {error} />
 				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>

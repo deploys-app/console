@@ -24,6 +24,56 @@ test.describe('roles', () => {
 		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 
+	test('surfaces an API error in the list', async ({ page }) => {
+		await setMocks({
+			'role.list': { ok: false, error: { message: 'api: internal error' } }
+		})
+		await page.goto('/role?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
+	})
+
+	test('shows a permission message when the list is forbidden', async ({ page }) => {
+		await setMocks({
+			'role.list': { ok: false, error: { message: 'iam: forbidden' } }
+		})
+		await page.goto('/role?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText("You don't have permission to view data")).toBeVisible()
+	})
+
+	test('gates the create button when the create permission is missing', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['role.list'], admin: false } }
+		})
+		await page.goto('/role?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('button', { name: 'Create' })).toBeDisabled()
+		await expect(main.getByRole('link', { name: 'Create' })).toHaveCount(0)
+	})
+
+	test('shows the API error in a modal when create fails', async ({ page }) => {
+		await setMocks({
+			// role.permissions is the assignable-permission catalog; the create
+			// page returns it under `permissions`, which shadows the layout's
+			// effective-grants in $page.data — so it must include 'role.create'
+			// for the guarded submit button to render enabled.
+			'role.permissions': { ok: true, result: ['role.create', 'deployment.list'] },
+			'role.create': { ok: false, error: { message: 'api: role already exists' } }
+		})
+
+		await page.goto('/role/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await main.locator('#input-role').fill('developer')
+		await main.locator('#input-name').fill('Developer')
+		await main.getByRole('button', { name: 'Create', exact: true }).click()
+
+		await expect(page.locator('.swal2-popup')).toBeVisible()
+		await expect(page.locator('.swal2-html-container')).toContainText('api: role already exists')
+	})
+
 	test('searchable permission picker filters, adds, and resets', async ({ page }) => {
 		await setMocks({
 			'role.permissions': {
