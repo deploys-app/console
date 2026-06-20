@@ -494,6 +494,21 @@ declare namespace Api {
         List<RepositoryManifest>
         & { name: string }
 
+    export type RegistryGcRepository = {
+        repository: string
+        manifests: string[]
+        tags: string[]
+        size: number
+    }
+
+    export type RegistryGcResult = {
+        dryRun: boolean
+        removedManifests: number
+        removedTags: number
+        reclaimedSize: number
+        repositories: RegistryGcRepository[]
+    }
+
     export type AuditActorType = 'User' | 'ServiceAccount'
 
     export type AuditOutcome = 'success' | 'failure'

@@ -1540,7 +1540,17 @@ const handlers: Record<string, (args: any) => object> = {
 	'registry.getManifests': (args) => ok({ name: args?.repository ?? repositories[0].name, items: repositoryManifests }),
 	'registry.delete': () => ok({}),
 	'registry.deleteManifest': () => ok({}),
-	'registry.untag': () => ok({})
+	'registry.untag': () => ok({}),
+	'registry.gc': (args) => ok({
+		dryRun: !!args?.dryRun,
+		removedManifests: 3,
+		removedTags: 2,
+		reclaimedSize: 61440000,
+		repositories: [
+			{ repository: 'acme/web', manifests: ['sha256:aaaa', 'sha256:bbbb'], tags: ['old-staging'], size: 40960000 },
+			{ repository: 'acme/worker', manifests: ['sha256:cccc'], tags: ['v0.9.0'], size: 20480000 }
+		]
+	})
 }
 
 /**
