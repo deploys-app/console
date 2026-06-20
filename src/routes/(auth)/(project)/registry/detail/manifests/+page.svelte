@@ -34,6 +34,7 @@
 		<thead>
 		<tr>
 			<th>Digest</th>
+			<th class="is-align-right">Size</th>
 			<th>Created At</th>
 			<th class="is-collapse"></th>
 		</tr>
@@ -42,6 +43,7 @@
 			{#each manifests as manifest (manifest.digest)}
 				<tr>
 					<td>{format.shortDigest(manifest.digest)}</td>
+					<td class="is-align-right">{format.storage(manifest.size)}</td>
 					<td>{format.datetime(manifest.createdAt)}</td>
 					<td>
 						<GuardedButton permission="registry.push" class="icon-button" aria-label="Delete" onclick={() => deleteManifest(manifest.digest)}>
@@ -50,8 +52,8 @@
 					</td>
 				</tr>
 			{/each}
-			<NoDataRow span={3} list={manifests} />
-			<ErrorRow span={3} {error} />
+			<NoDataRow span={4} list={manifests} />
+			<ErrorRow span={4} {error} />
 		</tbody>
 	</table>
 </div>
