@@ -30,7 +30,13 @@
 			</a>
 		</td>
 		<td><span class="type-badge" data-type={it.config.type}>{it.config.type}</span></td>
-		<td><span class="font-mono text-sm text-content/70 wrap-anywhere">{it.config.url}</span></td>
+		<td>
+			{#if it.config.type === 'pull'}
+				<span class="text-sm text-content/50">agent pull (no URL)</span>
+			{:else}
+				<span class="font-mono text-sm text-content/70 wrap-anywhere">{it.config.url}</span>
+			{/if}
+		</td>
 		<td>
 			{#if it.disabled}
 				<span class="inline-flex items-center gap-2 text-content/60"><i class="fa-solid fa-ban"></i> Disabled</span>
@@ -72,5 +78,10 @@
 	.type-badge[data-type='discord'] {
 		color: hsl(var(--hsl-accent, var(--hsl-primary)));
 		background-color: hsl(var(--hsl-accent, var(--hsl-primary)) / 0.12);
+	}
+
+	.type-badge[data-type='pull'] {
+		color: hsl(var(--hsl-positive));
+		background-color: hsl(var(--hsl-positive) / 0.12);
 	}
 </style>

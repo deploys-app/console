@@ -722,7 +722,7 @@ const notificationChannels = [
 		project: 'acme',
 		name: 'ops-webhook',
 		config: { type: 'webhook', url: 'https://hooks.example.com/deploys', insecureSkipVerify: false },
-		subscription: { resourceTypes: ['deployment'], actions: ['deploy', 'delete'], outcomes: [] },
+		subscription: { events: ['deployment.deploy', 'deployment.delete'], outcomes: [] },
 		disabled: false,
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL,
@@ -733,8 +733,19 @@ const notificationChannels = [
 		project: 'acme',
 		name: 'team-discord',
 		config: { type: 'discord', url: 'https://discord.com/api/webhooks/123/abc', insecureSkipVerify: false },
-		subscription: { resourceTypes: [], actions: [], outcomes: ['failure'] },
+		subscription: { events: [], outcomes: ['failure'] },
 		disabled: true,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'local-agent',
+		config: { type: 'pull', url: '', insecureSkipVerify: false, pullTtlSeconds: 900 },
+		subscription: { events: ['deployment.*'], outcomes: [] },
+		disabled: false,
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL,
 		updatedAt: CREATED_AT,
@@ -1418,6 +1429,7 @@ const handlers: Record<string, (args: any) => object> = {
 	'notification.delete': () => ok({}),
 	'notification.test': () => ok({ id: '', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 73, error: '' }),
 	'notification.deliveries': () => list(notificationDeliveries),
+	'notification.pull': () => ok({ project: 'acme', name: 'local-agent', events: [], cursor: 0, hasMore: false }),
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
 
