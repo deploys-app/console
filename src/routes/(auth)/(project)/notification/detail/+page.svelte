@@ -14,7 +14,7 @@
 	const deliveries = $derived(data.deliveries)
 
 	const sub = $derived(channel.subscription)
-	const noFilter = $derived(!sub.resourceTypes.length && !sub.actions.length && !sub.outcomes.length)
+	const noFilter = $derived(!sub.events.length && !sub.outcomes.length)
 
 	let busy = $state(false)
 	let testResult = $state<Api.NotificationDelivery | null>(null)
@@ -143,8 +143,7 @@
 				<p class="text-content/70">All changes (no filter).</p>
 			{:else}
 				<div class="grid gap-2">
-					<div class="sub-row"><span class="sub-key">Resource types</span><span class="sub-val">{sub.resourceTypes.length ? sub.resourceTypes.join(', ') : 'Any'}</span></div>
-					<div class="sub-row"><span class="sub-key">Actions</span><span class="sub-val">{sub.actions.length ? sub.actions.join(', ') : 'Any'}</span></div>
+					<div class="sub-row"><span class="sub-key">Events</span><span class="sub-val">{sub.events.length ? sub.events.join(', ') : 'Any'}</span></div>
 					<div class="sub-row"><span class="sub-key">Outcomes</span><span class="sub-val">{sub.outcomes.length ? sub.outcomes.join(', ') : 'Any'}</span></div>
 				</div>
 			{/if}

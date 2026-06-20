@@ -795,8 +795,8 @@ declare namespace Api {
     }
 
     export type NotificationSubscription = {
-        resourceTypes: string[]
-        actions: string[]
+        // "<resource>.<action>" patterns: *, deployment.*, *.delete, deployment.deploy. [] = all.
+        events: string[]
         outcomes: string[]
     }
 

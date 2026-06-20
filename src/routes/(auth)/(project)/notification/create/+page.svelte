@@ -20,18 +20,16 @@
 		{ value: 'pull', label: 'Pull (agent)' }
 	]
 
-	// Known values for the subscription axes, surfaced as click-to-add suggestions
-	// so the user isn't typing blind. The axes still accept any string (forward-
-	// compatible with new resource types / actions), so these are hints, not a
-	// closed set.
-	const RESOURCE_TYPE_SUGGESTIONS = [
-		'deployment', 'route', 'domain', 'disk', 'database', 'pull-secret',
-		'registry', 'role', 'service-account', 'workload-identity', 'env-group',
-		'scheduler', 'notification'
-	]
-	const ACTION_SUGGESTIONS = [
-		'create', 'update', 'delete', 'deploy', 'rollback', 'restart',
-		'pause', 'resume', 'grant', 'revoke'
+	// An event is a "<resource>.<action>" pattern (the IAM permission grammar plus
+	// a leading "*." form). Surface common patterns as click-to-add suggestions so
+	// the user isn't typing blind; the field still accepts any pattern (forward-
+	// compatible with new resources / actions). Grouped by resource wildcards,
+	// action wildcards, and a couple of exact pairs.
+	const EVENT_SUGGESTIONS = [
+		'*',
+		'deployment.*', 'route.*', 'domain.*', 'role.*', 'scheduler.*',
+		'*.create', '*.update', '*.delete',
+		'deployment.deploy', 'role.grant'
 	]
 	const OUTCOME_SUGGESTIONS = ['success', 'failure']
 
@@ -44,13 +42,12 @@
 		secret: '',
 		insecureSkipVerify: channel?.config?.insecureSkipVerify ?? false,
 		pullTtlSeconds: (channel?.config?.pullTtlSeconds ?? null) as number | null,
-		resourceTypes: channel?.subscription?.resourceTypes ?? [],
-		actions: channel?.subscription?.actions ?? [],
+		events: channel?.subscription?.events ?? [],
 		outcomes: channel?.subscription?.outcomes ?? [],
 		disabled: channel?.disabled ?? false
 	})))
 
-	type AxisKey = 'resourceTypes' | 'actions' | 'outcomes'
+	type AxisKey = 'events' | 'outcomes'
 	function addAxisValue (key: AxisKey, value: string) {
 		if (!form[key].includes(value)) form[key] = [...form[key], value]
 	}
@@ -92,8 +89,7 @@
 				name: form.name,
 				config,
 				subscription: {
-					resourceTypes: form.resourceTypes,
-					actions: form.actions,
+					events: form.events,
 					outcomes: form.outcomes
 				},
 				disabled: form.disabled
@@ -203,35 +199,27 @@
 		<div>
 			<h6><strong>Subscription</strong></h6>
 			<p class="text-content/50 text-sm mt-1">
-				Pick the changes this channel receives. A change is delivered only when it matches on
-				<em>every</em> axis you set; <strong>leave an axis empty to match all of it</strong>. An empty
-				subscription receives every change.
+				Pick the changes this channel receives. A change is delivered only when it matches an
+				<em>event</em> <strong>and</strong> an outcome you set; <strong>leave an axis empty to match all of it</strong>.
+				An empty subscription receives every change.
 			</p>
 		</div>
 
 		<div class="field">
-			<label for="input-resourceTypes">Resource types</label>
-			<TagInput id="input-resourceTypes" bind:tags={form.resourceTypes} placeholder="Click a suggestion below, or type a resource type…" />
+			<label for="input-events">Events</label>
+			<TagInput id="input-events" bind:tags={form.events} placeholder="Click a suggestion below, or type a resource.action pattern…" />
 			<div class="suggestions">
-				{#each RESOURCE_TYPE_SUGGESTIONS.filter((s) => !form.resourceTypes.includes(s)) as s (s)}
-					<button type="button" class="suggestion" onclick={() => addAxisValue('resourceTypes', s)}>
+				{#each EVENT_SUGGESTIONS.filter((s) => !form.events.includes(s)) as s (s)}
+					<button type="button" class="suggestion" onclick={() => addAxisValue('events', s)}>
 						<i class="fa-solid fa-plus"></i> {s}
 					</button>
 				{/each}
 			</div>
-			<p class="text-content/50 text-sm mt-1">The kind of resource that changed — e.g. a <code>deployment</code> deploy, a <code>domain</code> edit, a <code>role</code> grant.</p>
-		</div>
-		<div class="field">
-			<label for="input-actions">Actions</label>
-			<TagInput id="input-actions" bind:tags={form.actions} placeholder="Click a suggestion below, or type an action…" />
-			<div class="suggestions">
-				{#each ACTION_SUGGESTIONS.filter((s) => !form.actions.includes(s)) as s (s)}
-					<button type="button" class="suggestion" onclick={() => addAxisValue('actions', s)}>
-						<i class="fa-solid fa-plus"></i> {s}
-					</button>
-				{/each}
-			</div>
-			<p class="text-content/50 text-sm mt-1">What happened to it — most resources use <code>create</code>/<code>update</code>/<code>delete</code>; deployments also use <code>deploy</code>, roles use <code>grant</code>/<code>revoke</code>.</p>
+			<p class="text-content/50 text-sm mt-1">
+				A <code>resource.action</code> pattern — what changed. Use <code>*</code> for everything,
+				<code>deployment.*</code> for any deployment change, <code>*.delete</code> for any delete, or
+				<code>deployment.deploy</code> for an exact pair. Add several to match any of them.
+			</p>
 		</div>
 		<div class="field">
 			<label for="input-outcomes">Outcomes</label>
