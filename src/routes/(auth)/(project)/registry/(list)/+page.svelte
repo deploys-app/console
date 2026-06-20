@@ -3,6 +3,7 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import RegistryGcModal from '$lib/components/RegistryGcModal.svelte'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 
@@ -11,6 +12,8 @@
 	const project = $derived(data.project)
 	const repositories = $derived(data.repositories)
 	const error = $derived(data.error)
+
+	let gcModal = $state<RegistryGcModal>()
 
 	function deleteRepository (name: string) {
 		modal.confirm({
@@ -33,11 +36,19 @@
 		<h4><strong>Registry</strong></h4>
 		<p class="page-sub">Container image registry</p>
 	</div>
-	<a class="button is-variant-secondary is-icon-left" href={`/registry/usage?project=${project}`}>
-		<i class="fa-solid fa-chart-line"></i>
-		Usage
-	</a>
+	<div class="flex gap-3">
+		<GuardedButton permission="registry.push" class="button is-variant-secondary is-icon-left" onclick={() => gcModal?.open()}>
+			<i class="fa-solid fa-broom"></i>
+			Garbage collect
+		</GuardedButton>
+		<a class="button is-variant-secondary is-icon-left" href={`/registry/usage?project=${project}`}>
+			<i class="fa-solid fa-chart-line"></i>
+			Usage
+		</a>
+	</div>
 </div>
+
+<RegistryGcModal bind:this={gcModal} {project} />
 <div class="panel is-level-300">
 	<div class="table-container">
 		<table class="table is-variant-compact">
