@@ -765,6 +765,49 @@ declare namespace Api {
         items: SchedulerInvocation[]
     }
 
+    // Notification — change-notification channels (project-scoped, location-less).
+    // The webhook signing secret is write-only: never present in responses.
+    export type NotificationConfig = {
+        type: 'webhook' | 'discord'
+        url: string
+        // accepted on create/update (webhook only), never returned by get/list.
+        secret?: string
+        insecureSkipVerify: boolean
+    }
+
+    export type NotificationSubscription = {
+        resourceTypes: string[]
+        actions: string[]
+        outcomes: string[]
+    }
+
+    export type NotificationItem = {
+        project: string
+        name: string
+        config: NotificationConfig
+        subscription: NotificationSubscription
+        disabled: boolean
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+        updatedBy: string
+    }
+
+    export type NotificationDelivery = {
+        id: string
+        startedAt: string
+        result: 'pending' | 'success' | 'retry' | 'failed'
+        httpStatus: number
+        latencyMs: number
+        error: string
+    }
+
+    export type NotificationDeliveriesResult = {
+        project: string
+        name: string
+        items: NotificationDelivery[]
+    }
+
     // cache.metrics reuses WafMetricsTimeRange.
     export type CacheMetricsSeries = {
         overrideId: string

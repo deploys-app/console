@@ -717,6 +717,38 @@ const schedulerInvocations = [
 	{ id: '1', startedAt: CREATED_AT, result: 'failed', httpStatus: 500, latencyMs: 88, error: 'unexpected status 500' }
 ]
 
+const notificationChannels = [
+	{
+		project: 'acme',
+		name: 'ops-webhook',
+		config: { type: 'webhook', url: 'https://hooks.example.com/deploys', insecureSkipVerify: false },
+		subscription: { resourceTypes: ['deployment'], actions: ['deploy', 'delete'], outcomes: [] },
+		disabled: false,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'team-discord',
+		config: { type: 'discord', url: 'https://discord.com/api/webhooks/123/abc', insecureSkipVerify: false },
+		subscription: { resourceTypes: [], actions: [], outcomes: ['failure'] },
+		disabled: true,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	}
+]
+
+const notificationDeliveries = [
+	{ id: '4', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 84, error: '' },
+	{ id: '3', startedAt: CREATED_AT, result: 'retry', httpStatus: 503, latencyMs: 120, error: 'unexpected status 503' },
+	{ id: '2', startedAt: CREATED_AT, result: 'success', httpStatus: 204, latencyMs: 61, error: '' },
+	{ id: '1', startedAt: CREATED_AT, result: 'failed', httpStatus: 0, latencyMs: 30002, error: 'context deadline exceeded' }
+]
+
 const roles = [
 	{
 		role: 'viewer',
@@ -1378,6 +1410,14 @@ const handlers: Record<string, (args: any) => object> = {
 	'scheduler.resume': () => ok({}),
 	'scheduler.trigger': () => ok({ id: '99', startedAt: CREATED_AT, result: 'pending', httpStatus: 0, latencyMs: 0, error: '' }),
 	'scheduler.logs': () => list(schedulerInvocations),
+
+	'notification.list': () => list(notificationChannels),
+	'notification.get': (args) => ok(notificationChannels.find((c) => c.name === args?.name) ?? { ...notificationChannels[0], name: args?.name ?? 'ops-webhook' }),
+	'notification.create': () => ok({}),
+	'notification.update': () => ok({}),
+	'notification.delete': () => ok({}),
+	'notification.test': () => ok({ id: '', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 73, error: '' }),
+	'notification.deliveries': () => list(notificationDeliveries),
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
 
