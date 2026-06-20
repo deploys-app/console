@@ -57,7 +57,7 @@ test.describe('registry', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('columnheader', { name: 'Size' })).toBeVisible()
 		const row = main.getByRole('row').filter({ hasText: 'latest' })
-		await expect(row.getByRole('cell', { name: '0.17 GiB' })).toBeVisible()
+		await expect(row.getByRole('cell', { name: '175.78 MiB' })).toBeVisible()
 	})
 
 	test('manifests tab shows per-manifest size', async ({ page }) => {
@@ -71,6 +71,6 @@ test.describe('registry', () => {
 		await page.goto('/registry/detail/manifests?project=test-project&repository=web')
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('columnheader', { name: 'Size' })).toBeVisible()
-		await expect(main.getByRole('cell', { name: '0.15 GiB' })).toBeVisible()
+		await expect(main.getByRole('cell', { name: '149 MiB' })).toBeVisible()
 	})
 })
