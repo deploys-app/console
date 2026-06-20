@@ -24,6 +24,50 @@ test.describe('env groups', () => {
 		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
 
+	test('surfaces an API error in the list', async ({ page }) => {
+		await setMocks({
+			'envGroup.list': { ok: false, error: { message: 'api: internal error' } }
+		})
+		await page.goto('/env-group?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
+	})
+
+	test('shows a permission message when the list is forbidden', async ({ page }) => {
+		await setMocks({
+			'envGroup.list': { ok: false, error: { message: 'iam: forbidden' } }
+		})
+		await page.goto('/env-group?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText("You don't have permission to view data")).toBeVisible()
+	})
+
+	test('gates the create button when the create permission is missing', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['envgroup.list'], admin: false } }
+		})
+		await page.goto('/env-group?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('button', { name: 'Create' })).toBeDisabled()
+		await expect(main.getByRole('link', { name: 'Create' })).toHaveCount(0)
+	})
+
+	test('shows the API error in a modal when create fails', async ({ page }) => {
+		await setMocks({
+			'envgroup.create': { ok: false, error: { message: 'api: env group already exists' } }
+		})
+
+		await page.goto('/env-group/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await main.locator('#input-name').fill('shared-config')
+		await main.getByRole('button', { name: 'Create', exact: true }).click()
+
+		await expect(page.locator('.swal2-popup')).toBeVisible()
+		await expect(page.locator('.swal2-html-container')).toContainText('api: env group already exists')
+	})
+
 	test('shows existing env vars on update', async ({ page }) => {
 		await setMocks({
 			'envGroup.get': {

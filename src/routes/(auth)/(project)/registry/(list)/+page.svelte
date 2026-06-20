@@ -81,7 +81,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={repositories} />
+				<NoDataRow span={5} list={repositories} {error} />
 				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>

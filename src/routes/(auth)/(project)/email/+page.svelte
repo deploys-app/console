@@ -37,7 +37,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={3} list={domains} />
+				<NoDataRow span={3} list={domains} {error} />
 				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>

@@ -234,7 +234,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={3} list={routes} message="No routes point to this deployment" />
+				<NoDataRow span={3} list={routes} message="No routes point to this deployment" {error} />
 				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>

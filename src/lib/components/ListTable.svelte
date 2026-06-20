@@ -59,7 +59,7 @@
 				{#each items as item (key(item))}
 					<tr>{@render row(item)}</tr>
 				{/each}
-				<NoDataRow {span} list={items} />
+				<NoDataRow {span} list={items} {error} />
 				<ErrorRow {span} {error} />
 			</tbody>
 		</table>

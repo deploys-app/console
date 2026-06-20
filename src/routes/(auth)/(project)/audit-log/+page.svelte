@@ -507,7 +507,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={7} list={items} />
+				<NoDataRow span={7} list={items} {error} />
 				<ErrorRow span={7} {error} />
 				{#if hasMore || loadingMore || loadMoreError}
 					<tr class="loadmore-row">

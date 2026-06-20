@@ -22,4 +22,23 @@ test.describe('email domains', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('Nothing here yet')).toBeVisible()
 	})
+
+	test('surfaces an API error in the list', async ({ page }) => {
+		await setMocks({
+			'email.list': { ok: false, error: { message: 'api: internal error' } }
+		})
+		await page.goto('/email?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
+	})
+
+	test('shows a permission message when the list is forbidden', async ({ page }) => {
+		await setMocks({
+			'email.list': { ok: false, error: { message: 'iam: forbidden' } }
+		})
+		await page.goto('/email?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText("You don't have permission to view data")).toBeVisible()
+	})
 })

@@ -41,6 +41,20 @@ export async function getRequestLog () {
 }
 
 /**
+ * Pick an option from the custom `Select.svelte` dropdown (a button trigger +
+ * listbox, not a native `<select>` — Playwright's `selectOption` can't drive
+ * it). Opens the trigger by id, then clicks the option matching `label`.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} triggerId  the Select's `id` (without the leading `#`)
+ * @param {string} label      the visible option label to pick
+ */
+export async function pickSelect (page, triggerId, label) {
+	await page.locator(`#${triggerId}`).click()
+	await page.getByRole('option', { name: label, exact: true }).click()
+}
+
+/**
  * Inject the auth token cookie so the SvelteKit `(auth)` group treats
  * the session as authenticated.
  *

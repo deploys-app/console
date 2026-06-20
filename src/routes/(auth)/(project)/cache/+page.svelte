@@ -164,7 +164,8 @@
 					message="No cache zones yet"
 					hint="Configure cache to start overriding edge caching in a location."
 					ctaLabel="Configure cache"
-					ctaHref={`/cache/create?project=${project}`} />
+					ctaHref={`/cache/create?project=${project}`}
+					{error} />
 				<ErrorRow span={6} {error} />
 			</tbody>
 		</table>
