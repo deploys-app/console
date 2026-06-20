@@ -783,11 +783,15 @@ declare namespace Api {
     // Notification — change-notification channels (project-scoped, location-less).
     // The webhook signing secret is write-only: never present in responses.
     export type NotificationConfig = {
-        type: 'webhook' | 'discord'
+        type: 'webhook' | 'discord' | 'pull'
+        // delivery target for webhook/discord; empty for pull.
         url: string
         // accepted on create/update (webhook only), never returned by get/list.
         secret?: string
         insecureSkipVerify: boolean
+        // pull only: inactivity TTL (seconds) before the channel auto-deletes;
+        // 0/absent = server default.
+        pullTtlSeconds?: number
     }
 
     export type NotificationSubscription = {

@@ -75,11 +75,13 @@
 		</p>
 	</div>
 	<div class="flex gap-3 flex-wrap">
-		<GuardedButton permission="notification.test" class="button is-variant-secondary is-icon-left" type="button"
-			loading={busy} onclick={sendTest}>
-			<i class="fa-solid fa-paper-plane"></i>
-			Send test
-		</GuardedButton>
+		{#if channel.config.type !== 'pull'}
+			<GuardedButton permission="notification.test" class="button is-variant-secondary is-icon-left" type="button"
+				loading={busy} onclick={sendTest}>
+				<i class="fa-solid fa-paper-plane"></i>
+				Send test
+			</GuardedButton>
+		{/if}
 		<GuardedButton permission="notification.update" class="button is-variant-secondary is-icon-left"
 			href={`/notification/create?project=${project}&name=${encodeURIComponent(channel.name)}`}>
 			<i class="fa-solid fa-pen"></i>
@@ -107,11 +109,26 @@
 				<label for="d-type">Type</label>
 				<div class="input"><input id="d-type" value={channel.config.type} readonly disabled></div>
 			</div>
-			<div class="field">
-				<label for="d-url">URL</label>
-				<div class="input"><input id="d-url" value={channel.config.url} readonly disabled></div>
-			</div>
+			{#if channel.config.type === 'pull'}
+				<div class="field">
+					<label for="d-ttl">Auto-delete when idle</label>
+					<div class="input"><input id="d-ttl" value={channel.config.pullTtlSeconds ? `${channel.config.pullTtlSeconds} seconds` : 'Server default (15 min)'} readonly disabled></div>
+				</div>
+			{:else}
+				<div class="field">
+					<label for="d-url">URL</label>
+					<div class="input"><input id="d-url" value={channel.config.url} readonly disabled></div>
+				</div>
+			{/if}
 		</div>
+
+		{#if channel.config.type === 'pull'}
+			<p class="text-content/60 text-sm">
+				<i class="fa-solid fa-circle-info"></i>
+				This channel has no delivery endpoint — an agent reads its events on its own schedule via the API or CLI
+				(<code>deploys notification pull --project {project} --name {channel.name}</code>). It auto-deletes after the idle window above.
+			</p>
+		{/if}
 
 		{#if channel.config.type === 'webhook'}
 			<div class="field">
@@ -133,6 +150,7 @@
 			{/if}
 		</div>
 
+		{#if channel.config.type !== 'pull'}
 		<hr>
 
 		<div>
@@ -176,6 +194,7 @@
 				</tbody>
 			</table>
 		</div>
+		{/if}
 
 		<DangerZone description="Permanently delete this notification channel.">
 			<GuardedButton permission="notification.delete" class="button is-variant-negative" type="button" onclick={deleteItem}>Delete</GuardedButton>
@@ -202,6 +221,11 @@
 	.type-badge[data-type='discord'] {
 		color: hsl(var(--hsl-accent, var(--hsl-primary)));
 		background-color: hsl(var(--hsl-accent, var(--hsl-primary)) / 0.12);
+	}
+
+	.type-badge[data-type='pull'] {
+		color: hsl(var(--hsl-positive));
+		background-color: hsl(var(--hsl-positive) / 0.12);
 	}
 
 	.test-result {

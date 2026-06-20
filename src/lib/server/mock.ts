@@ -739,6 +739,17 @@ const notificationChannels = [
 		createdBy: USER_EMAIL,
 		updatedAt: CREATED_AT,
 		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'local-agent',
+		config: { type: 'pull', url: '', insecureSkipVerify: false, pullTtlSeconds: 900 },
+		subscription: { resourceTypes: ['deployment'], actions: [], outcomes: [] },
+		disabled: false,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
 	}
 ]
 
@@ -1418,6 +1429,7 @@ const handlers: Record<string, (args: any) => object> = {
 	'notification.delete': () => ok({}),
 	'notification.test': () => ok({ id: '', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 73, error: '' }),
 	'notification.deliveries': () => list(notificationDeliveries),
+	'notification.pull': () => ok({ project: 'acme', name: 'local-agent', events: [], cursor: 0, hasMore: false }),
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
 
