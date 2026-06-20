@@ -732,7 +732,8 @@ const notificationChannels = [
 	{
 		project: 'acme',
 		name: 'team-discord',
-		config: { type: 'discord', url: 'https://discord.com/api/webhooks/123/abc', insecureSkipVerify: false },
+		// the API returns a Discord URL with its secret token redacted
+		config: { type: 'discord', url: 'https://discord.com/api/webhooks/123456789/••••••', insecureSkipVerify: false },
 		subscription: { events: [], outcomes: ['failure'] },
 		disabled: true,
 		createdAt: CREATED_AT,
