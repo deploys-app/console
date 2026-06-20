@@ -71,7 +71,7 @@
 					</td>
 				</tr>
 			{/each}
-			<NoDataRow span={5} list={tags} />
+			<NoDataRow span={5} list={tags} {error} />
 			<ErrorRow span={5} {error} />
 		</tbody>
 	</table>

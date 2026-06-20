@@ -29,7 +29,8 @@ test.describe('pull secrets', () => {
 		})
 		await page.goto('/pull-secret?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('api: internal error')).toBeVisible()
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
 	})
 
 	test('shows a permission message when the list is forbidden', async ({ page }) => {

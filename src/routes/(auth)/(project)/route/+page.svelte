@@ -116,7 +116,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={routes} />
+				<NoDataRow span={5} list={routes} {error} />
 				<ErrorRow span={5} {error} />
 			</tbody>
 		</table>

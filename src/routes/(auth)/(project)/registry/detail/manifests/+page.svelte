@@ -52,7 +52,7 @@
 					</td>
 				</tr>
 			{/each}
-			<NoDataRow span={4} list={manifests} />
+			<NoDataRow span={4} list={manifests} {error} />
 			<ErrorRow span={4} {error} />
 		</tbody>
 	</table>

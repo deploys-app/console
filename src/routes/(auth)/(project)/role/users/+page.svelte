@@ -176,7 +176,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={3} list={users} />
+				<NoDataRow span={3} list={users} {error} />
 				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>

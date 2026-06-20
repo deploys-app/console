@@ -166,7 +166,8 @@
 					message="No firewalls yet"
 					hint="Create a firewall to start filtering traffic in a location."
 					ctaLabel="Create firewall"
-					ctaHref={`/waf/create?project=${project}`} />
+					ctaHref={`/waf/create?project=${project}`}
+					{error} />
 				<ErrorRow span={7} {error} />
 			</tbody>
 		</table>

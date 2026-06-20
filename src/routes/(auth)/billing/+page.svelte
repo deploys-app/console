@@ -45,7 +45,7 @@
 						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={3} list={billingAccounts} />
+				<NoDataRow span={3} list={billingAccounts} {error} />
 				<ErrorRow span={3} {error} />
 			</tbody>
 		</table>

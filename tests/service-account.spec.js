@@ -34,7 +34,27 @@ test.describe('service accounts', () => {
 
 		await page.goto('/service-account?project=test-project')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('api: internal error')).toBeVisible()
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
+	})
+
+	test('Try again recovers the list after a transient error', async ({ page }) => {
+		await setMocks({
+			'serviceAccount.list': { ok: false, error: { message: 'api: internal error' } }
+		})
+
+		await page.goto('/service-account?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
+
+		// Upstream recovers; clicking Try again re-runs load() in place.
+		await setMocks({
+			'serviceAccount.list': { ok: true, result: { items: [sampleServiceAccount] } }
+		})
+		await main.getByRole('button', { name: 'Try again' }).click()
+
+		await expect(main.getByRole('link', { name: '[email protected]' })).toBeVisible()
+		await expect(main.getByText(/Something went wrong while loading this data/)).toHaveCount(0)
 	})
 
 	test('shows a permission message when the list is forbidden', async ({ page }) => {
