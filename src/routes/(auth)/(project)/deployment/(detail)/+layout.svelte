@@ -13,10 +13,14 @@
 
 	// A Static deployment runs no pods, so it has no logs or k8s events — hide
 	// those tabs (the metrics tab stays but drops the pod-only charts).
+	// Routes only make sense for the deployment types that can be the target
+	// of a `deployment://` route — matches the filter in /route/create.
+	const canHaveRoutes = $derived(deployment.type === 'WebService' || deployment.type === 'Static')
 	const tabs = $derived([
 		{ label: 'Metrics', path: '/deployment/metrics' },
 		{ label: 'Details', path: '/deployment/detail' },
 		{ label: 'Revisions', path: '/deployment/revision' },
+		...(canHaveRoutes ? [{ label: 'Routes', path: '/deployment/routes' }] : []),
 		...(deployment.type === 'Static'
 			? []
 			: [
