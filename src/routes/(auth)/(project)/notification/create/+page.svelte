@@ -36,7 +36,10 @@
 	const form = $state(untrack(() => ({
 		name: channel?.name ?? '',
 		type: (channel?.config?.type ?? 'webhook') as string,
-		url: channel?.config?.url ?? '',
+		// A Discord URL embeds a secret token and is returned redacted, so — like
+		// the secret — it is write-only: never prefilled on edit, and leaving it
+		// blank keeps the stored URL.
+		url: channel?.config?.type === 'discord' ? '' : (channel?.config?.url ?? ''),
 		// Secret is write-only: never prefilled. On edit, leaving it blank keeps the
 		// stored one.
 		secret: '',
@@ -57,6 +60,12 @@
 	// belonged to the old type, so a fresh one is needed.
 	const originalType = $derived(channel?.config?.type ?? 'webhook')
 	const secretRequired = $derived(form.type === 'webhook' && (!isEdit || originalType !== 'webhook'))
+
+	// A Discord URL is write-only (the server returns it redacted), just like the
+	// secret: required when creating or when switching to discord, but on a
+	// discord→discord edit a blank value keeps the stored URL.
+	const urlWriteOnly = $derived(form.type === 'discord')
+	const urlRequired = $derived(form.type !== 'pull' && (!urlWriteOnly || !isEdit || originalType !== 'discord'))
 
 	let saving = $state(false)
 
@@ -170,10 +179,18 @@
 				<div class="field">
 					<label for="input-url">URL</label>
 					<div class="input">
-						<input id="input-url" type="url" placeholder="https://example.com/webhook" bind:value={form.url} required>
+						<input id="input-url" type="url"
+							placeholder={urlWriteOnly && !urlRequired ? 'Unchanged' : 'https://example.com/webhook'}
+							bind:value={form.url} required={urlRequired}>
 					</div>
 					{#if form.type === 'discord'}
-						<p class="text-content/50 text-sm mt-1">The Discord channel's incoming webhook URL.</p>
+						<p class="text-content/50 text-sm mt-1">
+							{#if urlWriteOnly && !urlRequired}
+								The Discord channel's incoming webhook URL is stored with its secret token hidden — leave blank to keep the current URL, or paste a new one to replace it.
+							{:else}
+								The Discord channel's incoming webhook URL.
+							{/if}
+						</p>
 					{/if}
 				</div>
 			{/if}
