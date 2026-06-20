@@ -467,6 +467,8 @@ declare namespace Api {
     export type Repository = {
         name: string
         size: number
+        manifests: number
+        tags: number
         createdAt: string
     }
 

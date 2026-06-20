@@ -353,6 +353,8 @@ export const sampleInvoice = {
 export const sampleRepository = {
 	name: 'web',
 	size: 12345678,
+	manifests: 4,
+	tags: 6,
 	createdAt: now
 }
 
