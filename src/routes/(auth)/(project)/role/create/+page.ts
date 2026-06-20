@@ -23,6 +23,10 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 	return {
 		menu: 'role',
 		role,
-		permissions: permissions.result ?? []
+		// The assignable-permission catalog. Deliberately NOT named `permissions`:
+		// the (project) layout returns the caller's effective grants under that
+		// key, and a page-data field of the same name would shadow it in
+		// $page.data — breaking GuardedButton's `can()` on this page.
+		allPermissions: permissions.result ?? []
 	}
 }

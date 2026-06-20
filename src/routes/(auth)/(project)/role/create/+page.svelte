@@ -10,7 +10,7 @@
 
 	const { data }: { data: PageData } = $props()
 	const role = $derived(data.role)
-	const permissions = $derived(data.permissions)
+	const allPermissions = $derived(data.allPermissions)
 
 	const project = $derived(data.project)
 
@@ -117,7 +117,7 @@
 					emptyText="No matching permission"
 					resetOnSelect
 					onchange={(v) => addPermission(String(v))}
-					options={permissions.filter((x) => !form.permissions.includes(x)).map((it) => ({ value: it, label: it }))} />
+					options={allPermissions.filter((x) => !form.permissions.includes(x)).map((it) => ({ value: it, label: it }))} />
 			</div>
 
 			<div class="table-container">
