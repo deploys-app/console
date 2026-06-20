@@ -738,18 +738,6 @@
 		resize: vertical;
 	}
 
-	/* iOS Safari zooms the page when a focused form control has a font-size
-	 * below 16px. Bump to 16px on coarse-pointer (touch) devices to suppress
-	 * that auto-zoom, while keeping the tighter 14px on desktop. */
-	@media (pointer: coarse) {
-		.input > input,
-		.input > select,
-		.select > select,
-		.textarea > textarea {
-			font-size: 16px;
-		}
-	}
-
 	/* Readonly/disabled tint applied at the wrapper so it covers the
 	 * whole row (including the padding gap around the native control).
 	 * `:has` is well-supported across modern browsers. */
