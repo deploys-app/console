@@ -594,6 +594,17 @@ declare namespace Api {
         voidedAt: string
         createdAt: string
         lineItems: InvoiceLineItem[]
+        // Seller settlement details (bank transfer + PromptPay). Static company
+        // info, identical on every invoice; lets the UI show "how to pay"
+        // without rendering the PDF.
+        payment: InvoicePayment
+    }
+
+    export type InvoicePayment = {
+        bank: string
+        accountName: string
+        accountNo: string
+        promptPay: string
     }
 
     export type InvoiceDownloadResult = {

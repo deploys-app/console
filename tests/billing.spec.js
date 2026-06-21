@@ -48,6 +48,86 @@ test.describe('invoice detail', () => {
 		await expect(apiRow.locator('td').nth(2)).toHaveText('1.70 USD')
 	})
 
+	test('shows how-to-pay payment details on an open invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		// The bank-transfer / PromptPay details are visible inline — no PDF needed.
+		await expect(page.getByRole('heading', { name: 'How to pay' })).toBeVisible()
+		await expect(page.getByText('Test Bank')).toBeVisible()
+		await expect(page.getByText('1234567890')).toBeVisible()
+		await expect(page.getByText('0812345678')).toBeVisible()
+	})
+
+	test('hides the how-to-pay panel on a paid invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, status: 'paid', paidAt: '2026-05-03T00:00:00Z' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		// Payment instructions only matter while the invoice is still payable.
+		await expect(page.getByRole('heading', { name: 'How to pay' })).toHaveCount(0)
+	})
+
+	test('pay modal shows the transfer-to account details', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		// The destination account a customer must transfer to is shown in the modal
+		// itself, so paying never requires opening the PDF.
+		const modal = page.locator('.modal.is-active .modal-panel')
+		await expect(modal.getByText('Transfer to')).toBeVisible()
+		await expect(modal.getByText('10.70 USD')).toBeVisible()
+		await expect(modal.getByText('1234567890')).toBeVisible()
+		await expect(modal.getByText('0812345678')).toBeVisible()
+	})
+
+	test('truncates a long slip file name instead of widening the modal', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		// A long, unbreakable (no-spaces) name is the worst case: without min-width:0
+		// on the selected-file row it pushes the whole modal wider than its panel.
+		await page.locator('input[type=file]').setInputFiles({
+			name: 'transfer-slip-payment-confirmation-screenshot-from-mobile-banking-app-INV-2026-0009-original-highres.pdf',
+			mimeType: 'application/pdf',
+			buffer: Buffer.from('%PDF-1.4 mock slip')
+		})
+
+		const name = page.locator('.selected-file .file-name')
+		await expect(name).toBeVisible()
+
+		// The name must be clipped (scrollWidth > clientWidth = ellipsis active) and
+		// the row must not exceed the modal panel's inner width.
+		const m = await page.evaluate(() => {
+			const n = document.querySelector('.selected-file .file-name')
+			const panel = document.querySelector('.modal.is-active .modal-panel')
+			return {
+				ellipsized: n.scrollWidth > n.clientWidth,
+				rowWidth: document.querySelector('.selected-file').getBoundingClientRect().width,
+				panelWidth: panel.getBoundingClientRect().width
+			}
+		})
+		expect(m.ellipsized).toBe(true)
+		expect(m.rowWidth).toBeLessThanOrEqual(m.panelWidth)
+	})
+
 	test('hides the receipt button on unpaid invoices', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open

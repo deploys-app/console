@@ -83,6 +83,10 @@
 		if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
 		return `${(n / 1024 / 1024).toFixed(1)} MB`
 	}
+
+	function money (v: number, currency: string): string {
+		return `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`
+	}
 </script>
 
 <div class="modal" onclick={onBackdrop} class:is-active={isActive} aria-hidden={!isActive}>
@@ -90,8 +94,26 @@
 		<div class="modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
 		<h4><strong>Pay invoice {invoice?.number}</strong></h4>
 		<p class="mt-1 text-content/70">
-			Upload your bank transfer slip as proof of payment. We'll verify it and mark the invoice as paid.
+			Transfer the amount to the account below, then upload your bank transfer slip as proof of payment. We'll verify it and mark the invoice as paid.
 		</p>
+
+		{#if invoice?.payment?.accountNo}
+			<div class="pay-to">
+				<div class="pay-to-title">Transfer to</div>
+				<div class="pay-grid">
+					<div class="pay-key">Amount due</div>
+					<div class="font-semibold tabular-nums">{money(invoice.total, invoice.currency)}</div>
+					<div class="pay-key">Bank</div>
+					<div>{invoice.payment.bank}</div>
+					<div class="pay-key">Account name</div>
+					<div>{invoice.payment.accountName}</div>
+					<div class="pay-key">Account no.</div>
+					<div class="tabular-nums">{invoice.payment.accountNo}</div>
+					<div class="pay-key">PromptPay</div>
+					<div class="tabular-nums">{invoice.payment.promptPay}</div>
+				</div>
+			</div>
+		{/if}
 
 		<input
 			bind:this={elFile}
@@ -148,6 +170,34 @@
 		pointer-events: none;
 	}
 
+	.pay-to {
+		margin-top: 1rem;
+		padding: 0.75rem 1rem;
+		background-color: hsl(var(--hsl-content) / 0.06);
+		border: 1px solid hsl(var(--hsl-content) / 0.15);
+		border-radius: 6px;
+	}
+
+	.pay-to-title {
+		font-size: var(--fs-1);
+		font-weight: 600;
+		color: hsl(var(--hsl-content) / 0.6);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		margin-bottom: 0.5rem;
+	}
+
+	.pay-grid {
+		display: grid;
+		grid-template-columns: max-content 1fr;
+		column-gap: 1.25rem;
+		row-gap: 0.35rem;
+	}
+
+	.pay-grid .pay-key {
+		color: hsl(var(--hsl-content) / 0.65);
+	}
+
 	.selected-file {
 		display: flex;
 		align-items: center;
@@ -156,6 +206,11 @@
 		background-color: hsl(var(--hsl-content) / 0.06);
 		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
+		/* This row is a grid item (the modal's button column). Grid items default
+		   to min-width:auto, which would let a long file name push the row — and
+		   the whole modal — wider than the panel. min-width:0 lets it shrink so
+		   the .file-name ellipsis below actually kicks in. */
+		min-width: 0;
 	}
 
 	.selected-file .file-icon {

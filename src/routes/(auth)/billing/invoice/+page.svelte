@@ -247,6 +247,29 @@
 			<div class="grand value">{money(invoice.total)}</div>
 		</div>
 	</div>
+
+	{#if invoice.status === 'open' && invoice.payment?.accountNo}
+		<hr>
+
+		<div>
+			<h6 class="mb-3"><strong>How to pay</strong></h6>
+			<p class="mb-3 text-content/70">
+				Transfer {money(invoice.total)} to the account below, then use the
+				<strong>Pay</strong> button above to upload your slip. We'll verify it and
+				mark the invoice as paid.
+			</p>
+			<div class="meta">
+				<div class="key">Bank</div>
+				<div>{invoice.payment.bank}</div>
+				<div class="key">Account name</div>
+				<div>{invoice.payment.accountName}</div>
+				<div class="key">Account no.</div>
+				<div class="tabular-nums">{invoice.payment.accountNo}</div>
+				<div class="key">PromptPay</div>
+				<div class="tabular-nums">{invoice.payment.promptPay}</div>
+			</div>
+		</div>
+	{/if}
 </div>
 
 <PayInvoiceModal bind:this={payModal} onuploaded={onSlipUploaded} />

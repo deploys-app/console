@@ -347,7 +347,14 @@ export const sampleInvoice = {
 	lineItems: [
 		{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 9 },
 		{ projectId: '1002', project: 'api-service', description: 'API service', amount: 1.7 }
-	]
+	],
+	// Seller settlement details (placeholder demo values, not the real account).
+	payment: {
+		bank: 'Test Bank',
+		accountName: 'Demo Seller Co., Ltd.',
+		accountNo: '1234567890',
+		promptPay: '0812345678'
+	}
 }
 
 export const sampleRepository = {

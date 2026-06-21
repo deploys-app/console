@@ -1079,6 +1079,16 @@ const invoices = [
 	}
 ]
 
+// Seller settlement details returned by billing.getInvoice. Placeholder demo
+// values for offline dev — not the real account (the live values come from
+// apiserver's invoicepdf.Payment).
+const mockPayment = {
+	bank: 'Test Bank',
+	accountName: 'Demo Seller Co., Ltd.',
+	accountNo: '1234567890',
+	promptPay: '0812345678'
+}
+
 function invoiceListItem (inv: (typeof invoices)[number]) {
 	return {
 		id: inv.id,
@@ -1164,7 +1174,7 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 	}),
 	'billing.listInvoices': () => list(invoices.map(invoiceListItem)),
-	'billing.getInvoice': (args) => ok(invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]),
+	'billing.getInvoice': (args) => ok({ ...(invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]), payment: mockPayment }),
 	'billing.downloadInvoice': (args) => {
 		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
 		return ok({
