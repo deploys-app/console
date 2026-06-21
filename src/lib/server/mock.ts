@@ -1334,7 +1334,7 @@ const handlers: Record<string, (args: any) => object> = {
 	// page returns nextCursor='page2', the second returns the rest with no
 	// further cursor. The 'sg1' location simulates a location with no log
 	// capture (error detection unavailable).
-	'deployment.errors': (args) => {
+	'error.list': (args) => {
 		if (args?.location === 'gke.cluster-sg1') {
 			return err('api: error detection is not available for this location')
 		}
@@ -1350,7 +1350,7 @@ const handlers: Record<string, (args: any) => object> = {
 		const location = String(args?.location ?? LOCATION_ID)
 
 		// Per-deployment fixture: every issue belongs to the queried deployment.
-		const single: Api.DeploymentErrorIssue[] = [
+		const single: Api.ErrorIssue[] = [
 			{
 				id: 'iss_go_nilmap',
 				deployment: deploymentName,
@@ -1434,7 +1434,7 @@ const handlers: Record<string, (args: any) => object> = {
 		// Project-wide fixture: issues span several deployments + locations and
 		// every kind/status, enough to page across two screens. Sorted lastSeen
 		// desc to match the page's default sort.
-		const wide: Api.DeploymentErrorIssue[] = [
+		const wide: Api.ErrorIssue[] = [
 			{
 				id: 'iss_api_go_nilmap',
 				deployment: 'api',
@@ -1542,7 +1542,7 @@ const handlers: Record<string, (args: any) => object> = {
 		]
 
 		const all = projectWide ? wide : single
-		const status = (args?.status as Api.DeploymentErrorStatusFilter | undefined) ?? 'open'
+		const status = (args?.status as Api.ErrorStatusFilter | undefined) ?? 'open'
 		const filtered = status === 'all' ? all : all.filter((it) => it.status === status)
 		// Two-page paging: first request (no cursor) returns the first 3, then
 		// nextCursor='page2' yields the remainder. Pages are only meaningful when
@@ -1553,7 +1553,7 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 		return ok({ issues: filtered.slice(3), nextCursor: undefined })
 	},
-	'deployment.errorGet': (args) => {
+	'error.get': (args) => {
 		const base = Date.now()
 		const at = (mins: number) => new Date(base - mins * 60_000).toISOString()
 		const samples: Record<string, { title: string, sample: string }> = {
@@ -1607,7 +1607,7 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 		const id = String(args?.id ?? 'iss_go_nilmap')
 		const s = samples[id] ?? samples.iss_go_nilmap
-		const issue: Api.DeploymentErrorIssueDetail = {
+		const issue: Api.ErrorIssueDetail = {
 			id,
 			deployment: String(args?.name ?? 'api'),
 			location: String(args?.location ?? LOCATION_ID),
@@ -1642,7 +1642,7 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 		return ok({ issue })
 	},
-	'deployment.errorUpdate': () => ok({}),
+	'error.update': () => ok({}),
 
 	'disk.list': () => list(disks),
 	'disk.get': (args) => ok({ ...disks[0], name: args?.name ?? 'data', location: args?.location ?? LOCATION_ID }),

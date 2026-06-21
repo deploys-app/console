@@ -7,17 +7,18 @@
 	const { data }: { data: PageData } = $props()
 	const deployment = $derived(data.deployment)
 
-	// Triage (resolve/mute/reopen) and read both ride the single deployment.logs
-	// permission for v1 (one surface; a dedicated deployment.errors perm may be
-	// split out later). Keep this in lockstep with the server-side gate.
-	const TRIAGE_PERMISSION = 'deployment.logs'
+	// Reading the issue list + detail is gated by error.list / error.get; triage
+	// (resolve/mute/reopen) by error.update. Keep these in lockstep with the
+	// server-side gate.
+	const READ_PERMISSION = 'error.list'
+	const TRIAGE_PERMISSION = 'error.update'
 
 	// The list endpoint reports this when the deployment's location has no log
 	// bucket (error detection permanently unavailable there); we match on the
 	// stable substring rather than an error code, mirroring the API contract.
 	const UNAVAILABLE_MARKER = 'error detection is not available for this location'
 
-	type StatusFilter = Api.DeploymentErrorStatusFilter
+	type StatusFilter = Api.ErrorStatusFilter
 
 	const STATUS_FILTERS: { value: StatusFilter, label: string }[] = [
 		{ value: 'open', label: 'Open' },
@@ -28,7 +29,7 @@
 
 	// Short, language-coloured kind badges. Hues are token-based so they recolour
 	// with the theme. Kept LOCAL to this page on purpose (see PR notes).
-	const KIND_META: Record<Api.DeploymentErrorKind, { label: string, hue: number }> = {
+	const KIND_META: Record<Api.ErrorKind, { label: string, hue: number }> = {
 		go: { label: 'Go', hue: 198 },
 		java: { label: 'Java', hue: 18 },
 		python: { label: 'Py', hue: 142 },
@@ -37,7 +38,7 @@
 		generic: { label: 'Generic', hue: 250 }
 	}
 
-	function kindMeta (kind: Api.DeploymentErrorKind) {
+	function kindMeta (kind: Api.ErrorKind) {
 		return KIND_META[kind] ?? { label: kind, hue: 250 }
 	}
 
@@ -65,7 +66,7 @@
 
 	let status = $state<StatusFilter>('open')
 	let query = $state('')
-	let issues = $state<Api.DeploymentErrorIssue[]>([])
+	let issues = $state<Api.ErrorIssue[]>([])
 	let nextCursor = $state<string | undefined>(undefined)
 	let loading = $state(false)
 	let loadingMore = $state(false)
@@ -79,7 +80,7 @@
 
 	// Expanded issue id → its loaded detail (or null while loading).
 	let expandedId = $state<string | null>(null)
-	let detail = $state<Api.DeploymentErrorIssueDetail | null>(null)
+	let detail = $state<Api.ErrorIssueDetail | null>(null)
 	let detailLoading = $state(false)
 	let detailError = $state('')
 	// id currently being mutated, so only its buttons show the loading state.
@@ -121,7 +122,7 @@
 		// new filter.
 		expandedId = null
 		detail = null
-		const resp = await api.invoke<Api.DeploymentErrorsResult>('deployment.errors', {
+		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project: deployment.project,
 			location: deployment.location,
 			name: deployment.name,
@@ -143,7 +144,7 @@
 	async function loadMore (): Promise<void> {
 		if (!nextCursor || loadingMore) return
 		loadingMore = true
-		const resp = await api.invoke<Api.DeploymentErrorsResult>('deployment.errors', {
+		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project: deployment.project,
 			location: deployment.location,
 			name: deployment.name,
@@ -158,7 +159,7 @@
 		loadingMore = false
 	}
 
-	async function toggleExpand (issue: Api.DeploymentErrorIssue): Promise<void> {
+	async function toggleExpand (issue: Api.ErrorIssue): Promise<void> {
 		if (expandedId === issue.id) {
 			expandedId = null
 			detail = null
@@ -169,7 +170,7 @@
 		detail = null
 		detailError = ''
 		detailLoading = true
-		const resp = await api.invoke<Api.DeploymentErrorGetResult>('deployment.errorGet', {
+		const resp = await api.invoke<Api.ErrorGetResult>('error.get', {
 			project: deployment.project,
 			location: deployment.location,
 			name: deployment.name,
@@ -186,9 +187,9 @@
 		detailLoading = false
 	}
 
-	async function updateStatus (issue: Api.DeploymentErrorIssue, next: Api.DeploymentErrorStatus): Promise<void> {
+	async function updateStatus (issue: Api.ErrorIssue, next: Api.ErrorStatus): Promise<void> {
 		updatingId = issue.id
-		const resp = await api.invoke('deployment.errorUpdate', {
+		const resp = await api.invoke('error.update', {
 			project: deployment.project,
 			location: deployment.location,
 			name: deployment.name,
@@ -661,7 +662,7 @@
 					<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
 				</svg>
 				<div class="state-pane__title">You don't have access to errors</div>
-				<div class="state-pane__hint">Viewing application errors requires the <code>deployment.logs</code> permission.</div>
+				<div class="state-pane__hint">Viewing application errors requires the <code>{READ_PERMISSION}</code> permission.</div>
 			</div>
 		{:else if unavailable}
 			<div class="state-pane">
