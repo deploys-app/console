@@ -30,6 +30,7 @@
 			? []
 			: [
 				{ label: 'Logs', path: '/deployment/logs' },
+				{ label: 'Errors', path: '/deployment/errors' },
 				{ label: 'Events', path: '/deployment/events' }
 			])
 	])

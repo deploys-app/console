@@ -920,6 +920,88 @@ declare namespace Api {
         cappedByBytes?: boolean
     }
 
+    // Application-error detection (Sentry-lite). An "issue" is a group of
+    // identical application-level errors (panics, exceptions, stack traces the
+    // app prints) deduplicated by a stable server-side fingerprint.
+    export type DeploymentErrorKind = 'go' | 'java' | 'python' | 'node' | 'ruby' | 'generic'
+    export type DeploymentErrorStatus = 'open' | 'resolved' | 'muted'
+    // The status query also accepts 'all' (no filter); the default is 'open'.
+    export type DeploymentErrorStatusFilter = DeploymentErrorStatus | 'all'
+    export type DeploymentErrorSort = 'lastSeen' | 'firstSeen' | 'count'
+
+    // One grouped issue as returned by deployment.errors (the list view).
+    export type DeploymentErrorIssue = {
+        id: string
+        fingerprint: string
+        kind: DeploymentErrorKind
+        title: string
+        status: DeploymentErrorStatus
+        count: number
+        firstSeen: string
+        lastSeen: string
+        samplePod: string
+    }
+
+    // A lightweight pointer to one occurrence of an issue (recent_events). The
+    // full sample stack lives once on the issue; these only carry where/when.
+    export type DeploymentErrorOccurrence = {
+        pod: string
+        timestamp: string
+        // object + offset locate the occurrence in the durable _errorlog stream
+        // (used by the History deep-link, not surfaced in v1 of the tab).
+        object?: string
+        offset?: number
+    }
+
+    // The detail view: all list fields plus the representative sample stack and
+    // the recent occurrence pointers.
+    export type DeploymentErrorIssueDetail = DeploymentErrorIssue & {
+        sampleMessage: string
+        recentEvents: DeploymentErrorOccurrence[]
+    }
+
+    // Args of deployment.errors (list). status defaults to 'open', sort to
+    // 'lastSeen'; cursor is the opaque page token from a prior nextCursor.
+    export type DeploymentErrorsArgs = {
+        project: string
+        location: string
+        name: string
+        status?: DeploymentErrorStatusFilter
+        limit?: number
+        cursor?: string
+        sort?: DeploymentErrorSort
+    }
+
+    // Result of deployment.errors. nextCursor is non-empty while more issues
+    // remain for the current filter/sort.
+    export type DeploymentErrorsResult = {
+        issues: DeploymentErrorIssue[]
+        nextCursor?: string
+    }
+
+    // Args of deployment.errorGet (detail).
+    export type DeploymentErrorGetArgs = {
+        project: string
+        location: string
+        name: string
+        id: string
+    }
+
+    // Result of deployment.errorGet.
+    export type DeploymentErrorGetResult = {
+        issue: DeploymentErrorIssueDetail
+    }
+
+    // Args of deployment.errorUpdate (triage). status flips the lifecycle:
+    // resolved / open (reopen) / muted.
+    export type DeploymentErrorUpdateArgs = {
+        project: string
+        location: string
+        name: string
+        id: string
+        status: DeploymentErrorStatus
+    }
+
     export type BillingReportProject = {
         sid: string
         name: string
