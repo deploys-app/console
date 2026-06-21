@@ -1329,6 +1329,185 @@ const handlers: Record<string, (args: any) => object> = {
 		})
 	},
 
+	// Application-error detection (Sentry-lite). Synthetic issues across kinds
+	// and statuses so the Errors tab renders offline. Cursor-aware: the first
+	// page returns nextCursor='page2', the second returns the rest with no
+	// further cursor. The 'sg1' location simulates a location with no log
+	// capture (error detection unavailable).
+	'deployment.errors': (args) => {
+		if (args?.location === 'gke.cluster-sg1') {
+			return err('api: error detection is not available for this location')
+		}
+		const base = Date.now()
+		const at = (mins: number) => new Date(base - mins * 60_000).toISOString()
+		const all: Api.DeploymentErrorIssue[] = [
+			{
+				id: 'iss_go_nilmap',
+				fingerprint: 'a1b2c3d4e5',
+				kind: 'go',
+				title: 'panic: assignment to entry in nil map',
+				status: 'open',
+				count: 1284,
+				firstSeen: at(60 * 26),
+				lastSeen: at(2),
+				samplePod: 'web-12-7d9f8-abcde'
+			},
+			{
+				id: 'iss_py_keyerror',
+				fingerprint: 'b2c3d4e5f6',
+				kind: 'python',
+				title: "KeyError: 'user_id'",
+				status: 'open',
+				count: 342,
+				firstSeen: at(60 * 9),
+				lastSeen: at(11),
+				samplePod: 'web-12-7d9f8-fghij'
+			},
+			{
+				id: 'iss_node_undef',
+				fingerprint: 'c3d4e5f6a7',
+				kind: 'node',
+				title: "TypeError: Cannot read properties of undefined (reading 'id')",
+				status: 'open',
+				count: 87,
+				firstSeen: at(60 * 4),
+				lastSeen: at(38),
+				samplePod: 'web-12-7d9f8-abcde'
+			},
+			{
+				id: 'iss_java_npe',
+				fingerprint: 'd4e5f6a7b8',
+				kind: 'java',
+				title: 'java.lang.NullPointerException: Cannot invoke "String.length()"',
+				status: 'muted',
+				count: 56,
+				firstSeen: at(60 * 40),
+				lastSeen: at(60 * 3),
+				samplePod: 'web-12-7d9f8-fghij'
+			},
+			{
+				id: 'iss_ruby_nomethod',
+				fingerprint: 'e5f6a7b8c9',
+				kind: 'ruby',
+				title: "NoMethodError: undefined method `name' for nil:NilClass",
+				status: 'resolved',
+				count: 19,
+				firstSeen: at(60 * 72),
+				lastSeen: at(60 * 30),
+				samplePod: 'web-12-7d9f8-abcde'
+			},
+			{
+				id: 'iss_generic_oom',
+				fingerprint: 'f6a7b8c9d0',
+				kind: 'generic',
+				title: 'fatal: out of memory allocating 268435456 bytes',
+				status: 'resolved',
+				count: 4,
+				firstSeen: at(60 * 90),
+				lastSeen: at(60 * 50),
+				samplePod: 'web-12-7d9f8-fghij'
+			}
+		]
+		const status = (args?.status as Api.DeploymentErrorStatusFilter | undefined) ?? 'open'
+		const filtered = status === 'all' ? all : all.filter((it) => it.status === status)
+		// Two-page paging: first request (no cursor) returns the first 3, then
+		// nextCursor='page2' yields the remainder. Pages are only meaningful when
+		// the filter leaves more than one page.
+		if (!args?.cursor) {
+			const head = filtered.slice(0, 3)
+			return ok({ issues: head, nextCursor: filtered.length > 3 ? 'page2' : undefined })
+		}
+		return ok({ issues: filtered.slice(3), nextCursor: undefined })
+	},
+	'deployment.errorGet': (args) => {
+		const base = Date.now()
+		const at = (mins: number) => new Date(base - mins * 60_000).toISOString()
+		const samples: Record<string, { title: string, sample: string }> = {
+			iss_go_nilmap: {
+				title: 'panic: assignment to entry in nil map',
+				sample: 'panic: assignment to entry in nil map\n\n' +
+					'goroutine 17 [running]:\n' +
+					'main.(*Server).handleCheckout(0xc0001a4000, {0x9b2e40, 0xc0002b8000}, 0xc0001fe000)\n' +
+					'\t/app/internal/server/checkout.go:142 +0x1f4\n' +
+					'net/http.HandlerFunc.ServeHTTP(0xc0001b0000, {0x9b2e40, 0xc0002b8000}, 0xc0001fe000)\n' +
+					'\t/usr/local/go/src/net/http/server.go:2136 +0x2f\n' +
+					'net/http.(*ServeMux).ServeHTTP(0xc0001c0000, {0x9b2e40, 0xc0002b8000}, 0xc0001fe000)\n' +
+					'\t/usr/local/go/src/net/http/server.go:2514 +0x149'
+			},
+			iss_py_keyerror: {
+				title: "KeyError: 'user_id'",
+				sample: 'Traceback (most recent call last):\n' +
+					'  File "/app/handlers/checkout.py", line 88, in post\n' +
+					'    user = session["user_id"]\n' +
+					'  File "/app/lib/session.py", line 42, in __getitem__\n' +
+					'    return self._data[key]\n' +
+					"KeyError: 'user_id'"
+			},
+			iss_node_undef: {
+				title: "TypeError: Cannot read properties of undefined (reading 'id')",
+				sample: "TypeError: Cannot read properties of undefined (reading 'id')\n" +
+					'    at resolveUser (/app/src/auth.js:51:23)\n' +
+					'    at /app/src/routes/checkout.js:18:30\n' +
+					'    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)\n' +
+					'    at next (/app/node_modules/express/lib/router/route.js:144:13)'
+			},
+			iss_java_npe: {
+				title: 'java.lang.NullPointerException: Cannot invoke "String.length()"',
+				sample: 'java.lang.NullPointerException: Cannot invoke "String.length()" because "name" is null\n' +
+					'\tat com.acme.checkout.CheckoutService.validate(CheckoutService.java:73)\n' +
+					'\tat com.acme.checkout.CheckoutController.post(CheckoutController.java:41)\n' +
+					'\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)'
+			},
+			iss_ruby_nomethod: {
+				title: "NoMethodError: undefined method `name' for nil:NilClass",
+				sample: "app/services/checkout_service.rb:24:in `validate': undefined method `name' for nil:NilClass (NoMethodError)\n" +
+					"\tfrom app/controllers/checkout_controller.rb:12:in `create'\n" +
+					"\tfrom actionpack (7.1.0) lib/action_controller/metal/basic_implicit_render.rb:8:in `send_action'"
+			},
+			iss_generic_oom: {
+				title: 'fatal: out of memory allocating 268435456 bytes',
+				sample: 'fatal: out of memory allocating 268435456 bytes\n' +
+					'  while processing batch job #4821\n' +
+					'  rss=512MiB limit=512MiB'
+			}
+		}
+		const id = String(args?.id ?? 'iss_go_nilmap')
+		const s = samples[id] ?? samples.iss_go_nilmap
+		const issue: Api.DeploymentErrorIssueDetail = {
+			id,
+			fingerprint: 'a1b2c3d4e5',
+			kind: id.startsWith('iss_py')
+				? 'python'
+				: id.startsWith('iss_node')
+					? 'node'
+					: id.startsWith('iss_java')
+						? 'java'
+						: id.startsWith('iss_ruby')
+							? 'ruby'
+							: id.startsWith('iss_generic')
+								? 'generic'
+								: 'go',
+			title: s.title,
+			status: id.startsWith('iss_ruby') || id.startsWith('iss_generic')
+				? 'resolved'
+				: id.startsWith('iss_java')
+					? 'muted'
+					: 'open',
+			count: 1284,
+			firstSeen: at(60 * 26),
+			lastSeen: at(2),
+			samplePod: 'web-12-7d9f8-abcde',
+			sampleMessage: s.sample,
+			recentEvents: [
+				{ pod: 'web-12-7d9f8-abcde', timestamp: at(2), object: '_errorlog/o1.ndjson.zst', offset: 12 },
+				{ pod: 'web-12-7d9f8-fghij', timestamp: at(14), object: '_errorlog/o1.ndjson.zst', offset: 88 },
+				{ pod: 'web-12-7d9f8-abcde', timestamp: at(31), object: '_errorlog/o2.ndjson.zst', offset: 4 }
+			]
+		}
+		return ok({ issue })
+	},
+	'deployment.errorUpdate': () => ok({}),
+
 	'disk.list': () => list(disks),
 	'disk.get': (args) => ok({ ...disks[0], name: args?.name ?? 'data', location: args?.location ?? LOCATION_ID }),
 	'disk.create': () => ok({}),
