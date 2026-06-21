@@ -440,6 +440,17 @@
 						</span>
 					</div>
 				{/if}
+				{#if deployment.type === 'Static' && deployment.releaseUrl}
+					<div class="spec">
+						<span class="spec__label" title="Immutable URL pinned to this exact release — safe to share a specific build">Release URL</span>
+						<a class="spec__link" href={`https://${deployment.releaseUrl}`} target="_blank" rel="noopener">
+							{`https://${deployment.releaseUrl}`}
+						</a>
+						<span class="spec__copy copy" data-clipboard-text={`https://${deployment.releaseUrl}`} title="Copy immutable per-release URL">
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
+				{/if}
 				{#if deployment.type === 'WebService'}
 					<div class="spec">
 						<span class="spec__label">Internal URL</span>

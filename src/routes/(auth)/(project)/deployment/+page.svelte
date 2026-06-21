@@ -89,7 +89,13 @@
 		font-size: 0.74rem;
 	}
 
-	.ttl-flag { font-size: 0.72rem; }
+	.ttl-flag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.28rem;
+		font-size: 0.72rem;
+		white-space: nowrap;
+	}
 
 	.replicas-none { color: hsl(var(--hsl-content) / 0.35); }
 </style>
@@ -136,10 +142,14 @@
 											<span class="status-pill is-{pill.tone}">{pill.label}</span>
 										{/if}
 										{#if it.ttl === -1}
-											<i class="fa-regular fa-clock ttl-flag text-negative" title="Expired — pending deletion"></i>
+											<span class="ttl-flag text-negative" title="Expired — pending deletion">
+												<i class="fa-regular fa-clock"></i> expired
+											</span>
 										{:else if it.ttl > 0}
-											<i class="fa-regular fa-clock ttl-flag text-warning"
-												title={`Auto-delete at ${format.ttlExpireAt(it.ttl)} (in ${format.duration(it.ttl)})`}></i>
+											<span class="ttl-flag text-warning"
+												title={`Auto-delete at ${format.ttlExpireAt(it.ttl)}`}>
+												<i class="fa-regular fa-clock"></i> expires in {format.duration(it.ttl)}
+											</span>
 										{/if}
 									</div>
 									<div class="cell-meta">

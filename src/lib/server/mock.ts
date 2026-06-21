@@ -179,7 +179,8 @@ function deployment (project = 'acme') {
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL,
 		successAt: CREATED_AT,
-		ttl: 0
+		ttl: 0,
+		expiresAt: ''
 	}
 }
 
@@ -210,7 +211,10 @@ function staticDeployment (project = 'acme', releaseSha = STATIC_RELEASE_SHA) {
 		workloadIdentity: '',
 		internalUrl: '',
 		internalAddress: '',
-		url: 'website.acme.rcf2.deploys.app'
+		url: 'website.acme.rcf2.deploys.app',
+		// Immutable per-release URL: <name>-<release8>.<region> pinned to this
+		// release-sha, so the detail page exercises the Release URL row offline.
+		releaseUrl: `website-${releaseSha.slice(0, 8)}.acme.rcf2.deploys.app`
 	}
 }
 
@@ -231,6 +235,13 @@ const deployments = [
 	deployment('acme'),
 	erroringDeployment('acme'),
 	staticDeployment('acme'),
+	{
+		// A TTL'd Static preview, so the list exercises the "expires in" flag.
+		...staticDeployment('acme'),
+		name: 'website-preview',
+		ttl: 7200,
+		expiresAt: '2026-06-22T00:00:00Z'
+	},
 	{
 		...deployment('acme'),
 		name: 'web-paused',

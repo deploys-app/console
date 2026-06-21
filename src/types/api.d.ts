@@ -356,6 +356,7 @@ declare namespace Api {
         sidecars: Sidecar[]
         access?: DeploymentAccessConfig | null
         url: string
+        releaseUrl?: string
         internalUrl: string
         logUrl: string
         eventUrl: string
@@ -371,6 +372,7 @@ declare namespace Api {
         createdBy: string
         successAt: string
         ttl: number
+        expiresAt: string
     }
 
     export type ServiceAccountKey = {
