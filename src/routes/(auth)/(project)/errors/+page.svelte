@@ -6,11 +6,11 @@
 	const { data }: { data: PageData } = $props()
 	const project = $derived(data.project)
 
-	// Reading errors is gated by the same deployment.logs permission as the
-	// per-deployment Errors tab (one surface; keep in lockstep with the server).
-	const READ_PERMISSION = 'deployment.logs'
+	// Reading errors is gated by the error.list permission, matching the
+	// per-deployment Errors tab (keep in lockstep with the server).
+	const READ_PERMISSION = 'error.list'
 
-	type StatusFilter = Api.DeploymentErrorStatusFilter
+	type StatusFilter = Api.ErrorStatusFilter
 
 	const STATUS_FILTERS: { value: StatusFilter, label: string }[] = [
 		{ value: 'open', label: 'Open' },
@@ -21,7 +21,7 @@
 
 	// Short, language-coloured kind badges. Hues are token-based so they recolour
 	// with the theme. Kept LOCAL, mirroring the per-deployment Errors tab.
-	const KIND_META: Record<Api.DeploymentErrorKind, { label: string, hue: number }> = {
+	const KIND_META: Record<Api.ErrorKind, { label: string, hue: number }> = {
 		go: { label: 'Go', hue: 198 },
 		java: { label: 'Java', hue: 18 },
 		python: { label: 'Py', hue: 142 },
@@ -30,7 +30,7 @@
 		generic: { label: 'Generic', hue: 250 }
 	}
 
-	function kindMeta (kind: Api.DeploymentErrorKind) {
+	function kindMeta (kind: Api.ErrorKind) {
 		return KIND_META[kind] ?? { label: kind, hue: 250 }
 	}
 
@@ -58,7 +58,7 @@
 
 	// Deep-link to this issue on the owning deployment's Errors tab, where the
 	// full detail + triage (resolve / mute / reopen) lives.
-	function issueHref (issue: Api.DeploymentErrorIssue): string {
+	function issueHref (issue: Api.ErrorIssue): string {
 		const q = new URLSearchParams({
 			project,
 			location: issue.location,
@@ -69,7 +69,7 @@
 
 	let status = $state<StatusFilter>('open')
 	let query = $state('')
-	let issues = $state<Api.DeploymentErrorIssue[]>([])
+	let issues = $state<Api.ErrorIssue[]>([])
 	let nextCursor = $state<string | undefined>(undefined)
 	let loading = $state(false)
 	let loadingMore = $state(false)
@@ -107,9 +107,9 @@
 		// forbidden response can recover.
 		forbidden = false
 		errorMessage = ''
-		// Project-wide listing: deployment.errors with no `name` aggregates issues
+		// Project-wide listing: error.list with no `name` aggregates issues
 		// across every deployment in the project.
-		const resp = await api.invoke<Api.DeploymentErrorsResult>('deployment.errors', {
+		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project,
 			status,
 			sort: 'lastSeen'
@@ -129,7 +129,7 @@
 	async function loadMore (): Promise<void> {
 		if (!nextCursor || loadingMore) return
 		loadingMore = true
-		const resp = await api.invoke<Api.DeploymentErrorsResult>('deployment.errors', {
+		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project,
 			status,
 			sort: 'lastSeen',

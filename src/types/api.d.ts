@@ -923,26 +923,26 @@ declare namespace Api {
     // Application-error detection (Sentry-lite). An "issue" is a group of
     // identical application-level errors (panics, exceptions, stack traces the
     // app prints) deduplicated by a stable server-side fingerprint.
-    export type DeploymentErrorKind = 'go' | 'java' | 'python' | 'node' | 'ruby' | 'generic'
-    export type DeploymentErrorStatus = 'open' | 'resolved' | 'muted'
+    export type ErrorKind = 'go' | 'java' | 'python' | 'node' | 'ruby' | 'generic'
+    export type ErrorStatus = 'open' | 'resolved' | 'muted'
     // The status query also accepts 'all' (no filter); the default is 'open'.
-    export type DeploymentErrorStatusFilter = DeploymentErrorStatus | 'all'
-    export type DeploymentErrorSort = 'lastSeen' | 'firstSeen' | 'count'
+    export type ErrorStatusFilter = ErrorStatus | 'all'
+    export type ErrorSort = 'lastSeen' | 'firstSeen' | 'count'
 
-    // One grouped issue as returned by deployment.errors (the list view).
+    // One grouped issue as returned by error.list (the list view).
     //
     // `deployment` + `location` identify which deployment the issue belongs to.
     // They are always present; on the per-deployment call they echo the queried
-    // deployment, and on the project-wide call (deployment.errors without a
+    // deployment, and on the project-wide call (error.list without a
     // `name`) they are the column that distinguishes issues across deployments.
-    export type DeploymentErrorIssue = {
+    export type ErrorIssue = {
         id: string
         deployment: string
         location: string
         fingerprint: string
-        kind: DeploymentErrorKind
+        kind: ErrorKind
         title: string
-        status: DeploymentErrorStatus
+        status: ErrorStatus
         count: number
         firstSeen: string
         lastSeen: string
@@ -951,7 +951,7 @@ declare namespace Api {
 
     // A lightweight pointer to one occurrence of an issue (recent_events). The
     // full sample stack lives once on the issue; these only carry where/when.
-    export type DeploymentErrorOccurrence = {
+    export type ErrorOccurrence = {
         pod: string
         timestamp: string
         // object + offset locate the occurrence in the durable _errorlog stream
@@ -962,56 +962,56 @@ declare namespace Api {
 
     // The detail view: all list fields plus the representative sample stack and
     // the recent occurrence pointers.
-    export type DeploymentErrorIssueDetail = DeploymentErrorIssue & {
+    export type ErrorIssueDetail = ErrorIssue & {
         sampleMessage: string
-        recentEvents: DeploymentErrorOccurrence[]
+        recentEvents: ErrorOccurrence[]
     }
 
-    // Args of deployment.errors (list). status defaults to 'open', sort to
+    // Args of error.list. status defaults to 'open', sort to
     // 'lastSeen'; cursor is the opaque page token from a prior nextCursor.
     //
     // `location` + `name` are optional: supplying both scopes the listing to a
     // single deployment, while OMITTING `name` lists error issues across every
     // deployment in the project (the project-wide Errors view). Each returned
     // issue carries its own `deployment` + `location` regardless.
-    export type DeploymentErrorsArgs = {
+    export type ErrorListArgs = {
         project: string
         location?: string
         name?: string
-        status?: DeploymentErrorStatusFilter
+        status?: ErrorStatusFilter
         limit?: number
         cursor?: string
-        sort?: DeploymentErrorSort
+        sort?: ErrorSort
     }
 
-    // Result of deployment.errors. nextCursor is non-empty while more issues
+    // Result of error.list. nextCursor is non-empty while more issues
     // remain for the current filter/sort.
-    export type DeploymentErrorsResult = {
-        issues: DeploymentErrorIssue[]
+    export type ErrorListResult = {
+        issues: ErrorIssue[]
         nextCursor?: string
     }
 
-    // Args of deployment.errorGet (detail).
-    export type DeploymentErrorGetArgs = {
+    // Args of error.get (detail).
+    export type ErrorGetArgs = {
         project: string
         location: string
         name: string
         id: string
     }
 
-    // Result of deployment.errorGet.
-    export type DeploymentErrorGetResult = {
-        issue: DeploymentErrorIssueDetail
+    // Result of error.get.
+    export type ErrorGetResult = {
+        issue: ErrorIssueDetail
     }
 
-    // Args of deployment.errorUpdate (triage). status flips the lifecycle:
+    // Args of error.update (triage). status flips the lifecycle:
     // resolved / open (reopen) / muted.
-    export type DeploymentErrorUpdateArgs = {
+    export type ErrorUpdateArgs = {
         project: string
         location: string
         name: string
         id: string
-        status: DeploymentErrorStatus
+        status: ErrorStatus
     }
 
     export type BillingReportProject = {
