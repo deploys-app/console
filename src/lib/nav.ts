@@ -18,7 +18,7 @@ export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'dashboard', title: 'Dashboard', icon: 'fa-columns', link: '/' },
 	{ id: 'metrics', title: 'Metrics', icon: 'fa-chart-line', link: '/metrics' },
 	{ id: 'deployment', title: 'Deployments', icon: 'fa-rocket', link: '/deployment' },
-	{ id: 'errors', title: 'Errors', icon: 'fa-bug', link: '/errors' },
+	{ id: 'errors', title: 'Errors', icon: 'fa-bug', link: '/errors', preview: true },
 	{ id: 'domain', title: 'Domains', icon: 'fa-globe', link: '/domain' },
 	{ id: 'route', title: 'Routes', icon: 'fa-router', link: '/route' },
 	{ id: 'waf', title: 'Firewall', icon: 'fa-shield-halved', link: '/waf', preview: true },
