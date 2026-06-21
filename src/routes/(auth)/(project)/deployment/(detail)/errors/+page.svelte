@@ -306,12 +306,45 @@
 		box-shadow: 0 1px 2px hsl(var(--hsl-content) / 0.1);
 	}
 
+	/* Compact rail search, matching the Logs rail's .log-filter — the .input
+	   component class can't be used here (its min-height: 2.5rem towers over the
+	   ~1.85rem status pills next to it). */
 	.filter-search {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
 		height: 1.85rem;
-		min-width: 9rem;
-		max-width: 16rem;
-		flex: 1;
+		padding: 0 0.55rem;
+		background: hsl(var(--hsl-content) / 0.04);
+		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border-radius: 6px;
+		transition: border-color 0.15s ease, background 0.15s ease;
 	}
+	.filter-search:focus-within {
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		background: hsl(var(--hsl-base-100));
+		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
+	}
+	.filter-search__icon { font-size: 0.625rem; color: hsl(var(--hsl-content) / 0.4); }
+	.filter-search__input {
+		background: transparent;
+		border: none;
+		outline: none;
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content));
+		width: 11rem;
+	}
+	.filter-search__input::placeholder { color: hsl(var(--hsl-content) / 0.4); letter-spacing: 0.02em; }
+	.filter-search__clear {
+		background: transparent;
+		border: none;
+		padding: 0 0.1rem;
+		color: hsl(var(--hsl-content) / 0.4);
+		cursor: pointer;
+		font-size: 0.625rem;
+		line-height: 1;
+	}
+	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
 
 	/* surface */
 	.errors-surface {
@@ -598,12 +631,22 @@
 			{/each}
 		</div>
 
-		<input
-			class="input filter-search"
-			type="search"
-			placeholder="Filter issues…"
-			aria-label="Filter issues"
-			bind:value={query} />
+		<label class="filter-search">
+			<i class="fa-solid fa-magnifying-glass filter-search__icon" aria-hidden="true"></i>
+			<input
+				class="filter-search__input"
+				type="text"
+				placeholder="Filter issues…"
+				aria-label="Filter issues"
+				spellcheck="false"
+				autocomplete="off"
+				bind:value={query} />
+			{#if query}
+				<button type="button" class="filter-search__clear" onclick={() => (query = '')} aria-label="Clear filter">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+			{/if}
+		</label>
 	</header>
 
 	<main class="errors-surface">
