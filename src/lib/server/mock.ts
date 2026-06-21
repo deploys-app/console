@@ -1282,6 +1282,43 @@ const handlers: Record<string, (args: any) => object> = {
 		storage: dailyMetricLine('static_storage', 1610612736)
 	}),
 
+	// Two synthetic pages (newest-first) so the History view, "Load older", the
+	// pod chips and severity colouring all render under bun dev:mock.
+	'deployment.logsHistory': (args) => {
+		const podA = `${args?.name ?? 'web'}-12-7d9f8-abcde`
+		const podB = `${args?.name ?? 'web'}-12-7d9f8-fghij`
+		const base = Date.now()
+		const mk = (offsetMin: number, pod: string, log: string): Api.DeploymentLogLine => ({
+			pod,
+			timestamp: new Date(base - offsetMin * 60_000).toISOString(),
+			log
+		})
+		if (args?.cursor) {
+			return ok({
+				lines: [
+					mk(65, podA, 'GET /healthz 200 1ms'),
+					mk(70, podB, 'cache warm complete'),
+					mk(95, podA, 'WARN slow query took 812ms'),
+					mk(120, podA, 'server started, listening on :8080')
+				],
+				nextCursor: '',
+				cappedByBytes: false
+			})
+		}
+		return ok({
+			lines: [
+				mk(1, podA, 'GET /api/users 200 4ms'),
+				mk(2, podB, 'POST /api/login 200 22ms'),
+				mk(4, podA, 'ERROR failed to reach upstream: connection refused'),
+				mk(5, podA, 'WARN retrying upstream (attempt 2)'),
+				mk(9, podB, 'GET /api/users 200 3ms'),
+				mk(15, podA, 'DEBUG flushing metrics batch (size=128)')
+			],
+			nextCursor: 'page2',
+			cappedByBytes: false
+		})
+	},
+
 	'disk.list': () => list(disks),
 	'disk.get': (args) => ok({ ...disks[0], name: args?.name ?? 'data', location: args?.location ?? LOCATION_ID }),
 	'disk.create': () => ok({}),
