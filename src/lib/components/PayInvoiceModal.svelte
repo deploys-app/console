@@ -206,6 +206,11 @@
 		background-color: hsl(var(--hsl-content) / 0.06);
 		border: 1px solid hsl(var(--hsl-content) / 0.15);
 		border-radius: 6px;
+		/* This row is a grid item (the modal's button column). Grid items default
+		   to min-width:auto, which would let a long file name push the row — and
+		   the whole modal — wider than the panel. min-width:0 lets it shrink so
+		   the .file-name ellipsis below actually kicks in. */
+		min-width: 0;
 	}
 
 	.selected-file .file-icon {
