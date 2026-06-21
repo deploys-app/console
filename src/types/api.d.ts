@@ -930,8 +930,15 @@ declare namespace Api {
     export type DeploymentErrorSort = 'lastSeen' | 'firstSeen' | 'count'
 
     // One grouped issue as returned by deployment.errors (the list view).
+    //
+    // `deployment` + `location` identify which deployment the issue belongs to.
+    // They are always present; on the per-deployment call they echo the queried
+    // deployment, and on the project-wide call (deployment.errors without a
+    // `name`) they are the column that distinguishes issues across deployments.
     export type DeploymentErrorIssue = {
         id: string
+        deployment: string
+        location: string
         fingerprint: string
         kind: DeploymentErrorKind
         title: string
@@ -962,10 +969,15 @@ declare namespace Api {
 
     // Args of deployment.errors (list). status defaults to 'open', sort to
     // 'lastSeen'; cursor is the opaque page token from a prior nextCursor.
+    //
+    // `location` + `name` are optional: supplying both scopes the listing to a
+    // single deployment, while OMITTING `name` lists error issues across every
+    // deployment in the project (the project-wide Errors view). Each returned
+    // issue carries its own `deployment` + `location` regardless.
     export type DeploymentErrorsArgs = {
         project: string
-        location: string
-        name: string
+        location?: string
+        name?: string
         status?: DeploymentErrorStatusFilter
         limit?: number
         cursor?: string

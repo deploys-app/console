@@ -1340,9 +1340,21 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 		const base = Date.now()
 		const at = (mins: number) => new Date(base - mins * 60_000).toISOString()
-		const all: Api.DeploymentErrorIssue[] = [
+
+		// Whether the caller scoped to a single deployment (`name` present) or asked
+		// for the project-wide view (`name` omitted). The project-wide list spans
+		// several deployments/locations; the per-deployment list stamps every issue
+		// with the queried deployment so its `deployment`/`location` echo the query.
+		const projectWide = !args?.name
+		const deploymentName = String(args?.name ?? 'api')
+		const location = String(args?.location ?? LOCATION_ID)
+
+		// Per-deployment fixture: every issue belongs to the queried deployment.
+		const single: Api.DeploymentErrorIssue[] = [
 			{
 				id: 'iss_go_nilmap',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'a1b2c3d4e5',
 				kind: 'go',
 				title: 'panic: assignment to entry in nil map',
@@ -1354,6 +1366,8 @@ const handlers: Record<string, (args: any) => object> = {
 			},
 			{
 				id: 'iss_py_keyerror',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'b2c3d4e5f6',
 				kind: 'python',
 				title: "KeyError: 'user_id'",
@@ -1365,6 +1379,8 @@ const handlers: Record<string, (args: any) => object> = {
 			},
 			{
 				id: 'iss_node_undef',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'c3d4e5f6a7',
 				kind: 'node',
 				title: "TypeError: Cannot read properties of undefined (reading 'id')",
@@ -1376,6 +1392,8 @@ const handlers: Record<string, (args: any) => object> = {
 			},
 			{
 				id: 'iss_java_npe',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'd4e5f6a7b8',
 				kind: 'java',
 				title: 'java.lang.NullPointerException: Cannot invoke "String.length()"',
@@ -1387,6 +1405,8 @@ const handlers: Record<string, (args: any) => object> = {
 			},
 			{
 				id: 'iss_ruby_nomethod',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'e5f6a7b8c9',
 				kind: 'ruby',
 				title: "NoMethodError: undefined method `name' for nil:NilClass",
@@ -1398,6 +1418,8 @@ const handlers: Record<string, (args: any) => object> = {
 			},
 			{
 				id: 'iss_generic_oom',
+				deployment: deploymentName,
+				location,
 				fingerprint: 'f6a7b8c9d0',
 				kind: 'generic',
 				title: 'fatal: out of memory allocating 268435456 bytes',
@@ -1408,6 +1430,118 @@ const handlers: Record<string, (args: any) => object> = {
 				samplePod: 'web-12-7d9f8-fghij'
 			}
 		]
+
+		// Project-wide fixture: issues span several deployments + locations and
+		// every kind/status, enough to page across two screens. Sorted lastSeen
+		// desc to match the page's default sort.
+		const wide: Api.DeploymentErrorIssue[] = [
+			{
+				id: 'iss_api_go_nilmap',
+				deployment: 'api',
+				location: LOCATION_ID,
+				fingerprint: 'a1b2c3d4e5',
+				kind: 'go',
+				title: 'panic: assignment to entry in nil map',
+				status: 'open',
+				count: 1284,
+				firstSeen: at(60 * 26),
+				lastSeen: at(2),
+				samplePod: 'api-12-7d9f8-abcde'
+			},
+			{
+				id: 'iss_web_node_undef',
+				deployment: 'web',
+				location: LOCATION_ID,
+				fingerprint: 'c3d4e5f6a7',
+				kind: 'node',
+				title: "TypeError: Cannot read properties of undefined (reading 'id')",
+				status: 'open',
+				count: 612,
+				firstSeen: at(60 * 4),
+				lastSeen: at(7),
+				samplePod: 'web-44-58cd1-pqrst'
+			},
+			{
+				id: 'iss_worker_py_keyerror',
+				deployment: 'worker',
+				location: 'gke.cluster-rcf3',
+				fingerprint: 'b2c3d4e5f6',
+				kind: 'python',
+				title: "KeyError: 'user_id'",
+				status: 'open',
+				count: 342,
+				firstSeen: at(60 * 9),
+				lastSeen: at(11),
+				samplePod: 'worker-9-7d9f8-fghij'
+			},
+			{
+				id: 'iss_billing_ruby_nomethod',
+				deployment: 'billing',
+				location: LOCATION_ID,
+				fingerprint: 'e5f6a7b8c9',
+				kind: 'ruby',
+				title: "NoMethodError: undefined method `name' for nil:NilClass",
+				status: 'open',
+				count: 128,
+				firstSeen: at(60 * 12),
+				lastSeen: at(24),
+				samplePod: 'billing-3-aa18c-klmno'
+			},
+			{
+				id: 'iss_api_java_npe',
+				deployment: 'api',
+				location: LOCATION_ID,
+				fingerprint: 'd4e5f6a7b8',
+				kind: 'java',
+				title: 'java.lang.NullPointerException: Cannot invoke "String.length()"',
+				status: 'muted',
+				count: 56,
+				firstSeen: at(60 * 40),
+				lastSeen: at(60 * 3),
+				samplePod: 'api-12-7d9f8-fghij'
+			},
+			{
+				id: 'iss_web_go_index',
+				deployment: 'web',
+				location: 'gke.cluster-rcf3',
+				fingerprint: 'aa11bb22cc',
+				kind: 'go',
+				title: 'panic: runtime error: index out of range [3] with length 3',
+				status: 'open',
+				count: 41,
+				firstSeen: at(60 * 6),
+				lastSeen: at(60 * 4),
+				samplePod: 'web-44-58cd1-uvwxy'
+			},
+			{
+				id: 'iss_worker_generic_oom',
+				deployment: 'worker',
+				location: 'gke.cluster-rcf3',
+				fingerprint: 'f6a7b8c9d0',
+				kind: 'generic',
+				title: 'fatal: out of memory allocating 268435456 bytes',
+				status: 'resolved',
+				count: 17,
+				firstSeen: at(60 * 90),
+				lastSeen: at(60 * 50),
+				samplePod: 'worker-9-7d9f8-zabcd'
+			},
+			{
+				id: 'iss_billing_py_zerodiv',
+				deployment: 'billing',
+				location: LOCATION_ID,
+				fingerprint: '0a1b2c3d4e',
+				kind: 'python',
+				title: 'ZeroDivisionError: division by zero',
+				status: 'resolved',
+				count: 5,
+				firstSeen: at(60 * 120),
+				lastSeen: at(60 * 80),
+				samplePod: 'billing-3-aa18c-efghi'
+			}
+		]
+
+		const all = projectWide ? wide : single
 		const status = (args?.status as Api.DeploymentErrorStatusFilter | undefined) ?? 'open'
 		const filtered = status === 'all' ? all : all.filter((it) => it.status === status)
 		// Two-page paging: first request (no cursor) returns the first 3, then
@@ -1475,6 +1609,8 @@ const handlers: Record<string, (args: any) => object> = {
 		const s = samples[id] ?? samples.iss_go_nilmap
 		const issue: Api.DeploymentErrorIssueDetail = {
 			id,
+			deployment: String(args?.name ?? 'api'),
+			location: String(args?.location ?? LOCATION_ID),
 			fingerprint: 'a1b2c3d4e5',
 			kind: id.startsWith('iss_py')
 				? 'python'
