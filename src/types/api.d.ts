@@ -894,6 +894,21 @@ declare namespace Api {
         size?: UsageMetricsLine[]
     }
 
+    export type DeploymentLogLine = {
+        pod: string
+        timestamp: string
+        log: string
+    }
+
+    // Result of deployment.logsHistory — one bounded, paginated page of durable
+    // stored log lines. nextCursor is non-empty while more remain in the window;
+    // cappedByBytes is set when the page hit the server byte budget.
+    export type DeploymentLogsHistoryResult = {
+        lines?: DeploymentLogLine[]
+        nextCursor?: string
+        cappedByBytes?: boolean
+    }
+
     export type BillingReportProject = {
         sid: string
         name: string
