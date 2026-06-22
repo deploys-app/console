@@ -1408,7 +1408,9 @@ const handlers: Record<string, (args: any) => object> = {
 				kind: 'node',
 				title: "TypeError: Cannot read properties of undefined (reading 'id')",
 				status: 'open',
-				count: 87,
+				// Loud but stale: highest count yet not the most recent, so sorting by
+				// count visibly reorders it above the fresher-but-quieter issues.
+				count: 4823,
 				firstSeen: at(60 * 4),
 				lastSeen: at(38),
 				samplePod: 'web-12-7d9f8-abcde'
@@ -1567,14 +1569,21 @@ const handlers: Record<string, (args: any) => object> = {
 		const all = projectWide ? wide : single
 		const status = (args?.status as Api.ErrorStatusFilter | undefined) ?? 'open'
 		const filtered = status === 'all' ? all : all.filter((it) => it.status === status)
+		// Honour the requested ordering so the sort control is exercised in mock dev.
+		const sort = (args?.sort as Api.ErrorSort | undefined) ?? 'lastSeen'
+		const sorted = [...filtered].sort((a, b) => {
+			if (sort === 'count') return b.count - a.count
+			if (sort === 'firstSeen') return Date.parse(b.firstSeen) - Date.parse(a.firstSeen)
+			return Date.parse(b.lastSeen) - Date.parse(a.lastSeen)
+		})
 		// Two-page paging: first request (no cursor) returns the first 3, then
 		// nextCursor='page2' yields the remainder. Pages are only meaningful when
 		// the filter leaves more than one page.
 		if (!args?.cursor) {
-			const head = filtered.slice(0, 3)
-			return ok({ issues: head, nextCursor: filtered.length > 3 ? 'page2' : undefined })
+			const head = sorted.slice(0, 3)
+			return ok({ issues: head, nextCursor: sorted.length > 3 ? 'page2' : undefined })
 		}
-		return ok({ issues: filtered.slice(3), nextCursor: undefined })
+		return ok({ issues: sorted.slice(3), nextCursor: undefined })
 	},
 	'error.get': (args) => {
 		const base = Date.now()
