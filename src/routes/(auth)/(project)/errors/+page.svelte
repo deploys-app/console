@@ -19,6 +19,14 @@
 		{ value: 'all', label: 'All' }
 	]
 
+	// Server-side ordering (error.list `sort`). Default keeps the freshest issue on
+	// top; "Count" surfaces the loudest, which is what you usually want to triage.
+	const SORT_OPTIONS: { value: Api.ErrorSort, label: string }[] = [
+		{ value: 'lastSeen', label: 'Last seen' },
+		{ value: 'count', label: 'Count' },
+		{ value: 'firstSeen', label: 'First seen' }
+	]
+
 	// Short, language-coloured kind badges. Hues are token-based so they recolour
 	// with the theme. Kept LOCAL, mirroring the per-deployment Errors tab.
 	const KIND_META: Record<Api.ErrorKind, { label: string, hue: number }> = {
@@ -70,6 +78,7 @@
 	}
 
 	let status = $state<StatusFilter>('open')
+	let sort = $state<Api.ErrorSort>('lastSeen')
 	let query = $state('')
 	let issues = $state<Api.ErrorIssue[]>([])
 	let nextCursor = $state<string | undefined>(undefined)
@@ -117,7 +126,7 @@
 		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project,
 			status,
-			sort: 'lastSeen'
+			sort
 		}, fetch)
 		if (resp.ok) {
 			issues = resp.result.issues ?? []
@@ -138,7 +147,7 @@
 		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project,
 			status,
-			sort: 'lastSeen',
+			sort,
 			cursor: nextCursor
 		}, fetch)
 		if (resp.ok) {
@@ -166,14 +175,14 @@
 		return () => clearInterval(ticker)
 	})
 
-	// Reload when the status filter changes (after the first mount). Reading
-	// `status` here is what subscribes the effect to its changes.
-	let trackedStatus = $state<StatusFilter | null>(null)
+	// Reload when the status filter or sort changes (after the first mount).
+	// Reading both here is what subscribes the effect to their changes.
+	let trackedListKey = $state<string | null>(null)
 	$effect(() => {
-		const current = status
-		if (trackedStatus === current) return
-		const first = trackedStatus === null
-		trackedStatus = current
+		const key = `${status} ${sort}`
+		if (trackedListKey === key) return
+		const first = trackedListKey === null
+		trackedListKey = key
 		if (!first) loadIssues()
 	})
 </script>
@@ -290,6 +299,53 @@
 	}
 	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
 
+	/* sort selector — compact native select sized to sit in the rail next to the
+	   status pills (the .select component class is too tall, like .input). */
+	.sort-control {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+	.sort-control__label {
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+	.sort-control__field {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+	}
+	.sort-control__select {
+		appearance: none;
+		-webkit-appearance: none;
+		height: 1.85rem;
+		padding: 0 1.6rem 0 0.55rem;
+		background: hsl(var(--hsl-content) / 0.04);
+		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border-radius: 6px;
+		font-family: var(--ffml-primary);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		color: hsl(var(--hsl-content));
+		cursor: pointer;
+		transition: border-color 0.15s ease, background 0.15s ease;
+	}
+	.sort-control__select:hover { background: hsl(var(--hsl-content) / 0.07); }
+	.sort-control__select:focus-visible {
+		outline: none;
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		background: hsl(var(--hsl-base-100));
+		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
+	}
+	.sort-control__chevron {
+		position: absolute;
+		right: 0.55rem;
+		font-size: 0.625rem;
+		color: hsl(var(--hsl-content) / 0.4);
+		pointer-events: none;
+	}
+
 	/* surface */
 	.errors-surface {
 		position: relative;
@@ -336,9 +392,9 @@
 		font-size: 0.6875rem;
 		font-weight: 700;
 		letter-spacing: 0.02em;
-		background: hsl(var(--kind-hue) 60% 50% / 0.14);
-		color: hsl(var(--kind-hue) 62% 42%);
-		border: 1px solid hsl(var(--kind-hue) 60% 50% / 0.28);
+		background: hsl(var(--kind-hue) 60% 50% / 0.2);
+		color: hsl(var(--kind-hue) 64% 38%);
+		border: 1px solid hsl(var(--kind-hue) 60% 50% / 0.36);
 	}
 	:global(.dark) .kind-badge {
 		background: hsl(var(--kind-hue) 60% 60% / 0.16);
@@ -383,9 +439,13 @@
 		font-size: 0.8125rem;
 		font-weight: 600;
 		color: hsl(var(--hsl-content));
-		white-space: nowrap;
+		/* Clamp to two lines so the meaningful tail of a message survives (e.g. the
+		   property name in "TypeError: Cannot read properties of undefined (…'id')"). */
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 	.issue-title__pod {
 		font-family: var(--ffml-mono);
@@ -399,9 +459,11 @@
 	.issue-count {
 		grid-column: count;
 		font-variant-numeric: tabular-nums;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.75);
+		/* Count is the severity signal — give it weight on par with the title
+		   instead of burying it smaller and dimmer. */
+		font-size: 0.8125rem;
+		font-weight: 700;
+		color: hsl(var(--hsl-content) / 0.9);
 		display: inline-flex;
 		align-items: baseline;
 		gap: 0.25rem;
@@ -446,8 +508,17 @@
 		color: hsl(var(--hsl-positive));
 	}
 	.status-chip[data-status='muted'] {
-		background: hsl(var(--hsl-content) / 0.08);
-		color: hsl(var(--hsl-content) / 0.55);
+		/* muted was near-invisible in light mode at 0.08/0.55 */
+		background: hsl(var(--hsl-content) / 0.12);
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+	/* Chips had no dark-mode lift (unlike .kind-badge), so the tints washed out on
+	   the dark surface — raise the fills in dark. */
+	:global(.dark) .status-chip[data-status='open'] { background: hsl(var(--hsl-negative) / 0.22); }
+	:global(.dark) .status-chip[data-status='resolved'] { background: hsl(var(--hsl-positive) / 0.22); }
+	:global(.dark) .status-chip[data-status='muted'] {
+		background: hsl(var(--hsl-content) / 0.16);
+		color: hsl(var(--hsl-content) / 0.72);
 	}
 
 	/* states */
@@ -535,6 +606,18 @@
 				</button>
 			{/each}
 		</div>
+
+		<label class="sort-control">
+			<span class="sort-control__label">Sort</span>
+			<span class="sort-control__field">
+				<select class="sort-control__select" bind:value={sort} aria-label="Sort issues by">
+					{#each SORT_OPTIONS as o (o.value)}
+						<option value={o.value}>{o.label}</option>
+					{/each}
+				</select>
+				<i class="fa-solid fa-chevron-down sort-control__chevron" aria-hidden="true"></i>
+			</span>
+		</label>
 
 		<label class="filter-search">
 			<i class="fa-solid fa-magnifying-glass filter-search__icon" aria-hidden="true"></i>
