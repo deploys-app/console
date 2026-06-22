@@ -3,6 +3,10 @@
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { kindMeta, hashHue, relTime, classifyListError } from '$lib/errors/format'
+	import ErrorsRail from '$lib/errors/ErrorsRail.svelte'
+	import KindBadge from '$lib/errors/KindBadge.svelte'
+	import StatusChip from '$lib/errors/StatusChip.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -18,64 +22,9 @@
 	const READ_PERMISSION = 'error.list'
 	const TRIAGE_PERMISSION = 'error.update'
 
-	// The list endpoint reports this when the deployment's location has no log
-	// bucket (error detection permanently unavailable there); we match on the
-	// stable substring rather than an error code, mirroring the API contract.
-	const UNAVAILABLE_MARKER = 'error detection is not available for this location'
-
+	// Shared logic (STATUS_FILTERS/SORT_OPTIONS/kindMeta/hashHue/relTime/
+	// classifyListError) and the rail/badge/chip UI live in $lib/errors.
 	type StatusFilter = Api.ErrorStatusFilter
-
-	const STATUS_FILTERS: { value: StatusFilter, label: string }[] = [
-		{ value: 'open', label: 'Open' },
-		{ value: 'resolved', label: 'Resolved' },
-		{ value: 'muted', label: 'Muted' },
-		{ value: 'all', label: 'All' }
-	]
-
-	// Server-side ordering (error.list `sort`). Default keeps the freshest issue on
-	// top; "Count" surfaces the loudest, which is what you usually want to triage.
-	const SORT_OPTIONS: { value: Api.ErrorSort, label: string }[] = [
-		{ value: 'lastSeen', label: 'Last seen' },
-		{ value: 'count', label: 'Count' },
-		{ value: 'firstSeen', label: 'First seen' }
-	]
-
-	// Short, language-coloured kind badges. Hues are token-based so they recolour
-	// with the theme. Kept LOCAL to this page on purpose (see PR notes).
-	const KIND_META: Record<Api.ErrorKind, { label: string, hue: number }> = {
-		go: { label: 'Go', hue: 198 },
-		java: { label: 'Java', hue: 18 },
-		python: { label: 'Py', hue: 142 },
-		node: { label: 'Node', hue: 96 },
-		ruby: { label: 'Ruby', hue: 355 },
-		generic: { label: 'Generic', hue: 250 }
-	}
-
-	function kindMeta (kind: Api.ErrorKind) {
-		return KIND_META[kind] ?? { label: kind, hue: 250 }
-	}
-
-	// Eight evenly-spaced hues; hashing the pod name into the palette gives every
-	// pod a stable, distinguishable colour. Local copy (do not import logFormat).
-	const POD_HUES = [355, 28, 48, 142, 175, 205, 260, 312]
-
-	function podHue (s: string): number {
-		let h = 0
-		for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
-		return POD_HUES[Math.abs(h) % POD_HUES.length]
-	}
-
-	// ts is ISO 8601; nowMs is a shared "now" tick so all rows refresh together.
-	function relTime (ts: string, nowMs: number): string {
-		const t = Date.parse(ts)
-		if (isNaN(t)) return ''
-		const diff = Math.max(0, nowMs - t)
-		if (diff < 1000) return 'now'
-		if (diff < 60_000) return `${Math.floor(diff / 1000)}s`
-		if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m`
-		if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h`
-		return `${Math.floor(diff / 86_400_000)}d`
-	}
 
 	// Deep-linked arrivals default to "all" so the target issue is present
 	// whatever its status (it may have been resolved/muted since).
@@ -113,19 +62,10 @@
 	})
 
 	function classifyError (resp: Api.Response<unknown>): void {
-		forbidden = false
-		unavailable = false
-		errorMessage = ''
-		if (resp.error?.forbidden) {
-			forbidden = true
-			return
-		}
-		const msg = resp.error?.message ?? ''
-		if (msg.includes(UNAVAILABLE_MARKER)) {
-			unavailable = true
-			return
-		}
-		errorMessage = msg || 'Failed to load application errors.'
+		const c = classifyListError(resp)
+		forbidden = c.kind === 'forbidden'
+		unavailable = c.kind === 'unavailable'
+		errorMessage = c.kind === 'error' ? c.message : ''
 	}
 
 	async function loadIssues (): Promise<void> {
@@ -277,7 +217,7 @@
 	// Reading both here is what subscribes the effect to their changes.
 	let trackedListKey = $state<string | null>(null)
 	$effect(() => {
-		const key = `${status} ${sort}`
+		const key = `${status} ${sort}`
 		if (trackedListKey === key) return
 		const first = trackedListKey === null
 		trackedListKey = key
@@ -296,166 +236,6 @@
 		border-radius: 10px;
 		overflow: hidden;
 		font-feature-settings: 'tnum' 1;
-	}
-
-	.errors-rail {
-		display: flex;
-		align-items: center;
-		gap: 0.85rem;
-		padding: 0.6rem 1rem;
-		border-bottom: 1px solid var(--shell-divider);
-		background: linear-gradient(180deg,
-			hsl(var(--hsl-base-200)) 0%,
-			hsl(var(--hsl-base-100)) 100%);
-		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
-		font-family: var(--ffml-primary);
-		flex-wrap: wrap;
-	}
-
-	.errors-rail__brand {
-		margin: 0;
-		font-weight: 600;
-		color: hsl(var(--hsl-content));
-		font-size: 0.9rem;
-	}
-
-	.errors-rail__count {
-		color: hsl(var(--hsl-content) / 0.5);
-		font-size: 0.8125rem;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.errors-rail__spacer { flex: 1; }
-
-	/* status filter pills */
-	.filter-pills {
-		display: inline-flex;
-		background: hsl(var(--hsl-content) / 0.05);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 7px;
-		padding: 2px;
-		gap: 2px;
-	}
-
-	.filter-pill {
-		border: none;
-		background: transparent;
-		border-radius: 5px;
-		padding: 0 0.65rem;
-		height: 1.6rem;
-		font-family: var(--ffml-primary);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.55);
-		cursor: pointer;
-		transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-	}
-	.filter-pill:hover { color: hsl(var(--hsl-content) / 0.85); }
-	.filter-pill[data-active='true'] {
-		background: hsl(var(--hsl-base-100));
-		color: hsl(var(--hsl-content));
-		box-shadow: 0 1px 2px hsl(var(--hsl-content) / 0.1);
-	}
-
-	/* Compact rail search, matching the Logs rail's .log-filter — the .input
-	   component class can't be used here (its min-height: 2.5rem towers over the
-	   ~1.85rem status pills next to it). */
-	.filter-search {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		height: 1.85rem;
-		padding: 0 0.55rem;
-		background: hsl(var(--hsl-content) / 0.04);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 6px;
-		transition: border-color 0.15s ease, background 0.15s ease;
-	}
-	.filter-search:focus-within {
-		border-color: hsl(var(--hsl-primary) / 0.5);
-		background: hsl(var(--hsl-base-100));
-		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
-	}
-	.filter-search__icon { font-size: 0.625rem; color: hsl(var(--hsl-content) / 0.4); }
-	.filter-search__input {
-		background: transparent;
-		border: none;
-		outline: none;
-		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content));
-		width: 11rem;
-	}
-	.filter-search__input::placeholder { color: hsl(var(--hsl-content) / 0.4); letter-spacing: 0.02em; }
-	.filter-search__clear {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 1.25rem;
-		height: 1.25rem;
-		background: transparent;
-		border: none;
-		border-radius: 4px;
-		padding: 0;
-		color: hsl(var(--hsl-content) / 0.4);
-		cursor: pointer;
-		font-size: 0.7rem;
-		line-height: 1;
-	}
-	/* Extend the hit target to ~44px (WCAG) without growing the compact rail —
-	   the icon stays small, the clickable area spills invisibly around it. */
-	.filter-search__clear::after {
-		content: '';
-		position: absolute;
-		inset: -0.75rem;
-	}
-	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
-
-	/* sort selector — compact native select sized to sit in the rail next to the
-	   status pills (the .select component class is too tall, like .input). */
-	.sort-control {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
-	.sort-control__label {
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.5);
-	}
-	.sort-control__field {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-	}
-	.sort-control__select {
-		appearance: none;
-		-webkit-appearance: none;
-		height: 1.85rem;
-		padding: 0 1.6rem 0 0.55rem;
-		background: hsl(var(--hsl-content) / 0.04);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 6px;
-		font-family: var(--ffml-primary);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content));
-		cursor: pointer;
-		transition: border-color 0.15s ease, background 0.15s ease;
-	}
-	.sort-control__select:hover { background: hsl(var(--hsl-content) / 0.07); }
-	.sort-control__select:focus-visible {
-		outline: none;
-		border-color: hsl(var(--hsl-primary) / 0.5);
-		background: hsl(var(--hsl-base-100));
-		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
-	}
-	.sort-control__chevron {
-		position: absolute;
-		right: 0.55rem;
-		font-size: 0.625rem;
-		color: hsl(var(--hsl-content) / 0.4);
-		pointer-events: none;
 	}
 
 	/* surface */
@@ -493,27 +273,6 @@
 	}
 	.issue-row:hover { background: hsl(var(--hsl-content) / 0.035); }
 	.issue-item[data-expanded='true'] .issue-row { background: hsl(var(--hsl-content) / 0.045); }
-
-	.kind-badge {
-		grid-column: kind;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.12rem 0;
-		width: 100%;
-		border-radius: 5px;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		background: hsl(var(--kind-hue) 60% 50% / 0.2);
-		color: hsl(var(--kind-hue) 64% 38%);
-		border: 1px solid hsl(var(--kind-hue) 60% 50% / 0.36);
-	}
-	:global(.dark) .kind-badge {
-		background: hsl(var(--kind-hue) 60% 60% / 0.16);
-		color: hsl(var(--kind-hue) 70% 72%);
-		border-color: hsl(var(--kind-hue) 60% 60% / 0.3);
-	}
 
 	.issue-title {
 		grid-column: title;
@@ -565,48 +324,6 @@
 		font-size: 0.6875rem;
 		color: hsl(var(--hsl-content) / 0.45);
 		cursor: help;
-	}
-
-	.status-chip {
-		grid-column: status;
-		justify-self: end;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		padding: 0.1rem 0.5rem;
-		border-radius: 999px;
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: capitalize;
-		white-space: nowrap;
-	}
-	.status-chip::before {
-		content: '';
-		width: 0.4rem;
-		height: 0.4rem;
-		border-radius: 50%;
-		background: currentColor;
-	}
-	.status-chip[data-status='open'] {
-		background: hsl(var(--hsl-negative) / 0.12);
-		color: hsl(var(--hsl-negative));
-	}
-	.status-chip[data-status='resolved'] {
-		background: hsl(var(--hsl-positive) / 0.12);
-		color: hsl(var(--hsl-positive));
-	}
-	.status-chip[data-status='muted'] {
-		/* muted was near-invisible in light mode at 0.08/0.55 */
-		background: hsl(var(--hsl-content) / 0.12);
-		color: hsl(var(--hsl-content) / 0.7);
-	}
-	/* Chips had no dark-mode lift (unlike .kind-badge), so the tints washed out on
-	   the dark surface — raise the fills in dark. */
-	:global(.dark) .status-chip[data-status='open'] { background: hsl(var(--hsl-negative) / 0.22); }
-	:global(.dark) .status-chip[data-status='resolved'] { background: hsl(var(--hsl-positive) / 0.22); }
-	:global(.dark) .status-chip[data-status='muted'] {
-		background: hsl(var(--hsl-content) / 0.16);
-		color: hsl(var(--hsl-content) / 0.72);
 	}
 
 	/* detail */
@@ -755,56 +472,11 @@
 </style>
 
 <div class="errors-shell">
-	<header class="errors-rail">
-		<h6 class="errors-rail__brand">Errors</h6>
-		{#if loaded && !forbidden && !unavailable && !errorMessage}
-			<span class="errors-rail__count">{countLabel}</span>
-		{/if}
-
-		<span class="errors-rail__spacer"></span>
-
-		<div class="filter-pills" role="group" aria-label="Status filter">
-			{#each STATUS_FILTERS as f (f.value)}
-				<button
-					type="button"
-					class="filter-pill"
-					aria-pressed={status === f.value}
-					data-active={status === f.value}
-					onclick={() => (status = f.value)}>
-					{f.label}
-				</button>
-			{/each}
-		</div>
-
-		<label class="sort-control">
-			<span class="sort-control__label">Sort</span>
-			<span class="sort-control__field">
-				<select class="sort-control__select" bind:value={sort} aria-label="Sort issues by">
-					{#each SORT_OPTIONS as o (o.value)}
-						<option value={o.value}>{o.label}</option>
-					{/each}
-				</select>
-				<i class="fa-solid fa-chevron-down sort-control__chevron" aria-hidden="true"></i>
-			</span>
-		</label>
-
-		<label class="filter-search">
-			<i class="fa-solid fa-magnifying-glass filter-search__icon" aria-hidden="true"></i>
-			<input
-				class="filter-search__input"
-				type="text"
-				placeholder="Filter issues…"
-				aria-label="Filter issues"
-				spellcheck="false"
-				autocomplete="off"
-				bind:value={query} />
-			{#if query}
-				<button type="button" class="filter-search__clear" onclick={() => (query = '')} aria-label="Clear filter">
-					<i class="fa-solid fa-xmark"></i>
-				</button>
-			{/if}
-		</label>
-	</header>
+	<ErrorsRail
+		bind:status
+		bind:sort
+		bind:query
+		count={loaded && !forbidden && !unavailable && !errorMessage ? countLabel : null} />
 
 	<main class="errors-surface">
 		{#if loading && !issues.length}
@@ -869,16 +541,16 @@
 							aria-expanded={expandedId === issue.id}
 							aria-controls={expandedId === issue.id ? `detail-${issue.id}` : undefined}
 							onclick={() => toggleExpand(issue)}>
-							<span class="kind-badge" style={`--kind-hue: ${meta.hue}`}>{meta.label}</span>
+							<KindBadge kind={issue.kind} />
 							<span class="issue-title">
 								<span class="issue-title__text" title={issue.title}>{issue.title}</span>
-								<span class="issue-title__pod" style={`--pod-hue: ${podHue(issue.samplePod)}`} title={issue.samplePod}>{issue.samplePod}</span>
+								<span class="issue-title__pod" style={`--pod-hue: ${hashHue(issue.samplePod)}`} title={issue.samplePod}>{issue.samplePod}</span>
 							</span>
 							<span class="issue-count" title={`${issue.count} occurrences`}>
 								{issue.count.toLocaleString()}<span class="issue-count__unit">×</span>
 							</span>
 							<span class="issue-time" title={issue.lastSeen}>{relTime(issue.lastSeen, now)}</span>
-							<span class="status-chip" data-status={issue.status}>{issue.status}</span>
+							<StatusChip status={issue.status} />
 						</button>
 
 						{#if expandedId === issue.id}
@@ -945,7 +617,7 @@
 										<ul class="occ-list">
 											{#each detail.recentEvents as occ, i (i)}
 												<li class="occ-row">
-													<span class="occ-pod" style={`--pod-hue: ${podHue(occ.pod)}`} title={occ.pod}>{occ.pod}</span>
+													<span class="occ-pod" style={`--pod-hue: ${hashHue(occ.pod)}`} title={occ.pod}>{occ.pod}</span>
 													<span class="occ-time" title={occ.timestamp}>{relTime(occ.timestamp, now)} ago</span>
 												</li>
 											{/each}

@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import { hashHue, relTime, classifyListError } from '$lib/errors/format'
+	import ErrorsRail from '$lib/errors/ErrorsRail.svelte'
+	import KindBadge from '$lib/errors/KindBadge.svelte'
+	import StatusChip from '$lib/errors/StatusChip.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -10,59 +14,9 @@
 	// per-deployment Errors tab (keep in lockstep with the server).
 	const READ_PERMISSION = 'error.list'
 
+	// Shared logic (STATUS_FILTERS/SORT_OPTIONS/kindMeta/hashHue/relTime/
+	// classifyListError) and the rail/badge/chip UI live in $lib/errors.
 	type StatusFilter = Api.ErrorStatusFilter
-
-	const STATUS_FILTERS: { value: StatusFilter, label: string }[] = [
-		{ value: 'open', label: 'Open' },
-		{ value: 'resolved', label: 'Resolved' },
-		{ value: 'muted', label: 'Muted' },
-		{ value: 'all', label: 'All' }
-	]
-
-	// Server-side ordering (error.list `sort`). Default keeps the freshest issue on
-	// top; "Count" surfaces the loudest, which is what you usually want to triage.
-	const SORT_OPTIONS: { value: Api.ErrorSort, label: string }[] = [
-		{ value: 'lastSeen', label: 'Last seen' },
-		{ value: 'count', label: 'Count' },
-		{ value: 'firstSeen', label: 'First seen' }
-	]
-
-	// Short, language-coloured kind badges. Hues are token-based so they recolour
-	// with the theme. Kept LOCAL, mirroring the per-deployment Errors tab.
-	const KIND_META: Record<Api.ErrorKind, { label: string, hue: number }> = {
-		go: { label: 'Go', hue: 198 },
-		java: { label: 'Java', hue: 18 },
-		python: { label: 'Py', hue: 142 },
-		node: { label: 'Node', hue: 96 },
-		ruby: { label: 'Ruby', hue: 355 },
-		generic: { label: 'Generic', hue: 250 }
-	}
-
-	function kindMeta (kind: Api.ErrorKind) {
-		return KIND_META[kind] ?? { label: kind, hue: 250 }
-	}
-
-	// Eight evenly-spaced hues; hashing the deployment name into the palette gives
-	// every deployment a stable, distinguishable colour (local copy).
-	const POD_HUES = [355, 28, 48, 142, 175, 205, 260, 312]
-
-	function nameHue (s: string): number {
-		let h = 0
-		for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0
-		return POD_HUES[Math.abs(h) % POD_HUES.length]
-	}
-
-	// ts is ISO 8601; nowMs is a shared "now" tick so all rows refresh together.
-	function relTime (ts: string, nowMs: number): string {
-		const t = Date.parse(ts)
-		if (isNaN(t)) return ''
-		const diff = Math.max(0, nowMs - t)
-		if (diff < 1000) return 'now'
-		if (diff < 60_000) return `${Math.floor(diff / 1000)}s`
-		if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m`
-		if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h`
-		return `${Math.floor(diff / 86_400_000)}d`
-	}
 
 	// Deep-link to this issue on the owning deployment's Errors tab, where the
 	// full detail + triage (resolve / mute / reopen) lives.
@@ -89,6 +43,7 @@
 	// the empty state before the first fetch resolves.
 	let loaded = $state(false)
 	let forbidden = $state(false)
+	let unavailable = $state(false)
 	let errorMessage = $state('')
 	let now = $state(Date.now())
 
@@ -104,20 +59,18 @@
 	})
 
 	function classifyError (resp: Api.Response<unknown>): void {
-		forbidden = false
-		errorMessage = ''
-		if (resp.error?.forbidden) {
-			forbidden = true
-			return
-		}
-		errorMessage = resp.error?.message || 'Failed to load application errors.'
+		const c = classifyListError(resp)
+		forbidden = c.kind === 'forbidden'
+		unavailable = c.kind === 'unavailable'
+		errorMessage = c.kind === 'error' ? c.message : ''
 	}
 
 	async function loadIssues (): Promise<void> {
 		loading = true
 		// Reset terminal states on each fresh load so a filter change after a
-		// forbidden response can recover.
+		// forbidden/unavailable response can recover.
 		forbidden = false
+		unavailable = false
 		errorMessage = ''
 		// A prior page's load-more failure must not haunt a freshly loaded list.
 		loadMoreError = false
@@ -200,166 +153,6 @@
 		font-feature-settings: 'tnum' 1;
 	}
 
-	.errors-rail {
-		display: flex;
-		align-items: center;
-		gap: 0.85rem;
-		padding: 0.6rem 1rem;
-		border-bottom: 1px solid var(--shell-divider);
-		background: linear-gradient(180deg,
-			hsl(var(--hsl-base-200)) 0%,
-			hsl(var(--hsl-base-100)) 100%);
-		box-shadow: inset 0 1px 0 hsl(var(--hsl-content) / 0.04);
-		font-family: var(--ffml-primary);
-		flex-wrap: wrap;
-	}
-
-	.errors-rail__brand {
-		margin: 0;
-		font-weight: 600;
-		color: hsl(var(--hsl-content));
-		font-size: 0.9rem;
-	}
-
-	.errors-rail__count {
-		color: hsl(var(--hsl-content) / 0.5);
-		font-size: 0.8125rem;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.errors-rail__spacer { flex: 1; }
-
-	/* status filter pills */
-	.filter-pills {
-		display: inline-flex;
-		background: hsl(var(--hsl-content) / 0.05);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 7px;
-		padding: 2px;
-		gap: 2px;
-	}
-
-	.filter-pill {
-		border: none;
-		background: transparent;
-		border-radius: 5px;
-		padding: 0 0.65rem;
-		height: 1.6rem;
-		font-family: var(--ffml-primary);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.55);
-		cursor: pointer;
-		transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
-	}
-	.filter-pill:hover { color: hsl(var(--hsl-content) / 0.85); }
-	.filter-pill[data-active='true'] {
-		background: hsl(var(--hsl-base-100));
-		color: hsl(var(--hsl-content));
-		box-shadow: 0 1px 2px hsl(var(--hsl-content) / 0.1);
-	}
-
-	/* Compact rail search, matching the per-deployment Errors tab — the .input
-	   component class can't be used here (its min-height: 2.5rem towers over the
-	   ~1.85rem status pills next to it). */
-	.filter-search {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		height: 1.85rem;
-		padding: 0 0.55rem;
-		background: hsl(var(--hsl-content) / 0.04);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 6px;
-		transition: border-color 0.15s ease, background 0.15s ease;
-	}
-	.filter-search:focus-within {
-		border-color: hsl(var(--hsl-primary) / 0.5);
-		background: hsl(var(--hsl-base-100));
-		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
-	}
-	.filter-search__icon { font-size: 0.625rem; color: hsl(var(--hsl-content) / 0.4); }
-	.filter-search__input {
-		background: transparent;
-		border: none;
-		outline: none;
-		font-size: 0.8125rem;
-		color: hsl(var(--hsl-content));
-		width: 11rem;
-	}
-	.filter-search__input::placeholder { color: hsl(var(--hsl-content) / 0.4); letter-spacing: 0.02em; }
-	.filter-search__clear {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 1.25rem;
-		height: 1.25rem;
-		background: transparent;
-		border: none;
-		border-radius: 4px;
-		padding: 0;
-		color: hsl(var(--hsl-content) / 0.4);
-		cursor: pointer;
-		font-size: 0.7rem;
-		line-height: 1;
-	}
-	/* Extend the hit target to ~44px (WCAG) without growing the compact rail —
-	   the icon stays small, the clickable area spills invisibly around it. */
-	.filter-search__clear::after {
-		content: '';
-		position: absolute;
-		inset: -0.75rem;
-	}
-	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
-
-	/* sort selector — compact native select sized to sit in the rail next to the
-	   status pills (the .select component class is too tall, like .input). */
-	.sort-control {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
-	.sort-control__label {
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.5);
-	}
-	.sort-control__field {
-		position: relative;
-		display: inline-flex;
-		align-items: center;
-	}
-	.sort-control__select {
-		appearance: none;
-		-webkit-appearance: none;
-		height: 1.85rem;
-		padding: 0 1.6rem 0 0.55rem;
-		background: hsl(var(--hsl-content) / 0.04);
-		border: 1px solid hsl(var(--hsl-content) / 0.08);
-		border-radius: 6px;
-		font-family: var(--ffml-primary);
-		font-size: 0.8125rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content));
-		cursor: pointer;
-		transition: border-color 0.15s ease, background 0.15s ease;
-	}
-	.sort-control__select:hover { background: hsl(var(--hsl-content) / 0.07); }
-	.sort-control__select:focus-visible {
-		outline: none;
-		border-color: hsl(var(--hsl-primary) / 0.5);
-		background: hsl(var(--hsl-base-100));
-		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
-	}
-	.sort-control__chevron {
-		position: absolute;
-		right: 0.55rem;
-		font-size: 0.625rem;
-		color: hsl(var(--hsl-content) / 0.4);
-		pointer-events: none;
-	}
-
 	/* surface */
 	.errors-surface {
 		position: relative;
@@ -394,27 +187,6 @@
 		transition: background-color 0.12s ease;
 	}
 	.issue-row:hover { background: hsl(var(--hsl-content) / 0.035); }
-
-	.kind-badge {
-		grid-column: kind;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.12rem 0;
-		width: 100%;
-		border-radius: 5px;
-		font-size: 0.6875rem;
-		font-weight: 700;
-		letter-spacing: 0.02em;
-		background: hsl(var(--kind-hue) 60% 50% / 0.2);
-		color: hsl(var(--kind-hue) 64% 38%);
-		border: 1px solid hsl(var(--kind-hue) 60% 50% / 0.36);
-	}
-	:global(.dark) .kind-badge {
-		background: hsl(var(--kind-hue) 60% 60% / 0.16);
-		color: hsl(var(--kind-hue) 70% 72%);
-		border-color: hsl(var(--kind-hue) 60% 60% / 0.3);
-	}
 
 	/* deployment column — the column that distinguishes this project-wide view
 	   from the per-deployment tab. */
@@ -464,11 +236,12 @@
 	.issue-title__pod {
 		font-family: var(--ffml-mono);
 		font-size: 0.6875rem;
-		color: hsl(var(--hsl-content) / 0.4);
+		color: hsl(var(--pod-hue) 55% 45%);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	:global(.dark) .issue-title__pod { color: hsl(var(--pod-hue) 65% 68%); }
 
 	.issue-count {
 		grid-column: count;
@@ -491,48 +264,6 @@
 		font-size: 0.6875rem;
 		color: hsl(var(--hsl-content) / 0.45);
 		cursor: help;
-	}
-
-	.status-chip {
-		grid-column: status;
-		justify-self: end;
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		padding: 0.1rem 0.5rem;
-		border-radius: 999px;
-		font-size: 0.6875rem;
-		font-weight: 600;
-		text-transform: capitalize;
-		white-space: nowrap;
-	}
-	.status-chip::before {
-		content: '';
-		width: 0.4rem;
-		height: 0.4rem;
-		border-radius: 50%;
-		background: currentColor;
-	}
-	.status-chip[data-status='open'] {
-		background: hsl(var(--hsl-negative) / 0.12);
-		color: hsl(var(--hsl-negative));
-	}
-	.status-chip[data-status='resolved'] {
-		background: hsl(var(--hsl-positive) / 0.12);
-		color: hsl(var(--hsl-positive));
-	}
-	.status-chip[data-status='muted'] {
-		/* muted was near-invisible in light mode at 0.08/0.55 */
-		background: hsl(var(--hsl-content) / 0.12);
-		color: hsl(var(--hsl-content) / 0.7);
-	}
-	/* Chips had no dark-mode lift (unlike .kind-badge), so the tints washed out on
-	   the dark surface — raise the fills in dark. */
-	:global(.dark) .status-chip[data-status='open'] { background: hsl(var(--hsl-negative) / 0.22); }
-	:global(.dark) .status-chip[data-status='resolved'] { background: hsl(var(--hsl-positive) / 0.22); }
-	:global(.dark) .status-chip[data-status='muted'] {
-		background: hsl(var(--hsl-content) / 0.16);
-		color: hsl(var(--hsl-content) / 0.72);
 	}
 
 	/* states */
@@ -599,56 +330,11 @@
 </div>
 
 <div class="errors-shell">
-	<header class="errors-rail">
-		<h6 class="errors-rail__brand">Issues</h6>
-		{#if loaded && !forbidden && !errorMessage}
-			<span class="errors-rail__count">{countLabel}</span>
-		{/if}
-
-		<span class="errors-rail__spacer"></span>
-
-		<div class="filter-pills" role="group" aria-label="Status filter">
-			{#each STATUS_FILTERS as f (f.value)}
-				<button
-					type="button"
-					class="filter-pill"
-					aria-pressed={status === f.value}
-					data-active={status === f.value}
-					onclick={() => (status = f.value)}>
-					{f.label}
-				</button>
-			{/each}
-		</div>
-
-		<label class="sort-control">
-			<span class="sort-control__label">Sort</span>
-			<span class="sort-control__field">
-				<select class="sort-control__select" bind:value={sort} aria-label="Sort issues by">
-					{#each SORT_OPTIONS as o (o.value)}
-						<option value={o.value}>{o.label}</option>
-					{/each}
-				</select>
-				<i class="fa-solid fa-chevron-down sort-control__chevron" aria-hidden="true"></i>
-			</span>
-		</label>
-
-		<label class="filter-search">
-			<i class="fa-solid fa-magnifying-glass filter-search__icon" aria-hidden="true"></i>
-			<input
-				class="filter-search__input"
-				type="text"
-				placeholder="Filter issues…"
-				aria-label="Filter issues"
-				spellcheck="false"
-				autocomplete="off"
-				bind:value={query} />
-			{#if query}
-				<button type="button" class="filter-search__clear" onclick={() => (query = '')} aria-label="Clear filter">
-					<i class="fa-solid fa-xmark"></i>
-				</button>
-			{/if}
-		</label>
-	</header>
+	<ErrorsRail
+		bind:status
+		bind:sort
+		bind:query
+		count={loaded && !forbidden && !unavailable && !errorMessage ? countLabel : null} />
 
 	<main class="errors-surface">
 		{#if loading && !issues.length}
@@ -663,6 +349,15 @@
 				</svg>
 				<div class="state-pane__title">You don't have access to errors</div>
 				<div class="state-pane__hint">Viewing application errors requires the <code>{READ_PERMISSION}</code> permission.</div>
+			</div>
+		{:else if unavailable}
+			<div class="state-pane">
+				<svg class="state-pane__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+					<circle cx="12" cy="12" r="9"></circle>
+					<path d="M12 8v4M12 16h.01"></path>
+				</svg>
+				<div class="state-pane__title">Error detection isn't available yet.</div>
+				<div class="state-pane__hint">No location in this project has log capture, so application errors can't be detected.</div>
 			</div>
 		{:else if errorMessage}
 			<div class="state-pane">
@@ -696,23 +391,22 @@
 		{:else}
 			<ul class="issue-list">
 				{#each visibleIssues as issue (issue.id)}
-					{@const meta = kindMeta(issue.kind)}
 					<li class="issue-item">
 						<a class="issue-row" href={issueHref(issue)}>
-							<span class="kind-badge" style={`--kind-hue: ${meta.hue}`}>{meta.label}</span>
-							<span class="issue-deployment" style={`--name-hue: ${nameHue(issue.deployment)}`}>
+							<KindBadge kind={issue.kind} />
+							<span class="issue-deployment" style={`--name-hue: ${hashHue(issue.deployment)}`}>
 								<span class="issue-deployment__name" title={issue.deployment}>{issue.deployment}</span>
 								<span class="issue-deployment__loc" title={issue.location}>{issue.location}</span>
 							</span>
 							<span class="issue-title">
 								<span class="issue-title__text" title={issue.title}>{issue.title}</span>
-								<span class="issue-title__pod" title={issue.samplePod}>{issue.samplePod}</span>
+								<span class="issue-title__pod" style={`--pod-hue: ${hashHue(issue.samplePod)}`} title={issue.samplePod}>{issue.samplePod}</span>
 							</span>
 							<span class="issue-count" title={`${issue.count} occurrences`}>
 								{issue.count.toLocaleString()}<span class="issue-count__unit">×</span>
 							</span>
 							<span class="issue-time" title={issue.lastSeen}>{relTime(issue.lastSeen, now)}</span>
-							<span class="status-chip" data-status={issue.status}>{issue.status}</span>
+							<StatusChip status={issue.status} />
 						</a>
 					</li>
 				{/each}
