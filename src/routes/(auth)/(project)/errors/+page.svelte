@@ -62,7 +62,9 @@
 		const q = new URLSearchParams({
 			project,
 			location: issue.location,
-			name: issue.deployment
+			name: issue.deployment,
+			// Carry the issue id so the deployment tab opens it expanded.
+			id: issue.id
 		})
 		return `/deployment/errors?${q.toString()}`
 	}
@@ -73,6 +75,7 @@
 	let nextCursor = $state<string | undefined>(undefined)
 	let loading = $state(false)
 	let loadingMore = $state(false)
+	let loadMoreError = $state(false)
 	// Distinguish "no data yet" from the various terminal states so we never flash
 	// the empty state before the first fetch resolves.
 	let loaded = $state(false)
@@ -107,6 +110,8 @@
 		// forbidden response can recover.
 		forbidden = false
 		errorMessage = ''
+		// A prior page's load-more failure must not haunt a freshly loaded list.
+		loadMoreError = false
 		// Project-wide listing: error.list with no `name` aggregates issues
 		// across every deployment in the project.
 		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
@@ -129,6 +134,7 @@
 	async function loadMore (): Promise<void> {
 		if (!nextCursor || loadingMore) return
 		loadingMore = true
+		loadMoreError = false
 		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project,
 			status,
@@ -138,6 +144,8 @@
 		if (resp.ok) {
 			issues = [...issues, ...(resp.result.issues ?? [])]
 			nextCursor = resp.result.nextCursor || undefined
+		} else {
+			loadMoreError = true
 		}
 		loadingMore = false
 	}
@@ -146,7 +154,7 @@
 	// whichever status is selected (e.g. "3 open", "2 resolved", "6 issues").
 	const countLabel = $derived(
 		query.trim()
-			? `${visibleIssues.length} shown`
+			? `${visibleIssues.length} of ${issues.length} shown`
 			: status === 'all'
 				? `${issues.length} ${issues.length === 1 ? 'issue' : 'issues'}`
 				: `${issues.length} ${status}`
@@ -472,9 +480,21 @@
 
 	.load-more-bar {
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
 		padding: 0.85rem;
 		border-top: 1px solid hsl(var(--hsl-content) / 0.06);
+	}
+	.load-more-hint {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.5);
+		text-align: center;
+	}
+	.load-more-error {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-negative));
+		text-align: center;
 	}
 
 	@media (max-width: 768px) {
@@ -535,7 +555,7 @@
 	</header>
 
 	<main class="errors-surface">
-		{#if loading && !loaded}
+		{#if loading && !issues.length}
 			<div class="state-pane">
 				<div class="state-pane__title">Loading errors…</div>
 			</div>
@@ -556,6 +576,13 @@
 				</svg>
 				<div class="state-pane__title">Couldn't load errors</div>
 				<div class="state-pane__hint">{errorMessage}</div>
+				<button
+					type="button"
+					class="button is-variant-secondary is-size-small"
+					class:is-loading={loading}
+					onclick={loadIssues}>
+					Try again
+				</button>
 			</div>
 		{:else if visibleIssues.length === 0}
 			<div class="state-pane">
@@ -597,14 +624,23 @@
 
 			{#if nextCursor}
 				<div class="load-more-bar">
-					<button
-						type="button"
-						class="button is-variant-secondary is-size-small"
-						class:is-loading={loadingMore}
-						disabled={loadingMore}
-						onclick={loadMore}>
-						Load more
-					</button>
+					{#if query.trim()}
+						<!-- The filter runs over loaded rows only, so paging more in while a
+						     query is active just hides them — explain instead of an inert button. -->
+						<span class="load-more-hint">Filter applies to loaded issues only — clear it to load more.</span>
+					{:else}
+						{#if loadMoreError}
+							<span class="load-more-error">Couldn't load more issues.</span>
+						{/if}
+						<button
+							type="button"
+							class="button is-variant-secondary is-size-small"
+							class:is-loading={loadingMore}
+							disabled={loadingMore}
+							onclick={loadMore}>
+							{loadMoreError ? 'Try again' : 'Load more'}
+						</button>
+					{/if}
 				</div>
 			{/if}
 		{/if}

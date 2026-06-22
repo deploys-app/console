@@ -1,11 +1,16 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
+	import * as modal from '$lib/modal'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
 	const deployment = $derived(data.deployment)
+	// Read once: a deep-link from the project-wide Errors view that we open
+	// straight to (see onMount). untrack() makes the single-read intent explicit
+	// (this is a landing param, not something to react to on prop churn).
+	const initialIssueId = untrack(() => data.initialIssueId)
 
 	// Reading the issue list + detail is gated by error.list / error.get; triage
 	// (resolve/mute/reopen) by error.update. Keep these in lockstep with the
@@ -64,12 +69,15 @@
 		return `${Math.floor(diff / 86_400_000)}d`
 	}
 
-	let status = $state<StatusFilter>('open')
+	// Deep-linked arrivals default to "all" so the target issue is present
+	// whatever its status (it may have been resolved/muted since).
+	let status = $state<StatusFilter>(initialIssueId ? 'all' : 'open')
 	let query = $state('')
 	let issues = $state<Api.ErrorIssue[]>([])
 	let nextCursor = $state<string | undefined>(undefined)
 	let loading = $state(false)
 	let loadingMore = $state(false)
+	let loadMoreError = $state(false)
 	// Distinguish "no data yet" from the various terminal states so we never flash
 	// the empty state before the first fetch resolves.
 	let loaded = $state(false)
@@ -118,6 +126,8 @@
 		forbidden = false
 		unavailable = false
 		errorMessage = ''
+		// A prior page's load-more failure must not haunt a freshly loaded list.
+		loadMoreError = false
 		// Collapse any open detail — the expanded issue may not exist under the
 		// new filter.
 		expandedId = null
@@ -144,6 +154,7 @@
 	async function loadMore (): Promise<void> {
 		if (!nextCursor || loadingMore) return
 		loadingMore = true
+		loadMoreError = false
 		const resp = await api.invoke<Api.ErrorListResult>('error.list', {
 			project: deployment.project,
 			location: deployment.location,
@@ -155,8 +166,33 @@
 		if (resp.ok) {
 			issues = [...issues, ...(resp.result.issues ?? [])]
 			nextCursor = resp.result.nextCursor || undefined
+		} else {
+			loadMoreError = true
 		}
 		loadingMore = false
+	}
+
+	// Fetch and show the detail for an already-expanded issue id. Split out of
+	// toggleExpand so the deep-link open and the detail "Try again" can reuse it.
+	async function loadDetail (id: string): Promise<void> {
+		detail = null
+		detailError = ''
+		detailLoading = true
+		const resp = await api.invoke<Api.ErrorGetResult>('error.get', {
+			project: deployment.project,
+			location: deployment.location,
+			name: deployment.name,
+			id
+		}, fetch)
+		// A different row may have been expanded while this was in flight; only
+		// apply the result if it's still the active one.
+		if (expandedId !== id) return
+		if (resp.ok) {
+			detail = resp.result.issue
+		} else {
+			detailError = resp.error?.message || 'Failed to load issue detail.'
+		}
+		detailLoading = false
 	}
 
 	async function toggleExpand (issue: Api.ErrorIssue): Promise<void> {
@@ -167,24 +203,14 @@
 			return
 		}
 		expandedId = issue.id
-		detail = null
-		detailError = ''
-		detailLoading = true
-		const resp = await api.invoke<Api.ErrorGetResult>('error.get', {
-			project: deployment.project,
-			location: deployment.location,
-			name: deployment.name,
-			id: issue.id
-		}, fetch)
-		// A different row may have been expanded while this was in flight; only
-		// apply the result if it's still the active one.
-		if (expandedId !== issue.id) return
-		if (resp.ok) {
-			detail = resp.result.issue
-		} else {
-			detailError = resp.error?.message || 'Failed to load issue detail.'
-		}
-		detailLoading = false
+		await loadDetail(issue.id)
+	}
+
+	function triageMessage (next: Api.ErrorStatus): string {
+		if (next === 'resolved') return 'Issue resolved.'
+		if (next === 'muted') return 'Issue muted.'
+		if (next === 'open') return 'Issue reopened.'
+		return 'Issue updated.'
 	}
 
 	async function updateStatus (issue: Api.ErrorIssue, next: Api.ErrorStatus): Promise<void> {
@@ -198,27 +224,39 @@
 		}, fetch)
 		updatingId = null
 		if (!resp.ok) {
-			detailError = resp.error?.message || 'Failed to update issue.'
+			// Surface failure in a modal — the detail panel it lives in may collapse
+			// or scroll away on the refetch below, hiding an inline message.
+			modal.error({ error: resp.error })
 			return
 		}
 		// Refetch the list so the issue moves to (or out of) the active filter.
 		// loadIssues() collapses the open detail (the issue may now be filtered
-		// out), so triage from the expanded view closes it on success.
+		// out), so confirm the action in a modal since the panel closes silently.
 		await loadIssues()
+		modal.success({ content: triageMessage(next) })
 	}
 
 	// Label the loaded count with the active filter's noun, so it stays accurate
 	// whichever status is selected (e.g. "3 open", "2 resolved", "6 issues").
 	const countLabel = $derived(
 		query.trim()
-			? `${visibleIssues.length} shown`
+			? `${visibleIssues.length} of ${issues.length} shown`
 			: status === 'all'
 				? `${issues.length} ${issues.length === 1 ? 'issue' : 'issues'}`
 				: `${issues.length} ${status}`
 	)
 
 	onMount(() => {
-		loadIssues()
+		loadIssues().then(() => {
+			// Deep-link: open the target issue once the list has loaded. If it isn't
+			// present (paged off or gone), fall through silently — no broken expand.
+			if (initialIssueId && issues.some((it) => it.id === initialIssueId)) {
+				expandedId = initialIssueId
+				loadDetail(initialIssueId)
+				requestAnimationFrame(() =>
+					document.getElementById(`issue-${initialIssueId}`)?.scrollIntoView({ block: 'nearest' }))
+			}
+		})
 		const ticker = setInterval(() => { now = Date.now() }, 1000)
 		return () => clearInterval(ticker)
 	})
@@ -558,6 +596,10 @@
 	.occ-time { color: hsl(var(--hsl-content) / 0.45); font-variant-numeric: tabular-nums; cursor: help; }
 
 	.detail-error {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
 		font-size: 0.75rem;
 		color: hsl(var(--hsl-negative));
 		padding: 0.5rem 0;
@@ -594,9 +636,21 @@
 
 	.load-more-bar {
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
 		padding: 0.85rem;
 		border-top: 1px solid hsl(var(--hsl-content) / 0.06);
+	}
+	.load-more-hint {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.5);
+		text-align: center;
+	}
+	.load-more-error {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-negative));
+		text-align: center;
 	}
 
 	@media (max-width: 768px) {
@@ -651,7 +705,7 @@
 	</header>
 
 	<main class="errors-surface">
-		{#if loading && !loaded}
+		{#if loading && !issues.length}
 			<div class="state-pane">
 				<div class="state-pane__title">Loading errors…</div>
 			</div>
@@ -681,6 +735,13 @@
 				</svg>
 				<div class="state-pane__title">Couldn't load errors</div>
 				<div class="state-pane__hint">{errorMessage}</div>
+				<button
+					type="button"
+					class="button is-variant-secondary is-size-small"
+					class:is-loading={loading}
+					onclick={loadIssues}>
+					Try again
+				</button>
 			</div>
 		{:else if visibleIssues.length === 0}
 			<div class="state-pane">
@@ -699,7 +760,7 @@
 			<ul class="issue-list">
 				{#each visibleIssues as issue (issue.id)}
 					{@const meta = kindMeta(issue.kind)}
-					<li class="issue-item" data-expanded={expandedId === issue.id}>
+					<li class="issue-item" id={`issue-${issue.id}`} data-expanded={expandedId === issue.id}>
 						<button
 							type="button"
 							class="issue-row"
@@ -758,7 +819,15 @@
 								{#if detailLoading}
 									<div class="detail-loading">Loading issue…</div>
 								{:else if detailError}
-									<div class="detail-error">{detailError}</div>
+									<div class="detail-error">
+										<span>{detailError}</span>
+										<button
+											type="button"
+											class="button is-variant-secondary is-size-small"
+											onclick={() => { if (expandedId) loadDetail(expandedId) }}>
+											Try again
+										</button>
+									</div>
 								{:else if detail}
 									<p class="detail-section-label">Sample stack trace</p>
 									<pre class="stack-surface">{detail.sampleMessage}</pre>
@@ -783,14 +852,23 @@
 
 			{#if nextCursor}
 				<div class="load-more-bar">
-					<button
-						type="button"
-						class="button is-variant-secondary is-size-small"
-						class:is-loading={loadingMore}
-						disabled={loadingMore}
-						onclick={loadMore}>
-						Load more
-					</button>
+					{#if query.trim()}
+						<!-- The filter runs over loaded rows only, so paging more in while a
+						     query is active just hides them — explain instead of an inert button. -->
+						<span class="load-more-hint">Filter applies to loaded issues only — clear it to load more.</span>
+					{:else}
+						{#if loadMoreError}
+							<span class="load-more-error">Couldn't load more issues.</span>
+						{/if}
+						<button
+							type="button"
+							class="button is-variant-secondary is-size-small"
+							class:is-loading={loadingMore}
+							disabled={loadingMore}
+							onclick={loadMore}>
+							{loadMoreError ? 'Try again' : 'Load more'}
+						</button>
+					{/if}
 				</div>
 			{/if}
 		{/if}
