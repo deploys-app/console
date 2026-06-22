@@ -9,6 +9,10 @@
 		// loading or in a terminal state).
 		count?: string | null
 		brand?: string
+		// Manual re-fetch. While `refreshing` is true the icon spins and the button
+		// is disabled.
+		onRefresh?: () => void
+		refreshing?: boolean
 	}
 
 	let {
@@ -16,7 +20,9 @@
 		sort = $bindable(),
 		query = $bindable(),
 		count = null,
-		brand = 'Errors'
+		brand = 'Errors',
+		onRefresh,
+		refreshing = false
 	}: Props = $props()
 </script>
 
@@ -69,6 +75,17 @@
 			</button>
 		{/if}
 	</label>
+
+	{#if onRefresh}
+		<button
+			type="button"
+			class="rail-refresh"
+			onclick={() => onRefresh?.()}
+			disabled={refreshing}
+			aria-label="Refresh errors">
+			<i class="fa-solid fa-arrows-rotate" class:fa-spin={refreshing} aria-hidden="true"></i>
+		</button>
+	{/if}
 </header>
 
 <style>
@@ -233,4 +250,30 @@
 		color: hsl(var(--hsl-content) / 0.4);
 		pointer-events: none;
 	}
+
+	/* manual refresh — compact icon button matching the rail controls' height */
+	.rail-refresh {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.85rem;
+		height: 1.85rem;
+		background: hsl(var(--hsl-content) / 0.04);
+		border: 1px solid hsl(var(--hsl-content) / 0.08);
+		border-radius: 6px;
+		color: hsl(var(--hsl-content) / 0.55);
+		font-size: 0.75rem;
+		cursor: pointer;
+		transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+	}
+	.rail-refresh:hover:not(:disabled) {
+		background: hsl(var(--hsl-content) / 0.07);
+		color: hsl(var(--hsl-content) / 0.85);
+	}
+	.rail-refresh:focus-visible {
+		outline: none;
+		border-color: hsl(var(--hsl-primary) / 0.5);
+		box-shadow: 0 0 0 3px hsl(var(--hsl-primary) / 0.08);
+	}
+	.rail-refresh:disabled { cursor: default; color: hsl(var(--hsl-content) / 0.4); }
 </style>

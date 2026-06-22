@@ -37,9 +37,9 @@ export function kindMeta (kind: Api.ErrorKind): { label: string, hue: number } {
 	return KIND_META[kind] ?? { label: kind, hue: 250 }
 }
 
-// Eight evenly-spaced hues; hashing a stable string (pod or deployment name)
+// Twelve spread-out hues; hashing a stable string (pod or deployment name)
 // into the palette gives each one a stable, distinguishable colour.
-const HUES = [355, 28, 48, 142, 175, 205, 260, 312]
+const HUES = [355, 18, 40, 62, 96, 142, 168, 192, 212, 248, 282, 320]
 
 export function hashHue (s: string): number {
 	let h = 0
