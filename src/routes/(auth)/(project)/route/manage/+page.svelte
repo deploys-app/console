@@ -55,6 +55,7 @@
 	const authIcon = $derived({ basic: 'fa-lock', forward: 'fa-shield-halved', none: 'fa-lock-open' }[authType])
 	const basic = $derived(route.config?.basicAuth)
 	const fwd = $derived(route.config?.forwardAuth)
+	const hostOverride = $derived(route.config?.host)
 	const reqHeaders = $derived(fwd?.authRequestHeaders ?? [])
 	const resHeaders = $derived(fwd?.authResponseHeaders ?? [])
 
@@ -481,6 +482,15 @@
 						<span></span>
 					{/if}
 				</div>
+				{#if hostOverride}
+					<div class="spec">
+						<span class="spec__label">Host header</span>
+						<span class="spec__value is-mono">{hostOverride}</span>
+						<span class="spec__copy copy" data-clipboard-text={hostOverride} title="Copy host header">
+							<i class="fa-light fa-copy"></i>
+						</span>
+					</div>
+				{/if}
 				<div class="spec">
 					<span class="spec__label">Created</span>
 					<span class="spec__value">

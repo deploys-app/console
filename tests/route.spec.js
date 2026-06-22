@@ -1,5 +1,5 @@
 import { test, expect, setMocks, getRequestLog } from './helpers.js'
-import { sampleRoute, sampleDeployment } from './fixtures/mocks.js'
+import { sampleRoute, sampleDeployment, sampleDomain } from './fixtures/mocks.js'
 
 test.describe('routes', () => {
 	test('lists routes', async ({ page }) => {
@@ -79,6 +79,26 @@ test.describe('route detail', () => {
 		await expect(page.locator('#input-auth')).toHaveCount(0)
 	})
 
+	test('shows the Host header override when set', async ({ page }) => {
+		await setMocks({
+			'route.get': {
+				ok: true,
+				result: {
+					...sampleRoute,
+					domain: 'legacy.example.com',
+					target: 'http://203.0.113.10:8080',
+					config: { host: 'legacy.internal' }
+				}
+			}
+		})
+
+		await page.goto('/route/manage?project=test-project&location=gke&domain=legacy.example.com&path=%2F')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Host header', { exact: true })).toBeVisible()
+		await expect(main.getByText('legacy.internal', { exact: true })).toBeVisible()
+	})
+
 	test('delete confirms then calls route.delete', async ({ page }) => {
 		await setMocks({
 			'route.get': { ok: true, result: sampleRoute },
@@ -124,6 +144,54 @@ test.describe('route edit', () => {
 		await expect(page.locator('#input-target_value')).toHaveValue('https://elsewhere.example.com')
 		// Basic-auth config seeds the auth fields.
 		await expect(page.locator('#input-basic_auth_user')).toHaveValue('admin')
+		// A redirect target has no upstream, so the Host override field is hidden.
+		await expect(page.locator('#input-host')).toHaveCount(0)
+	})
+
+	test('seeds and saves the Host header override for an external route', async ({ page }) => {
+		await setMocks({
+			'route.get': {
+				ok: true,
+				result: {
+					...sampleRoute,
+					domain: 'legacy.example.com',
+					target: 'http://203.0.113.10:8080',
+					config: { host: 'legacy.internal' }
+				}
+			},
+			'route.createV2': { ok: true, result: {} }
+		})
+
+		await page.goto('/route/edit?project=test-project&location=gke&domain=legacy.example.com&path=%2F')
+
+		// The external http:// target shows the Host field, seeded from config.host.
+		await expect(page.locator('#input-host')).toHaveValue('legacy.internal')
+
+		await page.locator('#input-host').fill('new.internal')
+		await page.getByRole('button', { name: 'Save' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/route.createV2')
+		}).toBeTruthy()
+
+		const req = (await getRequestLog()).find((r) => r.path === '/route.createV2')
+		if (!req) throw new Error('expected a route.createV2 request')
+		const body = JSON.parse(req.body)
+		expect(body.target).toBe('http://203.0.113.10:8080')
+		expect(body.config.host).toBe('new.internal')
+	})
+
+	test('hides the host field for a deployment target', async ({ page }) => {
+		// The override is external-only, so a deployment route never shows it.
+		await setMocks({
+			'route.get': { ok: true, result: sampleRoute },
+			'deployment.list': { ok: true, result: { items: [sampleDeployment] } }
+		})
+
+		await page.goto(editUrl)
+
+		await expect(page.locator('#input-host')).toHaveCount(0)
 	})
 
 	test('saves forward-auth config via route.createV2 and returns to the detail page', async ({ page }) => {
@@ -256,5 +324,68 @@ test.describe('route create — deployment picker', () => {
 		await page.locator('#input-target_deployment').click()
 		await pausedOption.click()
 		await expect(warning).toBeVisible()
+	})
+})
+
+test.describe('route create — host override', () => {
+	const createUrl = '/route/create?project=test-project'
+
+	async function selectLocationAndDomain (page) {
+		await page.goto(createUrl)
+		await page.locator('#input-location').click()
+		await page.getByRole('option', { name: 'gke' }).click()
+		await page.locator('#input-domain').click()
+		await page.getByRole('option', { name: 'example.com', exact: true }).click()
+	}
+
+	test('shows the host field for External server and sends config.host', async ({ page }) => {
+		await setMocks({
+			'domain.list': { ok: true, result: { items: [sampleDomain] } },
+			'route.createV2': { ok: true, result: {} }
+		})
+
+		await selectLocationAndDomain(page)
+
+		// Redirect has no upstream → no host field.
+		await page.locator('#input-target_prefix').click()
+		await page.getByRole('option', { name: 'Redirect', exact: true }).click()
+		await expect(page.locator('#input-host')).toHaveCount(0)
+
+		// External server → the host override field appears.
+		await page.locator('#input-target_prefix').click()
+		await page.getByRole('option', { name: 'External server (HTTP)', exact: true }).click()
+		await expect(page.locator('#input-host')).toBeVisible()
+
+		await page.locator('#input-target_value').fill('203.0.113.10:8080')
+		await page.locator('#input-host').fill('legacy.internal')
+		await page.getByRole('button', { name: 'Save' }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/route.createV2')
+		}).toBeTruthy()
+
+		const req = (await getRequestLog()).find((r) => r.path === '/route.createV2')
+		if (!req) throw new Error('expected a route.createV2 request')
+		const body = JSON.parse(req.body)
+		expect(body.target).toBe('http://203.0.113.10:8080')
+		expect(body.config.host).toBe('legacy.internal')
+	})
+
+	test('hides the host field for a deployment target', async ({ page }) => {
+		// The override is external-only (the api rejects host on a deployment
+		// target), so the field never appears for a deployment route.
+		await setMocks({
+			'domain.list': { ok: true, result: { items: [sampleDomain] } },
+			'deployment.list': { ok: true, result: { items: [sampleDeployment] } }
+		})
+
+		await selectLocationAndDomain(page)
+		await page.locator('#input-target_prefix').click()
+		await page.getByRole('option', { name: 'Deployment', exact: true }).click()
+		await page.locator('#input-target_deployment').click()
+		await page.getByRole('option', { name: 'web', exact: true }).click()
+
+		await expect(page.locator('#input-host')).toHaveCount(0)
 	})
 })

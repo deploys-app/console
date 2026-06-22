@@ -359,6 +359,18 @@ const routes = [
 		config: {},
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
+	},
+	{
+		location: LOCATION_ID,
+		domain: 'legacy.example.com',
+		path: '/',
+		target: 'http://203.0.113.10:8080',
+		deployment: 'http://203.0.113.10:8080',
+		// External upstream with a Host-header override — the backend
+		// virtual-hosts on Host, so the edge forwards `legacy.internal`.
+		config: { host: 'legacy.internal' },
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
 	}
 ]
 
@@ -1696,12 +1708,16 @@ const handlers: Record<string, (args: any) => object> = {
 	'domain.purgeCache': () => ok({}),
 
 	'route.list': () => list(routes),
-	'route.get': (args) => ok({
-		...routes[0],
-		location: args?.location ?? routes[0].location,
-		domain: args?.domain ?? routes[0].domain,
-		path: args?.path ?? routes[0].path
-	}),
+	'route.get': (args) => {
+		const match = routes.find((r) => r.domain === args?.domain && r.path === (args?.path ?? '/'))
+		const base = match ?? routes[0]
+		return ok({
+			...base,
+			location: args?.location ?? base.location,
+			domain: args?.domain ?? base.domain,
+			path: args?.path ?? base.path
+		})
+	},
 	'route.createV2': () => ok({}),
 	'route.delete': () => ok({}),
 

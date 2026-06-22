@@ -104,6 +104,9 @@ declare namespace Api {
             authRequestHeaders: string[]
             authResponseHeaders: string[]
         }
+        // Override the Host header forwarded upstream (external http:// and
+        // deployment:// targets). Empty keeps the request's original Host.
+        host?: string
     }
 
     export type Route = {
