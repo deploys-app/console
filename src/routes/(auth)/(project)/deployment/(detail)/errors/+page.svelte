@@ -7,6 +7,8 @@
 	import ErrorsRail from '$lib/errors/ErrorsRail.svelte'
 	import KindBadge from '$lib/errors/KindBadge.svelte'
 	import StatusChip from '$lib/errors/StatusChip.svelte'
+	import StatePane from '$lib/errors/StatePane.svelte'
+	import LoadMoreBar from '$lib/errors/LoadMoreBar.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -414,53 +416,6 @@
 	}
 	.detail-loading { padding: 0.85rem 0; font-size: 0.8125rem; color: hsl(var(--hsl-content) / 0.5); }
 
-	/* states */
-	.state-pane {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: 0.7rem;
-		min-height: 18rem;
-		padding: 3rem 1.5rem;
-		text-align: center;
-		font-family: var(--ffml-primary);
-	}
-	.state-pane__icon {
-		width: 2.5rem;
-		height: 2.5rem;
-		color: hsl(var(--hsl-content) / 0.3);
-	}
-	.state-pane__title {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: hsl(var(--hsl-content) / 0.7);
-	}
-	.state-pane__hint {
-		font-size: 0.75rem;
-		color: hsl(var(--hsl-content) / 0.45);
-		max-width: 26rem;
-	}
-
-	.load-more-bar {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.85rem;
-		border-top: 1px solid hsl(var(--hsl-content) / 0.06);
-	}
-	.load-more-hint {
-		font-size: 0.75rem;
-		color: hsl(var(--hsl-content) / 0.5);
-		text-align: center;
-	}
-	.load-more-error {
-		font-size: 0.75rem;
-		color: hsl(var(--hsl-negative));
-		text-align: center;
-	}
-
 	@media (max-width: 768px) {
 		.issue-row {
 			grid-template-columns: [kind] 3.5rem [title] 1fr [count] auto [status] auto;
@@ -476,60 +431,40 @@
 		bind:status
 		bind:sort
 		bind:query
-		count={loaded && !forbidden && !unavailable && !errorMessage ? countLabel : null} />
+		count={loaded && !forbidden && !unavailable && !errorMessage ? countLabel : null}
+		onRefresh={loadIssues}
+		refreshing={loading} />
 
 	<main class="errors-surface">
 		{#if loading && !issues.length}
-			<div class="state-pane">
-				<div class="state-pane__title">Loading errors…</div>
-			</div>
+			<StatePane title="Loading errors…" />
 		{:else if forbidden}
-			<div class="state-pane">
-				<svg class="state-pane__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-					<rect x="3" y="11" width="18" height="11" rx="2"></rect>
-					<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-				</svg>
-				<div class="state-pane__title">You don't have access to errors</div>
-				<div class="state-pane__hint">Viewing application errors requires the <code>{READ_PERMISSION}</code> permission.</div>
-			</div>
+			<StatePane
+				icon="lock"
+				title="You don't have access to errors"
+				hint={`Viewing application errors requires the ${READ_PERMISSION} permission.`} />
 		{:else if unavailable}
-			<div class="state-pane">
-				<svg class="state-pane__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-					<circle cx="12" cy="12" r="9"></circle>
-					<path d="M12 8v4M12 16h.01"></path>
-				</svg>
-				<div class="state-pane__title">Error detection isn't available for this location yet.</div>
-				<div class="state-pane__hint">This deployment's location has no log capture, so application errors can't be detected here.</div>
-			</div>
+			<StatePane
+				icon="alert"
+				title="Error detection isn't available for this location yet."
+				hint="This deployment's location has no log capture, so application errors can't be detected here." />
 		{:else if errorMessage}
-			<div class="state-pane">
-				<svg class="state-pane__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-					<circle cx="12" cy="12" r="9"></circle>
-					<path d="M12 8v4M12 16h.01"></path>
-				</svg>
-				<div class="state-pane__title">Couldn't load errors</div>
-				<div class="state-pane__hint">{errorMessage}</div>
-				<button
-					type="button"
-					class="button is-variant-secondary is-size-small"
-					class:is-loading={loading}
-					onclick={loadIssues}>
-					Try again
-				</button>
-			</div>
+			<StatePane icon="alert" title="Couldn't load errors" hint={errorMessage}>
+				{#snippet action()}
+					<button
+						type="button"
+						class="button is-variant-secondary is-size-small"
+						class:is-loading={loading}
+						onclick={loadIssues}>
+						Try again
+					</button>
+				{/snippet}
+			</StatePane>
 		{:else if visibleIssues.length === 0}
-			<div class="state-pane">
-				<svg class="state-pane__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-					<path d="M9 12l2 2 4-4"></path>
-					<circle cx="12" cy="12" r="9"></circle>
-				</svg>
-				<div class="state-pane__title">
-					{query.trim() ? 'No issues match your filter.' : 'No application errors detected.'}
-				</div>
-				{#if !query.trim()}
-					<div class="state-pane__hint">Stack traces and unhandled exceptions printed by this app would show up here.</div>
-				{/if}
-			</div>
+			<StatePane
+				icon="check"
+				title={query.trim() ? 'No issues match your filter.' : 'No application errors detected.'}
+				hint={query.trim() ? undefined : 'Stack traces and unhandled exceptions printed by this app would show up here.'} />
 		{:else}
 			<ul class="issue-list">
 				{#each visibleIssues as issue (issue.id)}
@@ -630,27 +565,7 @@
 				{/each}
 			</ul>
 
-			{#if nextCursor}
-				<div class="load-more-bar">
-					{#if query.trim()}
-						<!-- The filter runs over loaded rows only, so paging more in while a
-						     query is active just hides them — explain instead of an inert button. -->
-						<span class="load-more-hint">Filter applies to loaded issues only — clear it to load more.</span>
-					{:else}
-						{#if loadMoreError}
-							<span class="load-more-error">Couldn't load more issues.</span>
-						{/if}
-						<button
-							type="button"
-							class="button is-variant-secondary is-size-small"
-							class:is-loading={loadingMore}
-							disabled={loadingMore}
-							onclick={loadMore}>
-							{loadMoreError ? 'Try again' : 'Load more'}
-						</button>
-					{/if}
-				</div>
-			{/if}
+			<LoadMoreBar {nextCursor} {query} {loadingMore} {loadMoreError} onLoadMore={loadMore} />
 		{/if}
 	</main>
 </div>
