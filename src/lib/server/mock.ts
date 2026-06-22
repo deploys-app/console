@@ -1245,6 +1245,17 @@ const handlers: Record<string, (args: any) => object> = {
 			const sha = `${revision}`.repeat(64).slice(0, 64)
 			return ok({ ...base, revision, site: `site://deploys-static/${args?.project ?? 'acme'}/website@${sha}`, siteManifestDigest: sha })
 		}
+		// A TTL'd Static preview, so the detail page exercises the Auto-delete row
+		// and its Extend button offline.
+		if (args?.name === 'website-preview') {
+			return ok({
+				...staticDeployment(args?.project),
+				name: 'website-preview',
+				location: args?.location ?? LOCATION_ID,
+				ttl: 7200,
+				expiresAt: '2026-06-22T08:00:00Z'
+			})
+		}
 		if (args?.name === 'api') {
 			return ok({ ...erroringDeployment(args?.project), location: args?.location ?? LOCATION_ID })
 		}
@@ -1266,6 +1277,7 @@ const handlers: Record<string, (args: any) => object> = {
 	'deployment.resume': () => ok({}),
 	'deployment.restart': () => ok({}),
 	'deployment.rollback': () => ok({}),
+	'deployment.extendTTL': () => ok({}),
 	'deployment.revisions': (args) => {
 		// Static deployment: per-revision release-shas, no image.
 		if (args?.name === 'website') {

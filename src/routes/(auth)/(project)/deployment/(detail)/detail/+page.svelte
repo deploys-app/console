@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte'
 	import { setupCopy } from '$lib/clipboard'
 	import * as format from '$lib/format'
-	import { goto } from '$app/navigation'
+	import { goto, invalidateAll } from '$app/navigation'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
@@ -63,6 +63,40 @@
 
 	const envEntries = $derived(Object.entries(deployment.env || {}))
 	const mountEntries = $derived(Object.entries(deployment.mountData || {}))
+
+	// Extend TTL (preview keep-alive): re-stamp the auto-delete window to now + N
+	// hours without redeploying. Only offered for a deployment that already has a
+	// TTL — extendTTL is rejected server-side on a non-preview deployment.
+	let extendOpen = $state(false)
+	let extendHours = $state(2)
+	let extending = $state(false)
+
+	function openExtend () {
+		extendHours = 2
+		extendOpen = true
+	}
+
+	async function submitExtend () {
+		const ttl = Math.round(extendHours * 3600)
+		if (!(ttl > 0)) {
+			modal.error({ error: 'Enter a positive number of hours.' })
+			return
+		}
+		extending = true
+		const resp = await api.invoke('deployment.extendTTL', {
+			project: deployment.project,
+			location: deployment.location,
+			name: deployment.name,
+			ttl
+		}, fetch)
+		extending = false
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			return
+		}
+		extendOpen = false
+		await invalidateAll()
+	}
 </script>
 
 <style>
@@ -770,7 +804,9 @@
 								<i class="fa-regular fa-clock"></i> in {format.duration(deployment.ttl)}
 							</span>
 						</span>
-						<span></span>
+						<GuardedButton permission="deployment.deploy" class="button is-variant-secondary is-size-small" onclick={openExtend} title="Re-stamp the auto-delete window (keep this preview alive)">
+							Extend
+						</GuardedButton>
 					</div>
 				{/if}
 			</div>
@@ -894,3 +930,21 @@
 </DangerZone>
 
 <EnvGroupModal bind:this={envGroupModal} />
+
+<!-- Extend auto-delete window (preview keep-alive). No overlay-click-to-close so
+     a stray click while typing can't dismiss the form. -->
+<div class="modal" class:is-active={extendOpen} aria-hidden={!extendOpen}>
+	<div class="modal-panel" style="width: 100%; max-width: 26rem;">
+		<div class="modal-close" onclick={() => (extendOpen = false)} onkeypress={() => (extendOpen = false)} tabindex="0" role="button">✕</div>
+		<h4><strong>Extend auto-delete</strong></h4>
+		<p class="mt-2 text-sm text-content/60">Re-stamp the window so this deployment auto-deletes that many hours from now. It does not redeploy.</p>
+		<div class="field mt-4">
+			<label class="label" for="extend-hours">Hours from now</label>
+			<input id="extend-hours" class="input" type="number" min="0.25" step="0.25" bind:value={extendHours} />
+		</div>
+		<div class="mt-6 flex justify-end gap-3">
+			<button class="button is-variant-tertiary" type="button" onclick={() => (extendOpen = false)}>Cancel</button>
+			<button class="button" class:is-loading={extending} type="button" disabled={extending} onclick={submitExtend}>Extend</button>
+		</div>
+	</div>
+</div>
