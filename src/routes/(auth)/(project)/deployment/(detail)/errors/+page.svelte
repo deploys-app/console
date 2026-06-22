@@ -212,6 +212,9 @@
 			return
 		}
 		expandedId = issue.id
+		// Move focus into the freshly-opened detail region so keyboard users land in
+		// it and screen readers announce it; mouse users see no ring (:focus-visible).
+		requestAnimationFrame(() => document.getElementById(`detail-${issue.id}`)?.focus())
 		await loadDetail(issue.id)
 	}
 
@@ -384,13 +387,27 @@
 	}
 	.filter-search__input::placeholder { color: hsl(var(--hsl-content) / 0.4); letter-spacing: 0.02em; }
 	.filter-search__clear {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.25rem;
+		height: 1.25rem;
 		background: transparent;
 		border: none;
-		padding: 0 0.1rem;
+		border-radius: 4px;
+		padding: 0;
 		color: hsl(var(--hsl-content) / 0.4);
 		cursor: pointer;
-		font-size: 0.625rem;
+		font-size: 0.7rem;
 		line-height: 1;
+	}
+	/* Extend the hit target to ~44px (WCAG) without growing the compact rail —
+	   the icon stays small, the clickable area spills invisibly around it. */
+	.filter-search__clear::after {
+		content: '';
+		position: absolute;
+		inset: -0.75rem;
 	}
 	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
 
@@ -598,6 +615,9 @@
 		background: hsl(var(--hsl-content) / 0.02);
 		border-top: 1px solid hsl(var(--hsl-content) / 0.06);
 	}
+	/* The panel takes focus on open only to move the reading cursor here; it's a
+	   region, not a control, so suppress the ring (its buttons keep their own). */
+	.issue-detail:focus { outline: none; }
 
 	.detail-actions {
 		display: flex;
@@ -743,13 +763,12 @@
 
 		<span class="errors-rail__spacer"></span>
 
-		<div class="filter-pills" role="tablist" aria-label="Status filter">
+		<div class="filter-pills" role="group" aria-label="Status filter">
 			{#each STATUS_FILTERS as f (f.value)}
 				<button
 					type="button"
 					class="filter-pill"
-					role="tab"
-					aria-selected={status === f.value}
+					aria-pressed={status === f.value}
 					data-active={status === f.value}
 					onclick={() => (status = f.value)}>
 					{f.label}
@@ -848,6 +867,7 @@
 							type="button"
 							class="issue-row"
 							aria-expanded={expandedId === issue.id}
+							aria-controls={expandedId === issue.id ? `detail-${issue.id}` : undefined}
 							onclick={() => toggleExpand(issue)}>
 							<span class="kind-badge" style={`--kind-hue: ${meta.hue}`}>{meta.label}</span>
 							<span class="issue-title">
@@ -862,7 +882,12 @@
 						</button>
 
 						{#if expandedId === issue.id}
-							<div class="issue-detail">
+							<div
+								class="issue-detail"
+								id={`detail-${issue.id}`}
+								role="region"
+								aria-label={`Details for ${issue.title}`}
+								tabindex="-1">
 								<div class="detail-actions">
 									{#if issue.status !== 'resolved'}
 										<GuardedButton

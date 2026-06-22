@@ -289,13 +289,27 @@
 	}
 	.filter-search__input::placeholder { color: hsl(var(--hsl-content) / 0.4); letter-spacing: 0.02em; }
 	.filter-search__clear {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.25rem;
+		height: 1.25rem;
 		background: transparent;
 		border: none;
-		padding: 0 0.1rem;
+		border-radius: 4px;
+		padding: 0;
 		color: hsl(var(--hsl-content) / 0.4);
 		cursor: pointer;
-		font-size: 0.625rem;
+		font-size: 0.7rem;
 		line-height: 1;
+	}
+	/* Extend the hit target to ~44px (WCAG) without growing the compact rail —
+	   the icon stays small, the clickable area spills invisibly around it. */
+	.filter-search__clear::after {
+		content: '';
+		position: absolute;
+		inset: -0.75rem;
 	}
 	.filter-search__clear:hover { color: hsl(var(--hsl-content)); }
 
@@ -593,13 +607,12 @@
 
 		<span class="errors-rail__spacer"></span>
 
-		<div class="filter-pills" role="tablist" aria-label="Status filter">
+		<div class="filter-pills" role="group" aria-label="Status filter">
 			{#each STATUS_FILTERS as f (f.value)}
 				<button
 					type="button"
 					class="filter-pill"
-					role="tab"
-					aria-selected={status === f.value}
+					aria-pressed={status === f.value}
 					data-active={status === f.value}
 					onclick={() => (status = f.value)}>
 					{f.label}
