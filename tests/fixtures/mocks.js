@@ -114,6 +114,14 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
+		'/me.listTokens': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/me.revokeToken': {
+			ok: true,
+			result: {}
+		},
 		'/role.list': {
 			ok: true,
 			result: { items: [] }
@@ -277,6 +285,14 @@ export const sampleServiceAccount = {
 	description: 'used by ci',
 	createdAt: now,
 	createdBy: '[email protected]'
+}
+
+export const sampleScopedToken = {
+	id: 'tok_test123',
+	label: 'claude-code:pr-42',
+	permissions: ['deployment.get', 'deployment.logs'],
+	createdAt: now,
+	expiresAt: '2099-01-01T00:00:00Z'
 }
 
 export const sampleRole = {

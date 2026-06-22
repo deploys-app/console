@@ -30,6 +30,7 @@ export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'role', title: 'Roles', icon: 'fa-user-tag', link: '/role' },
 	{ id: 'role.users', title: 'Users', icon: 'fa-users', link: '/role/users' },
 	{ id: 'service-account', title: 'Service Accounts', icon: 'fa-user-lock', link: '/service-account' },
+	{ id: 'scoped-token', title: 'Scoped Tokens', icon: 'fa-user-clock', link: '/scoped-token' },
 	{ id: 'dropbox', title: 'Dropbox', icon: 'fa-box-open', link: '/dropbox' },
 	{ id: 'registry', title: 'Registry', icon: 'fa-warehouse-full', link: '/registry' },
 	{ id: 'github', title: 'GitHub', icon: 'fa-code-branch', link: '/github', preview: true },
