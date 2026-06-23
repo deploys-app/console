@@ -951,7 +951,34 @@
 		overflow-x: auto;
 		overflow-y: visible;
 		border-radius: 0.25rem;
+
+		/* Scroll affordance — edge shadows that show ONLY while the table is
+		   clipped horizontally, so narrow screens reveal there are more columns
+		   to scroll to. Classic pure-CSS technique: the two "cover" layers
+		   (background-attachment: local) ride flush against the content edges
+		   and mask the shadow when there is nothing more to scroll that way; the
+		   two radial "shadow" layers (background-attachment: scroll) are pinned
+		   to the container and surface once a cover scrolls out of view. No JS
+		   and no scroll-driven animation, so support is universal. The cover
+		   color tracks the panel background (base-300, the list-panel level) and
+		   the shadow tracks the line token, so both follow light/dark. */
+		--table-edge-bg: hsl(var(--hsl-base-300));
+		background:
+			linear-gradient(to right, var(--table-edge-bg) 30%, transparent) 0 0,
+			linear-gradient(to left, var(--table-edge-bg) 30%, transparent) 100% 0,
+			radial-gradient(farthest-side at 0 50%, hsl(var(--hsl-line)), transparent) 0 0,
+			radial-gradient(farthest-side at 100% 50%, hsl(var(--hsl-line)), transparent) 100% 0;
+		background-repeat: no-repeat;
+		background-size: 2.5rem 100%, 2.5rem 100%, 0.875rem 100%, 0.875rem 100%;
+		background-attachment: local, local, scroll, scroll;
 	}
+
+	/* Keep the scroll-shadow "cover" color matched to the panel the table sits
+	   on. Nearly every list table is on the base-300 panel (the default above),
+	   but a few embedded tables sit on other levels; without these the cover
+	   band would be a faintly wrong shade at the table's edges. */
+	.panel.is-level-200 .table-container { --table-edge-bg: hsl(var(--hsl-base-200)); }
+	.panel.is-level-400 .table-container { --table-edge-bg: hsl(var(--hsl-base-400)); }
 
 	.table {
 		width: 100%;
@@ -1041,6 +1068,42 @@
 	.table .is-align-left { text-align: left; }
 	.table .is-align-center { text-align: center; }
 	.table .is-align-right { text-align: right; }
+
+	/* On narrow screens, let cells wrap instead of forcing a wide horizontal
+	   scroll: most list tables are an identity column plus a few short
+	   attributes, so wrapping keeps them readable in place. Long unbreakable
+	   tokens (URLs, image digests, permission strings) get overflow-wrap so they
+	   break rather than blow the row out; headers wrap too so they don't pin the
+	   table to its old width. Any table that stays wider than the viewport (the
+	   genuinely wide ones — audit-log, waf, cache) still gets the scroll
+	   affordance on .table-container above. */
+	@media (max-width: 48rem) {
+		.table th,
+		.table td {
+			white-space: normal;
+		}
+
+		.table td {
+			/* break-word, NOT anywhere: anywhere lets the table-layout shrink a
+			   column to 1ch (it counts every char as a min-content break point),
+			   which stacks names like "website-preview" into a vertical column of
+			   single letters. break-word keeps the column at least as wide as its
+			   longest word and only breaks a token that still can't fit. */
+			overflow-wrap: break-word;
+		}
+
+		/* Progressive column-hiding: the genuinely wide tables tag their
+		   lowest-value columns — both the <th> and the matching body <td>s — with
+		   .is-hide-mobile so the column drops below this breakpoint while the
+		   table stays a real, comparable table (no restack, native semantics
+		   intact). Each such page keeps an escape hatch to the hidden fields (a
+		   row/identity link to a detail page), except flat logs where only a
+		   redundant column is dropped. Full-width colspan rows (empty/error/
+		   load-more) keep their original span and are never tagged. */
+		.table .is-hide-mobile {
+			display: none;
+		}
+	}
 
 	/* Table-cell vocabulary — shared chips/pills/badges used across the list
 	 * pages so every table speaks the same visual language. Introduced with

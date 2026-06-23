@@ -70,8 +70,8 @@
 			<tr>
 				<th>Route</th>
 				<th>Target</th>
-				<th>Location</th>
-				<th>Config</th>
+				<th class="is-hide-mobile">Location</th>
+				<th class="is-hide-mobile">Config</th>
 <!--				<th>Created at</th>-->
 <!--				<th>Created by</th>-->
 				<th class="is-collapse is-align-right"></th>
@@ -84,10 +84,10 @@
 						onkeydown={(e) => onRowKey(e, it)}>
 						<td><span class="cell-name">https://{it.domain}{it.path}</span></td>
 						<td><span class="cell-muted">{it.target}</span></td>
-						<td>
+						<td class="is-hide-mobile">
 							<span class="loc-chip"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}</span>
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							{#if it.config?.basicAuth}
 								<i class="fa-solid fa-lock" title="Basic auth"></i>
 							{/if}

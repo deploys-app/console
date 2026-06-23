@@ -116,10 +116,10 @@
 			<thead>
 			<tr>
 				<th>Deployment</th>
-				<th>Resources</th>
+				<th class="is-hide-mobile">Resources</th>
 				<th>Replicas</th>
 				<th>Location</th>
-				<th>Last deployed</th>
+				<th class="is-hide-mobile">Last deployed</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -165,7 +165,7 @@
 								</div>
 							</div>
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							{#if it.type === 'Static'}
 								<span class="resources-none" title="Static sites have no configurable resources">—</span>
 							{:else}
@@ -194,7 +194,7 @@
 								<i class="fa-solid fa-location-dot" aria-hidden="true"></i>{it.location}
 							</span>
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							<span class="cell-time" title={format.datetime(it.createdAt)}>
 								{format.fromNow(it.createdAt) || '—'}
 							</span>

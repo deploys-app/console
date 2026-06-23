@@ -4,6 +4,14 @@
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 
+	// A column is either a plain header string, or an object that can opt the
+	// column out of the mobile layout. `hideMobile` drops the column below the
+	// table's 48rem breakpoint (see `.is-hide-mobile` in app.css) so wide list
+	// pages shed low-value columns on phones while staying a real table; the row
+	// snippet must put `class="is-hide-mobile"` on the matching <td> to keep the
+	// header and body aligned.
+	type Column = string | { label: string, hideMobile?: boolean }
+
 	interface Props {
 		title: string
 		items: T[]
@@ -17,8 +25,9 @@
 		createPermission: string | string[]
 		createHref: string
 		createLabel?: string
-		/** data column headers (the row snippet renders matching cells) */
-		columns: string[]
+		/** data column headers (the row snippet renders matching cells); use
+		 *  `{ label, hideMobile: true }` to drop a column below 48rem */
+		columns: Column[]
 		/** append a right-aligned actions column header (+1 to the empty/error span) */
 		actions?: boolean
 		key: (item: T) => string | number
@@ -34,6 +43,9 @@
 
 	const plural = $derived(nounPlural ?? `${noun}s`)
 	const span = $derived(columns.length + (actions ? 1 : 0))
+
+	const colLabel = (c: Column) => typeof c === 'string' ? c : c.label
+	const colHidden = (c: Column) => typeof c !== 'string' && !!c.hideMobile
 </script>
 
 <div class="page-head">
@@ -51,7 +63,7 @@
 		<table class="table is-variant-compact">
 			<thead>
 				<tr>
-					{#each columns as col (col)}<th>{col}</th>{/each}
+					{#each columns as col (colLabel(col))}<th class:is-hide-mobile={colHidden(col)}>{colLabel(col)}</th>{/each}
 					{#if actions}<th class="is-collapse is-align-right"></th>{/if}
 				</tr>
 			</thead>

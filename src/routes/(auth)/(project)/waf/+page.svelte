@@ -89,9 +89,9 @@
 				<tr>
 					<th>Location</th>
 					<th>Status</th>
-					<th>Description</th>
-					<th>Rules</th>
-					<th>Limits</th>
+					<th class="is-hide-mobile">Description</th>
+					<th class="is-hide-mobile">Rules</th>
+					<th class="is-hide-mobile">Limits</th>
 					<th>Matches (24h)</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
@@ -120,15 +120,15 @@
 								</span>
 							{/if}
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							{#if fw.description}
 								{fw.description}
 							{:else}
 								<span class="text-content/40">—</span>
 							{/if}
 						</td>
-						<td>{fw.rules?.length ?? 0}</td>
-						<td>{fw.limits?.length ?? 0}</td>
+						<td class="is-hide-mobile">{fw.rules?.length ?? 0}</td>
+						<td class="is-hide-mobile">{fw.limits?.length ?? 0}</td>
 						<td>
 							<!-- Reserve the loaded size in every state so the row/column keeps
 							     its dimensions while the async sparkline fills in (no layout shift). -->

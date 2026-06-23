@@ -89,9 +89,9 @@
 				<tr>
 					<th>Location</th>
 					<th>Status</th>
-					<th>Description</th>
-					<th>Overrides</th>
-					<th>Decisions (24h)</th>
+					<th class="is-hide-mobile">Description</th>
+					<th class="is-hide-mobile">Overrides</th>
+					<th class="is-hide-mobile">Decisions (24h)</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
@@ -119,15 +119,15 @@
 								</span>
 							{/if}
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							{#if zone.description}
 								{zone.description}
 							{:else}
 								<span class="text-content/40">—</span>
 							{/if}
 						</td>
-						<td>{zone.overrides?.length ?? 0}</td>
-						<td>
+						<td class="is-hide-mobile">{zone.overrides?.length ?? 0}</td>
+						<td class="is-hide-mobile">
 							<!-- Reserve the loaded size in every state so the row/column keeps
 							     its dimensions while the async sparkline fills in (no layout shift). -->
 							<div class="matches-cell">

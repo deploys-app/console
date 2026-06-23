@@ -485,7 +485,7 @@
 					<th>Time</th>
 					<th>Outcome</th>
 					<th>Actor</th>
-					<th>Channel</th>
+					<th class="is-hide-mobile">Channel</th>
 					<th>Action</th>
 					<th>Resource</th>
 					<th>Detail</th>
@@ -507,7 +507,7 @@
 								</span>
 							{/if}
 						</td>
-						<td><ChannelBadge channel={it.channel} /></td>
+						<td class="is-hide-mobile"><ChannelBadge channel={it.channel} /></td>
 						<td><span class="action-cell">{it.action}</span></td>
 						<td>
 							{#if it.resource.type}

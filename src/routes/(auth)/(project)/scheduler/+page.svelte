@@ -30,7 +30,7 @@
 	createPermission="scheduler.create"
 	createHref="/scheduler/create?project={project}"
 	createLabel="Create job"
-	columns={['Name', 'Schedule', 'Method', 'Last run', 'Status']}
+	columns={['Name', 'Schedule', { label: 'Method', hideMobile: true }, { label: 'Last run', hideMobile: true }, 'Status']}
 	actions
 	key={(it) => it.name}>
 	{#snippet row(it)}
@@ -40,8 +40,8 @@
 			</a>
 		</td>
 		<td><span class="font-mono text-sm">{it.schedule}</span></td>
-		<td><span class="method-badge" data-method={it.method}>{it.method}</span></td>
-		<td>
+		<td class="is-hide-mobile"><span class="method-badge" data-method={it.method}>{it.method}</span></td>
+		<td class="is-hide-mobile">
 			{#if it.lastRunAt}
 				<span class="cell-time" title={format.datetime(it.lastRunAt)}>{format.fromNow(it.lastRunAt)}</span>
 			{:else}

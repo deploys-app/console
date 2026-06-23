@@ -76,7 +76,7 @@
 					<th>Label</th>
 					<th>Permissions</th>
 					<th>Expires</th>
-					<th>Created</th>
+					<th class="is-hide-mobile">Created</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
 			</thead>
@@ -105,7 +105,7 @@
 						<td>
 							<span class="cell-time" title={format.datetime(it.expiresAt)}>{format.fromNow(it.expiresAt) || '—'}</span>
 						</td>
-						<td>
+						<td class="is-hide-mobile">
 							<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 						</td>
 						<td>
