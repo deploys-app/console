@@ -539,6 +539,11 @@ declare namespace Api {
     export type AuditLogActor = {
         email: string
         type: AuditActorType
+        // Attribution tag of the scoped (agent) token the action was made under
+        // (e.g. "claude-code:pr-42"); empty/absent for non-agent actions. The
+        // principal (email/type) is still the minter — the label only names the
+        // agent session.
+        label?: string
     }
 
     export type AuditLogResource = {

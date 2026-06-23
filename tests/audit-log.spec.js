@@ -1,5 +1,5 @@
 import { test, expect, setMocks } from './helpers.js'
-import { sampleAuditLogItem } from './fixtures/mocks.js'
+import { sampleAuditLogItem, sampleAuditLogItemAgent } from './fixtures/mocks.js'
 
 test.describe('audit log', () => {
 	test('lists audit log entries', async ({ page }) => {
@@ -18,6 +18,38 @@ test.describe('audit log', () => {
 		await expect(main.getByText('[email protected]')).toBeVisible()
 		await expect(main.getByRole('cell', { name: /Success/ })).toBeVisible()
 		await expect(main.getByText('deployed revision 1')).toBeVisible()
+	})
+
+	test('shows the agent label for a scoped-token action, keeping the principal', async ({ page }) => {
+		await setMocks({
+			'auditLog.list': {
+				ok: true,
+				result: { items: [sampleAuditLogItemAgent] }
+			}
+		})
+
+		await page.goto('/audit-log?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		// The minting principal is still shown...
+		await expect(main.getByText('[email protected]')).toBeVisible()
+		// ...alongside the agent-session label from the scoped token.
+		await expect(main.getByText('claude-code:pr-42')).toBeVisible()
+	})
+
+	test('no agent label on a plain (non-scoped) action', async ({ page }) => {
+		await setMocks({
+			'auditLog.list': {
+				ok: true,
+				result: { items: [sampleAuditLogItem] }
+			}
+		})
+
+		await page.goto('/audit-log?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('[email protected]')).toBeVisible()
+		await expect(main.getByText('claude-code:pr-42')).toHaveCount(0)
 	})
 
 	test('empty state when no entries', async ({ page }) => {

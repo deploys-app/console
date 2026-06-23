@@ -250,6 +250,10 @@
 							</div>
 							<div class="activity-foot">
 								<span class="actor">{it.actor.email}</span>
+								{#if it.actor.label}
+									<span class="foot-sep">·</span>
+									<span class="agent" title="agent session (scoped token)"><i class="fa-solid fa-robot"></i>{it.actor.label}</span>
+								{/if}
 								<span class="foot-sep">·</span>
 								<time class="activity-time">{format.datetime(it.createdAt)}</time>
 							</div>
@@ -494,4 +498,14 @@
 	.foot-sep {
 		opacity: 0.5;
 	}
+
+	.agent {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		font-family: var(--font-family-mono, ui-monospace, monospace);
+		color: hsl(var(--hsl-primary));
+		white-space: nowrap;
+	}
+	.agent i { font-size: 0.6rem; opacity: 0.8; }
 </style>

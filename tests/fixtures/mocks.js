@@ -408,3 +408,25 @@ export const sampleAuditLogItem = {
 	createdAt: now
 }
 
+// An action made through a scoped (agent) token: the principal is still the
+// minter; the agent session is named by actor.label.
+export const sampleAuditLogItemAgent = {
+	id: 2,
+	resource: {
+		type: 'deployment',
+		id: 'd-2',
+		name: 'web',
+		locationId: 'gke'
+	},
+	actor: {
+		email: '[email protected]',
+		type: 'User',
+		label: 'claude-code:pr-42'
+	},
+	channel: 'mcp',
+	action: 'deployment.deploy',
+	outcome: 'success',
+	detail: 'deployed revision 2',
+	createdAt: now
+}
+

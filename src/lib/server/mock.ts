@@ -941,11 +941,14 @@ const auditLogItems = (() => {
 	const items = []
 	for (let i = 0; i < 137; i++) {
 		const s = samples[i % samples.length]
+		const ch = channels[i % channels.length]
 		items.push({
 			id: 1042 - i,
 			resource: { ...s.resource, locationId: LOCATION_ID },
-			actor: { email: USER_EMAIL, type: 'User' },
-			channel: channels[i % channels.length],
+			// mcp-channel rows are agent actions: attribute the agent session via
+			// the scoped-token label (the principal is still the minter).
+			actor: { email: USER_EMAIL, type: 'User', label: ch === 'mcp' ? 'claude-code:pr-42' : '' },
+			channel: ch,
 			action: s.action,
 			outcome: i % 11 === 0 ? 'failure' : 'success',
 			detail: `${s.detail} (#${1042 - i})`,
