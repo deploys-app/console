@@ -44,7 +44,7 @@
 
 	let disks = $state<Api.Disk[]>([])
 
-	let envGroups = $state<Api.EnvGroup[]>([])
+	let envGroups = $state<Api.EnvGroupListItem[]>([])
 
 	const form = $state({
 		location: deployment?.location || '',
@@ -205,7 +205,7 @@
 	}
 
 	async function fetchEnvGroups () {
-		const resp = await api.invoke<Api.List<Api.EnvGroup>>('envGroup.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.EnvGroupListItem>>('envGroup.list', { project }, fetch)
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.envGroups = false
@@ -252,10 +252,16 @@
 
 	let envGroupModal = $state<EnvGroupModal | null>(null)
 
-	function viewEnvGroup (name: string) {
-		const g = envGroupByName.get(name)
-		if (!g) return
-		envGroupModal?.open(g)
+	// envGroup.list is a non-sensitive index (names + count, no values), so fetch
+	// the full group on demand to preview its variables. Reading the values
+	// requires envgroup.get — a list-only caller gets a forbidden error here.
+	async function viewEnvGroup (name: string) {
+		const resp = await api.invoke<Api.EnvGroup>('envGroup.get', { project, name }, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			return
+		}
+		envGroupModal?.open(resp.result)
 	}
 
 	function convertSidecars () {

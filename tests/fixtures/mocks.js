@@ -316,6 +316,10 @@ export const sampleWorkloadIdentity = {
 export const sampleEnvGroup = {
 	project: 'test-project',
 	name: 'shared-config',
+	// envCount is the list projection's count (EnvGroupListItem); env is the full
+	// values map returned by envGroup.get. Both are kept on the shared fixture so
+	// it serves list (count pill) and get (values) without two fixtures.
+	envCount: 2,
 	env: {
 		LOG_LEVEL: 'info',
 		FEATURE_FLAG: 'true'

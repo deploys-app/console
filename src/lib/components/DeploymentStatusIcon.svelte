@@ -5,7 +5,11 @@
 	interface Props {
 		action: Api.DeploymentAction
 		status: Api.DeploymentStatus
-		url: string
+		// The signed pod-status URL. Optional: deployment.list omits it (it's a
+		// bearer capability gated behind deployment.get), so the list view passes
+		// no url and the icon resolves from props alone without polling. The
+		// detail page (deployment.get) supplies it for live pod-readiness.
+		url?: string
 		type: Api.DeploymentType
 	}
 
@@ -32,8 +36,9 @@
 	// Pod readiness only changes the icon for a running (non-paused) success
 	// deployment; every other state is resolved from props alone, so there's no
 	// reason to hit statusUrl for it. Static deployments have no pods (served by
-	// the static-gateway, no statusUrl), so they never poll either.
-	const needsPodStatus = $derived(status === 'success' && action !== 'pause' && type !== 'Static')
+	// the static-gateway, no statusUrl), so they never poll either. A missing url
+	// (the deployment.list view) also can't poll — it resolves from props alone.
+	const needsPodStatus = $derived(!!url && status === 'success' && action !== 'pause' && type !== 'Static')
 
 	function getIconClass (): string {
 		if (status !== 'success') {
@@ -46,6 +51,13 @@
 
 		if (type === 'Static') {
 			// No pods to wait on — a successful release is simply done.
+			return 'fa-solid fa-check-circle text-positive/80'
+		}
+
+		if (!url) {
+			// No statusUrl (the deployment.list view omits the signed JWT): we
+			// can't poll live pod readiness, so resolve a successful deployment to
+			// the plain success icon rather than spin forever.
 			return 'fa-solid fa-check-circle text-positive/80'
 		}
 
@@ -80,7 +92,7 @@
 
 	async function poll () {
 		clearTimer()
-		if (destroyed) {
+		if (destroyed || !url) {
 			return
 		}
 

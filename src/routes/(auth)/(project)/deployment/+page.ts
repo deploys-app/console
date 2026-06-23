@@ -1,3 +1,3 @@
 import { listLoad } from '$lib/loaders'
 
-export const load = listLoad<Api.Deployment, 'deployments'>('deployment.list', 'deployments')
+export const load = listLoad<Api.DeploymentListItem, 'deployments'>('deployment.list', 'deployments')

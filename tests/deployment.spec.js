@@ -254,6 +254,7 @@ test.describe('deployment deploy — env groups', () => {
 				result: { ...sampleDeployment, envGroups: ['shared-config'] }
 			},
 			'location.get': { ok: true, result: defaultLocation },
+			// envGroup.list is now a non-sensitive index (name + count, no values).
 			'envGroup.list': {
 				ok: true,
 				result: {
@@ -261,11 +262,23 @@ test.describe('deployment deploy — env groups', () => {
 						{
 							project: 'test-project',
 							name: 'shared-config',
-							env: { LOG_LEVEL: 'info', REGION: 'apac' },
+							envCount: 2,
 							createdAt: '2024-01-01T00:00:00Z',
 							createdBy: '[email protected]'
 						}
 					]
+				}
+			},
+			// The View popup fetches the values via envGroup.get (requires
+			// envgroup.get), not from the list item.
+			'envGroup.get': {
+				ok: true,
+				result: {
+					project: 'test-project',
+					name: 'shared-config',
+					env: { LOG_LEVEL: 'info', REGION: 'apac' },
+					createdAt: '2024-01-01T00:00:00Z',
+					createdBy: '[email protected]'
 				}
 			}
 		})

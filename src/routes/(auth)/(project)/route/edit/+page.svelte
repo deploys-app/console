@@ -113,7 +113,7 @@
 
 	async function fetchDeployments () {
 		deployments = []
-		const resp = await api.invoke<Api.List<Api.Deployment>>('deployment.list', { project }, fetch)
+		const resp = await api.invoke<Api.List<Api.DeploymentListItem>>('deployment.list', { project }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
 			return

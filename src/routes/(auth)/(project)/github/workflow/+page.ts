@@ -8,7 +8,7 @@ export const load: PageLoad = async ({ parent, url, fetch }) => {
 	const [links, locations, envGroups, pullSecrets, githubPullRole] = await Promise.all([
 		api.invoke<Api.List<Api.GithubLink>>('github.list', { project }, fetch),
 		api.invoke<Api.List<Api.Location>>('location.list', { project }, fetch),
-		api.invoke<Api.List<Api.EnvGroup>>('envGroup.list', { project }, fetch),
+		api.invoke<Api.List<Api.EnvGroupListItem>>('envGroup.list', { project }, fetch),
 		// No location => every location's pull secrets; the generator filters by
 		// the selected location client-side.
 		api.invoke<Api.List<Api.PullSecret>>('pullSecret.list', { project }, fetch),

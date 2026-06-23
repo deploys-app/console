@@ -252,6 +252,17 @@ declare namespace Api {
         createdBy: string
     }
 
+    // Reduced projection returned by envGroup.list (the full env map requires
+    // envGroup.get). An env group is a pure secret store, so the list carries
+    // only metadata + envCount (the number of variables) — never the values.
+    export type EnvGroupListItem = {
+        project: string
+        name: string
+        envCount: number
+        createdAt: string
+        createdBy: string
+    }
+
     export type MountData = {
         [key: string]: string
     }
@@ -378,6 +389,41 @@ declare namespace Api {
         errorsUrl: string
         address: string
         internalAddress: string
+        status: DeploymentStatus
+        action: DeploymentAction
+        allocatedPrice: number
+        createdAt: string
+        createdBy: string
+        successAt: string
+        ttl: number
+        expiresAt: string
+    }
+
+    // Reduced projection returned by deployment.list (a strict subset of
+    // Deployment with identical field names). It deliberately omits every
+    // sensitive field (env, mountData, command, args, annotations,
+    // workloadIdentity, pullSecret, disk, access, sidecars) AND the signed log
+    // JWTs (logUrl/eventUrl/podsUrl/statusUrl/errorsUrl) and in-cluster
+    // address/URL — those are bearer capabilities and require deployment.get.
+    // The security boundary lives in the type: a list item cannot carry a secret.
+    export type DeploymentListItem = {
+        project: string
+        location: string
+        name: string
+        type: DeploymentType
+        revision: number
+        image: string
+        site?: string
+        siteManifestDigest?: string
+        minReplicas: number
+        maxReplicas: number
+        schedule: string
+        port: number
+        protocol: DeploymentProtocol
+        internal: boolean
+        resources: DeploymentResource
+        url: string
+        releaseUrl?: string
         status: DeploymentStatus
         action: DeploymentAction
         allocatedPrice: number
