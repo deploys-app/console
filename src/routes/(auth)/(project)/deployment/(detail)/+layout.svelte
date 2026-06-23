@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '../_components/Header.svelte'
 	import { page } from '$app/stores'
+	import { goto } from '$app/navigation'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import type { LayoutData } from './$types'
@@ -69,7 +70,21 @@
      size the implicit column to the children's max-content and push the
      page past the viewport on narrow / iPhone-sized screens. -->
 <div class="panel is-level-300 grid grid-cols-1 gap-6">
-	<div class="tabs is-variant-underline w-full flex-col lg:flex-row">
+	<!-- Mobile (< lg): native dropdown — keeps the section content above the
+	     fold on narrow viewports where 7 stacked or side-scrolling tabs would
+	     dominate. Desktop (lg+): the underlined tab row. -->
+	<div class="select lg:hidden">
+		<select
+			aria-label="Section"
+			value={$page.url.pathname}
+			onchange={(e) => goto(tabHref((e.currentTarget as HTMLSelectElement).value))}
+		>
+			{#each tabs as t (t.path)}
+				<option value={t.path}>{t.label}</option>
+			{/each}
+		</select>
+	</div>
+	<div class="tabs is-variant-underline w-full hidden lg:flex">
 		{#each tabs as t (t.path)}
 			<a class="tab-button" class:is-active={$page.url.pathname === t.path} href={tabHref(t.path)}>
 				{t.label}
