@@ -27,6 +27,19 @@ const err = (message: string): { ok: false, error: { message: string } } => ({ o
 
 const list = <T>(items: T[]) => ok({ items })
 
+// deployment.list returns a reduced, non-sensitive projection (Api.DeploymentListItem):
+// it omits env + the signed log JWTs (statusUrl/logUrl/…) + the other sensitive
+// fields. Mirror that here so the mock list view exercises the real post-change
+// behaviour — e.g. the status icon resolves from props without a statusUrl to poll.
+const DEPLOYMENT_LIST_OMIT = new Set([
+	'env', 'envGroups', 'command', 'args', 'workloadIdentity', 'pullSecret',
+	'disk', 'mountData', 'nodePort', 'annotations', 'access', 'sidecars',
+	'internalUrl', 'logUrl', 'eventUrl', 'podsUrl', 'statusUrl', 'errorsUrl',
+	'address', 'internalAddress'
+])
+const toDeploymentListItem = (d: Record<string, unknown>): Record<string, unknown> =>
+	Object.fromEntries(Object.entries(d).filter(([k]) => !DEPLOYMENT_LIST_OMIT.has(k)))
+
 /**
  * Synthesize a metric line: a single named series of [unixSeconds, value] points.
  */
@@ -1267,7 +1280,7 @@ const handlers: Record<string, (args: any) => object> = {
 	'location.list': () => list(locations),
 	'location.get': (args) => ok(locations.find((l) => l.id === args?.location) ?? locations[0]),
 
-	'deployment.list': () => list(deployments),
+	'deployment.list': () => list(deployments.map(toDeploymentListItem)),
 	// revision > 0 returns that revision's historical spec (like the real
 	// deployment.get), with per-revision differences so the rollback modal's
 	// config diff has something to show.
@@ -1841,7 +1854,15 @@ const handlers: Record<string, (args: any) => object> = {
 	'workloadIdentity.create': () => ok({}),
 	'workloadIdentity.delete': () => ok({}),
 
-	'envGroup.list': () => list(envGroups),
+	// envGroup.list returns metadata + envCount only (Api.EnvGroupListItem); the
+	// values map lives behind envGroup.get.
+	'envGroup.list': () => list(envGroups.map((g) => ({
+		project: g.project,
+		name: g.name,
+		envCount: Object.keys(g.env ?? {}).length,
+		createdAt: g.createdAt,
+		createdBy: g.createdBy
+	}))),
 	'envGroup.get': (args) => ok({ ...envGroups[0], name: args?.name ?? 'shared' }),
 	'envGroup.create': () => ok({}),
 	'envGroup.update': () => ok({}),

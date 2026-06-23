@@ -29,7 +29,7 @@
 				{it.name}
 			</a>
 		</td>
-		<td><span class="count-pill"><i class="fa-solid fa-list" aria-hidden="true"></i>{Object.keys(it.env ?? {}).length}</span></td>
+		<td><span class="count-pill"><i class="fa-solid fa-list" aria-hidden="true"></i>{it.envCount}</span></td>
 		<td>
 			<span class="cell-time" title={format.datetime(it.createdAt)}>{format.fromNow(it.createdAt) || '—'}</span>
 		</td>

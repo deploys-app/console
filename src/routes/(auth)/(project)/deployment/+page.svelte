@@ -52,7 +52,7 @@
 	 * the action has to be checked first — otherwise a deployment being torn down
 	 * would mislabel as "Deploying".
 	 */
-	function statusPill (it: Api.Deployment): { label: string, tone: string } | null {
+	function statusPill (it: Api.DeploymentListItem): { label: string, tone: string } | null {
 		if (it.action === 'delete') {
 			return { label: 'Deleting', tone: 'negative' }
 		}
@@ -131,7 +131,11 @@
 						<td>
 							<div style="display:flex; align-items:flex-start;">
 								<div style="padding-top:0.15rem;">
-									<DeploymentStatusIcon action={it.action} status={it.status} url={it.statusUrl} type={it.type} />
+									<!-- No url: deployment.list omits the signed statusUrl JWT (it's a
+								     bearer capability gated behind deployment.get/deployment.logs), so
+								     the list icon shows the stored status without live pod-readiness
+								     polling. The detail page (deployment.get) still polls. -->
+								<DeploymentStatusIcon action={it.action} status={it.status} type={it.type} />
 								</div>
 								<div class="cell-stack">
 									<div class="cell-line">
