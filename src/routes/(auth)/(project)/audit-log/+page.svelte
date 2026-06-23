@@ -361,6 +361,21 @@
 		vertical-align: middle;
 	}
 
+	.agent-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin-left: 0.25rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: 4px;
+		font-size: 0.75rem;
+		font-family: var(--font-family-mono, ui-monospace, monospace);
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+		vertical-align: middle;
+	}
+	.agent-tag i { font-size: 0.62rem; opacity: 0.8; }
+
 	.loadmore-row > td {
 		padding: 0;
 	}
@@ -485,6 +500,11 @@
 							{it.actor.email}
 							{#if it.actor.type === 'ServiceAccount'}
 								<span class="actor-tag">service account</span>
+							{/if}
+							{#if it.actor.label}
+								<span class="agent-tag" title="agent session (scoped token)">
+									<i class="fa-solid fa-robot"></i>{it.actor.label}
+								</span>
 							{/if}
 						</td>
 						<td><ChannelBadge channel={it.channel} /></td>
