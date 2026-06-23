@@ -195,6 +195,31 @@
 		.log-row { grid-template-columns: [time] 2.75rem [mark] 2px [pod] 6.5rem [msg] 1fr; column-gap: 0.4rem; padding: 0.125rem 0.5rem; font-size: 0.75rem; }
 		.log-filter__input { width: 6rem; }
 	}
+
+	/* Phones: a 6.5rem pod chip + time leaves the message too narrow to read, and
+	   the rail's filter + range pills + Refresh overflow the shell. Stack the row
+	   (time · pod over a full-width message) and let the rail actions wrap onto
+	   their own full-width line. */
+	@media (max-width: 640px) {
+		.log-row {
+			grid-template-columns: 2px auto minmax(0, 1fr);
+			grid-template-areas:
+				'mark time pod'
+				'mark msg  msg';
+			column-gap: 0.5rem;
+			row-gap: 0.1rem;
+			padding: 0.3rem 0.75rem;
+			align-items: center;
+		}
+		.log-row__mark { grid-area: mark; }
+		.log-row__time { grid-area: time; text-align: left; padding-top: 0; }
+		.log-row__pod  { grid-area: pod; justify-self: start; }
+		.log-row__msg  { grid-area: msg; }
+
+		.log-rail__actions { width: 100%; margin-left: 0; flex-wrap: wrap; }
+		.log-filter { flex: 1 1 100%; }
+		.log-filter__input { flex: 1; width: auto; }
+	}
 </style>
 
 <div class="log-shell">

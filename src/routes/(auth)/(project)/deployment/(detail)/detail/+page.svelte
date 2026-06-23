@@ -441,6 +441,41 @@
 		border-color: hsl(var(--hsl-content) / 0.2);
 	}
 
+	/* Phones: the fixed 10rem label column crushes the value into a sliver that
+	   breaks mid-word (e.g. "registr y.deplo ys.app"). Stack each spec — label
+	   (with its copy/extend control) on top, value on its own full-width line. */
+	@media (max-width: 640px) {
+		.spec {
+			grid-template-columns: minmax(0, 1fr) auto;
+			grid-template-areas:
+				'label copy'
+				'value value';
+			column-gap: 0.5rem;
+			row-gap: 0.15rem;
+			align-items: center;
+			padding: 0.4rem 0;
+		}
+		.spec > :nth-child(1) { grid-area: label; }
+		.spec > :nth-child(2) { grid-area: value; min-width: 0; }
+		.spec > :nth-child(3) { grid-area: copy; justify-self: end; align-self: center; }
+
+		/* env / mount key-value list: stack key above value so a long key can't
+		   starve the value (and pre-formatted mount data can scroll, not clip).
+		   The 1.6rem zebra pitch no longer lines up with the taller stacked rows,
+		   so drop it; the value's bottom border still separates entries. */
+		.kv-list { grid-template-columns: 1fr; background: none; }
+		.kv-list__key {
+			border-right: none;
+			border-bottom: none;
+			overflow-wrap: anywhere;
+			padding-bottom: 0.1rem;
+		}
+		.kv-list__val {
+			padding-top: 0;
+			overflow-x: auto;
+		}
+	}
+
 </style>
 
 <!-- ─── DETAILS shell ─── -->

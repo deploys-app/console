@@ -410,6 +410,28 @@
 			font-size: 0.75rem;
 		}
 	}
+
+	/* Phones: the four fixed columns starve the message column to a few px,
+	   forcing it to wrap one glyph per line. Stack instead — a header line
+	   (time · type · reason) over a full-width message, with the severity bar
+	   spanning both. */
+	@media (max-width: 640px) {
+		.event-row {
+			grid-template-columns: 2px auto auto minmax(0, 1fr);
+			grid-template-areas:
+				'mark time type reason'
+				'mark msg  msg  msg';
+			column-gap: 0.5rem;
+			row-gap: 0.2rem;
+			padding: 0.5rem 0.85rem;
+			align-items: center;
+		}
+		.event-row__mark   { grid-area: mark; }
+		.event-row__time   { grid-area: time; text-align: left; padding-top: 0; }
+		.event-row__type   { grid-area: type; }
+		.event-row__reason { grid-area: reason; padding-top: 0; }
+		.event-row__msg    { grid-area: msg; }
+	}
 </style>
 
 <DeploymentPodErrors

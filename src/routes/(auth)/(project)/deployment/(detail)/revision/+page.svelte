@@ -506,8 +506,8 @@
 		.rev-row {
 			grid-template-columns:
 				[mark]  3px
-				[rev]   3.5rem
-				[image] 1fr
+				[rev]   auto
+				[image] minmax(0, 1fr)
 				[act]   auto;
 			grid-template-areas: 'mark rev image act'
 								 'mark meta meta act';
@@ -516,6 +516,39 @@
 		}
 		.rev-row__meta { grid-column: 2 / 4; align-items: flex-start; }
 		.rev-row__image { direction: ltr; }
+	}
+
+	/* Phones: the rev cell (#7 + Active tag), the image and the Rollback button
+	   can't share one line — at a fixed rev width the Active tag overran the image
+	   and overlapped it. Drop to a card: rev + action on top, then the image and
+	   the meta each on their own full-width line. The image can now show in full
+	   instead of being truncated to a sliver. */
+	@media (max-width: 640px) {
+		.rev-row {
+			grid-template-columns: 3px minmax(0, 1fr) auto;
+			grid-template-areas:
+				'mark rev   act'
+				'mark image image'
+				'mark meta  meta';
+			column-gap: 0.6rem;
+			row-gap: 0.25rem;
+			padding: 0.7rem 0.85rem;
+			align-items: center;
+		}
+		.rev-row__mark  { grid-area: mark; }
+		.rev-row__rev   { grid-area: rev; }
+		.rev-row__act   { grid-area: act; justify-self: end; }
+		.rev-row__image {
+			grid-area: image;
+			direction: ltr;
+			white-space: normal;
+			overflow: visible;
+			text-overflow: clip;
+			overflow-wrap: anywhere;
+			font-size: 0.75rem;
+			color: hsl(var(--hsl-content) / 0.6);
+		}
+		.rev-row__meta { grid-area: meta; align-items: flex-start; }
 	}
 </style>
 
