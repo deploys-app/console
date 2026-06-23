@@ -72,7 +72,19 @@
 <div class="panel is-level-300 grid grid-cols-1 gap-6">
 	<!-- Mobile (< lg): native dropdown — keeps the section content above the
 	     fold on narrow viewports where 7 stacked or side-scrolling tabs would
-	     dominate. Desktop (lg+): the underlined tab row. -->
+	     dominate. Desktop (lg+): the underlined tab row.
+
+	     The tab row uses `max-lg:hidden` (hide only below lg) rather than
+	     `hidden lg:flex` (hide always, re-show at lg). Both render the same, but
+	     the latter makes desktop visibility hinge on the `lg:flex` utility
+	     winning over `hidden` — two equal-specificity utilities whose order
+	     decides the outcome — and if that override ever fails to land (a stale or
+	     partially-propagated CSS bundle mid-deploy, an extension stripping a
+	     rule, …) the tab row AND this dropdown are both hidden at lg+, leaving
+	     zero navigation (see #289). With `max-lg:hidden` desktop visibility comes
+	     from the always-present `.tabs { display: flex }` base, with no override
+	     to lose; the worst case is the row showing on mobile too — never the
+	     reverse. -->
 	<div class="select lg:hidden">
 		<select
 			aria-label="Section"
@@ -84,7 +96,7 @@
 			{/each}
 		</select>
 	</div>
-	<div class="tabs is-variant-underline w-full hidden lg:flex">
+	<div class="tabs is-variant-underline w-full max-lg:hidden">
 		{#each tabs as t (t.path)}
 			<a class="tab-button" class:is-active={$page.url.pathname === t.path} href={tabHref(t.path)}>
 				{t.label}
