@@ -20,6 +20,7 @@
 		targetPrefix: '',
 		targetValue: '',
 		config: {
+			host: '',
 			enableBasicAuth: false,
 			basicAuth: {
 				user: '',
@@ -31,6 +32,10 @@
 
 	const targetPlaceholder = $derived(routeTargetMeta[form.targetPrefix]?.placeholder ?? '')
 	const targetHint = $derived(routeTargetMeta[form.targetPrefix]?.hint ?? '')
+
+	// The Host-header override only applies to an external server (http://) target;
+	// the api rejects it for every other target type, so the field is hidden.
+	const showHostOverride = $derived(form.targetPrefix === 'http://')
 
 	let domains = $state<Api.Domain[]>([])
 	let deployments = $state<{ name: string, paused: boolean }[]>([])
@@ -115,6 +120,7 @@
 				path: form.path,
 				target: `${form.targetPrefix}${form.targetValue}`,
 				config: {
+					host: showHostOverride ? form.config.host.trim() : '',
 					basicAuth: form.config.enableBasicAuth
 						? {
 							user: form.config.basicAuth.user,
@@ -238,6 +244,16 @@
 			<div class="field mt-3">
 				<h6><strong>Advanced Settings</strong></h6>
 			</div>
+
+			{#if showHostOverride}
+				<div class="field">
+					<label for="input-host">Host header override</label>
+					<div class="input">
+						<input id="input-host" bind:value={form.config.host} placeholder="leave empty to keep the request's Host">
+					</div>
+					<p class="page-sub">Override the <code>Host</code> header sent to the upstream — useful when the backend serves content by host name. A bare hostname or IP, optional <code>:port</code>.</p>
+				</div>
+			{/if}
 
 			<div class="field">
 				<div class="checkbox">

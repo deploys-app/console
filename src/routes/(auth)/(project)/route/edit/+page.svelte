@@ -40,6 +40,7 @@
 			// Basic-auth and forward-auth are mutually exclusive, so a single
 			// three-way selector matches the backend constraint.
 			auth: cfg.basicAuth ? 'basic' : cfg.forwardAuth ? 'forward' : 'none',
+			host: cfg.host ?? '',
 			basicAuth: {
 				user: cfg.basicAuth?.user ?? '',
 				password: cfg.basicAuth?.password ?? ''
@@ -87,6 +88,10 @@
 
 	const targetPlaceholder = $derived(routeTargetMeta[form.targetPrefix]?.placeholder ?? '')
 	const targetHint = $derived(routeTargetMeta[form.targetPrefix]?.hint ?? '')
+
+	// The Host-header override only applies to an external server (http://) target;
+	// the api rejects it for every other target type, so the field is hidden.
+	const showHostOverride = $derived(form.targetPrefix === 'http://')
 
 	let deployments = $state<{ name: string, paused: boolean }[]>([])
 
@@ -147,6 +152,7 @@
 		saving = true
 		try {
 			const config = {
+				host: showHostOverride ? form.host.trim() : '',
 				basicAuth: form.auth === 'basic'
 					? { user: form.basicAuth.user, password: form.basicAuth.password }
 					: null,
@@ -262,6 +268,16 @@
 				{#if targetHint}
 					<p class="page-sub">{targetHint}</p>
 				{/if}
+			</div>
+		{/if}
+
+		{#if showHostOverride}
+			<div class="field">
+				<label for="input-host">Host header override</label>
+				<div class="input">
+					<input id="input-host" bind:value={form.host} placeholder="leave empty to keep the request's Host">
+				</div>
+				<p class="text-content/50 text-sm mt-1">Override the <code>Host</code> header sent to the upstream — useful when the backend serves content by host name. A bare hostname or IP, optional <code>:port</code>.</p>
 			</div>
 		{/if}
 
