@@ -69,9 +69,9 @@
      size the implicit column to the children's max-content and push the
      page past the viewport on narrow / iPhone-sized screens. -->
 <div class="panel is-level-300 grid grid-cols-1 gap-6">
-	<div class="tabs is-variant-underline w-full flex-col lg:flex-row">
+	<div class="tabs is-variant-underline w-full overflow-x-auto">
 		{#each tabs as t (t.path)}
-			<a class="tab-button" class:is-active={$page.url.pathname === t.path} href={tabHref(t.path)}>
+			<a class="tab-button shrink-0 whitespace-nowrap" class:is-active={$page.url.pathname === t.path} href={tabHref(t.path)}>
 				{t.label}
 			</a>
 		{/each}
