@@ -830,6 +830,25 @@ const serviceAccounts: ServiceAccount[] = [
 	}
 ]
 
+// Active scoped (agent) tokens for the mock user. The token value is never
+// listed — only the non-secret handle + metadata.
+const scopedTokens = [
+	{
+		id: 'tok_a1b2c3d4e5',
+		label: 'claude-code:pr-42',
+		permissions: ['deployment.get', 'deployment.logs'],
+		createdAt: CREATED_AT,
+		expiresAt: new Date(Date.now() + 45 * 60 * 1000).toISOString()
+	},
+	{
+		id: 'tok_f6g7h8i9j0',
+		label: '',
+		permissions: ['dropbox.upload', 'site.publish'],
+		createdAt: CREATED_AT,
+		expiresAt: new Date(Date.now() + 12 * 60 * 1000).toISOString()
+	}
+]
+
 interface GithubLink {
 	repositoryId: number
 	repository: string
@@ -1148,6 +1167,8 @@ const handlers: Record<string, (args: any) => object> = {
 	// Effective grants for the mock user: the '*' wildcard grants everything, so
 	// all gated buttons (GuardedButton) render enabled by default offline.
 	'me.permissions': () => ok({ permissions: ['*'], admin: false }),
+	'me.listTokens': () => list(scopedTokens),
+	'me.revokeToken': () => ok({}),
 
 	'project.list': () => list(projects),
 	'project.get': (args) => ok(projects.find((p) => p.project === args?.project) ?? { ...projects[0], project: args?.project ?? 'acme' }),

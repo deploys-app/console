@@ -30,6 +30,16 @@ declare namespace Api {
         items: T[]
     }
 
+    // A scoped (agent) token minted via me.generateToken. The token value is
+    // never returned by me.listTokens — only this non-secret metadata.
+    export interface ScopedToken {
+        id: string
+        label: string
+        permissions: string[]
+        createdAt: string
+        expiresAt: string
+    }
+
     export type ProjectQuota = {
         deployments: number
         deploymentMaxReplicas: number
