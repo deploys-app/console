@@ -1,13 +1,31 @@
 import { test as base, expect } from '@playwright/test'
+import { randomUUID } from 'node:crypto'
 
 const MOCK_PORT = Number(process.env.MOCK_PORT || 9999)
 const MOCK_URL = `http://localhost:${MOCK_PORT}`
 
 /**
- * Reset the mock server to its default responses.
+ * Per-test mock-state key. The mock server (tests/mock-server.js) buckets its
+ * responses + request-log by this key so tests can run on PARALLEL workers
+ * without sharing state.
+ *
+ * It is kept module-level (not threaded through every call) on purpose: a
+ * Playwright worker runs its tests serially in a single process, so only one
+ * test is ever active per worker, and each worker is its own process with its
+ * own copy of this module. That makes a module-level "current key" race-free
+ * and lets `resetMocks` / `setMocks` / `getRequestLog` keep their original
+ * argument-free signatures — the ~290 call sites across the specs are untouched.
+ * The same key is also written to the `mock_key` cookie (see `setMockKeyCookie`)
+ * so the /api proxy forwards it as `x-mock-key` on every data request.
+ */
+let currentKey = 'default'
+function keyQuery () { return `key=${encodeURIComponent(currentKey)}` }
+
+/**
+ * Reset the current test's mock bucket to its default responses.
  */
 export async function resetMocks () {
-	const res = await fetch(`${MOCK_URL}/__reset`, { method: 'POST' })
+	const res = await fetch(`${MOCK_URL}/__reset?${keyQuery()}`, { method: 'POST' })
 	if (!res.ok) throw new Error(`failed to reset mocks: ${res.status}`)
 }
 
@@ -20,7 +38,7 @@ export async function resetMocks () {
  * @param {Record<string, unknown>} overrides
  */
 export async function setMocks (overrides) {
-	const res = await fetch(`${MOCK_URL}/__set`, {
+	const res = await fetch(`${MOCK_URL}/__set?${keyQuery()}`, {
 		method: 'POST',
 		headers: { 'content-type': 'application/json' },
 		body: JSON.stringify(overrides)
@@ -29,13 +47,13 @@ export async function setMocks (overrides) {
 }
 
 /**
- * Fetch the mock server's request log (every upstream call since the last
+ * Fetch the current test's request log (every upstream call since the last
  * reset), so a test can assert what the page sent — e.g. the `waf.set` body.
  *
  * @returns {Promise<{ path: string, method: string, body: string }[]>}
  */
 export async function getRequestLog () {
-	const res = await fetch(`${MOCK_URL}/__log`)
+	const res = await fetch(`${MOCK_URL}/__log?${keyQuery()}`)
 	if (!res.ok) throw new Error(`failed to read request log: ${res.status}`)
 	return res.json()
 }
@@ -79,20 +97,48 @@ export async function signIn (context) {
 }
 
 /**
+ * Inject the per-test `mock_key` cookie (same scope as the token cookie) so the
+ * /api proxy forwards it as `x-mock-key` and the mock server routes both SSR and
+ * client requests to this test's bucket.
+ *
+ * @param {import('@playwright/test').BrowserContext} context
+ * @param {string} key
+ */
+export async function setMockKeyCookie (context, key) {
+	await context.addCookies([
+		{
+			name: 'mock_key',
+			value: key,
+			url: 'http://localhost:4173',
+			httpOnly: true,
+			sameSite: 'Lax'
+		}
+	])
+}
+
+/**
  * Test fixture variants:
  *  - `test`            — default. Resets mocks before each test, signs in.
  *  - `unauthedTest`    — resets mocks, but does NOT inject an auth cookie.
+ *
+ * Both mint a fresh per-test key (race-free: see `currentKey` above), set it as
+ * the `mock_key` cookie, and reset that bucket — so each test starts from a
+ * clean, isolated copy of the default mocks even under parallel workers.
  */
 export const test = base.extend({
 	context: async ({ context }, use) => {
-		await resetMocks()
+		currentKey = randomUUID()
+		await setMockKeyCookie(context, currentKey)
 		await signIn(context)
+		await resetMocks()
 		await use(context)
 	}
 })
 
 export const unauthedTest = base.extend({
 	context: async ({ context }, use) => {
+		currentKey = randomUUID()
+		await setMockKeyCookie(context, currentKey)
 		await resetMocks()
 		await use(context)
 	}
