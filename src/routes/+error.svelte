@@ -24,8 +24,6 @@
 
 <div class="error-page">
 	<div class="panel is-level-300 error-card">
-		<img class="logo" src="/images/logo.webp" alt="Deploys.app" draggable="false">
-
 		{#if isUnauth}
 			<div class="empty-state">
 				<i class="fa-solid fa-lock empty-icon"></i>
@@ -71,13 +69,6 @@
 		width: 100%;
 		max-width: 26rem;
 		text-align: center;
-	}
-
-	.logo {
-		height: 2rem;
-		margin: 0 auto;
-		-webkit-user-select: none;
-		user-select: none;
 	}
 
 	/* Override the empty-state icon's primary tint for the generic-error branch. */

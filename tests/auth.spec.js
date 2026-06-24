@@ -1,20 +1,26 @@
 import { test, unauthedTest, expect, setMocks } from './helpers.js'
 
 unauthedTest.describe('unauthenticated access', () => {
-	unauthedTest('redirects to /auth/signin (remembering the path) when there is no token', async ({ page }) => {
-		const resp = await page.request.get('/?project=test-project', { maxRedirects: 0 })
-		expect([301, 302, 303, 307, 308]).toContain(resp.status())
-		const loc = new URL(resp.headers().location, 'http://localhost')
-		expect(loc.pathname).toBe('/auth/signin')
-		expect(loc.searchParams.get('redirect')).toBe('/?project=test-project')
+	unauthedTest('shows the unauthorized page (no auto-redirect) with a Sign in link that remembers the path', async ({ page }) => {
+		// No more auto-bounce to the OAuth provider: the load throws a 401 and the
+		// root +error.svelte renders a page where the user clicks "Sign in" itself.
+		const resp = await page.goto('/?project=test-project')
+		expect(resp?.status()).toBe(401)
+		const signin = page.getByRole('link', { name: 'Sign in' })
+		await expect(signin).toBeVisible()
+		const href = new URL(await signin.getAttribute('href') ?? '', 'http://localhost')
+		expect(href.pathname).toBe('/auth/signin')
+		expect(href.searchParams.get('redirect')).toBe('/?project=test-project')
 	})
 
-	unauthedTest('redirects to /auth/signin from the project list as well', async ({ page }) => {
-		const resp = await page.request.get('/project', { maxRedirects: 0 })
-		expect([301, 302, 303, 307, 308]).toContain(resp.status())
-		const loc = new URL(resp.headers().location, 'http://localhost')
-		expect(loc.pathname).toBe('/auth/signin')
-		expect(loc.searchParams.get('redirect')).toBe('/project')
+	unauthedTest('shows the unauthorized page from the project list as well', async ({ page }) => {
+		const resp = await page.goto('/project')
+		expect(resp?.status()).toBe(401)
+		const signin = page.getByRole('link', { name: 'Sign in' })
+		await expect(signin).toBeVisible()
+		const href = new URL(await signin.getAttribute('href') ?? '', 'http://localhost')
+		expect(href.pathname).toBe('/auth/signin')
+		expect(href.searchParams.get('redirect')).toBe('/project')
 	})
 
 	unauthedTest('/auth/signin redirects to the OAuth provider', async ({ page }) => {
