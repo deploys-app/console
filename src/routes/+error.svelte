@@ -11,6 +11,8 @@
 	import { page } from '$app/stores'
 
 	const isUnauth = $derived($page.status === 401)
+	// A 404 won't change on retry, so the "Try again" action is hidden for it.
+	const isNotFound = $derived($page.status === 404)
 
 	// Preserve where the user was so sign-in lands them back here. The URL is
 	// same-origin by construction; /auth/signin + /auth/callback re-validate it.
@@ -27,8 +29,8 @@
 		{#if isUnauth}
 			<div class="empty-state">
 				<i class="fa-solid fa-lock empty-icon"></i>
-				<!-- A missing token and an expired token both surface as a 401, so the
-				     copy must read true for a returning user AND a first-time visitor. -->
+				<!-- Reached only for an expired/rejected session (a first-time visitor
+				     with no token is redirected straight to sign-in by the layout). -->
 				<p class="empty-title">Sign in to continue</p>
 				<p class="empty-sub">Your session isn't active. Sign in to access the console.</p>
 				<!-- A plain link to the server sign-in endpoint (not client-routed):
@@ -38,6 +40,14 @@
 					<i class="fa-solid fa-right-to-bracket"></i>
 					Sign in
 				</a>
+			</div>
+		{:else if isNotFound}
+			<div class="empty-state">
+				<i class="fa-solid fa-compass empty-icon error-icon"></i>
+				<p class="empty-title">Page not found</p>
+				<p class="empty-sub">The page you're looking for doesn't exist or may have moved.</p>
+				<p class="error-status">Error 404</p>
+				<!-- No "Try again": retrying a 404 hits the same dead URL. -->
 			</div>
 		{:else}
 			<div class="empty-state">
