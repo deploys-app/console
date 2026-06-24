@@ -397,9 +397,9 @@ test.describe('deployment detail — static', () => {
 		await page.goto('/deployment/metrics?project=test-project&location=gke&name=website')
 
 		const main = page.locator('.content-wrapper')
-		// The static-gateway reports per-site request rate, so Requests applies;
+		// The static-gateway reports per-site request counts, so Requests applies;
 		// CPU/Memory don't (no pods). Egress stays.
-		await expect(main.getByText('Request (rps)')).toBeVisible()
+		await expect(main.getByText('Requests', { exact: true })).toBeVisible()
 		await expect(main.getByText('Egress (bytes)')).toBeVisible()
 		await expect(main.getByText('vCPU (second)')).toHaveCount(0)
 		await expect(main.getByText('Memory (bytes)')).toHaveCount(0)
