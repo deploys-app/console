@@ -12,15 +12,21 @@ const routesUrl = '/deployment/routes?project=test-project&location=gke&name=web
 const staticRoutesUrl = '/deployment/routes?project=test-project&location=gke&name=website'
 
 /**
- * Tests that drive clicks against this page must wait for Svelte 5 to finish
- * hydrating — otherwise a fast Playwright `.click()` lands before the
- * delegated handler is wired up and silently goes nowhere.
- * @param {import('@playwright/test').Page} page
- * @param {string} url
+ * Click a control whose Svelte 5 handler may not be wired up yet — a click that
+ * lands mid-hydration is silently dropped. Retries the click until `reveals`
+ * becomes visible, proving the handler fired. This replaces a blanket
+ * `waitForLoadState('networkidle')` after every navigation, which was slow (the
+ * routes page polls, so the network rarely fell idle) and only ever mattered for
+ * this click race. Assert-only tests just `page.goto` — their web-first
+ * assertions already auto-wait.
+ * @param {import('@playwright/test').Locator} control  the button/trigger to click
+ * @param {import('@playwright/test').Locator} reveals  what becoming visible proves the click landed
  */
-async function gotoHydrated (page, url) {
-	await page.goto(url)
-	await page.waitForLoadState('networkidle')
+async function clickWhenReady (control, reveals) {
+	await expect(async () => {
+		await control.click()
+		await expect(reveals).toBeVisible({ timeout: 1000 })
+	}).toPass()
 }
 
 test.describe('deployment detail — Routes tab', () => {
@@ -30,7 +36,7 @@ test.describe('deployment detail — Routes tab', () => {
 			'location.get': { ok: true, result: defaultLocation }
 		})
 
-		await gotoHydrated(page, detailUrl)
+		await page.goto(detailUrl)
 
 		const tabs = page.locator('.tabs')
 		await expect(tabs.getByRole('link', { name: 'Routes' })).toBeVisible()
@@ -42,7 +48,7 @@ test.describe('deployment detail — Routes tab', () => {
 			'location.get': { ok: true, result: defaultLocation }
 		})
 
-		await gotoHydrated(page, '/deployment/detail?project=test-project&location=gke&name=website')
+		await page.goto('/deployment/detail?project=test-project&location=gke&name=website')
 
 		const tabs = page.locator('.tabs')
 		await expect(tabs.getByRole('link', { name: 'Routes' })).toBeVisible()
@@ -57,7 +63,7 @@ test.describe('deployment detail — Routes tab', () => {
 			'location.get': { ok: true, result: defaultLocation }
 		})
 
-		await gotoHydrated(page, detailUrl)
+		await page.goto(detailUrl)
 
 		const tabs = page.locator('.tabs')
 		await expect(tabs.getByRole('link', { name: 'Routes' })).toHaveCount(0)
@@ -83,7 +89,7 @@ test.describe('deployment detail — Routes tab list', () => {
 			}
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('heading', { name: 'Routes', exact: true })).toBeVisible()
@@ -104,7 +110,7 @@ test.describe('deployment detail — Routes tab list', () => {
 			'location.get': { ok: true, result: defaultLocation }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('No routes point to this deployment')).toBeVisible()
@@ -117,7 +123,7 @@ test.describe('deployment detail — Routes tab list', () => {
 			'route.list': { ok: true, result: { items: [sampleRoute] } }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByRole('link', { name: 'Open route in new tab' }))
@@ -134,9 +140,12 @@ test.describe('deployment detail — Routes tab create', () => {
 			'route.createV2': { ok: true, result: {} }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.locator('.page-head').getByRole('button', { name: 'Create' }).click()
+		await clickWhenReady(
+			page.locator('.page-head').getByRole('button', { name: 'Create' }),
+			page.locator('.modal.is-active')
+		)
 
 		const modal = page.locator('.modal.is-active')
 		await expect(modal.getByRole('heading', { name: 'Create route' })).toBeVisible()
@@ -179,9 +188,12 @@ test.describe('deployment detail — Routes tab create', () => {
 			'route.createV2': { ok: true, result: {} }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.locator('.page-head').getByRole('button', { name: 'Create' }).click()
+		await clickWhenReady(
+			page.locator('.page-head').getByRole('button', { name: 'Create' }),
+			page.locator('.modal.is-active')
+		)
 
 		const modal = page.locator('.modal.is-active')
 		await modal.locator('#rt-domain').click()
@@ -220,9 +232,12 @@ test.describe('deployment detail — Routes tab create', () => {
 			'route.createV2': { ok: true, result: {} }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.locator('.page-head').getByRole('button', { name: 'Create' }).click()
+		await clickWhenReady(
+			page.locator('.page-head').getByRole('button', { name: 'Create' }),
+			page.locator('.modal.is-active')
+		)
 
 		const modal = page.locator('.modal.is-active')
 		await modal.locator('#rt-domain').click()
@@ -260,9 +275,12 @@ test.describe('deployment detail — Routes tab edit', () => {
 			}
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.getByRole('button', { name: 'Edit' }).click()
+		await clickWhenReady(
+			page.getByRole('button', { name: 'Edit' }),
+			page.locator('.modal.is-active')
+		)
 
 		const modal = page.locator('.modal.is-active')
 		await expect(modal.getByRole('heading', { name: 'Edit route' })).toBeVisible()
@@ -281,9 +299,12 @@ test.describe('deployment detail — Routes tab edit', () => {
 			'route.createV2': { ok: true, result: {} }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.getByRole('button', { name: 'Edit' }).click()
+		await clickWhenReady(
+			page.getByRole('button', { name: 'Edit' }),
+			page.locator('.modal.is-active')
+		)
 
 		const modal = page.locator('.modal.is-active')
 		await modal.locator('#rt-auth').click()
@@ -328,9 +349,12 @@ test.describe('deployment detail — Routes tab delete', () => {
 			'route.delete': { ok: true, result: {} }
 		})
 
-		await gotoHydrated(page, routesUrl)
+		await page.goto(routesUrl)
 
-		await page.getByRole('button', { name: 'Delete' }).click()
+		await clickWhenReady(
+			page.getByRole('button', { name: 'Delete' }),
+			page.locator('.swal2-confirm')
+		)
 		await page.locator('.swal2-confirm').click()
 
 		await expect.poll(async () => {
@@ -362,7 +386,7 @@ test.describe('deployment detail — Routes tab works for Static too', () => {
 			}
 		})
 
-		await gotoHydrated(page, staticRoutesUrl)
+		await page.goto(staticRoutesUrl)
 
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('1 route pointing to this deployment')).toBeVisible()
