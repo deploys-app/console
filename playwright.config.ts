@@ -10,11 +10,20 @@ const useBuild = !!process.env.PLAYWRIGHT_USE_BUILD
 const devCommand = `bun run dev --port ${PORT} --strictPort --host 127.0.0.1`
 const buildCommand = 'bun ./build'
 
+// Tests are isolated per-test on the mock server (each carries a `mock_key`
+// cookie → `x-mock-key` header that buckets its mock state), so they run
+// concurrently. Default to half the runner's cores in CI; `PW_WORKERS`
+// overrides with an absolute number or a percentage like '50%'.
+const pwWorkers = process.env.PW_WORKERS
+const workers = pwWorkers
+	? (pwWorkers.endsWith('%') ? pwWorkers : Number(pwWorkers))
+	: (process.env.CI ? '50%' : undefined)
+
 export default defineConfig({
 	testDir: './tests',
 	testMatch: '**/*.spec.js',
-	fullyParallel: false,
-	workers: 1,
+	fullyParallel: true,
+	workers,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 1 : 0,
 	reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

@@ -182,6 +182,12 @@ export const sampleDeployment = {
 	sidecars: [],
 	url: 'https://web.test-project.app.in.th',
 	internalUrl: '',
+	// Keep these signed-URL fields empty. The console fetches them DIRECTLY from
+	// the browser (DeploymentStatusIcon / LiveLogs / events page), bypassing the
+	// /api proxy — so they never carry the per-test `x-mock-key` header. Pointing
+	// one at the mock server would leak state across parallel tests. If a test
+	// needs live status/logs, route it through the proxy (or bake the key into
+	// the URL and have the mock bucket on it), not via these fields.
 	logUrl: '',
 	eventUrl: '',
 	podsUrl: '',
