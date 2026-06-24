@@ -104,10 +104,10 @@ test.describe('signed-in user', () => {
 		expect(resp?.status()).toBeGreaterThanOrEqual(500)
 	})
 
-	test('shows the unauthorized page (not a redirect) when the session token is rejected', async ({ page }) => {
+	test('shows the unauthorized page (not a redirect) on a deep link when the session token is rejected', async ({ page }) => {
 		// `test` fixture is signed in (token cookie present), but the API rejects it
-		// — an expired session. Unlike a first-time visitor, this surfaces the
-		// "Sign in to continue" page with a manual Sign in link, not an auto-redirect.
+		// — an expired session. On a deep link this surfaces the "Sign in to
+		// continue" page with a manual Sign in link, not an auto-redirect.
 		await setMocks({
 			'me.get': { ok: false, error: { message: 'api: unauthorized' } }
 		})
@@ -118,5 +118,18 @@ test.describe('signed-in user', () => {
 		const href = new URL(await signin.getAttribute('href') ?? '', 'http://localhost')
 		expect(href.pathname).toBe('/auth/signin')
 		expect(href.searchParams.get('redirect')).toBe('/project')
+	})
+
+	test('auto-redirects to /auth/signin from "/" even with an expired token (no interstitial)', async ({ page }) => {
+		// The bare root is just a router, so it always bounces to sign-in — an
+		// expired session here gets the redirect, not the "Sign in to continue" page.
+		await setMocks({
+			'me.get': { ok: false, error: { message: 'api: unauthorized' } }
+		})
+		const resp = await page.request.get('/', { maxRedirects: 0 })
+		expect([301, 302, 303, 307, 308]).toContain(resp.status())
+		const loc = new URL(resp.headers().location, 'http://localhost')
+		expect(loc.pathname).toBe('/auth/signin')
+		expect(loc.searchParams.get('redirect')).toBeNull()
 	})
 })
