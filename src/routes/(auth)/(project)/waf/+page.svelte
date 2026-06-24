@@ -4,7 +4,7 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import Sparkline from '$lib/components/Sparkline.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
 
@@ -39,19 +39,31 @@
 	const to = Math.floor(Date.now() / 1000)
 	const from = to - 24 * 60 * 60
 
-	onMount(() => {
-		Promise.all(firewalls.map(async (fw: Api.WafZone) => {
-			metrics[fw.location] = { loading: true, total: 0, points: [] }
+	// Refetch the per-zone sparklines when the project changes. A project switch
+	// navigates to /waf via goto (overrideRedirect) WITHOUT remounting this page,
+	// so an onMount fetch would keep showing the previous project's matches —
+	// worse, `metrics` is keyed by location only, so a shared location id would
+	// render the OLD project's count. Track `project` in an $effect instead;
+	// `firewalls` is read through untrack so the 3s waf.list poll (which replaces
+	// the array while a zone is pending) doesn't re-trigger a fetch storm. Reset
+	// the map first so a location the new project lacks can't show a stale entry.
+	$effect(() => {
+		const p = project
+		untrack(() => {
+			for (const k of Object.keys(metrics)) delete metrics[k]
+			Promise.all(firewalls.map(async (fw: Api.WafZone) => {
+				metrics[fw.location] = { loading: true, total: 0, points: [] }
 
-			const res = await api.invoke<Api.WafMetricsResult>('waf.metrics',
-				{ project, location: fw.location, timeRange: '1d' }, fetch)
+				const res = await api.invoke<Api.WafMetricsResult>('waf.metrics',
+					{ project: p, location: fw.location, timeRange: '1d' }, fetch)
 
-			metrics[fw.location] = {
-				loading: false,
-				total: res.result?.total ?? 0,
-				points: aggregate(res.result?.series ?? [])
-			}
-		}))
+				metrics[fw.location] = {
+					loading: false,
+					total: res.result?.total ?? 0,
+					points: aggregate(res.result?.series ?? [])
+				}
+			}))
+		})
 	})
 
 	// Collapse the per-(rule, action) series into one total-matches line: sum

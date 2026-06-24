@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores'
 	import api from '$lib/api'
-	import { onMount, tick } from 'svelte'
+	import { onMount, tick, untrack } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import type { PageData } from './$types'
@@ -35,12 +35,16 @@
 		reloadTimeout && clearTimeout(reloadTimeout)
 		reloadTimeout = null
 
+		// `range` is read untracked so the disk-keyed effect below isn't also
+		// triggered by range changes — those refetch via the Select's onchange.
+		const range = untrack(() => filter.range)
+
 		try {
 			const resp = await api.invoke<Api.DiskMetricsResult>('disk.metrics', {
 				project: disk.project,
 				location: disk.location,
 				name: disk.name,
-				timeRange: filter.range
+				timeRange: range
 			}, fetch)
 			if (!resp.ok) {
 				return
@@ -62,11 +66,21 @@
 	}
 
 	onMount(() => {
-		fetchMetrics()
-
 		return () => {
 			reloadTimeout && clearTimeout(reloadTimeout)
 		}
+	})
+
+	// Refetch the chart when the disk identity changes. A project switch unmounts
+	// this (detail) page (overrideRedirect '/disk'), but the disk list links here
+	// per disk, so /disk/metrics?name=A -> ?name=B (or a ?location= change) reuses
+	// this component WITHOUT remounting — an onMount-only fetch would leave disk
+	// A's Usage/Size series up until the next ~60s reload tick. fetchMetrics reads
+	// disk.project/location/name synchronously, so the effect tracks them (range
+	// is untracked; the Select refetches on a range change). clearFirst blanks the
+	// chart during the swap.
+	$effect(() => {
+		fetchMetrics(true)
 	})
 </script>
 

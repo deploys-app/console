@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types'
 	import type { LineSeries } from '$lib/charts/util'
-	import { onMount } from 'svelte'
+	import { untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
@@ -48,8 +48,11 @@
 
 	async function fetchMetrics () {
 		loading = true
+		// `range` is read untracked so the project+location-keyed effect below
+		// isn't also triggered by range changes — those refetch via selectRange.
+		const r = untrack(() => range)
 		try {
-			const args = { project, location, timeRange: range }
+			const args = { project, location, timeRange: r }
 			const [res, limitRes] = await Promise.all([
 				api.invoke<Api.WafMetricsResult>('waf.metrics', args, fetch),
 				hasLimits
@@ -89,7 +92,15 @@
 		fetchMetrics()
 	}
 
-	onMount(() => {
+	// Fetch on mount and refetch whenever the project or location changes. A
+	// project switch unmounts this detail page (overrideRedirect '/waf'), but the
+	// WAF list links here per location, so /waf/metrics?location=A -> ?location=B
+	// reuses this component WITHOUT remounting — an onMount-only fetch would leave
+	// location A's tiles/charts/tables on a B header (and for 7d/30d no refresh
+	// timer ever corrects it). fetchMetrics reads project + location synchronously,
+	// so the effect tracks them (range is read untracked and refetched via
+	// selectRange).
+	$effect(() => {
 		fetchMetrics()
 		return () => clearTimeout(refreshTimer)
 	})

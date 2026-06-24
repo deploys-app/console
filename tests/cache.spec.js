@@ -76,6 +76,41 @@ test.describe('cache list', () => {
 		await expect(main.getByText('No cache zones yet')).toBeVisible()
 		await expect(main.getByText('Configure cache to start overriding edge caching in a location.')).toBeVisible()
 	})
+
+	// Regression: switching project is a same-route SPA navigation (goto to
+	// /cache?project=…) that REUSES this page component, so onMount never re-runs.
+	// The performance chart + per-zone sparklines, fetched client-side, must
+	// refetch for the new project — they used to keep the previous project's data.
+	test('refetches the chart + sparklines on project switch', async ({ page }) => {
+		const twoProjects = [
+			{ id: 'p1', project: 'project-a', name: 'Project A' },
+			{ id: 'p2', project: 'project-b', name: 'Project B' }
+		]
+		await setMocks({
+			'project.list': { ok: true, result: { items: twoProjects } },
+			'cache.list': { ok: true, result: { project: 'project-a', items: [cacheZone({ location: 'gke' })] } },
+			'cache.metrics': { ok: true, result: { series: [], total: 0 } },
+			'cache.resultMetrics': { ok: true, result: { series: [] } }
+		})
+
+		await page.goto('/cache?project=project-a')
+
+		const calls = async (fn, project) => (await getRequestLog())
+			.filter((r) => r.path === fn && JSON.parse(r.body ?? '{}').project === project).length
+
+		// Initial load fetches both client-side series for project-a.
+		await expect.poll(() => calls('/cache.resultMetrics', 'project-a')).toBeGreaterThan(0)
+		await expect.poll(() => calls('/cache.metrics', 'project-a')).toBeGreaterThan(0)
+
+		// Switch project through the sidebar modal — same-route SPA nav.
+		await page.locator('.project-box').click()
+		await page.locator('.modal.is-active').getByRole('link', { name: 'Project B' }).click()
+		await expect(page).toHaveURL(/project=project-b/)
+
+		// Both client-side fetches must re-issue for project-b (the bug: they didn't).
+		await expect.poll(() => calls('/cache.resultMetrics', 'project-b')).toBeGreaterThan(0)
+		await expect.poll(() => calls('/cache.metrics', 'project-b')).toBeGreaterThan(0)
+	})
 })
 
 test.describe('cache create', () => {
