@@ -1,5 +1,5 @@
 import { test, expect, setMocks, getRequestLog } from './helpers.js'
-import { defaultLocation } from './fixtures/mocks.js'
+import { defaultLocation, sampleDomain } from './fixtures/mocks.js'
 
 // A cache-capable location (the default fixture location has no `cache` feature).
 const cacheLocation = { ...defaultLocation, id: 'gke', features: { cache: true } }
@@ -240,5 +240,85 @@ test.describe('cache override editor', () => {
 		// must be omitted from the payload.
 		expect(body.overrides[0].ttl).toBeUndefined()
 		expect(body.overrides[0].policy).toBeUndefined()
+	})
+})
+
+test.describe('cache purge', () => {
+	// The cache page renders fine with no zones; purge is driven entirely by the
+	// project's domains, fetched lazily when the modal opens.
+	const baseMocks = {
+		'cache.list': { ok: true, result: { project: 'test-project', items: [] } },
+		'cache.resultMetrics': { ok: true, result: { series: [] } }
+	}
+
+	test('purges everything for the preselected domain', async ({ page }) => {
+		await setMocks({
+			...baseMocks,
+			'domain.list': { ok: true, result: { items: [sampleDomain] } },
+			'domain.purgeCache': { ok: true, result: {} }
+		})
+
+		await page.goto('/cache?project=test-project')
+		await page.getByRole('button', { name: 'Purge cache' }).click()
+
+		// The modal loads domains and preselects the first purgeable one, so
+		// "Everything" is a one-click purge.
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByRole('heading', { name: 'Purge cache' })).toBeVisible()
+		await modal.getByRole('button', { name: 'Purge', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/domain.purgeCache')
+		}).toBe(true)
+
+		const req = (await getRequestLog()).find((r) => r.path === '/domain.purgeCache')
+		const body = JSON.parse(req?.body ?? '{}')
+		expect(body.domain).toBe('example.com')
+		// "Everything" sends neither file nor prefix.
+		expect(body.file).toBeUndefined()
+		expect(body.prefix).toBeUndefined()
+	})
+
+	test('purges a path prefix', async ({ page }) => {
+		await setMocks({
+			...baseMocks,
+			'domain.list': { ok: true, result: { items: [sampleDomain] } },
+			'domain.purgeCache': { ok: true, result: {} }
+		})
+
+		await page.goto('/cache?project=test-project')
+		await page.getByRole('button', { name: 'Purge cache' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await modal.getByRole('button', { name: 'Path prefix' }).click()
+		await modal.locator('#purge-path').fill('/static/')
+		await modal.getByRole('button', { name: 'Purge', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/domain.purgeCache')
+		}).toBe(true)
+
+		const req = (await getRequestLog()).find((r) => r.path === '/domain.purgeCache')
+		const body = JSON.parse(req?.body ?? '{}')
+		expect(body.domain).toBe('example.com')
+		expect(body.prefix).toBe('/static/')
+		expect(body.file).toBeUndefined()
+	})
+
+	test('excludes wildcard domains and shows the empty state', async ({ page }) => {
+		await setMocks({
+			...baseMocks,
+			// Only a wildcard domain exists — the edge purge can't target it.
+			'domain.list': { ok: true, result: { items: [{ ...sampleDomain, domain: '*.example.com', wildcard: true }] } }
+		})
+
+		await page.goto('/cache?project=test-project')
+		await page.getByRole('button', { name: 'Purge cache' }).click()
+
+		const modal = page.locator('.modal.is-active')
+		await expect(modal.getByText('No purgeable domains.')).toBeVisible()
+		await expect(modal.getByRole('button', { name: 'Purge', exact: true })).toHaveCount(0)
 	})
 })

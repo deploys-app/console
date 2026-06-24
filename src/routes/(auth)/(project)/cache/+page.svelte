@@ -5,6 +5,7 @@
 	import Sparkline from '$lib/components/Sparkline.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import CacheResultChart from '$lib/components/CacheResultChart.svelte'
+	import CachePurgeModal from '$lib/components/CachePurgeModal.svelte'
 	import RangeSwitch from '$lib/components/RangeSwitch.svelte'
 	import { RANGE_SECONDS, RANGE_LABEL } from '$lib/metrics'
 	import { formatBytes, formatNumber } from '$lib/charts/util'
@@ -139,6 +140,8 @@
 
 	const hasResultData = $derived((resultMetrics?.series ?? []).some((s) =>
 		(view === 'requests' ? (s.requestsTotal ?? 0) : (s.bytesTotal ?? 0)) > 0))
+
+	let purgeModal = $state<CachePurgeModal>()
 </script>
 
 <div class="page-head">
@@ -148,11 +151,19 @@
 			{zones.length} {zones.length === 1 ? 'cache zone' : 'cache zones'}
 		</p>
 	</div>
-	<GuardedButton permission="cache.set" class="button is-icon-left" href={`/cache/create?project=${project}`}>
-		<i class="fa-solid fa-plus"></i>
-		Configure cache
-	</GuardedButton>
+	<div class="head-actions">
+		<GuardedButton permission="domain.purgecache" class="button is-variant-secondary is-icon-left" onclick={() => purgeModal?.open()}>
+			<i class="fa-solid fa-broom"></i>
+			Purge cache
+		</GuardedButton>
+		<GuardedButton permission="cache.set" class="button is-icon-left" href={`/cache/create?project=${project}`}>
+			<i class="fa-solid fa-plus"></i>
+			Configure cache
+		</GuardedButton>
+	</div>
 </div>
+
+<CachePurgeModal bind:this={purgeModal} {project} />
 
 <div class="panel is-level-300 cache-perf">
 	<div class="perf-head">
@@ -279,6 +290,13 @@
 </div>
 
 <style>
+	.head-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
 	/* Hold a fixed box across the loading / loaded / empty states: min-height
 	   matches the Sparkline's height (28px) and min-width its count + chart, so
 	   the row doesn't grow taller or the column wider when the chart loads. */
