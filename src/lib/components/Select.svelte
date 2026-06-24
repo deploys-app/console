@@ -560,9 +560,14 @@
 	}
 
 	.select-menu {
-		/* Positioned as `position: fixed` via an inline style (see positionMenu)
-		 * so the menu floats above clipping ancestors like a scrollable modal
-		 * panel. z-index sits above the modal layer (.modal is z-index 50). */
+		/* `position: fixed` (with left/top/width/max-height supplied inline by
+		 * positionMenu) so the menu floats above clipping ancestors like a
+		 * scrollable modal panel. Declaring it here too — not just inline — keeps
+		 * the menu out of flow on its very first paint, before the positioning
+		 * effect runs; otherwise it would briefly be `static` inside .select-box
+		 * and inflate the trigger's measured height, mispositioning the first
+		 * open. z-index sits above the modal layer (.modal is z-index 50). */
+		position: fixed;
 		z-index: 100;
 		max-height: 18rem;
 		overflow-y: auto;
