@@ -1207,6 +1207,7 @@ const handlers: Record<string, (args: any) => object> = {
 		memory: dailyMetricLine('memory', 805306368),
 		disk: dailyMetricLine('disk', 10737418240),
 		egress: dailyMetricLine('egress', 1073741824),
+		cacheEgress: dailyMetricLine('cache_egress', 3221225472),
 		replica: dailyMetricLine('replica', 3),
 		staticStorage: dailyMetricLine('static_storage', 1610612736)
 	}),

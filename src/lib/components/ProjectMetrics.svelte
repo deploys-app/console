@@ -10,7 +10,8 @@
 	/**
 	 * Daily project-level usage charts read from the project.metrics RPC. CPU,
 	 * memory, disk and replicas are per-day average levels; egress is the day's
-	 * total bytes (pod + cache + WAF); static storage is the day's gauge.
+	 * origin bytes (pod + WAF), cache egress is the day's edge-cache HIT bytes
+	 * (split out so cache offload is visible); static storage is the day's gauge.
 	 */
 
 	interface Props {
@@ -32,6 +33,7 @@
 	let cpu = $state<MetricSeries[]>([])
 	let memory = $state<MetricSeries[]>([])
 	let egress = $state<MetricSeries[]>([])
+	let cacheEgress = $state<MetricSeries[]>([])
 	let replica = $state<MetricSeries[]>([])
 	let disk = $state<MetricSeries[]>([])
 	let storage = $state<MetricSeries[]>([])
@@ -49,6 +51,7 @@
 			cpu = []
 			memory = []
 			egress = []
+			cacheEgress = []
 			replica = []
 			disk = []
 			storage = []
@@ -58,6 +61,7 @@
 		cpu = [{ prefix: 'CPU', lines: resp.result.cpuUsage ?? [] }]
 		memory = [{ prefix: 'Memory', lines: resp.result.memory ?? [] }]
 		egress = [{ prefix: 'Egress', lines: resp.result.egress ?? [] }]
+		cacheEgress = [{ prefix: 'Cache egress', lines: resp.result.cacheEgress ?? [] }]
 		replica = [{ prefix: 'Replicas', lines: resp.result.replica ?? [] }]
 		disk = [{ prefix: 'Disk', lines: resp.result.disk ?? [] }]
 		storage = [{ prefix: 'Storage', lines: resp.result.staticStorage ?? [] }]
@@ -94,6 +98,7 @@
 	<Chart title="CPU (vCPU)" unit="count" series={cpu} range={filter.range} />
 	<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
 	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
+	<Chart title="Cache Egress (bytes)" unit="bytes" series={cacheEgress} range={filter.range} />
 	<Chart title="Replicas" unit="count" series={replica} range={filter.range} />
 	<Chart title="Disk (bytes)" unit="bytes" series={disk} range={filter.range} />
 	<Chart title="Static Storage (bytes)" unit="bytes" series={storage} range={filter.range} />

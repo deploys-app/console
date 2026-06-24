@@ -947,6 +947,7 @@ declare namespace Api {
         memory: UsageMetricsLine[]
         disk: UsageMetricsLine[]
         egress: UsageMetricsLine[]
+        cacheEgress: UsageMetricsLine[]
         replica: UsageMetricsLine[]
         staticStorage: UsageMetricsLine[]
     }
