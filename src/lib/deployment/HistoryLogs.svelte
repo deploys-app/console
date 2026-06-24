@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	import { untrack } from 'svelte'
 	import { SvelteSet } from 'svelte/reactivity'
 	import api from '$lib/api'
 	import { podPrefixStripper } from '$lib/deployment/podName'
@@ -56,7 +56,10 @@
 			forbidden = false
 			nextCursor = ''
 			capped = false
-			const ms = RANGES.find((r) => r.value === range)?.ms ?? 3_600_000
+			// `range` is read untracked so the deployment-keyed effect below isn't
+			// also triggered by range changes — those reload via setRange.
+			const rangeVal = untrack(() => range)
+			const ms = RANGES.find((x) => x.value === rangeVal)?.ms ?? 3_600_000
 			windowSince = new Date(Date.now() - ms).toISOString()
 		} else {
 			if (!nextCursor || loadingMore) return
@@ -116,7 +119,14 @@
 	})
 	const visibleCount = $derived(filteredIds ? filteredIds.size : lines.length)
 
-	onMount(() => {
+	// Reload the history when the deployment identity changes. This component is
+	// the History tab of /deployment/(detail)/logs and is rendered with no {#key},
+	// so navigating between deployments (?name=/?location= change, same route)
+	// reuses it WITHOUT remounting — an onMount-only load would strand the
+	// previous deployment's log lines. loadHistory(true) reads
+	// deployment.project/location/name synchronously, so the effect tracks them
+	// (range is untracked; setRange reloads on a range change).
+	$effect(() => {
 		loadHistory(true)
 	})
 </script>

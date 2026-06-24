@@ -9,7 +9,7 @@
 	import RangeSwitch from '$lib/components/RangeSwitch.svelte'
 	import { RANGE_SECONDS, RANGE_LABEL } from '$lib/metrics'
 	import { formatBytes, formatNumber } from '$lib/charts/util'
-	import { onMount } from 'svelte'
+	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
 
@@ -44,19 +44,31 @@
 	const to = Math.floor(Date.now() / 1000)
 	const from = to - 24 * 60 * 60
 
-	onMount(() => {
-		Promise.all(zones.map(async (z: Api.CacheZone) => {
-			metrics[z.location] = { loading: true, total: 0, points: [] }
+	// Refetch the per-zone sparklines when the project changes. A project switch
+	// navigates to /cache via goto (overrideRedirect) WITHOUT remounting this
+	// page, so an onMount fetch would keep showing the previous project's
+	// decisions — track `project` in an $effect instead. `zones` is read through
+	// untrack so the 3s cache.list poll (which replaces the zones array while a
+	// zone is pending) doesn't re-trigger a fetch storm; on a project switch
+	// `project` and `zones` update together, so the untracked read still sees the
+	// new project's zones.
+	$effect(() => {
+		const p = project
+		untrack(() => {
+			for (const k of Object.keys(metrics)) delete metrics[k]
+			Promise.all(zones.map(async (z: Api.CacheZone) => {
+				metrics[z.location] = { loading: true, total: 0, points: [] }
 
-			const res = await api.invoke<Api.CacheMetricsResult>('cache.metrics',
-				{ project, location: z.location, timeRange: '1d' }, fetch)
+				const res = await api.invoke<Api.CacheMetricsResult>('cache.metrics',
+					{ project: p, location: z.location, timeRange: '1d' }, fetch)
 
-			metrics[z.location] = {
-				loading: false,
-				total: res.result?.total ?? 0,
-				points: aggregate(res.result?.series ?? [])
-			}
-		}))
+				metrics[z.location] = {
+					loading: false,
+					total: res.result?.total ?? 0,
+					points: aggregate(res.result?.series ?? [])
+				}
+			}))
+		})
 	})
 
 	// Collapse the per-(override, action, result) series into one total-decisions
@@ -93,14 +105,25 @@
 
 	async function fetchResultMetrics () {
 		resultLoading = true
+		// `range` is read untracked so the project-keyed effect below isn't also
+		// triggered by range changes — those refetch via selectRange.
+		const r = untrack(() => range)
 		const res = await api.invoke<Api.CacheResultMetricsResult>('cache.resultMetrics',
-			{ project, timeRange: range }, fetch)
+			{ project, timeRange: r }, fetch)
 		resultFetchedAt = Math.floor(Date.now() / 1000)
 		resultMetrics = res.ok ? res.result : { series: [] }
 		resultLoading = false
 	}
 
-	onMount(fetchResultMetrics)
+	// Refetch the project cache-performance chart when the project changes. Same
+	// reason as the sparklines: a project switch reuses this component, so onMount
+	// would never re-run. fetchResultMetrics reads `project` synchronously, so the
+	// effect tracks it (range is untracked and refetched via selectRange; the
+	// Requests/Bandwidth `view` toggle just reformats the already-fetched series
+	// via $derived and must NOT refetch).
+	$effect(() => {
+		fetchResultMetrics()
+	})
 
 	function selectRange (v: string) {
 		if (v === range) return

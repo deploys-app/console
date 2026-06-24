@@ -125,20 +125,22 @@
 	)
 
 	onMount(() => {
-		loadIssues()
 		const ticker = setInterval(() => { now = Date.now() }, 1000)
 		return () => clearInterval(ticker)
 	})
 
-	// Reload when the status filter or sort changes (after the first mount).
-	// Reading both here is what subscribes the effect to their changes.
+	// Load on mount and reload whenever the project, status filter, or sort
+	// changes. `project` MUST be in the key: a project switch navigates to
+	// /errors via goto (overrideRedirect) WITHOUT remounting this page, so an
+	// onMount-only load would strand the previous project's issues in the list.
+	// Reading the three values here is what subscribes the effect to them; the
+	// key guard de-dupes the no-op re-run after this effect writes trackedListKey.
 	let trackedListKey = $state<string | null>(null)
 	$effect(() => {
-		const key = `${status} ${sort}`
+		const key = `${project} ${status} ${sort}`
 		if (trackedListKey === key) return
-		const first = trackedListKey === null
 		trackedListKey = key
-		if (!first) loadIssues()
+		loadIssues()
 	})
 </script>
 

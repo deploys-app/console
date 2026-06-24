@@ -61,12 +61,16 @@
 		reloadTimeout = null
 		fetching = true
 
+		// `range` is read untracked so the deployment-keyed effect below isn't
+		// also triggered by range changes — those refetch via setRange.
+		const range = untrack(() => filter.range)
+
 		try {
 			const resp = await api.invoke<Api.DeploymentMetricsResult>('deployment.metrics', {
 				project: deployment.project,
 				location: deployment.location,
 				name: deployment.name,
-				timeRange: filter.range
+				timeRange: range
 			}, fetch)
 			if (!resp.ok) return
 
@@ -113,12 +117,23 @@
 	}
 
 	onMount(() => {
-		fetchMetrics()
 		const ticker = setInterval(() => { now = Date.now() }, 1000)
 		return () => {
 			reloadTimeout && clearTimeout(reloadTimeout)
 			clearInterval(ticker)
 		}
+	})
+
+	// Refetch all 5 charts when the deployment identity changes. A project switch
+	// unmounts this (detail) page (overrideRedirect '/deployment'), but the tab
+	// bar / list link here per deployment, so /deployment/metrics?name=A ->
+	// ?name=B (or a ?location= change) reuses this component WITHOUT remounting —
+	// an onMount-only fetch would leave deployment A's charts up until the next
+	// ~60s reload tick. fetchMetrics reads deployment.project/location/name
+	// synchronously, so the effect tracks them (range is untracked; setRange
+	// refetches on a range change). clearFirst blanks the charts during the swap.
+	$effect(() => {
+		fetchMetrics(true)
 	})
 
 	function relTime (t: number): string {
