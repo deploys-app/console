@@ -4,6 +4,10 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import Sparkline from '$lib/components/Sparkline.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import CacheResultChart from '$lib/components/CacheResultChart.svelte'
+	import RangeSwitch from '$lib/components/RangeSwitch.svelte'
+	import { RANGE_SECONDS, RANGE_LABEL } from '$lib/metrics'
+	import { formatBytes, formatNumber } from '$lib/charts/util'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
@@ -67,6 +71,74 @@
 			.map(([ts, v]) => ([Number(ts), v] as [number, number]))
 			.sort((a, b) => a[0] - b[0])
 	}
+
+	// Project-wide edge response-cache outcomes (hit/miss/stale/bypass), summed
+	// across every location, as a full-width stacked chart. The Requests/Bandwidth
+	// toggle reuses the same chart with a different value series + formatter.
+	const RESULT_ORDER = ['HIT', 'STALE', 'MISS', 'BYPASS'] as const // bottom-to-top
+	const RESULT_LABEL: Record<string, string> = { HIT: 'Hit', STALE: 'Stale', MISS: 'Miss', BYPASS: 'Bypass' }
+	const RESULT_COLOR: Record<string, string> = {
+		HIT: 'hsl(var(--hsl-positive))',
+		STALE: 'hsl(var(--hsl-warning))',
+		MISS: 'hsl(var(--hsl-primary))',
+		BYPASS: 'hsl(var(--hsl-content) / 0.35)'
+	}
+
+	let range = $state('1d')
+	let view = $state<'requests' | 'bandwidth'>('requests')
+	let resultMetrics = $state<Api.CacheResultMetricsResult | null>(null)
+	let resultLoading = $state(true)
+	let resultFetchedAt = $state(Math.floor(Date.now() / 1000))
+
+	async function fetchResultMetrics () {
+		resultLoading = true
+		const res = await api.invoke<Api.CacheResultMetricsResult>('cache.resultMetrics',
+			{ project, timeRange: range }, fetch)
+		resultFetchedAt = Math.floor(Date.now() / 1000)
+		resultMetrics = res.ok ? res.result : { series: [] }
+		resultLoading = false
+	}
+
+	onMount(fetchResultMetrics)
+
+	function selectRange (v: string) {
+		if (v === range) return
+		range = v
+		fetchResultMetrics()
+	}
+
+	const seriesByResult = $derived(new Map((resultMetrics?.series ?? []).map((s) => [s.result, s])))
+
+	const chartSeries = $derived(RESULT_ORDER.map((result) => {
+		const s = seriesByResult.get(result)
+		const pts = (view === 'requests' ? s?.requests : s?.bytes) ?? []
+		return {
+			result,
+			name: RESULT_LABEL[result],
+			color: RESULT_COLOR[result],
+			data: pts.map(([ts, v]) => [ts * 1000, v] as [number, number])
+		}
+	}))
+
+	const fmtY = $derived(view === 'bandwidth' ? formatBytes : formatNumber)
+	const chartFrom = $derived((resultFetchedAt - (RANGE_SECONDS[range] ?? 86400)) * 1000)
+	const chartTo = $derived(resultFetchedAt * 1000)
+
+	// Cache hit ratio for the active view: cache-served (HIT + STALE) over all
+	// outcomes. STALE counts as served-from-cache (the body comes from the store).
+	const ratio = $derived.by(() => {
+		let served = 0
+		let all = 0
+		for (const s of resultMetrics?.series ?? []) {
+			const v = view === 'requests' ? (s.requestsTotal ?? 0) : (s.bytesTotal ?? 0)
+			all += v
+			if (s.result === 'HIT' || s.result === 'STALE') served += v
+		}
+		return all > 0 ? served / all : 0
+	})
+
+	const hasResultData = $derived((resultMetrics?.series ?? []).some((s) =>
+		(view === 'requests' ? (s.requestsTotal ?? 0) : (s.bytesTotal ?? 0)) > 0))
 </script>
 
 <div class="page-head">
@@ -80,6 +152,40 @@
 		<i class="fa-solid fa-plus"></i>
 		Configure cache
 	</GuardedButton>
+</div>
+
+<div class="panel is-level-300 cache-perf">
+	<div class="perf-head">
+		<div>
+			<h6 class="perf-title"><strong>Cache performance</strong></h6>
+			<p class="perf-sub">Edge cache outcomes across all locations · {RANGE_LABEL[range] ?? range}</p>
+		</div>
+		<div class="perf-controls">
+			<div class="seg" role="group" aria-label="Metric">
+				<button type="button" class="seg-btn" class:is-active={view === 'requests'}
+					aria-pressed={view === 'requests'} onclick={() => (view = 'requests')}>Requests</button>
+				<button type="button" class="seg-btn" class:is-active={view === 'bandwidth'}
+					aria-pressed={view === 'bandwidth'} onclick={() => (view = 'bandwidth')}>Bandwidth</button>
+			</div>
+			<RangeSwitch value={range} onselect={selectRange} />
+		</div>
+	</div>
+
+	{#if resultLoading}
+		<div class="perf-empty"><i class="fa-solid fa-spinner-third fa-spin"></i></div>
+	{:else if !hasResultData}
+		<div class="perf-empty">No cache activity in the {RANGE_LABEL[range] ?? range}.</div>
+	{:else}
+		<div class="legend">
+			{#each RESULT_ORDER as r (r)}
+				<span class="legend-item">
+					<span class="legend-dot" style:background={RESULT_COLOR[r]}></span>{RESULT_LABEL[r]}
+				</span>
+			{/each}
+			<span class="legend-ratio">Hit ratio <strong>{(ratio * 100).toFixed(1)}%</strong></span>
+		</div>
+		<CacheResultChart series={chartSeries} from={chartFrom} to={chartTo} formatY={fmtY} />
+	{/if}
 </div>
 
 <div class="panel is-level-300">
@@ -193,5 +299,105 @@
 
 	.matches-link:hover {
 		color: hsl(var(--hsl-primary));
+	}
+
+	.cache-perf {
+		margin-bottom: 1rem;
+	}
+
+	.perf-head {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.75rem;
+	}
+
+	.perf-title {
+		color: hsl(var(--hsl-content) / 0.85);
+	}
+
+	.perf-sub {
+		margin-top: 0.125rem;
+		font-size: 0.8125rem;
+		color: hsl(var(--hsl-content) / 0.5);
+	}
+
+	.perf-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+	}
+
+	/* Segmented Requests|Bandwidth toggle — mirrors RangeSwitch styling. */
+	.seg {
+		display: inline-flex;
+		padding: 0.1875rem;
+		gap: 0.125rem;
+		border-radius: 0.625rem;
+		background: hsl(var(--hsl-base-200));
+		border: 1px solid hsl(var(--hsl-line) / 0.7);
+	}
+
+	.seg-btn {
+		padding: 0.3125rem 0.6875rem;
+		border-radius: 0.4375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: hsl(var(--hsl-content) / 0.6);
+		transition: color var(--timing-fastest) ease, background var(--timing-fastest) ease;
+	}
+
+	.seg-btn:hover {
+		color: hsl(var(--hsl-content) / 0.9);
+	}
+
+	.seg-btn.is-active {
+		color: hsl(var(--hsl-primary-content));
+		background: hsl(var(--hsl-primary));
+	}
+
+	.perf-empty {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 320px;
+		color: hsl(var(--hsl-content) / 0.45);
+		font-size: 0.875rem;
+	}
+
+	.legend {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.5rem;
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.7);
+	}
+
+	.legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+	}
+
+	.legend-dot {
+		width: 0.625rem;
+		height: 0.625rem;
+		border-radius: 3px;
+		flex-shrink: 0;
+	}
+
+	.legend-ratio {
+		margin-left: auto;
+		color: hsl(var(--hsl-content) / 0.55);
+	}
+
+	.legend-ratio strong {
+		color: hsl(var(--hsl-content));
+		font-variant-numeric: tabular-nums;
 	}
 </style>

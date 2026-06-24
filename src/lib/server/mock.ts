@@ -631,6 +631,43 @@ function cacheMetrics (timeRange?: string) {
 	return { series, total }
 }
 
+// Fills the project cache-performance chart (cache.resultMetrics) with per-result
+// requests + bytes over the requested window on an even 48-bucket grid, so the
+// stacked HIT/STALE/MISS/BYPASS columns align. BYPASS carries requests but no
+// cache bytes (bypassed responses are origin-served), matching production.
+function cacheResultMetrics (timeRange?: string) {
+	const now = Math.floor(Date.now() / 1000)
+	const windowSeconds = wafRangeSeconds[timeRange ?? '1d'] ?? wafRangeSeconds['1d']
+	const buckets = 48
+	const step = Math.max(60, Math.floor(windowSeconds / buckets))
+
+	const make = (result: Api.CacheResultSeries['result'], reqScale: number, byteScale: number) => {
+		const requests: [number, number][] = []
+		const bytes: [number, number][] = []
+		let requestsTotal = 0
+		let bytesTotal = 0
+		for (let i = 0; i < buckets; i++) {
+			const ts = now - windowSeconds + i * step
+			const r = Math.floor(reqScale * (0.5 + Math.random()))
+			requests.push([ts, r])
+			requestsTotal += r
+			const b = Math.floor(byteScale * (0.5 + Math.random()))
+			bytes.push([ts, b])
+			bytesTotal += b
+		}
+		return { result, requests, bytes, requestsTotal, bytesTotal }
+	}
+
+	return {
+		series: [
+			make('HIT', 820, 5_200_000),
+			make('STALE', 130, 720_000),
+			make('MISS', 240, 1_500_000),
+			make('BYPASS', 95, 0) // bypass: requests only, no cache bytes
+		]
+	}
+}
+
 // Locations (besides the seed LOCATION_ID) that have had cache configured in
 // this dev session, mapped to { description, polls }. Mirrors wafConfigured —
 // the simulated deployer flips a freshly created zone from pending → success
@@ -1840,6 +1877,7 @@ const handlers: Record<string, (args: any) => object> = {
 		if (location === LOCATION_ID) return ok(cacheMetrics(args?.timeRange))
 		return ok({ series: [], total: 0 })
 	},
+	'cache.resultMetrics': (args) => ok(cacheResultMetrics(args?.timeRange)),
 	'cache.delete': (args) => {
 		if (args?.location) cacheConfigured.delete(args.location)
 		return ok({})

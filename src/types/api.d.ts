@@ -923,6 +923,19 @@ declare namespace Api {
         total: number
     }
 
+    export type CacheResultSeries = {
+        result: 'HIT' | 'MISS' | 'STALE' | 'BYPASS'
+        // [unixSeconds, value], time-ordered
+        requests: [number, number][]
+        bytes: [number, number][]
+        requestsTotal: number
+        bytesTotal: number
+    }
+
+    export type CacheResultMetricsResult = {
+        series: CacheResultSeries[]
+    }
+
     export type DropboxItem = {
         downloadUrl: string
         filename: string
