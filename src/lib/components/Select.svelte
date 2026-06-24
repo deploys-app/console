@@ -52,9 +52,32 @@
 	// works, and re-arm on blur for the next focus.
 	let autofillGuard = $state(true)
 
+	let boxEl = $state<HTMLDivElement | undefined>()
 	let triggerEl = $state<HTMLButtonElement | undefined>()
 	let inputEl = $state<HTMLInputElement | undefined>()
 	let listEl = $state<HTMLDivElement | undefined>()
+
+	// The menu is positioned with `position: fixed` (anchored to the trigger via
+	// getBoundingClientRect) so it floats above any clipping ancestor — e.g. a
+	// modal panel with `overflow-y: auto` would otherwise trap and scroll it.
+	let menuStyle = $state('')
+
+	function positionMenu () {
+		if (!boxEl) return
+		const r = boxEl.getBoundingClientRect()
+		const gap = 6 // matches the old `top: calc(100% + 0.35rem)` offset
+		const margin = 8 // breathing room from the viewport edge
+		const maxH = 288 // 18rem cap, same as the CSS max-height
+		const below = window.innerHeight - r.bottom - gap - margin
+		const above = r.top - gap - margin
+		// Flip above only when there's too little room below and more room above.
+		const placeAbove = below < 160 && above > below
+		const avail = Math.max(120, Math.min(maxH, placeAbove ? above : below))
+		const vertical = placeAbove
+			? `bottom: ${window.innerHeight - r.top + gap}px`
+			: `top: ${r.bottom + gap}px`
+		menuStyle = `position: fixed; left: ${r.left}px; width: ${r.width}px; max-height: ${avail}px; ${vertical};`
+	}
 
 	// Editable mode filters the visible options by case-insensitive substring of
 	// the typed value. Non-editable mode always shows the full list.
@@ -235,9 +258,23 @@
 		const el = listEl.querySelector(`#${CSS.escape(optionId(activeIndex))}`)
 		if (el instanceof HTMLElement) el.scrollIntoView({ block: 'nearest' })
 	})
+
+	// While the menu is open, keep it pinned to the trigger as the page (or an
+	// ancestor such as a scrollable modal panel) scrolls or the window resizes.
+	$effect(() => {
+		if (!open) return
+		positionMenu()
+		const reposition = () => positionMenu()
+		window.addEventListener('scroll', reposition, true)
+		window.addEventListener('resize', reposition)
+		return () => {
+			window.removeEventListener('scroll', reposition, true)
+			window.removeEventListener('resize', reposition)
+		}
+	})
 </script>
 
-<div class="select-box {className}" class:is-disabled={disabled} use:clickOutside={close}>
+<div bind:this={boxEl} class="select-box {className}" class:is-disabled={disabled} use:clickOutside={close}>
 	{#if editable}
 		<div class="select-trigger select-trigger-editable" class:is-open={open}>
 			<!-- A combobox, not a real text field — suppress browser and
@@ -302,7 +339,7 @@
 	{/if}
 
 	{#if open}
-		<div bind:this={listEl} id={listboxId} class="select-menu" role="listbox" tabindex="-1">
+		<div bind:this={listEl} id={listboxId} class="select-menu" role="listbox" tabindex="-1" style={menuStyle}>
 			{#each visibleOptions as opt, i (i)}
 				{#if opt.separator}
 					<div class="select-sep" role="separator"></div>
@@ -523,11 +560,10 @@
 	}
 
 	.select-menu {
-		position: absolute;
-		top: calc(100% + 0.35rem);
-		left: 0;
-		z-index: 20;
-		width: 100%;
+		/* Positioned as `position: fixed` via an inline style (see positionMenu)
+		 * so the menu floats above clipping ancestors like a scrollable modal
+		 * panel. z-index sits above the modal layer (.modal is z-index 50). */
+		z-index: 100;
 		max-height: 18rem;
 		overflow-y: auto;
 		padding: 0.25rem;
