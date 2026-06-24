@@ -1,8 +1,8 @@
-import { redirect, error } from '@sveltejs/kit'
+import { error } from '@sveltejs/kit'
 import api from '$lib/api'
 import type { LayoutLoad } from './$types'
 
-export const load: LayoutLoad = async ({ fetch, url }) => {
+export const load: LayoutLoad = async ({ fetch }) => {
 	const [
 		me,
 		projects
@@ -12,13 +12,11 @@ export const load: LayoutLoad = async ({ fetch, url }) => {
 	])
 	if (!me.ok) {
 		if (me.error?.unauth) {
-			// Remember where the user was headed so the OAuth round-trip can land
-			// them back here instead of dumping them on the dashboard. The path is
-			// same-origin by construction; signin/callback re-validate it.
-			const next = url.pathname + url.search
-			redirect(302, next && next !== '/'
-				? `/auth/signin?redirect=${encodeURIComponent(next)}`
-				: '/auth/signin')
+			// Don't bounce straight to the OAuth provider — surface a 401 so the
+			// root +error.svelte can show a "session expired" page with an explicit
+			// "Sign in" button. The current URL is preserved as $page.url, which the
+			// error page turns into the `?redirect=` so sign-in lands back here.
+			error(401, 'unauthorized')
 		}
 		error(500, me.error?.message)
 	}
