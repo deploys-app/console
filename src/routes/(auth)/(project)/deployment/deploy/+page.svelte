@@ -12,13 +12,29 @@
 
 	// Editable sidecar shape used by the form. Mirrors Api.SidecarForm but keeps
 	// `type` as a plain string so the <Select> two-way binding (value:
-	// string | number) type-checks.
+	// string | number) type-checks. Carries a config slot per variant so the
+	// form can switch between types without losing partial input.
 	interface FormSidecar {
 		type: string
 		cloudSqlProxy: {
 			instance: string
 			port: number | null
 			credentials: string
+			autoIamAuthn: boolean
+			privateIp: boolean
+		}
+		alloyDbProxy: {
+			instance: string
+			port: number | null
+			credentials: string
+		}
+	}
+
+	function newFormSidecar (type = ''): FormSidecar {
+		return {
+			type,
+			cloudSqlProxy: { instance: '', port: null, credentials: '', autoIamAuthn: false, privateIp: false },
+			alloyDbProxy: { instance: '', port: null, credentials: '' }
 		}
 	}
 
@@ -116,20 +132,25 @@
 		form.envGroups = [...(deployment.envGroups || [])]
 		form.mountData = Object.entries(deployment.mountData || {}).map(([k, v]) => ({ k, v }))
 		form.sidecars = (deployment.sidecars || []).map((s): FormSidecar => {
+			const sc = newFormSidecar()
 			if (s.cloudSqlProxy) {
-				return {
-					type: 'cloudSqlProxy',
-					cloudSqlProxy: {
-						instance: s.cloudSqlProxy.instance ?? '',
-						port: s.cloudSqlProxy.port ?? null,
-						credentials: s.cloudSqlProxy.credentials ?? ''
-					}
+				sc.type = 'cloudSqlProxy'
+				sc.cloudSqlProxy = {
+					instance: s.cloudSqlProxy.instance ?? '',
+					port: s.cloudSqlProxy.port ?? null,
+					credentials: s.cloudSqlProxy.credentials ?? '',
+					autoIamAuthn: s.cloudSqlProxy.autoIamAuthn ?? false,
+					privateIp: s.cloudSqlProxy.privateIp ?? false
+				}
+			} else if (s.alloyDbProxy) {
+				sc.type = 'alloyDbProxy'
+				sc.alloyDbProxy = {
+					instance: s.alloyDbProxy.instance ?? '',
+					port: s.alloyDbProxy.port ?? null,
+					credentials: s.alloyDbProxy.credentials ?? ''
 				}
 			}
-			return {
-				type: '',
-				cloudSqlProxy: { instance: '', port: null, credentials: '' }
-			}
+			return sc
 		})
 		requireGoogleLogin = deployment.access?.requireGoogleLogin ?? false
 		allowedEmails = [...(deployment.access?.allowedEmails || [])]
@@ -273,7 +294,20 @@
 						cloudSqlProxy: {
 							instance: s.cloudSqlProxy.instance,
 							port: s.cloudSqlProxy.port,
-							credentials: s.cloudSqlProxy.credentials
+							// autoIamAuthn and credentials are mutually exclusive; never
+							// send a stale credential when IAM auth is selected.
+							credentials: s.cloudSqlProxy.autoIamAuthn ? '' : s.cloudSqlProxy.credentials,
+							autoIamAuthn: s.cloudSqlProxy.autoIamAuthn,
+							privateIp: s.cloudSqlProxy.privateIp
+						}
+					}
+				}
+				if (s.type === 'alloyDbProxy') {
+					return {
+						alloyDbProxy: {
+							instance: s.alloyDbProxy.instance,
+							port: s.alloyDbProxy.port,
+							credentials: s.alloyDbProxy.credentials
 						}
 					}
 				}
@@ -287,13 +321,7 @@
 		if (form.sidecars.length >= sidecarMax) {
 			return
 		}
-		form.sidecars = [
-			...form.sidecars,
-			{
-				type: 'cloudSqlProxy',
-				cloudSqlProxy: { instance: '', port: null, credentials: '' }
-			}
-		]
+		form.sidecars = [...form.sidecars, newFormSidecar('cloudSqlProxy')]
 	}
 
 	function removeSidecar (i: number) {
@@ -845,7 +873,10 @@
 							id="input-sidecar-type-{i}"
 							bind:value={sidecar.type}
 							placeholder="Select Type"
-							options={[{ value: 'cloudSqlProxy', label: 'Cloud SQL Proxy' }]} />
+							options={[
+								{ value: 'cloudSqlProxy', label: 'Cloud SQL Proxy' },
+								{ value: 'alloyDbProxy', label: 'AlloyDB Proxy' }
+							]} />
 					</div>
 					{#if sidecar.type === 'cloudSqlProxy'}
 						<div class="field">
@@ -861,9 +892,46 @@
 							</div>
 						</div>
 						<div class="field">
-							<label for="input-sidecar-credentials-{i}">Credentials</label>
+							<div class="checkbox">
+								<input id="input-sidecar-private-ip-{i}" type="checkbox" bind:checked={sidecar.cloudSqlProxy.privateIp}>
+								<label for="input-sidecar-private-ip-{i}">Private IP</label>
+							</div>
+						</div>
+						<div class="field">
+							<div class="checkbox">
+								<input id="input-sidecar-auto-iam-{i}" type="checkbox" bind:checked={sidecar.cloudSqlProxy.autoIamAuthn}>
+								<label for="input-sidecar-auto-iam-{i}">Automatic IAM authentication</label>
+							</div>
+						</div>
+						{#if sidecar.cloudSqlProxy.autoIamAuthn}
+							<p class="text-content/60 text-sm">
+								Uses the deployment's IAM identity to connect — bind a workload identity and leave credentials empty.
+							</p>
+						{:else}
+							<div class="field">
+								<label for="input-sidecar-credentials-{i}">Credentials</label>
+								<div class="input">
+									<input id="input-sidecar-credentials-{i}" placeholder="Credentials JSON" bind:value={sidecar.cloudSqlProxy.credentials}>
+								</div>
+							</div>
+						{/if}
+					{:else if sidecar.type === 'alloyDbProxy'}
+						<div class="field">
+							<label for="input-sidecar-alloydb-instance-{i}">Instance</label>
 							<div class="input">
-								<input id="input-sidecar-credentials-{i}" placeholder="Credentials JSON" bind:value={sidecar.cloudSqlProxy.credentials}>
+								<input id="input-sidecar-alloydb-instance-{i}" placeholder="projects/p/locations/l/clusters/c/instances/i" bind:value={sidecar.alloyDbProxy.instance} required>
+							</div>
+						</div>
+						<div class="field">
+							<label for="input-sidecar-alloydb-port-{i}">Port</label>
+							<div class="input">
+								<input class="-no-arrow" id="input-sidecar-alloydb-port-{i}" placeholder="5432" type="number" bind:value={sidecar.alloyDbProxy.port}>
+							</div>
+						</div>
+						<div class="field">
+							<label for="input-sidecar-alloydb-credentials-{i}">Credentials</label>
+							<div class="input">
+								<input id="input-sidecar-alloydb-credentials-{i}" placeholder="Credentials JSON" bind:value={sidecar.alloyDbProxy.credentials}>
 							</div>
 						</div>
 					{/if}

@@ -297,13 +297,22 @@ declare namespace Api {
         instance: string
         port: number
         credentials: string
+        autoIamAuthn?: boolean
+        privateIp?: boolean
+    }
+
+    export type AlloyDbProxySidecar = {
+        instance: string
+        port: number
+        credentials: string
     }
 
     export type Sidecar = {
         cloudSqlProxy?: CloudSqlProxySidecar
+        alloyDbProxy?: AlloyDbProxySidecar
     }
 
-    export type SidecarType = '' | 'cloudSqlProxy'
+    export type SidecarType = '' | 'cloudSqlProxy' | 'alloyDbProxy'
 
     /**
      * Editable form shape for a sidecar. Carries a discriminator plus a
@@ -313,6 +322,13 @@ declare namespace Api {
     export type SidecarForm = {
         type: SidecarType
         cloudSqlProxy: {
+            instance: string
+            port: number | null
+            credentials: string
+            autoIamAuthn: boolean
+            privateIp: boolean
+        }
+        alloyDbProxy: {
             instance: string
             port: number | null
             credentials: string

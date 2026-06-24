@@ -1,6 +1,7 @@
 import { test, expect, setMocks } from './helpers.js'
 import {
 	defaultLocation,
+	sampleAlloyDbProxySidecar,
 	sampleCloudSqlProxySidecar,
 	sampleDeployment,
 	sampleStaticDeployment,
@@ -74,13 +75,7 @@ test.describe('deployment detail — sidecars', () => {
 					...sampleDeployment,
 					sidecars: [
 						sampleCloudSqlProxySidecar,
-						{
-							cloudSqlProxy: {
-								instance: 'my-project:asia-southeast1:replica',
-								port: 3307,
-								credentials: ''
-							}
-						}
+						sampleAlloyDbProxySidecar
 					]
 				}
 			},
@@ -92,10 +87,15 @@ test.describe('deployment detail — sidecars', () => {
 		// Sidecars render in a `.spec` row (label + value list), not a table row.
 		const row = page.locator('.spec').filter({ hasText: 'Sidecars' })
 		await expect(row).toBeVisible()
+		await expect(row.getByText('Cloud SQL Proxy')).toBeVisible()
 		await expect(row.getByText('my-project:us-central1:my-db')).toBeVisible()
 		await expect(row.getByText(':3306')).toBeVisible()
-		await expect(row.getByText('my-project:asia-southeast1:replica')).toBeVisible()
-		await expect(row.getByText(':3307')).toBeVisible()
+		// The AlloyDB variant renders with its own label and instance:port.
+		await expect(row.getByText('AlloyDB Proxy')).toBeVisible()
+		await expect(
+			row.getByText('projects/my-project/locations/us-central1/clusters/main/instances/primary')
+		).toBeVisible()
+		await expect(row.getByText(':5432')).toBeVisible()
 	})
 })
 
@@ -154,6 +154,48 @@ test.describe('deployment deploy — sidecars', () => {
 			'my-project:us-central1:my-db'
 		)
 		await expect(main.locator('#input-sidecar-port-0')).toHaveValue('3306')
+	})
+
+	test('hydrates an existing AlloyDB proxy sidecar with its own fields', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: {
+					...sampleDeployment,
+					sidecars: [sampleAlloyDbProxySidecar]
+				}
+			},
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/deploy?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Sidecar #1')).toBeVisible()
+		// AlloyDB uses its own instance/port inputs, not the Cloud SQL ones.
+		await expect(main.locator('#input-sidecar-alloydb-instance-0')).toHaveValue(
+			'projects/my-project/locations/us-central1/clusters/main/instances/primary'
+		)
+		await expect(main.locator('#input-sidecar-alloydb-port-0')).toHaveValue('5432')
+		await expect(main.locator('#input-sidecar-instance-0')).toHaveCount(0)
+	})
+
+	test('cloudSqlProxy autoIamAuthn hides the credentials field', async ({ page }) => {
+		await setMocks({
+			'deployment.get': {
+				ok: true,
+				result: { ...sampleDeployment, sidecars: [sampleCloudSqlProxySidecar] }
+			},
+			'location.get': { ok: true, result: defaultLocation }
+		})
+
+		await page.goto('/deployment/deploy?project=test-project&location=gke&name=web')
+
+		const main = page.locator('.content-wrapper')
+		// Credentials visible by default, hidden once IAM auth is enabled.
+		await expect(main.locator('#input-sidecar-credentials-0')).toBeVisible()
+		await main.locator('#input-sidecar-auto-iam-0').check()
+		await expect(main.locator('#input-sidecar-credentials-0')).toHaveCount(0)
 	})
 })
 
