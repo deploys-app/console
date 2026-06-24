@@ -331,10 +331,14 @@
 		<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
 	{/if}
 	<!-- Static deployments have no pods, but the static-gateway reports their
-	     per-site request rate, so Requests applies to them too. -->
+	     per-site request count, so Requests applies to them too. -->
 	{#if deployment.type === 'WebService' || deployment.type === 'Static'}
-		<Chart title="Request (rps)" unit="rps" series={request} range={filter.range} />
+		<!-- Total requests served in each time bucket (collector now records
+		     per-minute counts, summed per bucket), not a per-second rate. -->
+		<Chart title="Requests" unit="requests" series={request} range={filter.range} />
 	{/if}
+	<!-- Total bytes egressed in each time bucket (per-minute byte counts summed
+	     per bucket), not a per-second rate. -->
 	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
 	<!-- Static deploys serve from object storage; show each site's stored bytes
 	     (project-wide storage is on the project Metrics page). -->
