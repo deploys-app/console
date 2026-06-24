@@ -54,7 +54,7 @@ test.describe('cache list', () => {
 		await page.goto('/cache?project=test-project')
 
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByRole('heading', { name: 'Cache' })).toBeVisible()
+		await expect(main.getByRole('heading', { name: 'Cache', exact: true })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'gke', exact: true })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'sgp', exact: true })).toBeVisible()
 		await expect(main.getByText('prod edge')).toBeVisible()
