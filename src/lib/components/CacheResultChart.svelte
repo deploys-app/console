@@ -77,9 +77,22 @@
 	const yScale = $derived((v: number) =>
 		plot.y1 - ((v - yInfo.min) / (yInfo.max - yInfo.min)) * (plot.y1 - plot.y0))
 
+	// Size columns to the data's real cadence — the smallest pixel gap between
+	// adjacent bucket centers — NOT plot-width / bucket-count. Buckets are placed
+	// by timestamp (xScale), so a count-based width balloons when the data is
+	// sparse: a few buckets clustered near "now" (a freshly-deployed or low-traffic
+	// project) each become ~plot-width/N wide, so they overlap and clip at the
+	// edge. Gap-based width keeps them tight to their timestamps in every case;
+	// for a dense even grid min-gap ≈ plot-width/N, so this is unchanged there.
 	const colW = $derived.by(() => {
-		const step = xs.length > 1 ? (plot.x1 - plot.x0) / xs.length : (plot.x1 - plot.x0) * 0.4
-		return Math.max(2, Math.min(step * 0.72, 44))
+		if (xs.length < 2) return 24
+		let minGap = Infinity
+		for (let i = 1; i < xs.length; i++) {
+			const g = xScale(xs[i]) - xScale(xs[i - 1])
+			if (g > 0 && g < minGap) minGap = g
+		}
+		if (!Number.isFinite(minGap)) return 24
+		return Math.max(2, Math.min(minGap * 0.72, 44))
 	})
 
 	// One stack per bucket: an array of {result, color, name, value, y, h} segments.
