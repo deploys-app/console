@@ -19,21 +19,23 @@
 	const hasDnsErrors = $derived(dnsErrors.length > 0)
 	const headerStatus = $derived(domain.status)
 
-	// ─── DNS record groups (visibility mirrors the original conditionals) ───
-	// Prefer CNAME; fall back to A/AAAA only when no CNAME is available.
-	const cnames = $derived(domain.dnsConfig?.cname ?? [])
-	const useCname = $derived(cnames.length > 0)
-	const connectRecords = $derived.by(() => {
-		if (useCname) return cnames.map((value) => ({ type: 'CNAME', value }))
-		return [
-			...(domain.dnsConfig?.ipv4 ?? []).map((value) => ({ type: 'A', value })),
-			...(domain.dnsConfig?.ipv6 ?? []).map((value) => ({ type: 'AAAA', value }))
-		]
-	})
-	const connectLabel = $derived(useCname ? 'CNAME record' : 'A/AAAA records')
+	// ─── DNS record groups ───
+	// The CNAME target is geolocation-routed to the nearest CDN edge, so a
+	// subdomain should use it. The A/AAAA addresses are a fixed regional gateway
+	// (not the geo-routed edge), kept as the apex fallback: a root/apex domain
+	// can't carry a CNAME at the zone apex, so it needs an ALIAS/ANAME to the same
+	// target or these A/AAAA records. We surface both groups and let the note guide
+	// which to use (rather than only the CNAME, which silently broke apex domains).
+	const cnameRecords = $derived((domain.dnsConfig?.cname ?? []).map((value) => ({ type: 'CNAME', value })))
+	const ipRecords = $derived([
+		...(domain.dnsConfig?.ipv4 ?? []).map((value) => ({ type: 'A', value })),
+		...(domain.dnsConfig?.ipv6 ?? []).map((value) => ({ type: 'AAAA', value }))
+	])
+	const hasCname = $derived(cnameRecords.length > 0)
+	const hasIpRecords = $derived(ipRecords.length > 0)
 	const showConnect = $derived(
 		(domain.status === 'success' || domain.status === 'verify' || !domain.wildcard) &&
-		connectRecords.length > 0
+		(hasCname || hasIpRecords)
 	)
 	const ownership = $derived(domain.verification?.ownership)
 	const hasOwnership = $derived(!!ownership?.type)
@@ -457,6 +459,40 @@
 	}
 	.group__desc :global(em) { font-style: italic; color: hsl(var(--hsl-content) / 0.8); }
 
+	/* A record-set groups one record kind (CNAME vs A/AAAA) under a small caption
+	   so apex vs subdomain guidance maps onto the records you actually add. */
+	.rec-set { display: flex; flex-direction: column; gap: 0.4rem; }
+	.rec-set + .rec-set { margin-top: 0.6rem; }
+
+	.rec-set__label {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: hsl(var(--hsl-content) / 0.55);
+	}
+
+	.rec-set__hint {
+		text-transform: none;
+		letter-spacing: 0;
+		font-weight: 600;
+		font-size: 0.7rem;
+		padding: 0.05rem 0.4rem;
+		border-radius: 5px;
+		background: hsl(var(--hsl-primary) / 0.12);
+		color: hsl(var(--hsl-primary));
+	}
+
+	.rec-set__note {
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.65);
+	}
+	.rec-set__note :global(code) { font-family: var(--ffml-mono); font-size: 0.95em; }
+
 	.recs { display: flex; flex-direction: column; gap: 0.5rem; }
 
 	.rec {
@@ -615,7 +651,7 @@
 							<p>
 								Point your DNS at the records below. We re-check every few minutes and
 								switch the domain to <strong>success</strong> once it resolves to this
-								location. If your DNS sits behind a CDN/proxy and the {connectLabel}
+								location. If your DNS sits behind a CDN/proxy and the record
 								can't resolve to us directly, add the <em>Proxied DNS</em> TXT record
 								instead — that proves ownership but doesn't enable certificate issuance.
 							</p>
@@ -732,13 +768,43 @@
 					<div class="group">
 						<div class="group__head">
 							<div class="group__title"><span class="step">1</span> Point your domain</div>
-							<p class="group__desc">Create these records so traffic for <strong>{domain.domain}</strong> reaches this location.</p>
+							<p class="group__desc">
+								Create a record so traffic for <strong>{domain.domain}</strong> reaches this location.
+								{#if hasCname}
+									Apex domains (e.g. <code>example.com</code>) can't use CNAME — use an
+									ALIAS/ANAME record to the same target{#if hasIpRecords}, or the A/AAAA records below{/if}.
+								{/if}
+							</p>
 						</div>
-						<div class="recs">
-							{#each connectRecords as rec, i (i)}
-								{@render dnsRecord(rec.type, domain.domain, rec.value)}
-							{/each}
-						</div>
+
+						{#if hasCname}
+							<div class="rec-set">
+								<p class="rec-set__label">Subdomain <span class="rec-set__hint">recommended</span></p>
+								<div class="recs">
+									{#each cnameRecords as rec, i (i)}
+										{@render dnsRecord(rec.type, domain.domain, rec.value)}
+									{/each}
+								</div>
+							</div>
+						{/if}
+
+						{#if hasIpRecords}
+							<div class="rec-set">
+								{#if hasCname}
+									<p class="rec-set__label">Root / apex domain</p>
+									<p class="rec-set__note">
+										These A/AAAA addresses point to a fixed regional gateway, not the CDN edge —
+										the edge IPs are assigned by geolocation DNS, so a CNAME or ALIAS/ANAME (not a
+										fixed A/AAAA) keeps visitors on the nearest edge.
+									</p>
+								{/if}
+								<div class="recs">
+									{#each ipRecords as rec, i (i)}
+										{@render dnsRecord(rec.type, domain.domain, rec.value)}
+									{/each}
+								</div>
+							</div>
+						{/if}
 					</div>
 				</section>
 			{/if}
@@ -758,7 +824,7 @@
 							{#if !domain.wildcard}
 								<p class="group__desc">
 									If your DNS sits behind a CDN/proxy (e.g. Cloudflare) so the
-									{connectLabel} can't resolve here directly, add this TXT record
+									record can't resolve here directly, add this TXT record
 									instead to prove ownership and we'll accept the proxied setup.
 								</p>
 							{:else}
