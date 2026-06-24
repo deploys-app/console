@@ -1,7 +1,9 @@
 import { test, unauthedTest, expect, setMocks } from './helpers.js'
 
 unauthedTest.describe('unauthenticated access', () => {
-	unauthedTest('redirects to /auth/signin (remembering the path) when there is no token', async ({ page }) => {
+	unauthedTest('auto-redirects a first-time visitor (no token) to /auth/signin, remembering the path', async ({ page }) => {
+		// A fresh visitor with no session cookie is bounced straight to sign-in —
+		// no interstitial. (The unauthorized page is only for an expired session.)
 		const resp = await page.request.get('/?project=test-project', { maxRedirects: 0 })
 		expect([301, 302, 303, 307, 308]).toContain(resp.status())
 		const loc = new URL(resp.headers().location, 'http://localhost')
@@ -9,7 +11,7 @@ unauthedTest.describe('unauthenticated access', () => {
 		expect(loc.searchParams.get('redirect')).toBe('/?project=test-project')
 	})
 
-	unauthedTest('redirects to /auth/signin from the project list as well', async ({ page }) => {
+	unauthedTest('auto-redirects a first-time visitor from the project list as well', async ({ page }) => {
 		const resp = await page.request.get('/project', { maxRedirects: 0 })
 		expect([301, 302, 303, 307, 308]).toContain(resp.status())
 		const loc = new URL(resp.headers().location, 'http://localhost')
@@ -100,5 +102,34 @@ test.describe('signed-in user', () => {
 		})
 		const resp = await page.goto('/project')
 		expect(resp?.status()).toBeGreaterThanOrEqual(500)
+	})
+
+	test('shows the unauthorized page (not a redirect) on a deep link when the session token is rejected', async ({ page }) => {
+		// `test` fixture is signed in (token cookie present), but the API rejects it
+		// — an expired session. On a deep link this surfaces the "Sign in to
+		// continue" page with a manual Sign in link, not an auto-redirect.
+		await setMocks({
+			'me.get': { ok: false, error: { message: 'api: unauthorized' } }
+		})
+		const resp = await page.goto('/project')
+		expect(resp?.status()).toBe(401)
+		const signin = page.getByRole('link', { name: 'Sign in' })
+		await expect(signin).toBeVisible()
+		const href = new URL(await signin.getAttribute('href') ?? '', 'http://localhost')
+		expect(href.pathname).toBe('/auth/signin')
+		expect(href.searchParams.get('redirect')).toBe('/project')
+	})
+
+	test('auto-redirects to /auth/signin from "/" even with an expired token (no interstitial)', async ({ page }) => {
+		// The bare root is just a router, so it always bounces to sign-in — an
+		// expired session here gets the redirect, not the "Sign in to continue" page.
+		await setMocks({
+			'me.get': { ok: false, error: { message: 'api: unauthorized' } }
+		})
+		const resp = await page.request.get('/', { maxRedirects: 0 })
+		expect([301, 302, 303, 307, 308]).toContain(resp.status())
+		const loc = new URL(resp.headers().location, 'http://localhost')
+		expect(loc.pathname).toBe('/auth/signin')
+		expect(loc.searchParams.get('redirect')).toBeNull()
 	})
 })
