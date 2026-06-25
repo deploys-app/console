@@ -76,21 +76,33 @@ test.describe('global search palette', () => {
 		await expect(page.locator('.modal.is-active').getByPlaceholder(/Search projects, deployments/)).toHaveCount(0)
 	})
 
-	test('typing a project name surfaces it as a "Switch project" row and Enter switches', async ({ page }) => {
+	test('"Switch project" command opens a project sub-mode where typing then Enter switches', async ({ page }) => {
 		const otherProject = { ...defaultProject, id: '2', project: 'staging', name: 'Staging' }
 		await setMocks({
 			'project.list': { ok: true, result: { items: [defaultProject, otherProject] } }
 		})
 
 		await page.goto('/deployment?project=test-project')
+		// Wait for hydration before the "/" shortcut is wired up.
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Deployments' })).toBeVisible()
 		await page.keyboard.press('/')
 		const dialog = page.locator('.modal.is-active')
 		await expect(dialog).toBeVisible()
 
-		await dialog.getByPlaceholder(/Search projects, deployments/).fill('staging')
-		// The other project shows up under "Switch project" — the current project
-		// is intentionally excluded.
-		await expect(dialog.getByText('Switch project', { exact: false })).toBeVisible()
+		// Typing "project" surfaces the single "Switch project" command rather than
+		// a flat list of every project.
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('project')
+		const command = dialog.locator('.result').filter({ hasText: 'Switch project' }).first()
+		await expect(command).toBeVisible()
+
+		// Enter opens the project sub-mode: the heading and placeholder change and
+		// the input is refocused so the next keystrokes filter projects.
+		await page.keyboard.press('Enter')
+		await expect(dialog.getByRole('heading', { name: 'Switch project' })).toBeVisible()
+		const projectInput = dialog.getByPlaceholder(/Switch to project/)
+		await expect(projectInput).toBeFocused()
+
+		await projectInput.fill('staging')
 		const switchRow = dialog.locator('.result').filter({ hasText: 'Staging' }).first()
 		await expect(switchRow).toBeVisible()
 		// Current project should NOT appear (filtered out at source).
@@ -98,6 +110,28 @@ test.describe('global search palette', () => {
 
 		await switchRow.click()
 		await expect(page).toHaveURL(/[?&]project=staging\b/)
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+	})
+
+	test('Escape steps back out of the project sub-mode before closing the palette', async ({ page }) => {
+		await page.goto('/deployment?project=test-project')
+		// Wait for hydration before the "/" shortcut is wired up.
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Deployments' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('project')
+		await page.keyboard.press('Enter')
+		await expect(dialog.getByPlaceholder(/Switch to project/)).toBeFocused()
+
+		// First Escape returns to the main search palette (does not close).
+		await page.keyboard.press('Escape')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByPlaceholder(/Search projects, deployments/)).toBeFocused()
+
+		// Second Escape closes the palette.
+		await page.keyboard.press('Escape')
 		await expect(page.locator('.modal.is-active')).toHaveCount(0)
 	})
 
