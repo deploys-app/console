@@ -737,6 +737,11 @@
 										<span class="sidecars__label">Cloud SQL Proxy</span>
 										{s.cloudSqlProxy.instance}{#if s.cloudSqlProxy.port}:{s.cloudSqlProxy.port}{/if}
 									</li>
+								{:else if s.alloyDbProxy}
+									<li>
+										<span class="sidecars__label">AlloyDB Proxy</span>
+										{s.alloyDbProxy.instance}{#if s.alloyDbProxy.port}:{s.alloyDbProxy.port}{/if}
+									</li>
 								{/if}
 							{/each}
 						</ul>

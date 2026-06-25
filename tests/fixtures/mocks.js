@@ -211,6 +211,14 @@ export const sampleCloudSqlProxySidecar = {
 	}
 }
 
+export const sampleAlloyDbProxySidecar = {
+	alloyDbProxy: {
+		instance: 'projects/my-project/locations/us-central1/clusters/main/instances/primary',
+		port: 5432,
+		credentials: ''
+	}
+}
+
 // A Static (bucket-native static web) deployment: no container image/port — it
 // references a content-addressed release via `site` (site://…@<release-sha>) and
 // `siteManifestDigest`.
