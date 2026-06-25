@@ -95,6 +95,60 @@ const projects = [
 		quota: { deployments: 20, deploymentMaxReplicas: 5 },
 		config: {},
 		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_prod',
+		project: 'production',
+		name: 'Production',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 100, deploymentMaxReplicas: 20 },
+		config: {},
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_dev',
+		project: 'development',
+		name: 'Development',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 30, deploymentMaxReplicas: 5 },
+		config: {},
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_analytics',
+		project: 'analytics',
+		name: 'Analytics Platform',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 40, deploymentMaxReplicas: 8 },
+		config: {},
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_payments',
+		project: 'payments',
+		name: 'Payments Service',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 25, deploymentMaxReplicas: 6 },
+		config: {},
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_marketing',
+		project: 'marketing-site',
+		name: 'Marketing Site',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 15, deploymentMaxReplicas: 4 },
+		config: {},
+		createdAt: CREATED_AT
+	},
+	{
+		id: 'prj_mock_internal',
+		project: 'internal-tools',
+		name: 'Internal Tools',
+		billingAccount: 'ba_mock_1',
+		quota: { deployments: 20, deploymentMaxReplicas: 5 },
+		config: {},
+		createdAt: CREATED_AT
 	}
 ]
 

@@ -3,7 +3,7 @@
 	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { navEntries, projectEntries, fetchResourceEntries, filterEntries } from '$lib/search'
+	import { navEntries, projectEntries, switchProjectEntry, fetchResourceEntries, filterEntries } from '$lib/search'
 
 	interface Props {
 		projects?: Api.Project[]
@@ -19,21 +19,33 @@
 	let highlighted = $state(0)
 	const rowEls = $state<HTMLElement[]>([])
 
+	// `default` shows nav + resources + the single "Switch project" command;
+	// `project` is the sub-mode listing every project to switch to.
+	let mode = $state<'default' | 'project'>('default')
+
 	let loading = $state(false)
 	let loadedProject = $state<string | null>(null)
 	let resources = $state<SearchEntry[]>([])
 
-	// Project entries are first so typing a project name highlights the switch
-	// row before any nav/resource match (intent: "I'm trying to switch project").
+	// The "Switch project" command leads (so typing "project" highlights it),
+	// then the nav sections, then the lazily-fetched resources.
 	const allEntries = $derived(project
-		? [...projectEntries(projects, project, $page), ...navEntries(project), ...resources]
+		? [switchProjectEntry(), ...navEntries(project), ...resources]
 		: [])
 
-	// Empty query → just the nav sections (showing every resource — or every
-	// project — would be a wall of rows); typing surfaces projects + nav + fetched
-	// resources together.
-	const base = $derived(search.trim() ? allEntries : (project ? navEntries(project) : []))
+	// Empty query → the switch-project command + nav sections (showing every
+	// resource would be a wall of rows); typing surfaces resources too. The
+	// project sub-mode lists every project, filtered by the same query.
+	const base = $derived.by(() => {
+		if (!project) return []
+		if (mode === 'project') return projectEntries(projects, project, $page)
+		return search.trim() ? allEntries : [switchProjectEntry(), ...navEntries(project)]
+	})
 	const filtered = $derived(filterEntries(base, search))
+
+	const placeholder = $derived(mode === 'project'
+		? 'Switch to project…'
+		: 'Search projects, deployments, domains, routes…')
 
 	// Group consecutive entries by section for display while keeping the flat
 	// index that drives keyboard highlighting.
@@ -58,6 +70,7 @@
 	export async function open () {
 		search = ''
 		highlighted = 0
+		mode = 'default'
 		isActive = true
 		await tick()
 		elSearch?.focus()
@@ -81,8 +94,30 @@
 	}
 
 	function navigate (entry: SearchEntry) {
+		// Action entries open a sub-mode in place instead of navigating away.
+		if (entry.action === 'switch-project') {
+			enterProjectMode()
+			return
+		}
+		if (!entry.href) return
 		close()
 		goto(entry.href)
+	}
+
+	// Enter the project sub-mode: clear the query so the next keystrokes filter
+	// projects, and keep focus in the search box.
+	async function enterProjectMode () {
+		mode = 'project'
+		search = ''
+		highlighted = 0
+		await tick()
+		elSearch?.focus()
+	}
+
+	function exitProjectMode () {
+		mode = 'default'
+		search = ''
+		highlighted = 0
 	}
 
 	/**
@@ -98,7 +133,18 @@
 	 */
 	function onSearchKeydown (e: KeyboardEvent) {
 		if (e.key === 'Escape') {
+			// In the project sub-mode, Escape steps back to the main palette
+			// rather than closing outright.
+			if (mode === 'project') {
+				exitProjectMode()
+				return
+			}
 			close()
+			return
+		}
+		// Backspace on an empty query in the sub-mode also steps back out.
+		if (e.key === 'Backspace' && mode === 'project' && !search) {
+			exitProjectMode()
 			return
 		}
 		if (!filtered.length) return
@@ -118,7 +164,16 @@
 <div class="modal" onclick={onBackdrop} class:is-active={isActive} aria-hidden={!isActive}>
 	<div class="modal-panel">
 		<div class="modal-close" onclick={close} onkeypress={close} tabindex="0" role="button">✕</div>
-		<h4>Search</h4>
+		{#if mode === 'project'}
+			<h4>
+				<button class="back" onclick={exitProjectMode} type="button" aria-label="Back to search">
+					<i class="fa-solid fa-arrow-left"></i>
+				</button>
+				Switch project
+			</h4>
+		{:else}
+			<h4>Search</h4>
+		{/if}
 
 		<div class="input -has-icon-left mt-4">
 			<span class="icon -is-left"><i class="fa-solid fa-magnifying-glass"></i></span>
@@ -128,7 +183,7 @@
 				onkeydown={onSearchKeydown}
 				oninput={() => highlighted = 0}
 				type="text"
-				placeholder="Search projects, deployments, domains, routes…"
+				{placeholder}
 				autocomplete="off"
 			>
 		</div>
@@ -163,7 +218,7 @@
 
 				{#if !filtered.length}
 					<div class="empty">
-						{#if loading}
+						{#if loading && mode === 'default'}
 							<i class="fa-solid fa-spinner fa-spin"></i>
 							<span>Loading resources…</span>
 						{:else}
@@ -171,7 +226,7 @@
 							<span>No matches for “{search}”.</span>
 						{/if}
 					</div>
-				{:else if loading}
+				{:else if loading && mode === 'default'}
 					<div class="loading-hint">
 						<i class="fa-solid fa-spinner fa-spin"></i> Loading more resources…
 					</div>
@@ -181,8 +236,13 @@
 
 		<div class="footer-hints">
 			<span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
-			<span><kbd>↵</kbd> open</span>
-			<span><kbd>esc</kbd> close</span>
+			{#if mode === 'project'}
+				<span><kbd>↵</kbd> switch</span>
+				<span><kbd>esc</kbd> back</span>
+			{:else}
+				<span><kbd>↵</kbd> open</span>
+				<span><kbd>esc</kbd> close</span>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -192,6 +252,32 @@
 		box-shadow: 0 15px 15px 0 rgba(43, 43, 43, 0.1);
 		width: 100%;
 		max-width: 42rem;
+	}
+
+	h4 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.back {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		padding: 0;
+		font-size: 0.875rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		background: none;
+		border: none;
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+	}
+
+	.back:hover {
+		color: hsl(var(--hsl-content));
+		background-color: hsl(var(--hsl-base-200));
 	}
 
 	.results {
