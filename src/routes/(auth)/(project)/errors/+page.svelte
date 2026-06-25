@@ -33,20 +33,29 @@
 		return `/deployment/errors?${q.toString()}`
 	}
 
+	// Seed the first page from the server-side load (+page.ts) so the list is
+	// present on first paint. The status/sort defaults below MUST match
+	// INITIAL_STATUS/INITIAL_SORT in +page.ts, so the seeded view matches what
+	// the load fetched. This is an intentional one-time seed.
+	// svelte-ignore state_referenced_locally
+	const initial = data.initial
+	const initialError = initial.ok ? null : classifyListError(initial)
+
 	let status = $state<StatusFilter>('open')
 	let sort = $state<Api.ErrorSort>('lastSeen')
 	let query = $state('')
-	let issues = $state<Api.ErrorIssue[]>([])
-	let nextCursor = $state<string | undefined>(undefined)
+	let issues = $state<Api.ErrorIssue[]>(initial.ok ? initial.result.issues ?? [] : [])
+	let nextCursor = $state<string | undefined>(initial.ok ? (initial.result.nextCursor || undefined) : undefined)
 	let loading = $state(false)
 	let loadingMore = $state(false)
 	let loadMoreError = $state(false)
 	// Distinguish "no data yet" from the various terminal states so we never flash
-	// the empty state before the first fetch resolves.
-	let loaded = $state(false)
-	let forbidden = $state(false)
-	let unavailable = $state(false)
-	let errorMessage = $state('')
+	// the empty state before the first fetch resolves. Seeded true since the
+	// initial fetch already resolved server-side.
+	let loaded = $state(true)
+	let forbidden = $state(initialError?.kind === 'forbidden')
+	let unavailable = $state(initialError?.kind === 'unavailable')
+	let errorMessage = $state(initialError?.kind === 'error' ? initialError.message : '')
 	let now = $state(Date.now())
 
 	const visibleIssues = $derived.by(() => {
@@ -129,13 +138,17 @@
 		return () => clearInterval(ticker)
 	})
 
-	// Load on mount and reload whenever the project, status filter, or sort
-	// changes. `project` MUST be in the key: a project switch navigates to
-	// /errors via goto (overrideRedirect) WITHOUT remounting this page, so an
-	// onMount-only load would strand the previous project's issues in the list.
-	// Reading the three values here is what subscribes the effect to them; the
-	// key guard de-dupes the no-op re-run after this effect writes trackedListKey.
-	let trackedListKey = $state<string | null>(null)
+	// Reload whenever the project, status filter, or sort changes. `project` MUST
+	// be in the key: a project switch navigates to /errors via goto
+	// (overrideRedirect) WITHOUT remounting this page, so an unkeyed effect would
+	// strand the previous project's issues in the list.
+	//
+	// trackedListKey is primed with the seeded view (current project + the
+	// INITIAL_STATUS/INITIAL_SORT defaults), so the effect's first run is a no-op
+	// instead of re-fetching what the server already returned. Reading the three
+	// values here is what subscribes the effect to them.
+	// svelte-ignore state_referenced_locally
+	let trackedListKey = $state<string>(`${data.project} ${status} ${sort}`)
 	$effect(() => {
 		const key = `${project} ${status} ${sort}`
 		if (trackedListKey === key) return
