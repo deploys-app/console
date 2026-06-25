@@ -11,7 +11,8 @@ export interface SearchEntry {
 	label: string // primary text (the thing you'd type)
 	sublabel?: string // secondary text (location, target, …)
 	keywords?: string // extra text folded into search only, never shown
-	href: string // navigation target
+	href?: string // navigation target (omitted for `action` entries)
+	action?: 'switch-project' // when set, selecting opens a sub-mode instead of navigating
 }
 
 const enc = encodeURIComponent
@@ -151,13 +152,31 @@ const resourceSources: ResourceSource[] = [
 ]
 
 /**
+ * The single "Switch project" command shown in the default palette. Selecting it
+ * (type "project" → Enter) opens the project sub-mode rather than listing every
+ * project inline, so a large project list never floods the results.
+ */
+export function switchProjectEntry (): SearchEntry {
+	return {
+		id: 'cmd:switch-project',
+		group: 'Commands',
+		icon: 'fa-folder-open',
+		label: 'Switch project',
+		sublabel: 'Browse and switch to another project',
+		keywords: 'change select swap switch project',
+		action: 'switch-project'
+	}
+}
+
+/**
  * Project-switch entries. Mirrors {@link ../routes/(auth)/ModalSelectProject.svelte}'s
  * `setProject` URL shape: keep the current query params, swap `project=`, and
  * honour `data.overrideRedirect` so switching from a detail page lands on the
  * section's list in the new project instead of a stale deep link.
  *
  * The current project is excluded — switching to where you already are is a
- * no-op and would just be visual noise in the palette.
+ * no-op and would just be visual noise in the palette. These populate the
+ * project sub-mode reached via {@link switchProjectEntry}.
  */
 export function projectEntries (projects: Api.Project[], currentProject: string, page: { url: { search: string }, data: { overrideRedirect?: string } }): SearchEntry[] {
 	const overrideRedirect = page.data?.overrideRedirect || ''
