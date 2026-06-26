@@ -24,6 +24,41 @@ test.describe('billing accounts', () => {
 		await expect(main.getByRole('link', { name: 'Create account' })).toHaveAttribute('href', '/billing/create')
 	})
 
+	test('shows the entity type on the account detail', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: sampleBillingAccount } // type: company
+		})
+
+		await page.goto('/billing/detail?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Entity type')).toBeVisible()
+		await expect(main.getByText('Company', { exact: true })).toBeVisible()
+	})
+
+	test('shows receipt numbers in the invoices list', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			'billing.listInvoices': {
+				ok: true,
+				result: {
+					items: [
+						{ ...sampleInvoice, id: 'inv-1', status: 'paid', receiptNumber: 'DPLY-RC-202605-0001' },
+						{ ...sampleInvoice, id: 'inv-2', number: 'INV-2024-002', status: 'open', receiptNumber: '' }
+					]
+				}
+			}
+		})
+
+		await page.goto('/billing/invoices?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		const paidRow = main.locator('table tbody tr', { hasText: 'INV-2024-001' })
+		await expect(paidRow.getByText('DPLY-RC-202605-0001')).toBeVisible()
+		const openRow = main.locator('table tbody tr', { hasText: 'INV-2024-002' })
+		await expect(openRow.locator('td').nth(1)).toHaveText('—')
+	})
+
 	test('empty state when no billing accounts', async ({ page }) => {
 		await page.goto('/billing')
 		const main = page.locator('.content-wrapper')
@@ -46,6 +81,42 @@ test.describe('invoice detail', () => {
 
 		const apiRow = page.locator('table tbody tr', { hasText: 'API service' })
 		await expect(apiRow.locator('td').nth(2)).toHaveText('1.70 USD')
+	})
+
+	test('shows the Head Office line on a company invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // taxEntityType: company
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		await expect(page.getByText('Head Office (สำนักงานใหญ่)')).toBeVisible()
+	})
+
+	test('omits the Head Office line for an individual invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, taxEntityType: 'individual' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		await expect(page.getByText('Head Office (สำนักงานใหญ่)')).toHaveCount(0)
+	})
+
+	test('shows the receipt number on a paid invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': {
+				ok: true,
+				result: { ...sampleInvoice, status: 'paid', paidAt: '2026-05-03T00:00:00Z', receiptNumber: 'DPLY-RC-202605-0001' }
+			},
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		await expect(page.getByText('DPLY-RC-202605-0001')).toBeVisible()
 	})
 
 	test('shows how-to-pay payment details on an open invoice', async ({ page }) => {

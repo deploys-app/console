@@ -58,9 +58,14 @@ declare namespace Api {
         createdAt: string
     }
 
+    export type BillingAccountType = 'individual' | 'company'
+
     export type BillingAccount = {
         id: string
         name: string
+        // type is the legal entity type. A company prints the "Head Office"
+        // (สำนักงานใหญ่) designation on its tax documents; individual does not.
+        type: BillingAccountType
         taxId: string
         taxName: string
         taxAddress: string
@@ -631,6 +636,9 @@ declare namespace Api {
     export type InvoiceListItem = {
         id: string
         number: string
+        // receiptNumber is the receipt's own running number (DPLY-RC-YYYYMM-NNNN),
+        // assigned when the invoice is marked paid; empty until then.
+        receiptNumber: string
         currency: string
         periodStart: string
         periodEnd: string
@@ -660,6 +668,9 @@ declare namespace Api {
         id: string
         billingAccountId: string
         number: string
+        // receiptNumber is the receipt's own running number (DPLY-RC-YYYYMM-NNNN),
+        // assigned when paid and distinct from number; empty until paid.
+        receiptNumber: string
         currency: string
         periodStart: string
         periodEnd: string
@@ -671,6 +682,9 @@ declare namespace Api {
         taxId: string
         taxName: string
         taxAddress: string
+        // taxEntityType is the buyer's entity type snapshotted at issue time.
+        // 'company' prints the Head Office line on the bill-to block.
+        taxEntityType: BillingAccountType
         issuedAt: string
         paidAt: string
         voidedAt: string

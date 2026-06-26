@@ -179,6 +179,7 @@ const billingAccounts = [
 	{
 		id: 'ba_mock_1',
 		name: 'Acme Billing',
+		type: 'company',
 		taxId: '0123456789012',
 		taxName: 'Acme Co., Ltd.',
 		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
@@ -1238,10 +1239,20 @@ const mockPayment = {
 	promptPay: '0812345678'
 }
 
+// receiptNumberFor mirrors the server: a paid invoice carries a receipt number
+// (DPLY-RC-YYYYMM-NNNN) keyed to its payment month; unpaid invoices have none.
+function receiptNumberFor (inv: (typeof invoices)[number]): string {
+	if (inv.status !== 'paid' || !inv.paidAt) {
+		return ''
+	}
+	return `DPLY-RC-${inv.paidAt.slice(0, 7).replace('-', '')}-0001`
+}
+
 function invoiceListItem (inv: (typeof invoices)[number]) {
 	return {
 		id: inv.id,
 		number: inv.number,
+		receiptNumber: receiptNumberFor(inv),
 		currency: inv.currency,
 		periodStart: inv.periodStart,
 		periodEnd: inv.periodEnd,
@@ -1326,7 +1337,10 @@ const handlers: Record<string, (args: any) => object> = {
 		}
 	}),
 	'billing.listInvoices': () => list(invoices.map(invoiceListItem)),
-	'billing.getInvoice': (args) => ok({ ...(invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]), payment: mockPayment }),
+	'billing.getInvoice': (args) => {
+		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
+		return ok({ ...inv, receiptNumber: receiptNumberFor(inv), taxEntityType: 'company', payment: mockPayment })
+	},
 	'billing.downloadInvoice': (args) => {
 		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
 		return ok({

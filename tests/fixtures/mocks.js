@@ -350,6 +350,7 @@ export const sampleEmailDomain = {
 export const sampleBillingAccount = {
 	id: 'ba-1',
 	name: 'Personal',
+	type: 'company',
 	taxId: '',
 	taxName: '',
 	taxAddress: '',
@@ -360,6 +361,7 @@ export const sampleInvoice = {
 	id: 'inv-1',
 	billingAccountId: 'ba-1',
 	number: 'INV-2024-001',
+	receiptNumber: '',
 	currency: 'USD',
 	periodStart: '2024-01-01T00:00:00Z',
 	periodEnd: '2024-02-01T00:00:00Z',
@@ -371,6 +373,7 @@ export const sampleInvoice = {
 	taxId: '',
 	taxName: 'Acme Co',
 	taxAddress: '',
+	taxEntityType: 'company',
 	issuedAt: now,
 	paidAt: '0001-01-01T00:00:00Z',
 	voidedAt: '0001-01-01T00:00:00Z',

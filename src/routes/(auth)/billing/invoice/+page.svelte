@@ -190,11 +190,19 @@
 				<div>{invoice.taxId}</div>
 				<div class="key">Address</div>
 				<div class="whitespace-pre-line">{invoice.taxAddress}</div>
+				{#if invoice.taxEntityType === 'company'}
+					<div class="key">Branch</div>
+					<div>Head Office (สำนักงานใหญ่)</div>
+				{/if}
 			</div>
 		</div>
 		<div>
 			<h6 class="mb-3"><strong>Details</strong></h6>
 			<div class="meta">
+				{#if invoice.status === 'paid' && invoice.receiptNumber}
+					<div class="key">Receipt no.</div>
+					<div>{invoice.receiptNumber}</div>
+				{/if}
 				<div class="key">Issued at</div>
 				<div>{format.datetime(invoice.issuedAt)}</div>
 				<div class="key">Paid at</div>
