@@ -42,6 +42,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@svelte-plugins/datepicker": "^1.0.11"
+    "@svelte-plugins/datepicker": "^1.0.11",
+    "qrcode-generator": "^2.0.4"
   }
 }

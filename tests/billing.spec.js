@@ -93,6 +93,35 @@ test.describe('invoice detail', () => {
 		await expect(modal.getByText('0812345678')).toBeVisible()
 	})
 
+	test('shows a PromptPay QR in the pay modal for a THB invoice', async ({ page }) => {
+		await setMocks({
+			// PromptPay settles in THB, so the QR only renders for THB invoices.
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, currency: 'THB' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		const modal = page.locator('.modal.is-active .modal-panel')
+		await expect(modal.getByRole('img', { name: 'PromptPay QR code' })).toBeVisible()
+		await expect(modal.getByText('Scan with any Thai mobile banking app')).toBeVisible()
+	})
+
+	test('hides the PromptPay QR for a non-THB invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // currency: USD
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		const modal = page.locator('.modal.is-active .modal-panel')
+		await expect(modal.getByText('Transfer to')).toBeVisible()
+		await expect(modal.getByRole('img', { name: 'PromptPay QR code' })).toHaveCount(0)
+	})
+
 	test('truncates a long slip file name instead of widening the modal', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: sampleInvoice }, // status: open

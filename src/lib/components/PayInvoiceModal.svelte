@@ -1,4 +1,6 @@
 <script lang="ts">
+	import PromptPayQR from '$lib/components/PromptPayQR.svelte'
+
 	// Max upload size, mirrors api.MaxTransferSlipSize (10 MiB). The server
 	// enforces this too; checking here gives instant feedback.
 	const MAX_SIZE = 10 * 1024 * 1024
@@ -112,6 +114,14 @@
 					<div class="pay-key">PromptPay</div>
 					<div class="tabular-nums">{invoice.payment.promptPay}</div>
 				</div>
+
+				<!-- Self-gates to nothing unless the invoice is THB with a PromptPay id,
+				     so no wrapper/spacing is rendered for non-THB invoices. -->
+				<PromptPayQR
+					promptPay={invoice.payment.promptPay}
+					amount={invoice.total}
+					currency={invoice.currency}
+				/>
 			</div>
 		{/if}
 
