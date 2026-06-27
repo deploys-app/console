@@ -11,6 +11,7 @@
 
 	const form = $state(untrack(() => ({
 		name: billingAccount?.name || '',
+		type: billingAccount?.type || 'individual',
 		taxId: billingAccount?.taxId || '',
 		taxName: billingAccount?.taxName || '',
 		taxAddress: billingAccount?.taxAddress || ''
@@ -31,6 +32,7 @@
 			const resp = await api.invoke(fn, {
 				id: billingAccount?.id || undefined,
 				name: form.name,
+				type: form.type,
 				taxId: form.taxId,
 				taxName: form.taxName,
 				taxAddress: form.taxAddress
@@ -83,6 +85,17 @@
 		</div>
 
 		<h4 class="mb-3">Billing Information</h4>
+
+		<div class="field">
+			<label for="input-type">Entity type</label>
+			<div class="select">
+				<select id="input-type" bind:value={form.type}>
+					<option value="individual">Individual</option>
+					<option value="company">Company</option>
+				</select>
+			</div>
+			<p class="text-sm text-content/60 mt-1">A company has “Head Office (สำนักงานใหญ่)” printed on its tax invoices and receipts.</p>
+		</div>
 
 		<div class="field">
 			<label for="input-tax_id">Tax ID</label>

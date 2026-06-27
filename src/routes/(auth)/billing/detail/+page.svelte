@@ -94,6 +94,8 @@
 		<dl class="info-list">
 			<dt>Account name</dt>
 			<dd>{billingAccount.name}</dd>
+			<dt>Entity type</dt>
+			<dd>{billingAccount.type === 'company' ? 'Company' : 'Individual'}</dd>
 			<dt>Tax ID</dt>
 			<dd>{billingAccount.taxId}</dd>
 			<dt>Name</dt>

@@ -46,6 +46,7 @@
 			<thead>
 				<tr>
 					<th>Number</th>
+					<th>Receipt no.</th>
 					<th>Period</th>
 					<th class="is-align-right">Total</th>
 					<th>Status</th>
@@ -58,14 +59,15 @@
 						<td>
 							<a class="link" href={`/billing/invoice?id=${it.id}`}>{it.number}</a>
 						</td>
+						<td>{it.receiptNumber || '—'}</td>
 						<td>{period(it.periodStart, it.periodEnd)}</td>
 						<td class="is-align-right">{money(it.total, it.currency)}</td>
 						<td><InvoiceStatusBadge status={it.status} /></td>
 						<td>{format.datetime(it.issuedAt)}</td>
 					</tr>
 				{/each}
-				<NoDataRow span={5} list={invoices} {error} />
-				<ErrorRow span={5} {error} />
+				<NoDataRow span={6} list={invoices} {error} />
+				<ErrorRow span={6} {error} />
 			</tbody>
 		</table>
 	</div>
