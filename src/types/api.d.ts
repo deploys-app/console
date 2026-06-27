@@ -147,6 +147,7 @@ declare namespace Api {
             disk?: Record<string, never>
             waf?: Record<string, never>
             cache?: Record<string, never>
+            transform?: Record<string, never>
         }
         createdAt: string
     }
@@ -840,6 +841,86 @@ declare namespace Api {
     export type CacheZoneList = {
         project: string
         items: CacheZone[]
+    }
+
+    // Transform — declarative request/response transforms in the parapet proxy
+    // layer (per-(project, location) zone, whole-zone replace). snake_case wire
+    // tags on the rule/op ARE the parapet wire contract; the camelCase JSON
+    // tags below are what the api accepts/returns.
+
+    // The two physical mutation seams. Header ops are phase-polymorphic; the
+    // phase is REQUIRED on every rule (an absent phase is a hard validation
+    // error — there is no silent default).
+    export type TransformPhase = 'request' | 'response'
+
+    // Frozen op vocabulary. Legal types depend on the rule's phase:
+    //   request:  set-header, remove-header, rewrite-path, rewrite-query, redirect
+    //   response: set-header, remove-header, set-status, cors
+    export type TransformOpType =
+        | 'set-header'
+        | 'remove-header'
+        | 'rewrite-path'
+        | 'rewrite-query'
+        | 'redirect'
+        | 'set-status'
+        | 'cors'
+
+    // Flat, omitempty-driven: each op reads only its own subset of fields.
+    export type TransformOp = {
+        type: TransformOpType
+        // header ops (set-header / remove-header)
+        name?: string
+        value?: string
+        // redirect — target; '$uri' expands to the original RequestURI
+        to?: string
+        // rewrite-path — literal `path` XOR (`regex` + `replace`)
+        path?: string
+        regex?: string
+        replace?: string
+        // rewrite-query — set/overwrite `query`, delete `removeQuery`
+        query?: Record<string, string>
+        removeQuery?: string[]
+        // redirect 3xx | set-status 100..599
+        status?: number
+        // cors (dual-seam op, authored response-phase)
+        allowOrigins?: string[]
+        allowMethods?: string[]
+        allowHeaders?: string[]
+        exposeHeaders?: string[]
+        allowCredentials?: boolean
+        maxAge?: string // Go duration
+    }
+
+    export type TransformRule = {
+        id: string
+        description: string
+        // request | response — REQUIRED, the primary axis.
+        phase: TransformPhase
+        // Optional CEL over request.* (same surface as WafRule.expression);
+        // empty applies the rule to every request.
+        filter?: string
+        // Applied in array order; every op must be legal for `phase`.
+        ops: TransformOp[]
+        // '' = enforce | 'shadow' (match + count, apply nothing).
+        mode?: '' | 'shadow'
+        // ascending within a phase; ties broken by id.
+        priority: number
+    }
+
+    export type TransformZone = {
+        project: string
+        location: string
+        description: string
+        transforms: TransformRule[]
+        status: 'pending' | 'success' | 'error'
+        action: 'create' | 'delete'
+        createdAt: string
+        createdBy: string
+    }
+
+    export type TransformZoneList = {
+        project: string
+        items: TransformZone[]
     }
 
     // Scheduler — cron-driven outbound HTTP requests (project-scoped,
