@@ -4,6 +4,7 @@ import type { PageLoad } from './$types'
 
 export const load: PageLoad = async ({ url, fetch }) => {
 	const id = url.searchParams.get('id')
+	if (!id) redirect(302, '/billing')
 
 	const billingAccount = await api.invoke<Api.BillingAccount>('billing.get', { id }, fetch)
 	if (!billingAccount.ok) {

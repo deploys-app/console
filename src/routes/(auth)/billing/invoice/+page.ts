@@ -4,6 +4,7 @@ import type { PageLoad } from './$types'
 
 export const load: PageLoad = async ({ url, fetch }) => {
 	const id = url.searchParams.get('id')
+	if (!id) redirect(302, '/billing')
 
 	const invoice = await api.invoke<Api.Invoice>('billing.getInvoice', { invoiceId: id }, fetch)
 	if (!invoice.ok) {

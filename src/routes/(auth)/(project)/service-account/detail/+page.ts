@@ -5,6 +5,7 @@ import type { PageLoad } from './$types'
 export const load: PageLoad = async ({ url, parent, fetch }) => {
 	const { project } = await parent()
 	const id = url.searchParams.get('id')
+	if (!id) redirect(302, `/service-account?project=${project}`)
 	const serviceAccount = await api.invoke<Api.ServiceAccount>('serviceAccount.get', { project, id }, fetch)
 	if (!serviceAccount.ok) {
 		if (serviceAccount.error?.message === 'api: service account not found') {
