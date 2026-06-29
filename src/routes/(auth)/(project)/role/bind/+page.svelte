@@ -144,8 +144,9 @@
 					<tr>
 						<td>{it}</td>
 						<td>
-							<div class="icon-button" role="button" tabindex="0"
-								onclick={() => removeRole(it)} onkeypress={() => removeRole(it)}>
+							<div class="icon-button" role="button" tabindex="0" aria-label={`Remove ${it}`}
+								onclick={() => removeRole(it)}
+								onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); removeRole(it) } }}>
 								<i class="fa-solid fa-trash-alt"></i>
 							</div>
 						</td>
