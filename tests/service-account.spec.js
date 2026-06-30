@@ -99,9 +99,9 @@ test.describe('service account — create', () => {
 		await main.locator('#input-name').fill('CI bot')
 		await main.getByRole('button', { name: 'Save' }).click()
 
-		// modal.error surfaces resp.error via SweetAlert.
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: service account already exists')
+		// modal.error surfaces resp.error in the dialog.
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: service account already exists')
 	})
 
 	test('renders validate-error items in the modal', async ({ page }) => {
@@ -122,7 +122,7 @@ test.describe('service account — create', () => {
 		await main.locator('#input-name').fill('x')
 		await main.getByRole('button', { name: 'Save' }).click()
 
-		const dialog = page.locator('.swal2-html-container')
+		const dialog = page.locator('#app-modal')
 		await expect(dialog).toContainText('name is required')
 		await expect(dialog).toContainText('id is invalid')
 	})

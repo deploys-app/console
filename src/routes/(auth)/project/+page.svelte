@@ -2,7 +2,6 @@
 	import type { PageData } from './$types'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
-	import Swal from 'sweetalert2'
 	import * as modal from '$lib/modal'
 	import ModalSelectProject from '../ModalSelectProject.svelte'
 
@@ -30,24 +29,17 @@
 	})
 
 	async function deleteItem (project: string): Promise<void> {
-		const result = await Swal.fire({
+		// Type-to-confirm: the Delete button stays disabled until the typed name
+		// matches, so a confirmed result is always exactly `project`.
+		const result = await modal.prompt({
 			title: 'Are you sure?',
 			text: `Type "${project}" to confirm!`,
-			icon: 'warning',
-			input: 'text',
-			showCancelButton: true,
-			buttonsStyling: false,
-			background: 'var(--modal-panel-background)',
-			color: 'var(--modal-panel-color)',
-			confirmButtonText: 'Delete',
-			customClass: {
-				confirmButton: 'button is-variant-negative mr-4',
-				cancelButton: 'button is-variant-tertiary',
-				actions: 'mt-6'
-			},
-			preConfirm: (input) => input === project
+			placeholder: project,
+			yes: 'Delete',
+			variant: 'is-variant-negative',
+			requireMatch: project
 		})
-		if (!result.isConfirmed || !result.value) {
+		if (result === null) {
 			return
 		}
 

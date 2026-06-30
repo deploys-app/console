@@ -64,8 +64,8 @@ test.describe('env groups', () => {
 		await main.locator('#input-name').fill('shared-config')
 		await main.getByRole('button', { name: 'Create', exact: true }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: env group already exists')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: env group already exists')
 	})
 
 	test('shows existing env vars on update', async ({ page }) => {

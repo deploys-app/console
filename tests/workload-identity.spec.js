@@ -67,8 +67,8 @@ test.describe('workload identity — create', () => {
 		await main.locator('#input-gsa').fill('[email protected]')
 		await main.getByRole('button', { name: 'Create' }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: workload identity already exists')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: workload identity already exists')
 	})
 
 	test('disables Create when the create permission is missing', async ({ page }) => {

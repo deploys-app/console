@@ -8,7 +8,6 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
-	import Swal from 'sweetalert2'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -136,23 +135,13 @@
 			return
 		}
 
-		const result = await Swal.fire({
+		const prefix = await modal.prompt({
 			title: `Purge cache on domain "${domain.domain}"`,
 			text: 'Type path prefix',
-			icon: 'warning',
-			input: 'text',
-			showCancelButton: true,
-			buttonsStyling: false,
-			background: 'var(--modal-panel-background)',
-			color: 'var(--modal-panel-color)',
-			confirmButtonText: 'Purge',
-			customClass: {
-				confirmButton: 'button is-variant-negative mr-4',
-				cancelButton: 'button is-variant-tertiary',
-				actions: 'mt-6'
-			}
+			yes: 'Purge',
+			variant: 'is-variant-negative'
 		})
-		if (!result.isConfirmed || !result.value) {
+		if (!prefix) {
 			return
 		}
 
@@ -161,13 +150,13 @@
 			const resp = await api.invoke('domain.purgeCache', {
 				project,
 				domain: domain.domain,
-				prefix: result.value
+				prefix
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
 				return
 			}
-			modal.success({ content: `Purged cache on domain "${domain.domain}" path prefix "${result.value}"` })
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path prefix "${prefix}"` })
 		} finally {
 			purging = false
 		}
@@ -178,23 +167,13 @@
 			return
 		}
 
-		const result = await Swal.fire({
+		const file = await modal.prompt({
 			title: `Purge cache on domain "${domain.domain}"`,
 			text: 'Type path exact',
-			icon: 'warning',
-			input: 'text',
-			showCancelButton: true,
-			buttonsStyling: false,
-			background: 'var(--modal-panel-background)',
-			color: 'var(--modal-panel-color)',
-			confirmButtonText: 'Purge',
-			customClass: {
-				confirmButton: 'button is-variant-negative mr-4',
-				cancelButton: 'button is-variant-tertiary',
-				actions: 'mt-6'
-			}
+			yes: 'Purge',
+			variant: 'is-variant-negative'
 		})
-		if (!result.isConfirmed || !result.value) {
+		if (!file) {
 			return
 		}
 
@@ -203,13 +182,13 @@
 			const resp = await api.invoke('domain.purgeCache', {
 				project,
 				domain: domain.domain,
-				file: result.value
+				file
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
 				return
 			}
-			modal.success({ content: `Purged cache on domain "${domain.domain}" path exact "${result.value}"` })
+			modal.success({ content: `Purged cache on domain "${domain.domain}" path exact "${file}"` })
 		} finally {
 			purging = false
 		}

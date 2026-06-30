@@ -64,8 +64,8 @@ test.describe('pull secret — create', () => {
 		await main.locator('#input-server').fill('not a url')
 		await main.getByRole('button', { name: 'Save' }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('server must be an url')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('server must be an url')
 	})
 
 	test('shows the API error in a modal when create fails', async ({ page }) => {
@@ -80,8 +80,8 @@ test.describe('pull secret — create', () => {
 		await pickSelect(page, 'input-location', 'gke')
 		await main.getByRole('button', { name: 'Save' }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: pull secret already exists')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: pull secret already exists')
 	})
 
 	test('disables Save when the create permission is missing', async ({ page }) => {

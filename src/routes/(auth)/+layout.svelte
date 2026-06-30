@@ -9,6 +9,7 @@
 	import Sidebar from './Sidebar.svelte'
 	import ModalSelectProject from './ModalSelectProject.svelte'
 	import SearchModal from './SearchModal.svelte'
+	import Modal from '$lib/modal/Modal.svelte'
 
 	const { data, children }: { data: LayoutData, children: Snippet } = $props()
 
@@ -76,6 +77,9 @@
 
 <ModalSelectProject bind:this={projectModal} {projects} />
 <SearchModal bind:this={searchModal} {projects} />
+
+<!-- Single shared <dialog> backing modal.confirm/error/success/prompt. -->
+<Modal />
 
 <style>
 	:root {

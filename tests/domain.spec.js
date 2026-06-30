@@ -54,7 +54,7 @@ test.describe('domains', () => {
 
 		// The error modal turns the raw "domain in used by route(s): …" message
 		// into a readable list with a next step.
-		const dialog = page.locator('.swal2-popup')
+		const dialog = page.locator('#app-modal')
 		await expect(dialog.getByText('Delete them first:')).toBeVisible()
 		await expect(dialog.getByText('api.example.com/')).toBeVisible()
 		await expect(dialog.getByText('example.com/admin')).toBeVisible()

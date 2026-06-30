@@ -193,8 +193,8 @@ test.describe('cache manage', () => {
 		await page.goto('/cache/manage?project=test-project&location=gke')
 
 		await page.getByRole('button', { name: 'Disable cache' }).click()
-		// Confirm in the SweetAlert dialog.
-		await page.locator('.swal2-confirm').click()
+		// Confirm in the dialog.
+		await page.locator('#app-modal-confirm').click()
 
 		await expect.poll(async () => {
 			const log = await getRequestLog()

@@ -152,8 +152,8 @@ test.describe('firewall manage', () => {
 		await page.goto('/waf/manage?project=test-project&location=gke')
 
 		await page.getByRole('button', { name: 'Disable firewall' }).click()
-		// Confirm in the SweetAlert dialog.
-		await page.locator('.swal2-confirm').click()
+		// Confirm in the dialog.
+		await page.locator('#app-modal-confirm').click()
 
 		await expect.poll(async () => {
 			const log = await getRequestLog()

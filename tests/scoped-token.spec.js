@@ -75,7 +75,7 @@ test.describe('scoped tokens', () => {
 		await setMocks({ 'me.listTokens': { ok: true, result: { items: [] } } })
 
 		await main.getByRole('button', { name: 'Revoke' }).click()
-		await page.locator('.swal2-confirm').click()
+		await page.locator('#app-modal-confirm').click()
 
 		await expect.poll(async () => {
 			const log = await getRequestLog()
@@ -94,9 +94,9 @@ test.describe('scoped tokens', () => {
 		await page.goto('/scoped-token?project=test-project')
 		const main = page.locator('.content-wrapper')
 		await main.getByRole('button', { name: 'Revoke' }).click()
-		await page.locator('.swal2-confirm').click()
+		await page.locator('#app-modal-confirm').click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: internal error')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: internal error')
 	})
 })

@@ -37,8 +37,6 @@
 	--hsl-info-content: 200 90% 98%;
 	--hsl-black: 0 0% 0%;
 	--hsl-white: 0 0% 100%;
-	--modal-panel-background: hsl(var(--hsl-base-300));
-	--modal-panel-color: hsl(var(--hsl-content));
 
 	/* Blueprint grid — faint structural texture on the app shell */
 	--grid-line: hsl(230 24% 14% / 0.04);
@@ -70,8 +68,6 @@
 	--hsl-warning-content: 40 90% 8%;
 	--hsl-info: 198 88% 58%;
 	--hsl-info-content: 200 90% 8%;
-	--modal-panel-background: hsl(var(--hsl-base-300));
-	--modal-panel-color: hsl(var(--hsl-content));
 
 	--grid-line: hsl(220 40% 92% / 0.04);
 }
