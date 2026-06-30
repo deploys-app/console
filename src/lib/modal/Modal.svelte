@@ -25,6 +25,13 @@
 		modalState.requireMatch === null || modalState.value.trim() === modalState.requireMatch
 	)
 
+	// A destructive confirm = the negative-variant action that also offers a
+	// Cancel. We don't put initial focus on that action button (an accidental
+	// Enter/Space would fire it); focus lands on Cancel instead. Error/success
+	// dialogs (single dismiss button, no Cancel) still focus their button, and
+	// prompts still focus their input since it comes first in the DOM.
+	const dangerConfirm = $derived(modalState.confirmVariant === 'is-variant-negative' && modalState.cancel)
+
 	$effect(() => {
 		const el = dialogEl
 		if (!el) return
@@ -123,11 +130,11 @@
 
 			<div class="modal-actions">
 				{#if modalState.cancel}
-					<button type="button" class="button is-variant-tertiary" onclick={cancel}>
+					<button type="button" class="button is-variant-tertiary" data-autofocus={dangerConfirm ? '' : undefined} onclick={cancel}>
 						{modalState.cancelText}
 					</button>
 				{/if}
-				<button type="button" id="app-modal-confirm" class="button {modalState.confirmVariant}" disabled={!confirmEnabled} data-autofocus onclick={doConfirm}>
+				<button type="button" id="app-modal-confirm" class="button {modalState.confirmVariant}" disabled={!confirmEnabled} data-autofocus={dangerConfirm ? undefined : ''} onclick={doConfirm}>
 					{modalState.confirmText}
 				</button>
 			</div>
