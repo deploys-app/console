@@ -143,6 +143,16 @@
 		color: hsl(var(--hsl-content));
 		background-color: hsl(var(--hsl-content) / 0.06);
 	}
+
+	.sidebar-legal > a {
+		font-size: 0.75rem;
+		color: hsl(var(--hsl-content) / 0.5);
+		transition: color var(--timing-faster) ease;
+	}
+
+	.sidebar-legal > a:hover {
+		color: hsl(var(--hsl-content));
+	}
 </style>
 
 <nav class="sidebar pt-4 absolute z-[1]">
@@ -210,7 +220,10 @@
 		<div class="px-3 mb-3">
 			<hr>
 		</div>
-		<div class="flex justify-between items-center flex-col">
+		<div class="flex justify-between items-center flex-col gap-2">
+			<div class="sidebar-legal flex justify-center items-center w-full px-4">
+				<a href="/usage-policy">Usage policy</a>
+			</div>
 			<div class="social flex justify-end items-center gap-2 w-full px-4">
 				<a href="https://docs.deploys.app" target="_blank" rel="external" class="flex justify-center items-center rounded w-8 h-8" aria-label="Read the docs">
 					<i class="fa-solid fa-book-open"></i>
