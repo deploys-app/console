@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { browser } from '$app/environment'
-	import { scale } from 'svelte/transition'
 	import gravatarUrl from 'gravatar-url'
 	import Cookie from 'js-cookie'
 
@@ -13,28 +12,22 @@
 
 	const { profile = null, toggleSidebar, openSearch }: Props = $props()
 
-	let active = $state(false)
-
 	let theme = $state<'system' | 'light' | 'dark'>(browser ? ((Cookie.get('theme') as any) ?? 'system') : 'system')
 	const themeIndex = $derived(theme === 'light' ? 1 : theme === 'dark' ? 2 : 0)
 
 	let signOut = $state<HTMLFormElement | null>(null)
+	let menu = $state<HTMLDivElement | null>(null)
 
-	export function open () {
-		active = true
-	}
-
-	export function close () {
-		active = false
-	}
-
-	export function toggle (e: Event) {
-		e.stopPropagation()
-
-		active = !active
+	// The dropdown is a native popover ([popover] + popovertarget on the avatar):
+	// the browser handles open/toggle, light-dismiss (outside click), and Esc.
+	// We only close it manually after picking an item, since selecting one
+	// navigates/submits rather than dismissing the popover itself.
+	function closeMenu () {
+		menu?.hidePopover()
 	}
 
 	function doSignOut () {
+		closeMenu()
 		signOut?.submit()
 	}
 
@@ -100,29 +93,27 @@
 		</div>
 
 		<div>
-			<div class="avatar" onclick={toggle} onkeypress={toggle} tabindex="0" role="button">
+			<button type="button" class="avatar" popovertarget="user-menu" aria-label="Account menu">
 				<img src={profile ? gravatarUrl(profile.email, { default: 'mp' }) : 'https://www.gravatar.com/avatar?d=mp'} alt="profile" width="36" class="rounded-full" crossorigin="anonymous" draggable="false">
-			</div>
+			</button>
 
-			{#if active}
-				<div class="popup" transition:scale={{ duration: 160 }}>
-					<ul class="user-menu">
-						<li>
-							<a class="item block" href="/billing" onclick={close}>
-								Billing accounts
-							</a>
-						</li>
-						<li>
-							<div class="item" onclick={doSignOut} onkeypress={doSignOut} tabindex="0" role="button">
-								Sign Out
-							</div>
-							<form class="hidden" method="POST" action="/auth/signout" bind:this={signOut}>
-								<button>Sign Out</button>
-							</form>
-						</li>
-					</ul>
-				</div>
-			{/if}
+			<div bind:this={menu} popover id="user-menu" class="popup">
+				<ul class="user-menu">
+					<li>
+						<a class="item block" href="/billing" onclick={closeMenu}>
+							Billing accounts
+						</a>
+					</li>
+					<li>
+						<button type="button" class="item" onclick={doSignOut}>
+							Sign Out
+						</button>
+						<form class="hidden" method="POST" action="/auth/signout" bind:this={signOut}>
+							<button>Sign Out</button>
+						</form>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </nav>
@@ -239,15 +230,58 @@
 		outline-offset: 2px;
 	}
 
+	/* Native top-layer popover: it escapes the navbar's stacking + backdrop-filter
+	 * containing block, so it always sits above page content with no z-index games.
+	 * `position: fixed` is viewport-relative in the top layer — pin it under the
+	 * avatar at the top-right, where the fixed navbar lives. The UA stylesheet's
+	 * inset/margin/border/padding/background are reset here so only the inner
+	 * `.user-menu` card shows. */
 	.popup {
-		position: absolute;
-		z-index: 1;
-		box-shadow: var(--raised-z11);
-		min-width: 256px;
-
+		position: fixed;
+		top: calc(var(--height-navbar) - 0.5rem);
 		right: 1rem;
-		margin-top: -.5rem;
+		left: auto;
+		bottom: auto;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		min-width: 256px;
+		box-shadow: var(--raised-z11);
+
+		/* Enter/exit animation: discrete-property transitions + @starting-style
+		 * replace the old Svelte `scale` transition, since the popover element now
+		 * lives in the DOM permanently and is shown/hidden by the popover API. */
+		opacity: 0;
+		transform: scale(0.96);
 		transform-origin: top right;
+		transition:
+			opacity var(--timing-faster) ease,
+			transform var(--timing-faster) ease,
+			overlay var(--timing-faster) ease allow-discrete,
+			display var(--timing-faster) ease allow-discrete;
+	}
+
+	.popup:popover-open {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	@starting-style {
+		.popup:popover-open {
+			opacity: 0;
+			transform: scale(0.96);
+		}
+	}
+
+	/* Graceful fallback: an engine without the Popover API never applies the UA
+	 * `[popover] { display: none }`, which would leave this element painted (an
+	 * invisible interactive box) instead of hidden. Hide it explicitly there so
+	 * the menu is simply absent, matching the old `{#if active}` behaviour. */
+	@supports not selector(:popover-open) {
+		.popup {
+			display: none;
+		}
 	}
 
 	ul.user-menu {
@@ -270,6 +304,19 @@
 
 	a.item {
 		color: inherit;
+	}
+
+	/* Sign Out is a real <button> for keyboard/AT semantics; strip the UA chrome
+	 * so it reads like the sibling link. */
+	ul.user-menu button.item {
+		display: block;
+		width: 100%;
+		text-align: left;
+		font: inherit;
+		color: inherit;
+		background: transparent;
+		border: 0;
+		cursor: pointer;
 	}
 
 	ul.user-menu > li:not(:last-child) .item {
@@ -326,6 +373,9 @@
 		justify-content: center;
 		width: var(--height-navbar);
 		height: var(--height-navbar);
+		padding: 0;
+		border: 0;
+		background: transparent;
 		cursor: pointer;
 	}
 
