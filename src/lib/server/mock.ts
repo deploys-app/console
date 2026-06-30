@@ -160,7 +160,7 @@ const locations = [
 		cname: 'rcf2.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {}, transform: {} },
 		createdAt: CREATED_AT
 	},
 	{
@@ -170,7 +170,7 @@ const locations = [
 		cname: 'sg1.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {} },
+		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {}, transform: {} },
 		createdAt: CREATED_AT
 	}
 ]
@@ -747,6 +747,80 @@ function cacheConfiguredZone (location: string, advance = false) {
 		location,
 		description: entry.description,
 		overrides: [],
+		status,
+		action: 'create',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL
+	}
+}
+
+// Transform — seed zone with a request redirect rule, a response security-
+// header rule, and a shadow CORS rule, so the index, manage table, and edit
+// page all have content to show.
+const transformZone = {
+	project: 'acme',
+	location: LOCATION_ID,
+	description: 'Force www + security headers',
+	transforms: [
+		{
+			id: 'force-www',
+			description: 'Force the apex host to www (301)',
+			phase: 'request',
+			filter: "request.host == 'acme.com'",
+			ops: [
+				{ type: 'redirect', to: 'https://www.acme.com$uri', status: 301 }
+			],
+			mode: '',
+			priority: 0
+		},
+		{
+			id: 'security-headers',
+			description: 'HSTS + security baseline',
+			phase: 'response',
+			ops: [
+				{ type: 'set-header', name: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+				{ type: 'set-header', name: 'X-Content-Type-Options', value: 'nosniff' },
+				{ type: 'remove-header', name: 'X-Powered-By' }
+			],
+			mode: '',
+			priority: 1
+		},
+		{
+			id: 'spa-cors',
+			description: 'CORS for the SPA (shadow)',
+			phase: 'response',
+			filter: "request.path.startsWith('/api/')",
+			ops: [
+				{ type: 'cors', allowOrigins: ['https://app.acme.com'], allowMethods: ['GET', 'POST'], allowHeaders: ['Authorization'], allowCredentials: true, maxAge: '1h' }
+			],
+			mode: 'shadow',
+			priority: 2
+		}
+	],
+	status: 'success',
+	action: 'create',
+	createdAt: CREATED_AT,
+	createdBy: USER_EMAIL
+}
+
+// Locations (besides the seed LOCATION_ID) that have had transform configured
+// in this dev session, mapped to { description, polls }. Mirrors cacheConfigured
+// — the simulated deployer flips a freshly created zone from pending → success
+// after the first list read, so the index spinner resolves on its own.
+const transformConfigured = new Map<string, { description: string, polls: number }>()
+
+function transformConfiguredZone (location: string, advance = false) {
+	const entry = transformConfigured.get(location) ?? { description: '', polls: 0 }
+	const status = entry.polls > 0 ? 'success' : 'pending'
+	if (advance) {
+		entry.polls += 1
+		transformConfigured.set(location, entry)
+	}
+	return {
+		project: 'acme',
+		location,
+		description: entry.description,
+		transforms: [],
 		status,
 		action: 'create',
 		createdAt: CREATED_AT,
@@ -1948,6 +2022,38 @@ const handlers: Record<string, (args: any) => object> = {
 	'cache.resultMetrics': (args) => ok(cacheResultMetrics(args?.timeRange)),
 	'cache.delete': (args) => {
 		if (args?.location) cacheConfigured.delete(args.location)
+		return ok({})
+	},
+
+	// The seed location starts configured and live; every other location is
+	// "transform not configured yet" (not-found) until created. A freshly created
+	// location starts as { status: 'pending', action: 'create' } and the
+	// simulated deployer flips it to 'success' after the first read (see
+	// transformConfiguredZone), so the index spinner resolves on its own.
+	'transform.list': () => {
+		const items = [{ ...transformZone, location: LOCATION_ID }]
+		for (const location of transformConfigured.keys()) {
+			items.push(transformConfiguredZone(location, true))
+		}
+		return ok({ project: 'acme', items })
+	},
+	'transform.get': (args) => {
+		const location = args?.location ?? LOCATION_ID
+		if (location === LOCATION_ID) return ok({ ...transformZone, location: LOCATION_ID })
+		if (transformConfigured.has(location)) {
+			return ok(transformConfiguredZone(location))
+		}
+		return err('api: transform zone not found')
+	},
+	'transform.set': (args) => {
+		const location = args?.location
+		if (location && location !== LOCATION_ID) {
+			transformConfigured.set(location, { description: args?.description ?? '', polls: 0 })
+		}
+		return ok({})
+	},
+	'transform.delete': (args) => {
+		if (args?.location) transformConfigured.delete(args.location)
 		return ok({})
 	},
 
