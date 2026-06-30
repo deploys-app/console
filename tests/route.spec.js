@@ -108,7 +108,7 @@ test.describe('route detail', () => {
 		await page.goto(detailUrl)
 
 		await page.getByRole('button', { name: 'Delete route' }).click()
-		await page.locator('.swal2-confirm').click()
+		await page.locator('#app-modal-confirm').click()
 
 		await expect.poll(async () => {
 			const log = await getRequestLog()

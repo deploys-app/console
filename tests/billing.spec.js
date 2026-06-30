@@ -254,7 +254,7 @@ test.describe('invoice detail', () => {
 		const btn = page.getByRole('button', { name: 'Download receipt' })
 		await expect(btn).toBeVisible()
 		await btn.click()
-		await expect(page.locator('#swal2-html-container')).toHaveText(/invoice pdf export is not available/)
+		await expect(page.locator('#app-modal')).toHaveText(/invoice pdf export is not available/)
 	})
 
 	test('surfaces a clear message when PDF download fails with an empty 500', async ({ page }) => {
@@ -269,8 +269,8 @@ test.describe('invoice detail', () => {
 		await page.getByRole('button', { name: 'Download PDF' }).click()
 
 		// The empty error must not produce a blank "Oops…" dialog.
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('#swal2-html-container')).toHaveText(/Could not download the invoice PDF/)
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toHaveText(/Could not download the invoice PDF/)
 	})
 
 	test('shows the API message when PDF download returns a typed error', async ({ page }) => {
@@ -283,6 +283,6 @@ test.describe('invoice detail', () => {
 		await page.goto('/billing/invoice?id=inv-1')
 		await page.getByRole('button', { name: 'Download PDF' }).click()
 
-		await expect(page.locator('#swal2-html-container')).toHaveText(/invoice pdf export is not available/)
+		await expect(page.locator('#app-modal')).toHaveText(/invoice pdf export is not available/)
 	})
 })

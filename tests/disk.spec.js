@@ -74,8 +74,8 @@ test.describe('disk — create', () => {
 		await pickSelect(page, 'input-location', 'gke')
 		await main.getByRole('button', { name: 'Create' }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: disk already exists')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: disk already exists')
 	})
 
 	test('disables Create when the create permission is missing', async ({ page }) => {

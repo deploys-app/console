@@ -34,7 +34,6 @@
     "svelte": "^5.56.1",
     "svelte-check": "^4.5.0",
     "svelte-eslint-parser": "^1.7.1",
-    "sweetalert2": "^11.26.25",
     "tailwindcss": "=4.3.0",
     "typescript": "~6.0.3",
     "valid-url": "^1.0.9",

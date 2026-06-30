@@ -116,8 +116,8 @@ Tailwind CSS v4 via `@tailwindcss/vite`. The single entry stylesheet is `src/sty
 
 Two complementary patterns:
 
-- **`src/lib/modal/index.ts`** — wraps SweetAlert2 (`confirm` / `error` / `success`). Use for transient alerts, confirmations, and simple prompts rather than inline `alert`/`confirm`.
-- **In-page Svelte modal components** — for showing structured or user-provided content, build a small component using the `modal` / `modal-panel` / `modal-close` classes with an exported `open()` and local state (see `ModalSelectProject.svelte`, `EnvGroupModal.svelte`). Prefer this over SweetAlert's `html` option so values render through Svelte interpolation (auto-escaped) instead of hand-built/escaped HTML strings. Bind `aria-hidden` to the open state so the dialog is exposed to assistive tech only while open.
+- **`src/lib/modal/index.ts`** — `confirm` / `error` / `success` / `prompt`, backed by a single native `<dialog>` (`src/lib/modal/store.svelte.ts` holds the rune state; `Modal.svelte` is the host, mounted once in `(auth)/+layout.svelte`). The dialog closes via plain JS (`dialogEl.close()`) — we deliberately avoid the Invoker Commands API (`command="close"`) while iOS support is limited. Use these for transient alerts, confirmations, and simple text prompts rather than inline `alert`/`confirm`. `prompt` supports `requireMatch` for type-to-confirm gates.
+- **In-page Svelte modal components** — for showing structured or user-provided content, build a small component using the `modal` / `modal-panel` / `modal-close` classes with an exported `open()` and local state (see `ModalSelectProject.svelte`, `EnvGroupModal.svelte`). Values render through Svelte interpolation (auto-escaped) rather than hand-built HTML strings. Bind `aria-hidden` to the open state so the dialog is exposed to assistive tech only while open.
 
 ### Language note
 

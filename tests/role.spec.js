@@ -98,8 +98,8 @@ test.describe('roles', () => {
 		await main.locator('#input-name').fill('Developer')
 		await main.getByRole('button', { name: 'Create', exact: true }).click()
 
-		await expect(page.locator('.swal2-popup')).toBeVisible()
-		await expect(page.locator('.swal2-html-container')).toContainText('api: role already exists')
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await expect(page.locator('#app-modal')).toContainText('api: role already exists')
 	})
 
 	test('searchable permission picker filters, adds, and resets', async ({ page }) => {

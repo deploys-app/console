@@ -37,8 +37,6 @@
 	--hsl-info-content: 200 90% 98%;
 	--hsl-black: 0 0% 0%;
 	--hsl-white: 0 0% 100%;
-	--modal-panel-background: hsl(var(--hsl-base-300));
-	--modal-panel-color: hsl(var(--hsl-content));
 
 	/* Blueprint grid — faint structural texture on the app shell */
 	--grid-line: hsl(230 24% 14% / 0.04);
@@ -70,8 +68,6 @@
 	--hsl-warning-content: 40 90% 8%;
 	--hsl-info: 198 88% 58%;
 	--hsl-info-content: 200 90% 8%;
-	--modal-panel-background: hsl(var(--hsl-base-300));
-	--modal-panel-color: hsl(var(--hsl-content));
 
 	--grid-line: hsl(220 40% 92% / 0.04);
 }
@@ -515,7 +511,11 @@
 	}
 
 	.button:hover:not([disabled]):not(.is-loading),
-	.button:focus-visible:not([disabled]) {
+	/* Only the default (primary) button darkens its fill on keyboard focus; a
+	 * variant keeps its own background and shows focus via the outline ring above.
+	 * Without the :not, a focused tertiary/negative/etc. button wrongly turned
+	 * primary-pink. */
+	.button:focus-visible:not([disabled]):not([class*='is-variant-']) {
 		background-color: hsl(var(--hsl-primary-active));
 	}
 

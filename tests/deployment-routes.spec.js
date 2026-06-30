@@ -353,9 +353,9 @@ test.describe('deployment detail — Routes tab delete', () => {
 
 		await clickWhenReady(
 			page.getByRole('button', { name: 'Delete' }),
-			page.locator('.swal2-confirm')
+			page.locator('#app-modal-confirm')
 		)
-		await page.locator('.swal2-confirm').click()
+		await page.locator('#app-modal-confirm').click()
 
 		await expect.poll(async () => {
 			const log = await getRequestLog()

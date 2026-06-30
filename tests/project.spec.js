@@ -1,4 +1,4 @@
-import { test, expect, setMocks } from './helpers.js'
+import { test, expect, setMocks, getRequestLog } from './helpers.js'
 import { defaultProject } from './fixtures/mocks.js'
 
 test.describe('project list', () => {
@@ -81,6 +81,55 @@ test.describe('project list', () => {
 		// Escape closes it.
 		await page.keyboard.press('Escape')
 		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+	})
+})
+
+test.describe('project delete (type-to-confirm)', () => {
+	test('the Delete prompt stays gated until the exact project id is typed', async ({ page }) => {
+		await setMocks({
+			'project.list': { ok: true, result: { items: [defaultProject] } },
+			'project.delete': { ok: true, result: true }
+		})
+		await page.goto('/project')
+		const main = page.locator('.content-wrapper')
+		await main.getByRole('button', { name: 'Remove' }).click()
+
+		const dialog = page.locator('#app-modal')
+		const confirm = page.locator('#app-modal-confirm')
+		const input = page.locator('#app-modal-input')
+		await expect(dialog).toBeVisible()
+		// Delete is disabled until the typed name matches the project id exactly.
+		await expect(confirm).toBeDisabled()
+
+		await input.fill('wrong-name')
+		await expect(confirm).toBeDisabled()
+		// Enter on a non-match must neither close nor delete.
+		await input.press('Enter')
+		await expect(dialog).toBeVisible()
+		expect((await getRequestLog()).some((r) => r.path === '/project.delete')).toBe(false)
+
+		await input.fill('test-project')
+		await expect(confirm).toBeEnabled()
+		await confirm.click()
+
+		await expect.poll(async () =>
+			(await getRequestLog()).some((r) => r.path === '/project.delete')
+		).toBe(true)
+	})
+
+	test('Cancel dismisses the Delete prompt without deleting', async ({ page }) => {
+		await setMocks({
+			'project.list': { ok: true, result: { items: [defaultProject] } },
+			'project.delete': { ok: true, result: true }
+		})
+		await page.goto('/project')
+		const main = page.locator('.content-wrapper')
+		await main.getByRole('button', { name: 'Remove' }).click()
+		await expect(page.locator('#app-modal')).toBeVisible()
+
+		await page.getByRole('button', { name: 'Cancel' }).click()
+		await expect(page.locator('#app-modal')).toBeHidden()
+		expect((await getRequestLog()).some((r) => r.path === '/project.delete')).toBe(false)
 	})
 })
 
