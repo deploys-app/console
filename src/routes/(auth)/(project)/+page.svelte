@@ -70,57 +70,82 @@
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
 	const auditLog = $derived(data.auditLog)
-	const billing = $derived([
+	// Grouped into Compute / Storage / Network so the panel reads as sections
+	// rather than one ever-growing flat grid (a new card is added per billing
+	// SKU). The full, always-complete breakdown lives on the /billing page.
+	const billingGroups = $derived([
 		{
-			key: 'cpuUsage',
-			icon: 'fa-microchip',
-			label: 'CPU Usage',
-			...formatAvgCount(usage.cpuUsage, 'vCPUs', 'vCPU-s')
+			title: 'Compute',
+			items: [
+				{
+					key: 'cpuUsage',
+					icon: 'fa-microchip',
+					label: 'CPU Usage',
+					...formatAvgCount(usage.cpuUsage, 'vCPUs', 'vCPU-s')
+				},
+				{
+					key: 'memory',
+					icon: 'fa-memory',
+					label: 'Memory',
+					...formatStorage(usage.memory / billingElapsedSeconds(), ''),
+					tooltip: rawStorageTooltip(usage.memory)
+				},
+				{
+					key: 'disk',
+					icon: 'fa-hard-drive',
+					label: 'Disk',
+					...formatStorage(usage.disk / billingElapsedSeconds(), ''),
+					tooltip: rawStorageTooltip(usage.disk)
+				},
+				{
+					key: 'replica',
+					icon: 'fa-clone',
+					label: 'Replica',
+					...formatAvgCount(usage.replica, 'replicas', 'replica-s')
+				}
+			]
 		},
 		{
-			key: 'memory',
-			icon: 'fa-memory',
-			label: 'Memory',
-			...formatStorage(usage.memory / billingElapsedSeconds(), ''),
-			tooltip: rawStorageTooltip(usage.memory)
+			title: 'Storage',
+			items: [
+				{
+					key: 'staticStorage',
+					icon: 'fa-folder-tree',
+					label: 'Static Storage',
+					...formatStorage(usage.staticStorage / billingElapsedDays(), ''),
+					tooltip: rawStorageDayTooltip(usage.staticStorage)
+				},
+				{
+					key: 'dropboxStorage',
+					icon: 'fa-boxes-stacked',
+					label: 'Dropbox Storage',
+					...formatStorage(usage.dropboxStorage / billingElapsedDays(), ''),
+					tooltip: rawStorageDayTooltip(usage.dropboxStorage)
+				}
+			]
 		},
 		{
-			key: 'disk',
-			icon: 'fa-hard-drive',
-			label: 'Disk',
-			...formatStorage(usage.disk / billingElapsedSeconds(), ''),
-			tooltip: rawStorageTooltip(usage.disk)
-		},
-		{
-			key: 'staticStorage',
-			icon: 'fa-folder-tree',
-			label: 'Static Storage',
-			...formatStorage(usage.staticStorage / billingElapsedDays(), ''),
-			tooltip: rawStorageDayTooltip(usage.staticStorage)
-		},
-		{
-			key: 'egress',
-			icon: 'fa-cloud-arrow-up',
-			label: 'Egress',
-			...formatStorage(usage.egress, '')
-		},
-		{
-			key: 'registryEgress',
-			icon: 'fa-box-archive',
-			label: 'Registry Egress',
-			...formatStorage(usage.registryEgress, '')
-		},
-		{
-			key: 'dropboxEgress',
-			icon: 'fa-box-open',
-			label: 'Dropbox Egress',
-			...formatStorage(usage.dropboxEgress, '')
-		},
-		{
-			key: 'replica',
-			icon: 'fa-clone',
-			label: 'Replica',
-			...formatAvgCount(usage.replica, 'replicas', 'replica-s')
+			title: 'Network',
+			items: [
+				{
+					key: 'egress',
+					icon: 'fa-cloud-arrow-up',
+					label: 'Egress',
+					...formatStorage(usage.egress, '')
+				},
+				{
+					key: 'registryEgress',
+					icon: 'fa-box-archive',
+					label: 'Registry Egress',
+					...formatStorage(usage.registryEgress, '')
+				},
+				{
+					key: 'dropboxEgress',
+					icon: 'fa-box-open',
+					label: 'Dropbox Egress',
+					...formatStorage(usage.dropboxEgress, '')
+				}
+			]
 		}
 	])
 </script>
@@ -131,47 +156,105 @@
 		<p class="page-sub">{projectInfo.name}</p>
 	</div>
 </div>
-<div class="grid grid-cols-1 lg:grid lg:grid-cols-2 gap-6 items-stretch">
-	<div class="panel is-level-300 gap-6 dashboard-panel">
-		<h6>
-			<i class="fa-solid fa-project-diagram"></i>
-			<strong class="ml-4">Project Info</strong>
-		</h6>
-		<hr>
-		<div class="field">
-			<label for="input-project_name">Project Name</label>
-			<div class="input">
-				<input id="input-project_name" readonly value={projectInfo.name}>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+	<div class="flex flex-col gap-6">
+		<div class="panel is-level-300 gap-6 dashboard-panel">
+			<h6>
+				<i class="fa-solid fa-project-diagram"></i>
+				<strong class="ml-4">Project Info</strong>
+			</h6>
+			<hr>
+			<div class="field">
+				<label for="input-project_name">Project Name</label>
+				<div class="input">
+					<input id="input-project_name" readonly value={projectInfo.name}>
+				</div>
 			</div>
-		</div>
-		<div class="field">
-			<label for="input-project_id">Project ID</label>
-			<div class="input">
-				<input id="input-project_id" readonly value={projectInfo.project}>
+			<div class="field">
+				<label for="input-project_id">Project ID</label>
+				<div class="input">
+					<input id="input-project_id" readonly value={projectInfo.project}>
+				</div>
 			</div>
-		</div>
-		<div class="field">
-			<label for="input-project_number">Project Number</label>
-			<div class="input">
-				<input id="input-project_number" readonly value={projectInfo.id}>
+			<div class="field">
+				<label for="input-project_number">Project Number</label>
+				<div class="input">
+					<input id="input-project_number" readonly value={projectInfo.id}>
+				</div>
 			</div>
-		</div>
-		<div class="field">
-			<label for="input-project_billing">Billing Account ID</label>
-			<div class="input">
-				<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
+			<div class="field">
+				<label for="input-project_billing">Billing Account ID</label>
+				<div class="input">
+					<input id="input-project_billing" readonly value={projectInfo.billingAccount}>
+				</div>
 			</div>
+
+<!--			<hr>-->
+
+<!--			<a class="link flex items-center" href="">-->
+<!--				<i class="fa-solid fa-arrow-right text-xl"></i>-->
+<!--				<span class="ml-4">Project Settings</span>-->
+<!--			</a>-->
 		</div>
 
-<!--		<hr>-->
-
-<!--		<a class="link flex items-center" href="">-->
-<!--			<i class="fa-solid fa-arrow-right text-xl"></i>-->
-<!--			<span class="ml-4">Project Settings</span>-->
-<!--		</a>-->
+		<div class="panel is-level-300 gap-6 dashboard-panel flex-1 min-h-0">
+			<div class="flex items-center justify-between">
+				<h6>
+					<i class="fa-solid fa-clock-rotate-left"></i>
+					<strong class="ml-4">Recent Activity</strong>
+				</h6>
+				<a class="link" href="/audit-log?project={projectInfo.project}">
+					View all
+					<i class="fa-solid fa-arrow-right ml-1"></i>
+				</a>
+			</div>
+			<hr>
+			{#if auditLog.error?.forbidden}
+				<div class="text-center p-4 text-content/70">
+					<i class="fa-solid fa-lock mr-2"></i>
+					You don't have permission to view audit logs
+				</div>
+			{:else if auditLog.error}
+				<div class="text-center p-4 text-content/70">
+					{auditLog.error.message || auditLog.error}
+				</div>
+			{:else if !auditLog.items.length}
+				<div class="text-center p-4 text-content/70">
+					No recent activity
+				</div>
+			{:else}
+				<ul class="activity-feed">
+					{#each auditLog.items as it (it.id)}
+						<li class="activity-item">
+							<span class="activity-dot" class:is-fail={it.outcome === 'failure'}
+								title={it.outcome}></span>
+							<div class="activity-body">
+								<div class="activity-line">
+									<span class="action">{it.action}</span>
+									{#if it.resource.type}
+										<span class="resource">
+											<strong>{it.resource.type}</strong>{#if it.resource.name}<span class="resource-name">/{it.resource.name}</span>{/if}
+										</span>
+									{/if}
+								</div>
+								<div class="activity-foot">
+									<span class="actor">{it.actor.email}</span>
+									{#if it.actor.label}
+										<span class="foot-sep">·</span>
+										<span class="agent" title="agent session (scoped token)"><i class="fa-solid fa-robot"></i>{it.actor.label}</span>
+									{/if}
+									<span class="foot-sep">·</span>
+									<time class="activity-time">{format.datetime(it.createdAt)}</time>
+								</div>
+							</div>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
 	</div>
 
-	<div class="panel is-level-300 gap-6 dashboard-panel">
+	<div class="panel is-level-300 gap-6 dashboard-panel self-start">
 		<div class="flex items-center justify-between">
 			<h6>
 				<i class="fa-solid fa-credit-card"></i>
@@ -192,76 +275,22 @@
 			</div>
 		</div>
 
-		<div class="billing-grid">
-			{#each billing as item (item.key)}
-				<div class="billing-card" title={item.tooltip}>
-					<div class="billing-card-head">
-						<i class="fa-solid {item.icon}"></i>
-						<span class="billing-card-label">{item.label}</span>
-					</div>
-					<div class="billing-card-value">
-						<span class="billing-card-amount">{item.value}</span>
-						<span class="billing-card-unit">{item.unit}</span>
-					</div>
-				</div>
-			{/each}
-		</div>
-	</div>
-
-	<div class="panel is-level-300 gap-6 dashboard-panel">
-		<div class="flex items-center justify-between">
-			<h6>
-				<i class="fa-solid fa-clock-rotate-left"></i>
-				<strong class="ml-4">Recent Activity</strong>
-			</h6>
-			<a class="link" href="/audit-log?project={projectInfo.project}">
-				View all
-				<i class="fa-solid fa-arrow-right ml-1"></i>
-			</a>
-		</div>
-		<hr>
-		{#if auditLog.error?.forbidden}
-			<div class="text-center p-4 text-content/70">
-				<i class="fa-solid fa-lock mr-2"></i>
-				You don't have permission to view audit logs
-			</div>
-		{:else if auditLog.error}
-			<div class="text-center p-4 text-content/70">
-				{auditLog.error.message || auditLog.error}
-			</div>
-		{:else if !auditLog.items.length}
-			<div class="text-center p-4 text-content/70">
-				No recent activity
-			</div>
-		{:else}
-			<ul class="activity-feed">
-				{#each auditLog.items as it (it.id)}
-					<li class="activity-item">
-						<span class="activity-dot" class:is-fail={it.outcome === 'failure'}
-							title={it.outcome}></span>
-						<div class="activity-body">
-							<div class="activity-line">
-								<span class="action">{it.action}</span>
-								{#if it.resource.type}
-									<span class="resource">
-										<strong>{it.resource.type}</strong>{#if it.resource.name}<span class="resource-name">/{it.resource.name}</span>{/if}
-									</span>
-								{/if}
-							</div>
-							<div class="activity-foot">
-								<span class="actor">{it.actor.email}</span>
-								{#if it.actor.label}
-									<span class="foot-sep">·</span>
-									<span class="agent" title="agent session (scoped token)"><i class="fa-solid fa-robot"></i>{it.actor.label}</span>
-								{/if}
-								<span class="foot-sep">·</span>
-								<time class="activity-time">{format.datetime(it.createdAt)}</time>
-							</div>
-						</div>
-					</li>
+		<table class="billing-table">
+			<tbody>
+				{#each billingGroups as group (group.title)}
+					<tr class="billing-section">
+						<th colspan="3">{group.title}</th>
+					</tr>
+					{#each group.items as item (item.key)}
+						<tr class="billing-row" title={item.tooltip}>
+							<td class="billing-cell-icon"><i class="fa-solid {item.icon}"></i></td>
+							<td class="billing-cell-label">{item.label}</td>
+							<td class="billing-cell-value"><span class="billing-amount">{item.value}</span><span class="billing-unit">{item.unit}</span></td>
+						</tr>
+					{/each}
 				{/each}
-			</ul>
-		{/if}
+			</tbody>
+		</table>
 	</div>
 </div>
 
@@ -269,7 +298,6 @@
 	.dashboard-panel {
 		display: flex;
 		flex-direction: column;
-		min-height: 28rem;
 	}
 
 	.billing-total {
@@ -317,89 +345,67 @@
 		color: hsl(var(--hsl-content) / 0.7);
 	}
 
-	.billing-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.625rem;
+	.billing-table {
+		width: 100%;
+		border-collapse: collapse;
 	}
 
-	@media (min-width: 640px) {
-		.billing-grid {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-		}
+	.billing-section th {
+		padding: 0.9rem 0 0.35rem;
+		text-align: left;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: hsl(var(--hsl-content) / 0.5);
 	}
 
-	.billing-card {
-		display: flex;
-		flex-direction: column;
-		gap: 0.4rem;
-		padding: 0.75rem 0.875rem;
-		border-radius: 0.5rem;
+	.billing-table tbody tr:first-child th {
+		padding-top: 0;
+	}
+
+	.billing-row td {
+		padding-block: 0.45rem;
+		border-bottom: 1px solid hsl(var(--hsl-line) / 0.4);
+		vertical-align: baseline;
+		transition: background var(--timing-fastest) ease;
+	}
+
+	.billing-row:hover td {
 		background: hsl(var(--hsl-base-200));
-		border: 1px solid hsl(var(--hsl-line) / 0.6);
-		transition:
-			background var(--timing-fastest) ease,
-			border-color var(--timing-fastest) ease,
-			transform var(--timing-fastest) ease;
 	}
 
-	.billing-card:hover {
-		border-color: hsl(var(--hsl-primary) / 0.45);
-		background: hsl(var(--hsl-base-200));
-		transform: translateY(-1px);
-	}
-
-	.billing-card-head {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.4rem;
+	.billing-cell-icon {
+		width: 2rem;
+		padding-left: 0.5rem;
 		color: hsl(var(--hsl-primary));
 		font-size: 0.8125rem;
-		min-height: 2.5rem;
-	}
-
-	.billing-card-head i {
-		font-size: 0.875rem;
-		width: 1rem;
 		text-align: center;
-		line-height: 1.25rem;
 	}
 
-	.billing-card-label {
+	.billing-cell-label {
+		width: 100%;
+		padding-left: 0.5rem;
+		font-size: 0.8125rem;
 		font-weight: 600;
 		color: hsl(var(--hsl-content) / 0.85);
-		font-size: 0.8125rem;
-		line-height: 1.25rem;
 	}
 
-	@supports (grid-template-rows: subgrid) {
-		.billing-card {
-			display: grid;
-			grid-template-rows: subgrid;
-			grid-row: span 2;
-		}
-
-		.billing-card-head {
-			min-height: 0;
-		}
-	}
-
-	.billing-card-value {
-		display: flex;
-		align-items: baseline;
-		gap: 0.3rem;
-		flex-wrap: wrap;
-	}
-
-	.billing-card-amount {
-		font-size: 1.25rem;
-		font-weight: 700;
-		line-height: 1.1;
-		color: hsl(var(--hsl-content));
+	.billing-cell-value {
+		text-align: right;
+		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
+		padding-right: 0.5rem;
 	}
 
-	.billing-card-unit {
+	.billing-amount {
+		font-size: 0.9375rem;
+		font-weight: 700;
+		color: hsl(var(--hsl-content));
+	}
+
+	.billing-unit {
+		margin-left: 0.3rem;
 		font-size: 0.75rem;
 		color: hsl(var(--hsl-content) / 0.55);
 	}

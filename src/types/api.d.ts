@@ -105,6 +105,7 @@ declare namespace Api {
         disk: number
         replica: number
         staticStorage: number
+        dropboxStorage: number
     }
 
     export type BillingProject = {
