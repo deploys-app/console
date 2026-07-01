@@ -1476,6 +1476,10 @@ const handlers: Record<string, (args: any) => object> = {
 		downloadUrl: 'https://dropbox.deploys.app/files/mock-slip.jpg',
 		expiresAt: '2026-06-02T00:00:00Z'
 	}),
+	'billing.uploadWHTCertificate': () => ok({
+		downloadUrl: 'https://dropbox.deploys.app/files/mock-whtcert.pdf',
+		expiresAt: '2027-05-31T00:00:00Z'
+	}),
 
 	'auditLog.list': (args) => {
 		let arr = auditLogItems

@@ -200,6 +200,28 @@ test.describe('invoice detail', () => {
 		await expect(modal.getByText('Withhold 3% tax')).toHaveCount(0)
 	})
 
+	test('shows the Attach WHT certificate button on a company invoice paid with withholding', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': {
+				ok: true,
+				result: { ...sampleInvoice, status: 'paid', paidAt: '2026-05-03T00:00:00Z', withholdingTaxRate: 0.03, withholdingTaxAmount: 0.3 }
+			},
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+		await page.goto('/billing/invoice?id=inv-1')
+		// Company + paid-with-WHT → the customer can still attach the 50 ทวิ certificate later.
+		await expect(page.getByRole('button', { name: /Attach WHT certificate/ })).toBeVisible()
+	})
+
+	test('hides the Attach WHT certificate button for an individual invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, taxEntityType: 'individual' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+		await page.goto('/billing/invoice?id=inv-1')
+		await expect(page.getByRole('button', { name: /Attach WHT certificate/ })).toHaveCount(0)
+	})
+
 	test('shows a PromptPay QR in the pay modal for a THB invoice', async ({ page }) => {
 		await setMocks({
 			// PromptPay settles in THB, so the QR only renders for THB invoices.
@@ -240,7 +262,8 @@ test.describe('invoice detail', () => {
 
 		// A long, unbreakable (no-spaces) name is the worst case: without min-width:0
 		// on the selected-file row it pushes the whole modal wider than its panel.
-		await page.locator('input[type=file]').setInputFiles({
+		// Scope to the modal's slip input (the invoice page also has a cert input).
+		await page.locator('.modal.is-active input[type=file]').setInputFiles({
 			name: 'transfer-slip-payment-confirmation-screenshot-from-mobile-banking-app-INV-2026-0009-original-highres.pdf',
 			mimeType: 'application/pdf',
 			buffer: Buffer.from('%PDF-1.4 mock slip')

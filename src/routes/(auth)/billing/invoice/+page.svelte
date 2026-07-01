@@ -65,6 +65,45 @@
 		}
 	}
 
+	// Attach a withholding-tax certificate after the fact (company invoices). Shown
+	// while the invoice is still open (may withhold) or once it was paid with
+	// withholding — for customers who send the 50 ทวิ certificate later.
+	const MAX_CERT_SIZE = 10 * 1024 * 1024
+	let attachingCert = $state(false)
+	let elCert = $state<HTMLInputElement | null>(null)
+	const canAttachCert = $derived(
+		invoice.taxEntityType === 'company' &&
+		(invoice.status === 'open' || invoice.withholdingTaxAmount > 0)
+	)
+
+	async function onCertChange (e: Event) {
+		const input = e.currentTarget as HTMLInputElement
+		const file = input.files?.[0] ?? null
+		input.value = ''
+		if (!file) return
+		if (file.size > MAX_CERT_SIZE) {
+			await modal.error({ error: 'Certificate is too large (max 10 MB).' })
+			return
+		}
+		attachingCert = true
+		try {
+			const fd = new FormData()
+			fd.append('id', invoice.id)
+			fd.append('whtCert', file)
+			const resp = await fetch('/api/billing.uploadWHTCertificate', { method: 'POST', body: fd })
+			const res = await resp.json().catch(() => null)
+			if (!resp.ok || !res?.ok) {
+				await modal.error({ error: res?.error?.message ? res.error : `Upload failed (${resp.status}).` })
+				return
+			}
+			await modal.success({ content: 'Withholding tax certificate attached.' })
+		} catch (err) {
+			await modal.error({ error: err })
+		} finally {
+			attachingCert = false
+		}
+	}
+
 	const periodLabel = $derived.by(() => {
 		const s = dayjs(invoice.periodStart)
 		const e = dayjs(invoice.periodEnd).subtract(1, 'day')
@@ -171,6 +210,24 @@
 				>
 					<i class="fa-solid fa-file-invoice"></i>
 					Download receipt
+				</button>
+			{/if}
+			{#if canAttachCert}
+				<input
+					bind:this={elCert}
+					class="hidden"
+					type="file"
+					accept="image/*,application/pdf"
+					onchange={onCertChange}
+				>
+				<button
+					class="button is-variant-secondary is-icon-left"
+					class:is-loading={attachingCert}
+					disabled={attachingCert}
+					onclick={() => elCert?.click()}
+				>
+					<i class="fa-solid fa-file-contract"></i>
+					Attach WHT certificate
 				</button>
 			{/if}
 			{#if invoice.status === 'open'}
