@@ -1385,7 +1385,8 @@ const handlers: Record<string, (args: any) => object> = {
 		dropboxEgress: 134217728,
 		disk: 10737418240,
 		replica: 4,
-		staticStorage: 25769803776
+		staticStorage: 25769803776,
+		dropboxStorage: 8589934592
 	}),
 	'project.metrics': () => ok({
 		cpuUsage: dailyMetricLine('cpu_usage', 1.5),
