@@ -127,6 +127,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
+		margin-bottom: 1.5rem;
 		color: hsl(var(--hsl-content) / 0.6);
 		text-decoration: none;
 		font-size: 0.9rem;
@@ -142,8 +143,6 @@
 	<i class="fa-solid fa-arrow-left"></i>
 	Back to invoices
 </a>
-
-<br>
 
 <div class="panel is-level-300 grid gap-6">
 	<div class="flex flex-wrap items-center justify-between gap-3">
