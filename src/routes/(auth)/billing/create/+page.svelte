@@ -94,7 +94,6 @@
 					<option value="company">Company</option>
 				</select>
 			</div>
-			<p class="text-sm text-content/60 mt-1">A company has “Head Office (สำนักงานใหญ่)” printed on its tax invoices and receipts.</p>
 		</div>
 
 		<div class="field">
