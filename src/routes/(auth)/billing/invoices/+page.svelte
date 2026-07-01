@@ -8,7 +8,6 @@
 
 	const { data }: { data: PageData } = $props()
 
-	const billingAccount = $derived(data.billingAccount)
 	const invoices = $derived(data.invoices)
 	const error = $derived(data.error)
 
@@ -26,31 +25,18 @@
 	}
 </script>
 
-<div class="breadcrumb">
-	<div class="breadcrumb-item">
-		<a href="/billing" class="link"><h6>Billing</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<h6>Invoices</h6>
-	</div>
-</div>
-
-<br>
-
 <div class="panel is-level-300">
-	<div class="table-container mt-4">
+	<div class="table-container">
 		<table class="table">
 			<thead>
 				<tr>
 					<th>Number</th>
-					<th>Receipt no.</th>
 					<th>Period</th>
 					<th class="is-align-right">Total</th>
 					<th>Status</th>
-					<th>Issued</th>
+					<th class="is-hide-mobile">Receipt no.</th>
+					<th class="is-hide-mobile">Issued</th>
+					<th class="is-align-right"></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -59,15 +45,25 @@
 						<td>
 							<a class="link" href={`/billing/invoice?id=${it.id}`}>{it.number}</a>
 						</td>
-						<td>{it.receiptNumber || '—'}</td>
 						<td>{period(it.periodStart, it.periodEnd)}</td>
-						<td class="is-align-right">{money(it.total, it.currency)}</td>
+						<td class="is-align-right tabular-nums">{money(it.total, it.currency)}</td>
 						<td><InvoiceStatusBadge status={it.status} /></td>
-						<td>{format.datetime(it.issuedAt)}</td>
+						<td class="is-hide-mobile">{it.receiptNumber || '—'}</td>
+						<td class="is-hide-mobile">{format.datetime(it.issuedAt)}</td>
+						<td class="is-align-right">
+							{#if it.status === 'open'}
+								<a class="button is-size-small is-icon-left" href={`/billing/invoice?id=${it.id}`}>
+									<i class="fa-solid fa-receipt"></i>
+									Pay
+								</a>
+							{:else}
+								<a class="link text-sm" href={`/billing/invoice?id=${it.id}`}>View</a>
+							{/if}
+						</td>
 					</tr>
 				{/each}
-				<NoDataRow span={6} list={invoices} {error} />
-				<ErrorRow span={6} {error} />
+				<NoDataRow span={7} list={invoices} {error} />
+				<ErrorRow span={7} {error} />
 			</tbody>
 		</table>
 	</div>

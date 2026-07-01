@@ -1,5 +1,6 @@
 import { redirect, error } from '@sveltejs/kit'
 import api from '$lib/api'
+import { canManageBilling } from '$lib/billing'
 import type { PageLoad } from './$types'
 
 export const load: PageLoad = async ({ url, fetch }) => {
@@ -13,13 +14,18 @@ export const load: PageLoad = async ({ url, fetch }) => {
 	}
 	if (!billingAccount.result) redirect(302, '/billing')
 
-	// Load the invoices too so the overview can surface an "amount due" summary
-	// and the latest invoice — the accountant's landing view. Best-effort: a
-	// failure here must not break the account page, so fall back to an empty list.
-	const invoices = await api.invoke<Api.List<Api.InvoiceListItem>>('billing.listInvoices', { billingAccountId: id }, fetch)
+	// Managing members is owner/admin only. An accountant who deep-links here is
+	// bounced back to the account overview rather than shown a forbidden error.
+	if (!canManageBilling(billingAccount.result.role)) {
+		redirect(302, `/billing/detail?id=${id}`)
+	}
+
+	const members = await api.invoke<Api.BillingMemberList>('billing.listMembers', { id }, fetch)
 
 	return {
 		billingAccount: billingAccount.result,
-		invoices: invoices.result?.items ?? []
+		owner: members.result?.owner ?? '',
+		members: members.result?.items ?? [],
+		error: members.error
 	}
 }

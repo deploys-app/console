@@ -60,6 +60,11 @@ declare namespace Api {
 
     export type BillingAccountType = 'individual' | 'company'
 
+    // BillingRole is the caller's effective access on a billing account.
+    // 'owner' is implicit (the account's owner); 'admin' and 'accountant' are
+    // invited member roles.
+    export type BillingRole = 'owner' | 'admin' | 'accountant'
+
     export type BillingAccount = {
         id: string
         name: string
@@ -70,6 +75,24 @@ declare namespace Api {
         taxName: string
         taxAddress: string
         active: boolean
+        // role is the calling user's effective role on this account, so the UI
+        // can gate management surfaces without a second lookup.
+        role: BillingRole
+    }
+
+    // BillingMember is an invited (non-owner) user on a billing account.
+    export type BillingMember = {
+        email: string
+        role: 'admin' | 'accountant'
+        createdAt: string
+        createdBy: string
+    }
+
+    // BillingMemberList is the response of billing.listMembers: the account
+    // owner plus every invited member.
+    export type BillingMemberList = {
+        owner: string
+        items: BillingMember[]
     }
 
     export type ProjectUsage = {
