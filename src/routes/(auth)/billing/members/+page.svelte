@@ -110,15 +110,16 @@
 						</div>
 					</div>
 					<div class="member-controls">
-						<select
-							class="select is-size-small"
-							value={m.role}
-							disabled={busyEmail === m.email}
-							onchange={(e) => changeRole(m.email, (e.currentTarget as HTMLSelectElement).value)}
-						>
-							<option value="admin">Admin</option>
-							<option value="accountant">Accountant</option>
-						</select>
+						<div class="select role-select">
+							<select
+								value={m.role}
+								disabled={busyEmail === m.email}
+								onchange={(e) => changeRole(m.email, (e.currentTarget as HTMLSelectElement).value)}
+							>
+								<option value="admin">Admin</option>
+								<option value="accountant">Accountant</option>
+							</select>
+						</div>
 						<button
 							class="button is-variant-tertiary is-size-small icon-only"
 							title="Remove member"
@@ -144,22 +145,25 @@
 		<h5 class="mb-4"><strong>Invite a member</strong></h5>
 		<form class="invite" onsubmit={invite}>
 			<div class="field grow">
-				<label class="label" for="invite-email">Email</label>
-				<input
-					id="invite-email"
-					class="input"
-					type="email"
-					placeholder="accountant@example.com"
-					bind:value={inviteEmail}
-					required
-				/>
+				<label for="invite-email">Email</label>
+				<div class="input">
+					<input
+						id="invite-email"
+						type="email"
+						placeholder="accountant@example.com"
+						bind:value={inviteEmail}
+						required
+					/>
+				</div>
 			</div>
-			<div class="field">
-				<label class="label" for="invite-role">Role</label>
-				<select id="invite-role" class="select" bind:value={inviteRole}>
-					<option value="accountant">Accountant</option>
-					<option value="admin">Admin</option>
-				</select>
+			<div class="field role-field">
+				<label for="invite-role">Role</label>
+				<div class="select">
+					<select id="invite-role" bind:value={inviteRole}>
+						<option value="accountant">Accountant</option>
+						<option value="admin">Admin</option>
+					</select>
+				</div>
 			</div>
 			<div class="field invite-submit">
 				<button class="button is-icon-left" type="submit" class:is-loading={inviting} disabled={inviting}>
@@ -226,6 +230,13 @@
 		gap: 0.5rem;
 	}
 
+	/* Compact, fixed-width role picker in a member row (the .select wrapper is
+	   width:100% by default, which would stretch across the row). */
+	.role-select {
+		width: 10rem;
+		min-height: 2.25rem;
+	}
+
 	.icon-only {
 		color: hsl(var(--hsl-content) / 0.6);
 	}
@@ -249,6 +260,10 @@
 	.invite .grow {
 		flex: 1;
 		min-width: 14rem;
+	}
+
+	.invite .role-field {
+		width: 11rem;
 	}
 
 	.invite-submit {
