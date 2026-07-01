@@ -122,22 +122,26 @@
 	.is-align-right {
 		text-align: right;
 	}
+
+	.back-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: hsl(var(--hsl-content) / 0.6);
+		text-decoration: none;
+		font-size: 0.9rem;
+		transition: color 0.15s ease;
+	}
+
+	.back-link:hover {
+		color: hsl(var(--hsl-primary));
+	}
 </style>
 
-<div class="breadcrumb">
-	<div class="breadcrumb-item">
-		<a href="/billing" class="link"><h6>Billing</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6>{billingAccount.name}</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<a href={`/billing/invoices?id=${billingAccount.id}`} class="link"><h6>Invoices</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<h6>{invoice.number}</h6>
-	</div>
-</div>
+<a class="back-link" href={`/billing/invoices?id=${billingAccount.id}`}>
+	<i class="fa-solid fa-arrow-left"></i>
+	Back to invoices
+</a>
 
 <br>
 

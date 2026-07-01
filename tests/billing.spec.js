@@ -18,7 +18,8 @@ test.describe('billing accounts', () => {
 		await page.goto('/billing')
 
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByRole('heading', { name: 'Billing' })).toBeVisible()
+		// The billing portal brand + account cards (each card is a link to the account).
+		await expect(main.getByRole('link', { name: 'Billing' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'Personal' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'Company' })).toBeVisible()
 		await expect(main.getByRole('link', { name: 'Create account' })).toHaveAttribute('href', '/billing/create')
@@ -55,14 +56,15 @@ test.describe('billing accounts', () => {
 		const main = page.locator('.content-wrapper')
 		const paidRow = main.locator('table tbody tr', { hasText: 'INV-2024-001' })
 		await expect(paidRow.getByText('DPLY-RC-202605-0001')).toBeVisible()
+		// Receipt no. is the 5th column (Number, Period, Total, Status, Receipt no., Issued, action).
 		const openRow = main.locator('table tbody tr', { hasText: 'INV-2024-002' })
-		await expect(openRow.locator('td').nth(1)).toHaveText('—')
+		await expect(openRow.locator('td').nth(4)).toHaveText('—')
 	})
 
 	test('empty state when no billing accounts', async ({ page }) => {
 		await page.goto('/billing')
 		const main = page.locator('.content-wrapper')
-		await expect(main.getByText('Nothing here yet')).toBeVisible()
+		await expect(main.getByText(/don't have access to any billing accounts/)).toBeVisible()
 	})
 })
 

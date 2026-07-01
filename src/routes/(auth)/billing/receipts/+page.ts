@@ -13,13 +13,11 @@ export const load: PageLoad = async ({ url, fetch }) => {
 	}
 	if (!billingAccount.result) redirect(302, '/billing')
 
-	// Load the invoices too so the overview can surface an "amount due" summary
-	// and the latest invoice — the accountant's landing view. Best-effort: a
-	// failure here must not break the account page, so fall back to an empty list.
 	const invoices = await api.invoke<Api.List<Api.InvoiceListItem>>('billing.listInvoices', { billingAccountId: id }, fetch)
 
 	return {
 		billingAccount: billingAccount.result,
-		invoices: invoices.result?.items ?? []
+		invoices: invoices.result?.items ?? [],
+		error: invoices.error
 	}
 }

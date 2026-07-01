@@ -165,19 +165,6 @@
 	})
 </script>
 
-<div class="breadcrumb">
-	<div class="breadcrumb-item">
-		<a href="/billing" class="link"><h6>Billing</h6></a>
-	</div>
-	<div class="breadcrumb-item min-w-0">
-		<a href={`/billing/detail?id=${billingAccount.id}`} class="link"><h6 class="min-w-0 wrap-anywhere">{billingAccount.name}</h6></a>
-	</div>
-	<div class="breadcrumb-item">
-		<h6>Report</h6>
-	</div>
-</div>
-
-<br>
 
 <div class="grid gap-6">
 	<div class="panel is-level-300 grid gap-5">

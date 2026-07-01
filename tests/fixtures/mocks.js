@@ -86,6 +86,12 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
+		// The billing overview loads invoices for its amount-due summary; default
+		// to empty so an account page that doesn't override it renders cleanly.
+		'/billing.listInvoices': {
+			ok: true,
+			result: { items: [] }
+		},
 		'/deployment.list': {
 			ok: true,
 			result: { items: [] }
@@ -354,7 +360,8 @@ export const sampleBillingAccount = {
 	taxId: '',
 	taxName: '',
 	taxAddress: '',
-	active: true
+	active: true,
+	role: 'owner'
 }
 
 export const sampleInvoice = {

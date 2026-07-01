@@ -183,8 +183,17 @@ const billingAccounts = [
 		taxId: '0123456789012',
 		taxName: 'Acme Co., Ltd.',
 		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
-		active: true
+		active: true,
+		role: 'owner'
 	}
+]
+
+// Mutable member list so the Members page add/remove flows are exercisable in
+// mock mode (bun dev:mock + Playwright).
+const billingOwnerEmail = 'owner@example.com'
+let billingMembers = [
+	{ email: 'accountant@example.com', role: 'accountant', createdAt: '2026-06-01T09:00:00Z', createdBy: billingOwnerEmail },
+	{ email: 'cfo@example.com', role: 'admin', createdAt: '2026-05-12T10:30:00Z', createdBy: billingOwnerEmail }
 ]
 
 function deployment (project = 'acme') {
@@ -1435,6 +1444,23 @@ const handlers: Record<string, (args: any) => object> = {
 	},
 	// Multipart upload: the proxy can't JSON-parse the body in mock mode, so
 	// args is empty here — just acknowledge the upload.
+	'billing.listMembers': () => ok({ owner: billingOwnerEmail, items: billingMembers }),
+	'billing.addMember': (args) => {
+		const email = String(args?.email ?? '').toLowerCase()
+		const role = String(args?.role ?? 'accountant')
+		const existing = billingMembers.find((m) => m.email === email)
+		if (existing) {
+			existing.role = role
+		} else {
+			billingMembers = [...billingMembers, { email, role, createdAt: '2026-06-30T12:00:00Z', createdBy: billingOwnerEmail }]
+		}
+		return ok({})
+	},
+	'billing.removeMember': (args) => {
+		const email = String(args?.email ?? '').toLowerCase()
+		billingMembers = billingMembers.filter((m) => m.email !== email)
+		return ok({})
+	},
 	'billing.uploadTransferSlip': () => ok({
 		downloadUrl: 'https://dropbox.deploys.app/files/mock-slip.jpg',
 		expiresAt: '2026-06-02T00:00:00Z'
