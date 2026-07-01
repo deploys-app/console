@@ -734,6 +734,38 @@
 		font-size: 0.875rem;
 	}
 
+	/* Native <select> arrows render inconsistently across browsers/OSes (Safari
+	 * in particular crams its own control chrome against the right edge). Drop
+	 * the native arrow and draw one custom chevron with a controlled margin, so
+	 * every .select-wrapped picker looks identical everywhere. Extra right
+	 * padding reserves room so long option text never runs under the chevron. */
+	.select {
+		position: relative;
+	}
+
+	.select > select {
+		appearance: none;
+		-webkit-appearance: none;
+		padding-right: 2rem;
+	}
+
+	.select::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		right: 0.85rem;
+		width: 0.45rem;
+		height: 0.45rem;
+		border-right: 1.5px solid hsl(var(--hsl-content) / 0.55);
+		border-bottom: 1.5px solid hsl(var(--hsl-content) / 0.55);
+		transform: translateY(-65%) rotate(45deg);
+		pointer-events: none;
+	}
+
+	.select:has(> select[disabled])::after {
+		opacity: 0.4;
+	}
+
 	.textarea > textarea {
 		resize: vertical;
 	}
