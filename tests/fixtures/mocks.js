@@ -381,6 +381,8 @@ export const sampleInvoice = {
 	taxName: 'Acme Co',
 	taxAddress: '',
 	taxEntityType: 'company',
+	withholdingTaxRate: 0,
+	withholdingTaxAmount: 0,
 	issuedAt: now,
 	paidAt: '0001-01-01T00:00:00Z',
 	voidedAt: '0001-01-01T00:00:00Z',

@@ -710,6 +710,11 @@ declare namespace Api {
         // taxEntityType is the buyer's entity type snapshotted at issue time.
         // 'company' prints the Head Office line on the bill-to block.
         taxEntityType: BillingAccountType
+        // withholdingTaxRate / withholdingTaxAmount record a 3% withholding tax a
+        // company buyer deducted at payment (ภาษีหัก ณ ที่จ่าย); 0 for a normal or
+        // unpaid invoice. Settled in full when paidAmount + withholdingTaxAmount ≥ total.
+        withholdingTaxRate: number
+        withholdingTaxAmount: number
         issuedAt: string
         paidAt: string
         voidedAt: string
