@@ -12,19 +12,60 @@
 
 	const { onuploaded }: Props = $props()
 
+	// Thai service withholding-tax rate (mirrors api.WithholdingTaxRate). Only a
+	// company buyer may withhold; it is deducted off the pre-VAT subtotal.
+	const WHT_RATE = 0.03
+
 	let invoice = $state<Api.Invoice | null>(null)
 	let isActive = $state(false)
 	let uploading = $state(false)
 	let error = $state('')
 	let selectedFile = $state<File | null>(null)
 	let elFile = $state<HTMLInputElement | null>(null)
+	let withholdTax = $state(false)
+	let certFile = $state<File | null>(null)
+	let elCert = $state<HTMLInputElement | null>(null)
+
+	// Only a company (juristic) buyer may withhold tax. The amount is 3% of the
+	// pre-VAT subtotal, rounded to satang like the server; the net is what to
+	// transfer. Withholding off -> net == total.
+	const isCompany = $derived(invoice?.taxEntityType === 'company')
+	const whtAmount = $derived(
+		withholdTax && invoice ? Math.round(invoice.subtotal * WHT_RATE * 100) / 100 : 0
+	)
+	const netAmount = $derived(invoice ? Math.round((invoice.total - whtAmount) * 100) / 100 : 0)
 
 	export function open (inv: Api.Invoice): void {
 		invoice = inv
 		selectedFile = null
+		withholdTax = false
+		certFile = null
 		error = ''
 		if (elFile) elFile.value = ''
+		if (elCert) elCert.value = ''
 		isActive = true
+	}
+
+	function onToggleWithhold (e: Event) {
+		withholdTax = (e.currentTarget as HTMLInputElement).checked
+		// Clearing the election drops any attached certificate too.
+		if (!withholdTax) {
+			certFile = null
+			if (elCert) elCert.value = ''
+		}
+	}
+
+	function onCertChange (e: Event) {
+		const input = e.currentTarget as HTMLInputElement
+		const f = input.files?.[0] ?? null
+		error = ''
+		if (f && f.size > MAX_SIZE) {
+			error = 'Certificate is too large (max 10 MB).'
+			certFile = null
+			input.value = ''
+			return
+		}
+		certFile = f
 	}
 
 	function close () {
@@ -62,6 +103,8 @@
 			const fd = new FormData()
 			fd.append('id', invoice.id)
 			fd.append('slip', selectedFile)
+			if (isCompany) fd.append('withholdingTax', String(withholdTax))
+			if (withholdTax && certFile) fd.append('whtCert', certFile)
 			const resp = await fetch('/api/billing.uploadTransferSlip', {
 				method: 'POST',
 				body: fd
@@ -104,7 +147,14 @@
 				<div class="pay-to-title">Transfer to</div>
 				<div class="pay-grid">
 					<div class="pay-key">Amount due</div>
-					<div class="font-semibold tabular-nums">{money(invoice.total, invoice.currency)}</div>
+					<div>
+						<div class="font-semibold tabular-nums">{money(netAmount, invoice.currency)}</div>
+						{#if withholdTax}
+							<div class="wht-note tabular-nums">
+								{money(invoice.total, invoice.currency)} less {WHT_RATE * 100}% withholding {money(whtAmount, invoice.currency)}
+							</div>
+						{/if}
+					</div>
 					<div class="pay-key">Bank</div>
 					<div>{invoice.payment.bank}</div>
 					<div class="pay-key">Account name</div>
@@ -119,9 +169,50 @@
 				     so no wrapper/spacing is rendered for non-THB invoices. -->
 				<PromptPayQR
 					promptPay={invoice.payment.promptPay}
-					amount={invoice.total}
+					amount={netAmount}
 					currency={invoice.currency}
 				/>
+			</div>
+		{/if}
+
+		{#if isCompany}
+			<div class="wht mt-4">
+				<label class="checkbox">
+					<input type="checkbox" checked={withholdTax} onchange={onToggleWithhold}>
+					<span>Withhold 3% tax (หัก ณ ที่จ่าย)</span>
+				</label>
+				<p class="mt-1 text-content/60 text-sm">
+					For a company withholding tax on this payment: transfer the net amount above and,
+					if you have it, attach the withholding tax certificate (50 ทวิ). The invoice is still
+					settled in full.
+				</p>
+
+				{#if withholdTax}
+					<input
+						bind:this={elCert}
+						class="hidden-input"
+						type="file"
+						accept="image/*,application/pdf"
+						onchange={onCertChange}
+					>
+					<button
+						type="button"
+						class="button is-variant-secondary is-icon-left is-size-small mt-3"
+						onclick={() => elCert?.click()}
+					>
+						<i class="fa-solid fa-paperclip"></i>
+						Attach WHT certificate (optional)
+					</button>
+					{#if certFile}
+						<div class="selected-file mt-2">
+							<i class="fa-solid fa-file-lines file-icon"></i>
+							<div class="file-meta">
+								<div class="file-name">{certFile.name}</div>
+								<div class="file-size">{fileSize(certFile.size)}</div>
+							</div>
+						</div>
+					{/if}
+				{/if}
 			</div>
 		{/if}
 
@@ -206,6 +297,12 @@
 
 	.pay-grid .pay-key {
 		color: hsl(var(--hsl-content) / 0.65);
+	}
+
+	.wht-note {
+		margin-top: 0.15rem;
+		font-size: var(--fs-1);
+		color: hsl(var(--hsl-content) / 0.6);
 	}
 
 	.selected-file {

@@ -79,6 +79,7 @@
 	}
 
 	const taxRatePct = $derived(`${(invoice.taxRate * 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`)
+	const whtRatePct = $derived(`${(invoice.withholdingTaxRate * 100).toLocaleString(undefined, { maximumFractionDigits: 2 })}%`)
 </script>
 
 <style>
@@ -256,6 +257,10 @@
 			<div class="value">{money(invoice.taxAmount)}</div>
 			<div class="grand label">Total</div>
 			<div class="grand value">{money(invoice.total)}</div>
+			{#if invoice.withholdingTaxAmount > 0}
+				<div class="label">Withholding tax ({whtRatePct})</div>
+				<div class="value">−{money(invoice.withholdingTaxAmount)}</div>
+			{/if}
 		</div>
 	</div>
 

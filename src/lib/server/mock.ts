@@ -1422,7 +1422,18 @@ const handlers: Record<string, (args: any) => object> = {
 	'billing.listInvoices': () => list(invoices.map(invoiceListItem)),
 	'billing.getInvoice': (args) => {
 		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]
-		return ok({ ...inv, receiptNumber: receiptNumberFor(inv), taxEntityType: 'company', payment: mockPayment })
+		// Demo a 3% withholding-tax deduction on a paid (company) invoice so the
+		// receipt/totals show the offline-dev case; unpaid invoices carry none.
+		const withholdingTaxAmount = inv.status === 'paid' ? Math.round(inv.subtotal * 0.03 * 100) / 100 : 0
+		const withholdingTaxRate = withholdingTaxAmount > 0 ? 0.03 : 0
+		return ok({
+			...inv,
+			receiptNumber: receiptNumberFor(inv),
+			taxEntityType: 'company',
+			withholdingTaxRate,
+			withholdingTaxAmount,
+			payment: mockPayment
+		})
 	},
 	'billing.downloadInvoice': (args) => {
 		const inv = invoices.find((i) => i.id === args?.invoiceId) ?? invoices[0]

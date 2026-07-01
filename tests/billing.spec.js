@@ -166,6 +166,40 @@ test.describe('invoice detail', () => {
 		await expect(modal.getByText('0812345678')).toBeVisible()
 	})
 
+	test('pay modal offers a 3% withholding-tax option for a company invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // company, open, total 10.70
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		const modal = page.locator('.modal.is-active .modal-panel')
+		// Amount due starts at the full total.
+		await expect(modal.getByText('10.70 USD')).toBeVisible()
+
+		// Electing 3% withholding drops the net to transfer (10.70 − 0.30 = 10.40),
+		// shows the breakdown, and reveals the certificate attach button.
+		await modal.getByText('Withhold 3% tax').click()
+		await expect(modal.getByText('10.40 USD')).toBeVisible()
+		await expect(modal.getByText('less 3% withholding')).toBeVisible()
+		await expect(modal.getByRole('button', { name: /Attach WHT certificate/ })).toBeVisible()
+	})
+
+	test('pay modal hides withholding tax for an individual invoice', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, taxEntityType: 'individual' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await page.getByRole('button', { name: 'Pay' }).click()
+
+		const modal = page.locator('.modal.is-active .modal-panel')
+		await expect(modal.getByText('Withhold 3% tax')).toHaveCount(0)
+	})
+
 	test('shows a PromptPay QR in the pay modal for a THB invoice', async ({ page }) => {
 		await setMocks({
 			// PromptPay settles in THB, so the QR only renders for THB invoices.
