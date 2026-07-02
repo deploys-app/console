@@ -5,12 +5,26 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { onMount } from 'svelte'
 	import api from '$lib/api'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const zones = $derived(data.zones)
 	const error = $derived(data.error)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('transform.set')) return
+		return registerPageActions([{
+			id: 'transform-list:create',
+			label: 'Configure transform',
+			icon: 'fa-plus',
+			keywords: 'create new add configure transform',
+			href: `/transform/create?project=${project}`
+		}])
+	})
 
 	const hasPending = $derived(zones.some((z: Api.TransformZone) => z.status === 'pending'))
 

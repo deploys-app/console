@@ -6,6 +6,8 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -16,6 +18,18 @@
 
 	// The built-in `owner` role is fixed — it can't be edited or deleted.
 	const canUpdate = $derived(role.role !== 'owner')
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!canUpdate || !can('role.create')) return
+		return registerPageActions([{
+			id: 'role-detail:edit',
+			label: 'Edit',
+			icon: 'fa-pen',
+			keywords: 'edit modify update role permissions',
+			href: `/role/create?project=${project}&role=${encodeURIComponent(role.role)}`
+		}])
+	})
 
 	function deleteItem () {
 		modal.confirm({

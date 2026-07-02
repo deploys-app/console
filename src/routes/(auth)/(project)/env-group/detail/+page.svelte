@@ -7,6 +7,8 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import Secret from '$lib/components/Secret.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -15,6 +17,18 @@
 	const entries = $derived(Object.entries(envGroup.env ?? {}))
 
 	let showAllEnv = $state(false)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('envgroup.update')) return
+		return registerPageActions([{
+			id: 'env-group-detail:edit',
+			label: 'Edit',
+			icon: 'fa-pen',
+			keywords: 'edit modify update env group variables',
+			href: `/env-group/create?project=${project}&name=${encodeURIComponent(envGroup.name)}`
+		}])
+	})
 
 	function deleteItem () {
 		modal.confirm({

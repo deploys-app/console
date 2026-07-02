@@ -1,5 +1,6 @@
 import api from '$lib/api'
 import { projectMenu } from '$lib/nav'
+import { allPageActions } from '$lib/pageactions/store.svelte'
 
 /**
  * A single searchable item shown in the command palette.
@@ -11,8 +12,9 @@ export interface SearchEntry {
 	label: string // primary text (the thing you'd type)
 	sublabel?: string // secondary text (location, target, …)
 	keywords?: string // extra text folded into search only, never shown
-	href?: string // navigation target (omitted for `action` entries)
+	href?: string // navigation target (omitted for `action`/`run` entries)
 	action?: 'switch-project' // when set, selecting opens a sub-mode instead of navigating
+	run?: () => void // when set, selecting closes the palette and invokes this
 }
 
 const enc = encodeURIComponent
@@ -196,6 +198,25 @@ export function projectEntries (projects: Api.Project[], currentProject: string,
 				href: `${overrideRedirect}?${q.toString()}`
 			} as SearchEntry)
 		})
+}
+
+/**
+ * Context actions contributed by the current page (see
+ * {@link ../pageactions/store.svelte.ts}) — e.g. Pause/Restart on a deployment
+ * detail page. Listed first in the palette so the page's own commands rank
+ * ahead of navigation and resources. The store only holds actionable items, so
+ * every entry is safe to select as-is.
+ */
+export function pageActionEntries (): SearchEntry[] {
+	return allPageActions().map((a) => ({
+		id: `page:${a.id}`,
+		group: 'This page',
+		icon: a.icon ?? 'fa-bolt',
+		label: a.label,
+		keywords: a.keywords,
+		href: a.href,
+		run: a.run
+	}))
 }
 
 /**

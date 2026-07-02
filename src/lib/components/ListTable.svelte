@@ -3,6 +3,8 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import NoDataRow from '$lib/components/NoDataRow.svelte'
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	interface Props {
 		title: string
@@ -34,6 +36,25 @@
 
 	const plural = $derived(nounPlural ?? `${noun}s`)
 	const span = $derived(columns.length + (actions ? 1 : 0))
+
+	// Surface the create button as a command-palette action, mirroring its
+	// permission gate. ListTable can mount outside the (project) layout (billing /
+	// project list) where no permission context is set — guard and register
+	// nothing there. Registered as its own set, so it stacks after any actions a
+	// detail Header on the same page already contributed.
+	const ctx = getPermissionContext()
+	$effect(() => {
+		if (!ctx || !createHref) return
+		const required = Array.isArray(createPermission) ? createPermission : [createPermission]
+		if (!required.every((p) => ctx.can(p))) return
+		return registerPageActions([{
+			id: `list-create:${createHref}`,
+			label: createLabel,
+			icon: 'fa-plus',
+			keywords: 'create new add',
+			href: createHref
+		}])
+	})
 </script>
 
 <div class="page-head">

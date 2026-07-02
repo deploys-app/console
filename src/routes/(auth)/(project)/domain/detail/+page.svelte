@@ -8,6 +8,8 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -211,6 +213,21 @@
 			}
 		})
 	}
+
+	// The Cache section (and its purge buttons) only renders for an active domain;
+	// mirror that state gate here, plus the purge permission and the wildcard gate
+	// on "Purge everything". Never surface Delete.
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (domain.status !== 'success' || !can('domain.purgecache')) return
+		const actions: PageAction[] = []
+		if (!domain.wildcard) {
+			actions.push({ id: 'domain-detail:purge-all', label: 'Purge everything', icon: 'fa-broom', keywords: 'purge clear invalidate cache everything all', run: purgeCache })
+		}
+		actions.push({ id: 'domain-detail:purge-prefix', label: 'Purge prefix', icon: 'fa-broom', keywords: 'purge clear invalidate cache prefix path', run: purgeCachePrefix })
+		actions.push({ id: 'domain-detail:purge-file', label: 'Purge file', icon: 'fa-broom', keywords: 'purge clear invalidate cache file path exact', run: purgeCacheFile })
+		return registerPageActions(actions)
+	})
 
 </script>
 

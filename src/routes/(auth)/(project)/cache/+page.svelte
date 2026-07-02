@@ -12,6 +12,8 @@
 	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -165,6 +167,31 @@
 		(view === 'requests' ? (s.requestsTotal ?? 0) : (s.bytesTotal ?? 0)) > 0))
 
 	let purgeModal = $state<CachePurgeModal>()
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		const actions: PageAction[] = []
+		if (can('cache.set')) {
+			actions.push({
+				id: 'cache-list:create',
+				label: 'Configure cache',
+				icon: 'fa-plus',
+				keywords: 'create new add configure cache',
+				href: `/cache/create?project=${project}`
+			})
+		}
+		if (can('domain.purgecache')) {
+			actions.push({
+				id: 'cache-list:purge',
+				label: 'Purge cache',
+				icon: 'fa-broom',
+				keywords: 'purge clear invalidate cache',
+				run: () => purgeModal?.open()
+			})
+		}
+		if (!actions.length) return
+		return registerPageActions(actions)
+	})
 </script>
 
 <div class="page-head">

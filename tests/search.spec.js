@@ -1,5 +1,5 @@
-import { test, expect, setMocks } from './helpers.js'
-import { defaultProject, sampleDeployment } from './fixtures/mocks.js'
+import { test, expect, setMocks, getRequestLog } from './helpers.js'
+import { defaultLocation, defaultProject, sampleDeployment, sampleStaticDeployment, sampleDomain, sampleDisk, sampleSchedulerJob } from './fixtures/mocks.js'
 
 test.describe('global search palette', () => {
 	test('"/" opens the palette on a project page and shows the nav sections', async ({ page }) => {
@@ -141,5 +141,245 @@ test.describe('global search palette', () => {
 		// The trigger lives in the navbar (outside `.content-wrapper`), so a
 		// global "Search" button query should turn up nothing here.
 		await expect(page.getByRole('button', { name: 'Search', exact: true })).toHaveCount(0)
+	})
+})
+
+test.describe('global search palette — page actions', () => {
+	// Navigate to a deployment detail page (Header mounts, registering its actions)
+	// and open the palette. Returns the open dialog locator.
+	async function openPaletteOnDeployment (page, deployment = sampleDeployment) {
+		await setMocks({
+			'deployment.get': { ok: true, result: deployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+		await page.goto('/deployment/metrics?project=test-project&location=gke&name=web')
+		// Wait for the masthead (Header) to render — that is what registers the
+		// page actions, and confirms the page has hydrated for the "/" shortcut.
+		await expect(page.locator('.masthead').getByRole('heading', { name: 'web' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		return dialog
+	}
+
+	test('a live deployment surfaces its masthead actions and never the dangerous ones', async ({ page }) => {
+		const dialog = await openPaletteOnDeployment(page)
+
+		// The "This page" group leads the empty-query palette.
+		await expect(dialog.getByText('This page', { exact: false })).toBeVisible()
+		await expect(dialog.getByRole('link', { name: 'Deploy New Revision' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Pause' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Restart' })).toBeVisible()
+		// Resume only shows for a paused deployment.
+		await expect(dialog.locator('.result').filter({ hasText: 'Resume' })).toHaveCount(0)
+		// Dangerous actions are never offered anywhere in the palette.
+		await expect(dialog.locator('.result').filter({ hasText: 'Delete' })).toHaveCount(0)
+		await expect(dialog.locator('.result').filter({ hasText: 'Rollback' })).toHaveCount(0)
+	})
+
+	test('a paused deployment offers Resume, not Pause', async ({ page }) => {
+		const dialog = await openPaletteOnDeployment(page, { ...sampleDeployment, action: 'pause' })
+
+		await expect(dialog.locator('.result').filter({ hasText: 'Resume' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Pause' })).toHaveCount(0)
+		// Restart is gated on the same condition as Pause, so it is absent too.
+		await expect(dialog.locator('.result').filter({ hasText: 'Restart' })).toHaveCount(0)
+		// Deploy New Revision remains available.
+		await expect(dialog.getByRole('link', { name: 'Deploy New Revision' })).toBeVisible()
+	})
+
+	test('selecting Pause closes the palette and opens the confirm dialog, which fires deployment.pause', async ({ page }) => {
+		const dialog = await openPaletteOnDeployment(page)
+
+		await dialog.locator('.result').filter({ hasText: 'Pause' }).click()
+		// The palette closes and the shared confirm <dialog> takes over.
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+		const confirm = page.locator('dialog[open]')
+		await expect(confirm).toBeVisible()
+		await expect(confirm.getByText('Pause web in gke?')).toBeVisible()
+
+		await confirm.getByRole('button', { name: 'Pause' }).click()
+
+		// The confirm callback invokes deployment.pause through the /api proxy.
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path.includes('deployment.pause'))
+		}).toBe(true)
+	})
+
+	test('page actions are filterable', async ({ page }) => {
+		const dialog = await openPaletteOnDeployment(page)
+
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('pau')
+		await expect(dialog.locator('.result').filter({ hasText: 'Pause' })).toBeVisible()
+		// A nav entry that doesn't match "pau" is filtered out.
+		await expect(dialog.getByRole('link', { name: 'Deployments' })).toHaveCount(0)
+	})
+
+	test('the "reboot" keyword matches Restart', async ({ page }) => {
+		const dialog = await openPaletteOnDeployment(page)
+
+		await dialog.getByPlaceholder(/Search projects, deployments/).fill('reboot')
+		await expect(dialog.locator('.result').filter({ hasText: 'Restart' })).toBeVisible()
+	})
+
+	test('a static deployment contributes no page actions', async ({ page }) => {
+		await setMocks({
+			'deployment.get': { ok: true, result: sampleStaticDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+		await page.goto('/deployment/metrics?project=test-project&location=gke&name=website')
+		await expect(page.locator('.masthead').getByRole('heading', { name: 'website' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toHaveCount(0)
+	})
+
+	test('no page-action group on a page with no actions', async ({ page }) => {
+		// The audit-log page has no create/action button, so it registers nothing.
+		await page.goto('/audit-log?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: /Audit/i })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toHaveCount(0)
+	})
+
+	test('a user without deployment.deploy sees no page actions', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['deployment.get', 'deployment.list'], admin: false } },
+			'deployment.get': { ok: true, result: sampleDeployment },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+		await page.goto('/deployment/metrics?project=test-project&location=gke&name=web')
+		await expect(page.locator('.masthead').getByRole('heading', { name: 'web' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toHaveCount(0)
+	})
+
+	test('deployment list surfaces the Deploy action', async ({ page }) => {
+		await page.goto('/deployment?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Deployments' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toBeVisible()
+		// Palette rows are `<div role="link">` (no href). Match the action's exact
+		// label `Deploy` (distinct from the `Deployments` nav entry).
+		await expect(dialog.getByText('Deploy', { exact: true })).toBeVisible()
+	})
+
+	test('a ListTable list page surfaces its create action', async ({ page }) => {
+		await page.goto('/domain?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Domains' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toBeVisible()
+
+		const createRow = dialog.locator('.result').filter({ hasText: 'Create' }).first()
+		await expect(createRow).toBeVisible()
+		await createRow.click()
+		await expect(page).toHaveURL(/\/domain\/create\?project=test-project/)
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+	})
+
+	test('a user without the create permission sees no create action on a list page', async ({ page }) => {
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['domain.list', 'domain.get'], admin: false } }
+		})
+		await page.goto('/domain?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Domains' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.getByText('This page', { exact: false })).toHaveCount(0)
+	})
+
+	test('domain detail surfaces the purge actions and confirming Purge everything fires domain.purgeCache', async ({ page }) => {
+		await setMocks({
+			'domain.get': { ok: true, result: sampleDomain }
+		})
+		await page.goto('/domain/detail?project=test-project&domain=example.com')
+		// The page-head <h4> holds a StatusIcon next to "Domain", so match on the
+		// domain shown in the page-sub to confirm the detail page loaded.
+		await expect(page.locator('.page-head').getByText('example.com')).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+
+		await expect(dialog.locator('.result').filter({ hasText: 'Purge everything' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Purge prefix' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Purge file' })).toBeVisible()
+		// The destructive Delete is never surfaced.
+		await expect(dialog.locator('.result').filter({ hasText: 'Delete' })).toHaveCount(0)
+
+		await dialog.locator('.result').filter({ hasText: 'Purge everything' }).click()
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+		const confirm = page.locator('dialog[open]')
+		await expect(confirm).toBeVisible()
+		await expect(confirm.getByText(/Purge cache on domain/)).toBeVisible()
+
+		await confirm.getByRole('button', { name: 'Purge' }).click()
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path.includes('domain.purgeCache'))
+		}).toBe(true)
+	})
+
+	test('scheduler detail Run now opens a confirm that fires scheduler.trigger', async ({ page }) => {
+		await setMocks({
+			'scheduler.get': { ok: true, result: sampleSchedulerJob },
+			'scheduler.logs': { ok: true, result: { items: [] } }
+		})
+		await page.goto('/scheduler/detail?project=test-project&name=nightly')
+		await expect(page.locator('.page-head').getByRole('heading', { name: 'nightly' })).toBeVisible()
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+
+		await expect(dialog.locator('.result').filter({ hasText: 'Run now' })).toBeVisible()
+		// A not-paused job offers Pause, not Resume.
+		await expect(dialog.locator('.result').filter({ hasText: 'Pause' })).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Resume' })).toHaveCount(0)
+		await expect(dialog.locator('.result').filter({ hasText: 'Delete' })).toHaveCount(0)
+
+		await dialog.locator('.result').filter({ hasText: 'Run now' }).click()
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+		const confirm = page.locator('dialog[open]')
+		await expect(confirm).toBeVisible()
+		await expect(confirm.getByText('Run nightly now?')).toBeVisible()
+
+		await confirm.getByRole('button', { name: 'Run now' }).click()
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path.includes('scheduler.trigger'))
+		}).toBe(true)
+	})
+
+	test('a layout-registered action persists across the section tabs (multi-registration lifecycle)', async ({ page }) => {
+		await setMocks({
+			'disk.get': { ok: true, result: sampleDisk },
+			'location.get': { ok: true, result: defaultLocation }
+		})
+		// The disk (detail) LAYOUT registers "Update"; it must stay registered as we
+		// move between the layout's tabs (the layout set survives the tab swap).
+		await page.goto('/disk/detail?project=test-project&location=gke&name=data')
+		await expect(page.locator('.page-head').getByRole('heading', { name: 'data' })).toBeVisible()
+		await page.keyboard.press('/')
+		let dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Update' })).toBeVisible()
+		await page.keyboard.press('Escape')
+
+		await page.goto('/disk/metrics?project=test-project&location=gke&name=data')
+		await expect(page.locator('.page-head').getByRole('heading', { name: 'data' })).toBeVisible()
+		await page.keyboard.press('/')
+		dialog = page.locator('.modal.is-active')
+		await expect(dialog).toBeVisible()
+		await expect(dialog.locator('.result').filter({ hasText: 'Update' })).toBeVisible()
 	})
 })
