@@ -111,6 +111,13 @@
 		width: 100%;
 
 		padding-left: var(--width-sidebar);
+
+		/* Own view-transition snapshot: the app chrome stays put during page
+		 * transitions instead of fading with the whole viewport. The sidebar's
+		 * name lives on nav.sidebar (this wrapper's counterpart is a 0×0 box —
+		 * the nav inside it is absolutely positioned — which would snapshot
+		 * as nothing and make the sidebar flash out during transitions). */
+		view-transition-name: navbar;
 	}
 
 	.content-wrapper {

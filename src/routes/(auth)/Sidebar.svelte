@@ -29,6 +29,11 @@
 		overflow-y: auto;
 		background-color: hsl(var(--hsl-base-300));
 		border-right: 1px solid hsl(var(--hsl-line));
+		/* Own view-transition snapshot: stays put during page transitions
+		 * (only the active item crossfades). On the nav itself, not
+		 * .sidebar-wrapper — the wrapper is a 0×0 box (this nav is absolutely
+		 * positioned), which would snapshot as nothing. */
+		view-transition-name: sidebar;
 	}
 
 	.sidebar-bottom {
