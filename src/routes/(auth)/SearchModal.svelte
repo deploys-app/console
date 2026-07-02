@@ -3,7 +3,7 @@
 	import { tick } from 'svelte'
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
-	import { navEntries, projectEntries, switchProjectEntry, fetchResourceEntries, filterEntries } from '$lib/search'
+	import { navEntries, projectEntries, switchProjectEntry, fetchResourceEntries, filterEntries, pageActionEntries } from '$lib/search'
 
 	interface Props {
 		projects?: Api.Project[]
@@ -27,19 +27,21 @@
 	let loadedProject = $state<string | null>(null)
 	let resources = $state<SearchEntry[]>([])
 
-	// The "Switch project" command leads (so typing "project" highlights it),
-	// then the nav sections, then the lazily-fetched resources.
+	// The current page's context actions lead (so a deployment's Pause/Restart
+	// rank first), then the "Switch project" command (so typing "project"
+	// highlights it), then the nav sections and the lazily-fetched resources.
+	const pageActs = $derived(pageActionEntries())
 	const allEntries = $derived(project
-		? [switchProjectEntry(), ...navEntries(project), ...resources]
+		? [...pageActs, switchProjectEntry(), ...navEntries(project), ...resources]
 		: [])
 
-	// Empty query → the switch-project command + nav sections (showing every
-	// resource would be a wall of rows); typing surfaces resources too. The
-	// project sub-mode lists every project, filtered by the same query.
+	// Empty query → page actions + the switch-project command + nav sections
+	// (showing every resource would be a wall of rows); typing surfaces resources
+	// too. The project sub-mode lists every project, filtered by the same query.
 	const base = $derived.by(() => {
 		if (!project) return []
 		if (mode === 'project') return projectEntries(projects, project, $page)
-		return search.trim() ? allEntries : [switchProjectEntry(), ...navEntries(project)]
+		return search.trim() ? allEntries : [...pageActs, switchProjectEntry(), ...navEntries(project)]
 	})
 	const filtered = $derived(filterEntries(base, search))
 
@@ -97,6 +99,13 @@
 		// Action entries open a sub-mode in place instead of navigating away.
 		if (entry.action === 'switch-project') {
 			enterProjectMode()
+			return
+		}
+		// Page-action entries run an imperative handler (e.g. open a confirm
+		// dialog); close the palette first so the dialog takes the foreground.
+		if (entry.run) {
+			close()
+			entry.run()
 			return
 		}
 		if (!entry.href) return

@@ -6,6 +6,7 @@
 	import * as modal from '$lib/modal'
 	import * as format from '$lib/format'
 	import { denyTooltip, getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 
 	interface Props {
 		deployment: Api.Deployment
@@ -115,6 +116,29 @@
 			}
 		})
 	}
+
+	// Mirror the masthead's action buttons into the global command palette so the
+	// deployment is operable keyboard-only. Same state + permission gating as the
+	// buttons above, reusing their exact handlers — never surface the dangerous
+	// actions (Delete/Rollback). Re-runs when the gates change; the returned
+	// cleanup clears the actions when navigating away from the detail page.
+	$effect(() => {
+		if (!can('deployment.deploy')) return
+		const actions: PageAction[] = []
+		if (!isStatic) {
+			actions.push({
+				id: 'deployment.deploy',
+				label: 'Deploy New Revision',
+				icon: 'fa-rocket',
+				keywords: 'new revision release update',
+				href: `/deployment/deploy?project=${project}&location=${deployment.location}&name=${deployment.name}`
+			})
+		}
+		if (canPause) actions.push({ id: 'deployment.pause', label: 'Pause', icon: 'fa-pause', run: pause })
+		if (canResume) actions.push({ id: 'deployment.resume', label: 'Resume', icon: 'fa-play', run: resume })
+		if (canRestart) actions.push({ id: 'deployment.restart', label: 'Restart', icon: 'fa-rotate-right', keywords: 'reboot', run: restart })
+		return registerPageActions(actions)
+	})
 </script>
 
 <style>
