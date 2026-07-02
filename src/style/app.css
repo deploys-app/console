@@ -317,10 +317,32 @@
 		border-radius: 2px;
 	}
 
+	/* Page-change animation (View Transitions API, started from the root
+	 * layout's onNavigate). Navbar + sidebar carry their own
+	 * view-transition-name, so only the content crossfades; panels' own
+	 * panel-in entrance provides the motion inside the new snapshot. Faster
+	 * than the UA default 250ms so it reads as response, not effect. */
+	/* group(*) included: its geometry animation always runs at the UA default
+	 * 250ms and would keep the (input-blocking) transition alive ~90ms after
+	 * the fades finish. */
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation-duration: var(--timing-faster);
+	}
+
 	@media (prefers-reduced-motion: reduce) {
 		/* Disable decorative motion (entrance + transitions)... */
 		.panel {
 			animation: none;
+		}
+
+		/* Belt-and-braces: the onNavigate hook already skips view transitions
+		 * under reduced motion; kill the pseudo-element animations too. */
+		::view-transition-group(*),
+		::view-transition-old(*),
+		::view-transition-new(*) {
+			animation: none !important;
 		}
 
 		*, *::before, *::after {
