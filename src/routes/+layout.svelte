@@ -15,11 +15,13 @@
 	}
 
 	// Animate page changes with the View Transitions API (progressive
-	// enhancement — no-op where unsupported). Same-path navigations are
-	// skipped so query-param updates (filters, project switch) don't flash.
+	// enhancement — no-op where unsupported). Fires on every navigation that
+	// can change what's rendered — path or query (project switch, filters) —
+	// skipping only hash-only jumps within the same page.
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return
-		if (navigation.from?.url.pathname === navigation.to?.url.pathname) return
+		if (navigation.from?.url.pathname === navigation.to?.url.pathname &&
+			navigation.from?.url.search === navigation.to?.url.search) return
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 		// The mobile nav drawer closes as the navigation commits; its slide-out
 		// must stay live — a view transition freezes it in the old snapshot and

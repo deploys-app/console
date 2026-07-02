@@ -39,6 +39,26 @@ test.describe('view transitions', () => {
 		expect(names.sidebarWidth).toBeGreaterThan(0)
 	})
 
+	test('query-only page changes (filters, project switch) transition too; hash-only jumps do not', async ({ page }) => {
+		await page.goto('/audit-log?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Audit log' })).toBeVisible()
+
+		await page.evaluate(() => {
+			window.__vtCount = 0
+			const orig = document.startViewTransition.bind(document)
+			document.startViewTransition = (cb) => {
+				window.__vtCount++
+				return orig(cb)
+			}
+		})
+
+		// Applying a filter navigates to the same path with new query params.
+		await page.locator('#filter-actor').fill('user@example.com')
+		await page.getByRole('button', { name: 'Apply' }).click()
+		await expect(page).toHaveURL(/actor=user%40example.com/)
+		expect(await page.evaluate(() => window.__vtCount)).toBe(1)
+	})
+
 	test('no transition while the mobile nav drawer is open — its slide-out must stay live', async ({ page }) => {
 		await page.setViewportSize({ width: 390, height: 844 })
 		await page.goto('/deployment?project=test-project')
