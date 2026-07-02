@@ -8,6 +8,8 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { routeTargetMeta } from '$lib/route'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -60,6 +62,19 @@
 	const resHeaders = $derived(fwd?.authResponseHeaders ?? [])
 
 	onMount(() => setupCopy('.copy'))
+
+	// Mirror the header's Visit + Edit controls (never Delete). Visit is ungated
+	// like its link; Edit follows route.create.
+	const { can } = getPermissionContext()
+	$effect(() => {
+		const actions: PageAction[] = [
+			{ id: 'route-manage:visit', label: 'Visit', icon: 'fa-arrow-up-right-from-square', keywords: 'open visit browse url', run: () => window.open(fullUrl, '_blank', 'noopener,noreferrer') }
+		]
+		if (can('route.create')) {
+			actions.push({ id: 'route-manage:edit', label: 'Edit', icon: 'fa-pencil', keywords: 'edit modify update route', href: `/route/edit?${params}` })
+		}
+		return registerPageActions(actions)
+	})
 
 	function deleteRoute () {
 		modal.confirm({

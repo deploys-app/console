@@ -7,6 +7,8 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -26,39 +28,71 @@
 		return () => clearTimeout(t)
 	})
 
-	async function setPaused (paused: boolean) {
-		if (busy) return
-		busy = true
-		try {
-			const fn = paused ? 'scheduler.pause' : 'scheduler.resume'
-			const resp = await api.invoke(fn, { project, name: job.name }, fetch)
-			if (!resp.ok) {
-				modal.error({ error: resp.error })
-				return
+	// Confirm before run/pause/resume, mirroring the deployment Header — both the
+	// header buttons and the command-palette actions route through the same gate.
+	function setPaused (paused: boolean) {
+		modal.confirm({
+			title: paused ? `Pause ${job.name}?` : `Resume ${job.name}?`,
+			yes: paused ? 'Pause' : 'Resume',
+			callback: async () => {
+				if (busy) return
+				busy = true
+				try {
+					const fn = paused ? 'scheduler.pause' : 'scheduler.resume'
+					const resp = await api.invoke(fn, { project, name: job.name }, fetch)
+					if (!resp.ok) {
+						modal.error({ error: resp.error })
+						return
+					}
+					await invalidateAll()
+				} finally {
+					busy = false
+				}
 			}
-			await invalidateAll()
-		} finally {
-			busy = false
-		}
+		})
 	}
 
-	async function trigger () {
-		if (busy) return
-		busy = true
-		try {
-			const resp = await api.invoke<Api.SchedulerInvocation>('scheduler.trigger', { project, name: job.name }, fetch)
-			if (!resp.ok) {
-				modal.error({ error: resp.error })
-				return
+	function trigger () {
+		modal.confirm({
+			title: `Run ${job.name} now?`,
+			yes: 'Run now',
+			callback: async () => {
+				if (busy) return
+				busy = true
+				try {
+					const resp = await api.invoke<Api.SchedulerInvocation>('scheduler.trigger', { project, name: job.name }, fetch)
+					if (!resp.ok) {
+						modal.error({ error: resp.error })
+						return
+					}
+					// The run executes asynchronously — trigger only records a pending
+					// invocation. Reload the log so it shows up; the poll above refreshes
+					// it until it resolves to success/failed.
+					await invalidateAll()
+				} finally {
+					busy = false
+				}
 			}
-			// The run executes asynchronously — trigger only records a pending
-			// invocation. Reload the log so it shows up; the poll above refreshes it
-			// until it resolves to success/failed.
-			await invalidateAll()
-		} finally {
-			busy = false
-		}
+		})
 	}
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		const actions: PageAction[] = []
+		if (can('scheduler.run')) {
+			actions.push({ id: 'scheduler-detail:run', label: 'Run now', icon: 'fa-play', keywords: 'run trigger execute now scheduler job', run: trigger })
+		}
+		if (can('scheduler.update')) {
+			if (job.paused) {
+				actions.push({ id: 'scheduler-detail:resume', label: 'Resume', icon: 'fa-play', keywords: 'resume unpause enable scheduler job', run: () => setPaused(false) })
+			} else {
+				actions.push({ id: 'scheduler-detail:pause', label: 'Pause', icon: 'fa-pause', keywords: 'pause disable suspend scheduler job', run: () => setPaused(true) })
+			}
+			actions.push({ id: 'scheduler-detail:edit', label: 'Edit', icon: 'fa-pen', keywords: 'edit modify update scheduler job', href: `/scheduler/create?project=${project}&name=${encodeURIComponent(job.name)}` })
+		}
+		if (!actions.length) return
+		return registerPageActions(actions)
+	})
 
 	function deleteItem () {
 		modal.confirm({

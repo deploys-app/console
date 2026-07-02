@@ -6,6 +6,8 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -18,6 +20,19 @@
 
 	let busy = $state(false)
 	let testResult = $state<Api.NotificationDelivery | null>(null)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		const actions: PageAction[] = []
+		if (channel.config.type !== 'pull' && can('notification.test')) {
+			actions.push({ id: 'notification-detail:test', label: 'Send test', icon: 'fa-paper-plane', keywords: 'send test notification ping', run: sendTest })
+		}
+		if (can('notification.update')) {
+			actions.push({ id: 'notification-detail:edit', label: 'Edit', icon: 'fa-pen', keywords: 'edit modify update notification channel', href: `/notification/create?project=${project}&name=${encodeURIComponent(channel.name)}` })
+		}
+		if (!actions.length) return
+		return registerPageActions(actions)
+	})
 
 	async function sendTest () {
 		if (busy) return

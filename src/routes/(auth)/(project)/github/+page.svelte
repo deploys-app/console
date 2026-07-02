@@ -6,12 +6,26 @@
 	import EditGithubLinkModal from '$lib/components/EditGithubLinkModal.svelte'
 	import * as format from '$lib/format'
 	import GitHubNav from './_components/GitHubNav.svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const error = $derived(data.error)
 	const serviceAccounts = $derived(data.serviceAccounts)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('github.link')) return
+		return registerPageActions([{
+			id: 'github-list:link',
+			label: 'Link repository',
+			icon: 'fa-link',
+			keywords: 'link add connect repository repo github',
+			href: `/github/link?project=${project}`
+		}])
+	})
 
 	// Derived from the loader so switching project (same /github route → this
 	// component is reused, only `data.links` changes) re-syncs the list. Writable

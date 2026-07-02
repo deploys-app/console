@@ -6,6 +6,8 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import api from '$lib/api'
 	import { onMount } from 'svelte'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -13,6 +15,18 @@
 	const project = $derived(data.project)
 	const deployments = $derived(data.deployments)
 	const error = $derived(data.error)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('deployment.deploy')) return
+		return registerPageActions([{
+			id: 'deployment-list:deploy',
+			label: 'Deploy',
+			icon: 'fa-plus',
+			keywords: 'create new add deploy',
+			href: `/deployment/deploy?project=${project}`
+		}])
+	})
 
 	// A deploy/delete/pause that's still settling reports `status: 'pending'`, so
 	// the list snapshot goes stale the moment one is in flight (e.g. a row stuck

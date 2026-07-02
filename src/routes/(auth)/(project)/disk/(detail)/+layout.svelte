@@ -3,6 +3,8 @@
 	import api from '$lib/api'
 	import StatusIcon from '$lib/components/StatusIcon.svelte'
 	import { page } from '$app/stores'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 	import type { LayoutData } from './$types'
 
 	const { data, children }: { data: LayoutData, children: Snippet } = $props()
@@ -16,6 +18,20 @@
 			return 300000
 		}
 	}, 4000))
+
+	// Registered in the layout so the Update action is available on both disk tabs;
+	// mirrors the detail tab's GuardedButton (disk.update).
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('disk.update')) return
+		return registerPageActions([{
+			id: 'disk-detail:update',
+			label: 'Update',
+			icon: 'fa-pen',
+			keywords: 'edit modify update resize disk',
+			href: `/disk/create?project=${project}&location=${disk.location}&name=${disk.name}`
+		}])
+	})
 </script>
 
 <div class="breadcrumb">

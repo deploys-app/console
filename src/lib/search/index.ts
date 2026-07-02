@@ -1,6 +1,6 @@
 import api from '$lib/api'
 import { projectMenu } from '$lib/nav'
-import { pageActions } from '$lib/pageactions/store.svelte'
+import { allPageActions } from '$lib/pageactions/store.svelte'
 
 /**
  * A single searchable item shown in the command palette.
@@ -208,7 +208,7 @@ export function projectEntries (projects: Api.Project[], currentProject: string,
  * every entry is safe to select as-is.
  */
 export function pageActionEntries (): SearchEntry[] {
-	return pageActions.items.map((a) => ({
+	return allPageActions().map((a) => ({
 		id: `page:${a.id}`,
 		group: 'This page',
 		icon: a.icon ?? 'fa-bolt',

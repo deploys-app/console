@@ -7,12 +7,26 @@
 	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
+	import { getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const firewalls = $derived(data.firewalls)
 	const error = $derived(data.error)
+
+	const { can } = getPermissionContext()
+	$effect(() => {
+		if (!can('waf.set')) return
+		return registerPageActions([{
+			id: 'waf-list:create',
+			label: 'Create firewall',
+			icon: 'fa-plus',
+			keywords: 'create new add firewall waf',
+			href: `/waf/create?project=${project}`
+		}])
+	})
 
 	const hasPending = $derived(firewalls.some((fw: Api.WafZone) => fw.status === 'pending'))
 

@@ -353,6 +353,30 @@ export const sampleEmailDomain = {
 	createdAt: now
 }
 
+export const sampleSchedulerJob = {
+	project: 'test-project',
+	name: 'nightly',
+	schedule: '0 0 * * *',
+	timezone: 'UTC',
+	method: 'POST',
+	url: 'https://example.com/cron',
+	headers: {},
+	body: '',
+	auth: { type: 'none' },
+	insecureSkipVerify: false,
+	paused: false,
+	lastResult: '',
+	lastRunAt: null,
+	lastLatencyMs: 0,
+	lastHttpStatus: 0,
+	lastError: '',
+	nextRunAt: now,
+	createdAt: now,
+	createdBy: '[email protected]',
+	updatedAt: now,
+	updatedBy: '[email protected]'
+}
+
 export const sampleBillingAccount = {
 	id: 'ba-1',
 	name: 'Personal',

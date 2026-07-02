@@ -6,6 +6,7 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import { denyTooltip, getPermissionContext } from '$lib/permission'
+	import { registerPageActions } from '$lib/pageactions/store.svelte'
 	import type { PageData } from './$types'
 
 	const { can } = getPermissionContext()
@@ -15,6 +16,17 @@
 	const project = $derived(data.project)
 	const routes = $derived(data.routes)
 	const error = $derived(data.error)
+
+	$effect(() => {
+		if (!can('route.create')) return
+		return registerPageActions([{
+			id: 'route-list:create',
+			label: 'Create',
+			icon: 'fa-plus',
+			keywords: 'create new add route',
+			href: `/route/create?project=${project}`
+		}])
+	})
 
 	function openRoute (route: Api.Route) {
 		goto(`/route/manage?project=${project}` +

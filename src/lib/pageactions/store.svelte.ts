@@ -6,6 +6,13 @@
 // re-registers when the derived state that gates the actions (e.g. can-pause)
 // changes. Svelte context can't carry this — SearchModal lives above the page —
 // so it's a module-level rune store, mirroring $lib/modal/store.svelte.ts.
+//
+// Multiple components can contribute at once (a section layout AND a tab page, or
+// a detail Header AND a ListTable within a tab), so registrations stack: each
+// call adds an independent set and the palette sees every set concatenated in
+// registration order (so a Header that mounts before its tab's ListTable leads).
+
+import { untrack } from 'svelte'
 
 /**
  * A single context action offered by the current page. `href` navigates;
@@ -23,17 +30,47 @@ export interface PageAction {
 	run?: () => void // imperative handler (mutually exclusive with `href`)
 }
 
-export const pageActions = $state<{ items: PageAction[] }>({ items: [] })
+interface Registration {
+	// A primitive token, not object identity: `pageActions.sets` is a Svelte deep
+	// $state proxy, so the object pushed in is stored proxy-wrapped and the raw
+	// reference held by the cleanup no longer matches via indexOf. Matching on this
+	// numeric token (a primitive read back through the proxy) removes exactly the
+	// right set on cleanup.
+	token: number
+	items: PageAction[]
+}
+
+let nextToken = 0
+
+export const pageActions = $state<{ sets: Registration[] }>({ sets: [] })
 
 /**
- * Register the current page's actions, replacing any previous set. Returns a
- * cleanup that clears them — but only if this exact set is still the active one,
- * so a stale cleanup (an $effect teardown that fires after a newer page already
- * registered) never clobbers the newer registration.
+ * All registered actions, flattened in registration order. Reads `pageActions`
+ * in a tracked context (SearchModal calls this inside a $derived), so the palette
+ * recomputes whenever a page's actions change.
+ */
+export function allPageActions (): PageAction[] {
+	return pageActions.sets.flatMap((s) => s.items)
+}
+
+/**
+ * Register a set of actions for the current page, added after any already
+ * registered. Returns a cleanup that removes only this set.
+ *
+ * Callers register from inside a page $effect. The store reads/writes are wrapped
+ * in `untrack` so that reading `pageActions.sets` (e.g. `.push`/`.findIndex` first
+ * dereference the array) does NOT make the calling effect depend on the store —
+ * otherwise the mutation on the next line would re-trigger that same effect
+ * forever (effect_update_depth_exceeded). Writes still notify SearchModal, whose
+ * $derived reads the store in its own tracked context.
  */
 export function registerPageActions (items: PageAction[]): () => void {
-	pageActions.items = items
+	const token = nextToken++
+	untrack(() => pageActions.sets.push({ token, items }))
 	return () => {
-		if (pageActions.items === items) pageActions.items = []
+		untrack(() => {
+			const i = pageActions.sets.findIndex((s) => s.token === token)
+			if (i !== -1) pageActions.sets.splice(i, 1)
+		})
 	}
 }
