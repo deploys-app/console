@@ -38,4 +38,27 @@ test.describe('view transitions', () => {
 		expect(names.navbar).toBe('navbar')
 		expect(names.sidebarWidth).toBeGreaterThan(0)
 	})
+
+	test('no transition while the mobile nav drawer is open — its slide-out must stay live', async ({ page }) => {
+		await page.setViewportSize({ width: 390, height: 844 })
+		await page.goto('/deployment?project=test-project')
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Deployments' })).toBeVisible()
+
+		await page.evaluate(() => {
+			window.__vtCount = 0
+			const orig = document.startViewTransition.bind(document)
+			document.startViewTransition = (cb) => {
+				window.__vtCount++
+				return orig(cb)
+			}
+		})
+
+		// Open the drawer, then navigate from it: the drawer's own slide-out
+		// animates live; a view transition would freeze it and end in a jump.
+		await page.locator('.icon-nav-menu').click()
+		await expect(page.locator('.app-layout.is-shown-sidebar')).toBeVisible()
+		await page.locator('.sidebar-wrapper').getByRole('link', { name: 'Routes' }).click()
+		await expect(page.locator('.content-wrapper').getByRole('heading', { name: 'Routes' })).toBeVisible()
+		expect(await page.evaluate(() => window.__vtCount)).toBe(0)
+	})
 })

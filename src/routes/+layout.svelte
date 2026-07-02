@@ -21,6 +21,10 @@
 		if (!document.startViewTransition) return
 		if (navigation.from?.url.pathname === navigation.to?.url.pathname) return
 		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+		// The mobile nav drawer closes as the navigation commits; its slide-out
+		// must stay live — a view transition freezes it in the old snapshot and
+		// ends with a visible jump mid-slide. Let the slide be the animation.
+		if (document.querySelector('.app-layout.is-shown-sidebar')) return
 
 		return new Promise((resolve) => {
 			document.startViewTransition(async () => {
