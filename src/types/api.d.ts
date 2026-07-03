@@ -100,6 +100,7 @@ declare namespace Api {
         cpu: number
         memory: number
         egress: number
+        cacheEgress: number
         registryEgress: number
         dropboxEgress: number
         disk: number

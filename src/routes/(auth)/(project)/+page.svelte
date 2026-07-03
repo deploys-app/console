@@ -134,6 +134,12 @@
 					...formatStorage(usage.egress, '')
 				},
 				{
+					key: 'cacheEgress',
+					icon: 'fa-bolt',
+					label: 'Cache Egress',
+					...formatStorage(usage.cacheEgress, '')
+				},
+				{
 					key: 'registryEgress',
 					icon: 'fa-box-archive',
 					label: 'Registry Egress',
