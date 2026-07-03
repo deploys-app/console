@@ -1381,6 +1381,7 @@ const handlers: Record<string, (args: any) => object> = {
 		cpu: 1.5,
 		memory: 805306368,
 		egress: 1073741824,
+		cacheEgress: 3221225472,
 		registryEgress: 268435456,
 		dropboxEgress: 134217728,
 		disk: 10737418240,
