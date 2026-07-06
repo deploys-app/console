@@ -125,6 +125,27 @@ export async function setMockKeyCookie (context, key) {
  * the `mock_key` cookie, and reset that bucket — so each test starts from a
  * clean, isolated copy of the default mocks even under parallel workers.
  */
+/**
+ * Wrap `page.goto` so it resolves only after the SvelteKit client has hydrated
+ * (the root layout sets `<html data-hydrated>` in `onMount`). Web-first
+ * assertions auto-wait for elements, but one-shot inputs — `keyboard.press('/')`
+ * to open the palette, a click that opens a custom Select — are dispatched once
+ * and lost if they land before hydration wires the handlers. Under the Vite dev
+ * server's on-demand compilation with many parallel workers, hydration lags well
+ * behind the SSR paint the tests gate on, so those inputs raced and the run
+ * flaked (a different modal-driven test each time). Gating every navigation on
+ * hydration removes the race for all specs at once, with no per-test changes.
+ */
+function withHydrationGate (page) {
+	const origGoto = page.goto.bind(page)
+	page.goto = async (url, opts) => {
+		const res = await origGoto(url, opts)
+		await page.locator('html[data-hydrated]').waitFor({ state: 'attached', timeout: 20_000 })
+		return res
+	}
+	return page
+}
+
 export const test = base.extend({
 	context: async ({ context }, use) => {
 		currentKey = randomUUID()
@@ -132,6 +153,9 @@ export const test = base.extend({
 		await signIn(context)
 		await resetMocks()
 		await use(context)
+	},
+	page: async ({ page }, use) => {
+		await use(withHydrationGate(page))
 	}
 })
 
@@ -141,6 +165,9 @@ export const unauthedTest = base.extend({
 		await setMockKeyCookie(context, currentKey)
 		await resetMocks()
 		await use(context)
+	},
+	page: async ({ page }, use) => {
+		await use(withHydrationGate(page))
 	}
 })
 

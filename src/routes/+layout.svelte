@@ -1,10 +1,22 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte'
+	import { onMount } from 'svelte'
 	import { browser } from '$app/environment'
 	import { beforeNavigate, onNavigate } from '$app/navigation'
 	import { updated } from '$app/stores'
 
 	const { children }: { children: Snippet } = $props()
+
+	// Mark the document once the client has hydrated and every component's event
+	// handlers are wired (onMount flushes after the whole tree mounts). This is a
+	// hydration signal for e2e tests: a one-shot input (a "/" keypress, a dropdown
+	// click) dispatched before hydration lands on nothing and is lost, which under
+	// dev-server on-demand-compile load (parallel workers) produced flaky "modal
+	// never opened" failures. Tests wait for this attribute after navigating so
+	// they never race hydration. Harmless in production.
+	onMount(() => {
+		document.documentElement.dataset.hydrated = ''
+	})
 
 	if (browser) {
 		beforeNavigate(({ willUnload, to }) => {
