@@ -3,6 +3,8 @@
 // src/routes/api/registry/[fn]/+server.js) so the console can run fully
 // offline without the real api.deploys.app backend or an OAuth token.
 
+import { type ExpressionSpec, parseExpression, parseList } from '$lib/waf/expression'
+
 const CREATED_AT = '2026-05-01T08:00:00Z'
 const LOCATION_ID = 'gke.cluster-rcf2'
 const DOMAIN_SUFFIX = 'rcf2.deploys.app'
@@ -455,11 +457,15 @@ const wafZone = {
 	project: 'acme',
 	location: LOCATION_ID,
 	description: 'Block admin paths and noisy bots',
+	// Seed expressions stay in the visual builder's emitted grammar
+	// (double-quoted literals, engine field names) so parseExpression can
+	// round-trip them and the waf.test mock evaluator can actually evaluate
+	// them — a dry run against the seed zone shows real matches offline.
 	rules: [
 		{
 			id: 'block-admin',
 			description: 'Block external access to /admin',
-			expression: "request.path.startsWith('/admin')",
+			expression: 'request.path.startsWith("/admin")',
 			action: 'block',
 			status: 403,
 			message: 'Forbidden',
@@ -468,14 +474,14 @@ const wafZone = {
 		{
 			id: 'log-bots',
 			description: 'Log suspected bot traffic',
-			expression: "request.headers['user-agent'].contains('bot')",
+			expression: 'containsAny(request.headers["user-agent"], ["bot"])',
 			action: 'log',
 			priority: 20
 		},
 		{
 			id: 'allow-office',
 			description: 'Always allow the office egress IP',
-			expression: "request.ip == '203.0.113.7'",
+			expression: 'request.remote_ip == "203.0.113.7"',
 			action: 'allow',
 			priority: 30
 		}
@@ -620,6 +626,121 @@ function wafConfiguredZone (location: string, advance = false) {
 		createdAt: CREATED_AT,
 		createdBy: USER_EMAIL
 	}
+}
+
+// ---- waf.test dry run -------------------------------------------------------
+// Offline approximation of the server's CEL evaluation, so the test panel
+// feels live under `bun dev:mock` (Playwright specs don't use it — they set
+// static per-test mocks). Expressions the visual builder can represent
+// (parseExpression) are evaluated against the sample request. The RESULT
+// SHAPE follows the waf.test contract exactly — outcome/winningRuleId/status/
+// message, per-rule matched/evaluated/terminal, per-limit filterMatched/
+// counted, valid. Known divergences from the real engine, by design: raw CEL
+// the builder can't represent silently reports "not matched" (never an
+// error), matches_regex uses JS RegExp not RE2, and eval errors don't exist
+// here — never treat a mock verdict as engine truth.
+
+interface WafTestSample {
+	method?: string
+	path?: string
+	query?: string
+	host?: string
+	scheme?: string
+	headers?: Record<string, string>
+	cookies?: Record<string, string>
+	ip?: string
+	country?: string
+	asn?: number
+}
+
+function wafSampleField (spec: ExpressionSpec, req: WafTestSample): string | number {
+	const headers = Object.fromEntries(
+		Object.entries(req.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v])
+	)
+	const path = req.path || '/'
+	switch (spec.field) {
+	case 'method': return (req.method || 'GET').toUpperCase()
+	case 'path': return path
+	case 'host': return req.host ?? ''
+	case 'query': return req.query ?? ''
+	case 'uri': return req.query ? `${path}?${req.query}` : path
+	case 'scheme': return req.scheme || 'https'
+	case 'user_agent': return headers['user-agent'] ?? ''
+	case 'referer': return headers.referer ?? ''
+	case 'remote_ip': return req.ip ?? ''
+	case 'country': return req.country ?? ''
+	case 'asn': return req.asn ?? 0
+	case 'content_length': return 0 // the synthetic request has no body
+	case 'header': return headers[(spec.name ?? '').toLowerCase()] ?? ''
+	case 'arg': {
+		// first value wins, like the engine's request.args map
+		const v = new URLSearchParams(req.query ?? '').get(spec.name ?? '')
+		return v ?? ''
+	}
+	case 'cookie': return (req.cookies ?? {})[spec.name ?? ''] ?? ''
+	default: return ''
+	}
+}
+
+/** Naive IPv4-only CIDR membership — enough for dry-running dev fixtures. */
+function wafIpInCidr (ip: string, cidr: string): boolean {
+	const [net, bitsRaw] = cidr.split('/')
+	const bits = bitsRaw === undefined ? 32 : Number(bitsRaw)
+	const toInt = (v: string): number | null => {
+		const parts = v.split('.').map(Number)
+		if (parts.length !== 4 || parts.some((p) => !Number.isInteger(p) || p < 0 || p > 255)) return null
+		return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0
+	}
+	const a = toInt(ip)
+	const b = toInt(net)
+	if (a === null || b === null || !Number.isInteger(bits) || bits < 0 || bits > 32) return false
+	if (bits === 0) return true
+	const mask = (~0 << (32 - bits)) >>> 0
+	return ((a & mask) >>> 0) === ((b & mask) >>> 0)
+}
+
+function wafEvalCondition (spec: ExpressionSpec, req: WafTestSample): boolean {
+	const val = wafSampleField(spec, req)
+	const s = String(val)
+	const list = parseList(spec.values ?? '')
+	switch (spec.operator) {
+	case 'equals':
+		if (spec.tls !== undefined) return spec.tls ? s === 'https' : s === 'http'
+		return s === (spec.value ?? '')
+	case 'not_equals': return s !== (spec.value ?? '')
+	case 'in_list': return list.includes(s)
+	case 'not_in_list': return !list.includes(s)
+	case 'contains_any': return list.some((v) => s.includes(v))
+	case 'starts_with': return s.startsWith(spec.value ?? '')
+	case 'not_starts_with': return !s.startsWith(spec.value ?? '')
+	case 'ends_with': return s.endsWith(spec.value ?? '')
+	case 'not_ends_with': return !s.endsWith(spec.value ?? '')
+	case 'matches_regex':
+		try { return new RegExp(spec.value ?? '').test(s) } catch { return false }
+	case 'ip_equals': return s === (spec.value ?? '')
+	case 'in_cidr': return wafIpInCidr(s, spec.value ?? '')
+	case 'num_eq': return Number(val) === Number(spec.value)
+	case 'num_ne': return Number(val) !== Number(spec.value)
+	case 'num_lt': return Number(val) < Number(spec.value)
+	case 'num_gt': return Number(val) > Number(spec.value)
+	case 'num_le': return Number(val) <= Number(spec.value)
+	case 'num_ge': return Number(val) >= Number(spec.value)
+	default: return false
+	}
+}
+
+/**
+ * Evaluate a CEL expression against the sample. Returns null when the
+ * expression isn't representable by the visual-builder grammar — the mock's
+ * stand-in for "can't evaluate" (treated as no match, never as an error).
+ * An EMPTY expression matches everything (only limit filters may be empty).
+ */
+function wafEvalExpression (expr: string, req: WafTestSample): boolean | null {
+	const group = parseExpression(expr)
+	if (!group) return null
+	if (group.conditions.length === 0) return true
+	const results = group.conditions.map((c) => wafEvalCondition(c, req))
+	return group.combinator === 'or' ? results.some(Boolean) : results.every(Boolean)
 }
 
 const cacheZone = {
@@ -2024,6 +2145,87 @@ const handlers: Record<string, (args: any) => object> = {
 	'waf.delete': (args) => {
 		if (args?.location) wafConfigured.delete(args.location)
 		return ok({})
+	},
+	// Dry run per the waf.test contract: expression mode compiles one synthetic
+	// log rule {id: 'expression'}; draft mode walks the given rules in priority
+	// order (stable) — first matched allow/block terminates, log continues,
+	// rules past the terminal report matched but not evaluated. Limits echo
+	// mode and report filterMatched + counted (a blocked request is never
+	// counted — the WAF runs before the rate limiter). Nothing is stored.
+	'waf.test': (args) => {
+		const req: WafTestSample = args?.request ?? {}
+		const expressionMode = !!args?.expression
+		type InRule = { id?: string, expression?: string, action?: string, priority?: number, status?: number, message?: string }
+		type InLimit = { id?: string, mode?: string, filter?: string }
+		const inputRules: InRule[] = expressionMode
+			? [{ id: 'expression', expression: args.expression, action: 'log', priority: 0 }]
+			: (args?.rules ?? [])
+		const inputLimits: InLimit[] = expressionMode ? [] : (args?.limits ?? [])
+
+		// Evaluation order: stable sort by priority asc, ids defaulting to
+		// '#<index>' (never resolved or generated).
+		const ordered = inputRules
+			.map((r, i) => ({ ...r, id: r.id || `#${i}` }))
+			.map((r, i) => ({ r, i }))
+			.sort((a, b) => ((a.r.priority ?? 0) - (b.r.priority ?? 0)) || (a.i - b.i))
+			.map(({ r }) => r)
+
+		const ruleResults = ordered.map((r) => {
+			// The mock can't compile CEL; the only compile error it can honestly
+			// simulate is an empty expression. (An empty expression must NOT fall
+			// through to wafEvalExpression — empty only means match-everything for
+			// limit filters, never for rules.)
+			const error = (r.expression ?? '').trim() ? '' : 'compile error: empty expression'
+			return {
+				id: r.id,
+				action: r.action ?? 'log',
+				priority: r.priority ?? 0,
+				matched: !error && wafEvalExpression(r.expression ?? '', req) === true,
+				evaluated: true,
+				terminal: false,
+				error
+			}
+		})
+
+		let outcome = 'pass'
+		let winningRuleId = ''
+		let status = 0
+		let message = ''
+		for (const [i, rr] of ruleResults.entries()) {
+			if (rr.error || !rr.matched) continue
+			if (rr.action !== 'allow' && rr.action !== 'block') continue
+			rr.terminal = true
+			outcome = rr.action
+			winningRuleId = rr.id
+			if (rr.action === 'block') {
+				status = ordered[i].status || 403
+				message = ordered[i].message || 'Forbidden'
+			}
+			for (let j = i + 1; j < ruleResults.length; j++) ruleResults[j].evaluated = false
+			break
+		}
+
+		const limitResults = inputLimits.map((l, i) => {
+			const filter = (l.filter ?? '').trim()
+			const filterMatched = !filter || wafEvalExpression(filter, req) === true
+			return {
+				id: l.id || `#${i}`,
+				mode: l.mode === 'shadow' ? 'shadow' : 'enforce',
+				filterMatched,
+				counted: filterMatched && outcome !== 'block',
+				error: ''
+			}
+		})
+
+		return ok({
+			outcome,
+			winningRuleId,
+			status,
+			message,
+			rules: ruleResults,
+			limits: limitResults,
+			valid: ruleResults.every((r) => !r.error)
+		})
 	},
 
 	// The seed location starts configured and live; every other location is

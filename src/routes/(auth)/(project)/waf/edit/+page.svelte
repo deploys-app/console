@@ -7,6 +7,7 @@
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
+	import WafTestPanel from '$lib/components/WafTestPanel.svelte'
 	import { parseExpression } from '$lib/waf/expression'
 	import {
 		DEFAULT_STATUS,
@@ -289,4 +290,9 @@
 			{/if}
 		</div>
 	</form>
+
+	<hr>
+
+	<!-- Test the draft's expression BEFORE saving — the headline UX win. -->
+	<WafTestPanel {project} {location} expression={draft.expression} />
 </div>

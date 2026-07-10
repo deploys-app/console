@@ -7,6 +7,7 @@
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import WafConditionBuilder from '$lib/components/WafConditionBuilder.svelte'
+	import WafTestPanel from '$lib/components/WafTestPanel.svelte'
 	import { parseExpression } from '$lib/waf/expression'
 	import { normalizeRules, toApiRules } from '$lib/waf/rules'
 	import type { KeyRow } from '$lib/waf/limits'
@@ -411,6 +412,13 @@
 			{/if}
 		</div>
 	</form>
+
+	<!-- Test the draft's filter BEFORE saving. An empty filter matches every
+	     request — nothing to dry-run, so the panel only shows once one exists. -->
+	{#if draft.filter.trim()}
+		<hr>
+		<WafTestPanel {project} {location} expression={draft.filter} />
+	{/if}
 </div>
 
 <style>
