@@ -12,6 +12,7 @@
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 	import type { LimitForm } from '$lib/waf/limits'
 	import { describeKey, keyRowToApi, modeLabels, normalizeLimits, toApiLimits } from '$lib/waf/limits'
+	import { wafListRefs } from '$lib/waf/expression'
 
 	const { data }: { data: PageData } = $props()
 
@@ -258,6 +259,12 @@
 								{:else}
 									<span class="text-content/40">—</span>
 								{/if}
+								{#each wafListRefs(rule.expression) as ref (ref)}
+									<a class="list-chip" href={`/waf/lists?project=${project}`}
+										title={`References the IP list "${ref}"`}>
+										<i class="fa-solid fa-list"></i>{ref}
+									</a>
+								{/each}
 							</td>
 							<td>
 								<span class="action-badge" data-action={rule.action}>
@@ -350,6 +357,12 @@
 									<div class="font-mono text-xs text-content/50 mt-1 truncate max-w-56" title={limit.filter}>
 										<i class="fa-solid fa-filter mr-1"></i>{limit.filter}
 									</div>
+									{#each wafListRefs(limit.filter) as ref (ref)}
+										<a class="list-chip" href={`/waf/lists?project=${project}`}
+											title={`References the IP list "${ref}"`}>
+											<i class="fa-solid fa-list"></i>{ref}
+										</a>
+									{/each}
 								{/if}
 							</td>
 							<td>
@@ -446,5 +459,26 @@
 	.mode-badge[data-mode='shadow'] {
 		color: hsl(var(--hsl-content) / 0.5);
 		background-color: hsl(var(--hsl-content) / 0.05);
+	}
+
+	/* Marks a rule/limit whose expression references a named IP list; links to
+	   the lists page. */
+	.list-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		margin-left: 0.4rem;
+		padding: 0.125rem 0.5rem;
+		border-radius: 9999px;
+		font-family: var(--font-mono);
+		font-size: 0.6875rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: hsl(var(--hsl-primary));
+		background-color: hsl(var(--hsl-primary) / 0.1);
+	}
+
+	.list-chip:hover {
+		background-color: hsl(var(--hsl-primary) / 0.18);
 	}
 </style>

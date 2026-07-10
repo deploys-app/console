@@ -152,6 +152,12 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
+		// Named WAF IP lists — the lists page load and the condition builder's
+		// list picker both read this; default to none.
+		'/wafList.list': {
+			ok: true,
+			result: { items: [] }
+		},
 		'/dropbox.list': {
 			ok: true,
 			result: { items: [] }
@@ -346,6 +352,18 @@ export const sampleEnvGroup = {
 	},
 	createdAt: now,
 	createdBy: '[email protected]'
+}
+
+export const sampleWafList = {
+	project: 'test-project',
+	name: 'office-ips',
+	description: 'Office egress ranges',
+	type: 'ip',
+	entries: ['198.51.100.7', '203.0.113.0/24', '2001:db8::/48'],
+	referencedBy: [],
+	createdAt: now,
+	createdBy: '[email protected]',
+	updatedAt: now
 }
 
 export const sampleEmailDomain = {

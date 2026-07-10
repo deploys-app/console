@@ -3,7 +3,7 @@
 // src/routes/api/registry/[fn]/+server.js) so the console can run fully
 // offline without the real api.deploys.app backend or an OAuth token.
 
-import { type ExpressionSpec, parseExpression, parseList } from '$lib/waf/expression'
+import { type ExpressionSpec, parseExpression, parseList, wafListRefs } from '$lib/waf/expression'
 
 const CREATED_AT = '2026-05-01T08:00:00Z'
 const LOCATION_ID = 'gke.cluster-rcf2'
@@ -480,8 +480,10 @@ const wafZone = {
 		},
 		{
 			id: 'allow-office',
-			description: 'Always allow the office egress IP',
-			expression: 'request.remote_ip == "203.0.113.7"',
+			description: 'Always allow the office IP list',
+			// References the seed named IP list, so the manage page shows the
+			// list chip and wafList.delete exercises the in-use guard offline.
+			expression: 'ipInList(request.remote_ip, "office-ips")',
 			action: 'allow',
 			priority: 30
 		}
@@ -741,6 +743,53 @@ function wafEvalExpression (expr: string, req: WafTestSample): boolean | null {
 	if (group.conditions.length === 0) return true
 	const results = group.conditions.map((c) => wafEvalCondition(c, req))
 	return group.combinator === 'or' ? results.some(Boolean) : results.every(Boolean)
+}
+
+// Named IP lists (wafList.*). Session-mutable so the lists page CRUD flows
+// work offline. `office-ips` is referenced by the seed zone's allow rule, so
+// deleting it exercises the in-use guard.
+interface MockWafList {
+	name: string
+	description: string
+	type: 'ip'
+	entries: string[]
+	createdAt: string
+	createdBy: string
+	updatedAt: string
+}
+
+const wafLists = new Map<string, MockWafList>([
+	['office-ips', {
+		name: 'office-ips',
+		description: 'Office egress ranges',
+		type: 'ip',
+		entries: ['198.51.100.7', '203.0.113.0/24', '2001:db8::/48'],
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT
+	}],
+	['monitoring', {
+		name: 'monitoring',
+		description: 'Uptime probes exempt from rate limits',
+		type: 'ip',
+		entries: ['192.0.2.10', '192.0.2.11'],
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT
+	}]
+])
+
+// Locations of the seed zone's rules/limits referencing `name` — the mock twin
+// of the server's ReferencedBy scan over stored expressions.
+function wafListReferencedBy (name: string): string[] {
+	const referenced =
+		wafZone.rules.some((r) => wafListRefs(r.expression).includes(name)) ||
+		wafZone.limits.some((l) => 'filter' in l && wafListRefs(l.filter ?? '').includes(name))
+	return referenced ? [LOCATION_ID] : []
+}
+
+function wafListItem (l: MockWafList) {
+	return { project: 'acme', ...l, referencedBy: wafListReferencedBy(l.name) }
 }
 
 const cacheZone = {
@@ -2226,6 +2275,44 @@ const handlers: Record<string, (args: any) => object> = {
 			limits: limitResults,
 			valid: ruleResults.every((r) => !r.error)
 		})
+	},
+
+	// Named IP lists — session-mutable CRUD. Delete refuses while the seed
+	// zone still references the list, mirroring the server's in-use guard.
+	'wafList.list': () => ok({
+		project: 'acme',
+		items: [...wafLists.values()]
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.map(wafListItem)
+	}),
+	'wafList.get': (args) => {
+		const l = wafLists.get(args?.name ?? '')
+		if (!l) return err('api: waf list not found')
+		return ok(wafListItem(l))
+	},
+	'wafList.set': (args) => {
+		const name = String(args?.name ?? '')
+		const existing = wafLists.get(name)
+		wafLists.set(name, {
+			name,
+			description: args?.description ?? '',
+			type: 'ip',
+			entries: [...(args?.entries ?? [])],
+			createdAt: existing?.createdAt ?? new Date().toISOString(),
+			createdBy: existing?.createdBy ?? USER_EMAIL,
+			updatedAt: new Date().toISOString()
+		})
+		return ok({})
+	},
+	'wafList.delete': (args) => {
+		const name = String(args?.name ?? '')
+		if (!wafLists.has(name)) return err('api: waf list not found')
+		const refs = wafListReferencedBy(name)
+		if (refs.length > 0) {
+			return err(`waf list "${name}" is in use by the waf zone at ${refs.join(', ')} (rules: "Always allow the office IP list")`)
+		}
+		wafLists.delete(name)
+		return ok({})
 	},
 
 	// The seed location starts configured and live; every other location is

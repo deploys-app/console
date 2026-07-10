@@ -882,6 +882,33 @@ declare namespace Api {
         valid: boolean
     }
 
+    // wafList.* — named, reusable IP/CIDR lists referenced from rule
+    // expressions and limit filters via the platform macro
+    // ipInList(<field>, "<name>"). Project-scoped pure data (no location, no
+    // status lifecycle); the apiserver expands references at materialization
+    // time, so stored expressions always carry the unexpanded macro.
+    export type WafListType = 'ip'
+
+    export type WafListItem = {
+        project: string
+        name: string
+        description: string
+        type: WafListType
+        // IPs / CIDRs, normalized server-side
+        entries: string[]
+        // Locations of the project's zones whose rules/limits reference this
+        // list. Read-only (computed server-side); what a blocked delete reports.
+        referencedBy: string[]
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+    }
+
+    export type WafListListResult = {
+        project: string
+        items: WafListItem[]
+    }
+
     export type CacheAction = 'cache' | 'bypass'
 
     export type CacheOverride = {

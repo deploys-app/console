@@ -21,14 +21,23 @@
 
 	const { can } = getPermissionContext()
 	$effect(() => {
-		if (!can('waf.set')) return
-		return registerPageActions([{
-			id: 'waf-list:create',
-			label: 'Create firewall',
-			icon: 'fa-plus',
-			keywords: 'create new add firewall waf',
-			href: `/waf/create?project=${project}`
-		}])
+		const actions = [{
+			id: 'waf-list:lists',
+			label: 'IP lists',
+			icon: 'fa-list',
+			keywords: 'waf firewall ip lists allowlist blocklist cidr',
+			href: `/waf/lists?project=${project}`
+		}]
+		if (can('waf.set')) {
+			actions.unshift({
+				id: 'waf-list:create',
+				label: 'Create firewall',
+				icon: 'fa-plus',
+				keywords: 'create new add firewall waf',
+				href: `/waf/create?project=${project}`
+			})
+		}
+		return registerPageActions(actions)
 	})
 
 	const hasPending = $derived(firewalls.some((fw: Api.WafZone) => fw.status === 'pending'))
@@ -105,10 +114,16 @@
 			{firewalls.length} {firewalls.length === 1 ? 'firewall' : 'firewalls'}
 		</p>
 	</div>
-	<GuardedButton permission="waf.set" class="button is-icon-left" href={`/waf/create?project=${project}`}>
-		<i class="fa-solid fa-plus"></i>
-		Create firewall
-	</GuardedButton>
+	<div class="flex flex-wrap gap-2">
+		<a class="button is-variant-secondary is-icon-left" href={`/waf/lists?project=${project}`}>
+			<i class="fa-solid fa-list"></i>
+			IP lists
+		</a>
+		<GuardedButton permission="waf.set" class="button is-icon-left" href={`/waf/create?project=${project}`}>
+			<i class="fa-solid fa-plus"></i>
+			Create firewall
+		</GuardedButton>
+	</div>
 </div>
 
 <div class="panel is-level-300">

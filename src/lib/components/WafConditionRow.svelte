@@ -11,14 +11,19 @@
 		parseList
 	} from '$lib/waf/expression'
 	import type { ExpressionSpec } from '$lib/waf/expression'
+	import { validListName } from '$lib/waf/lists'
+	import { denyTooltip } from '$lib/permission'
 
 	interface Props {
 		condition: ExpressionSpec // bindable structured condition
 		onremove: () => void // remove this row
 		removable?: boolean // show the remove button (default true)
+		project?: string // for the manage-lists hint link
+		listNames?: string[] // the project's named IP lists (wafList.list)
+		listsDenied?: boolean // caller lacks wafList.list → picker disabled with a hint
 	}
 
-	let { condition = $bindable(), onremove, removable = true }: Props = $props()
+	let { condition = $bindable(), onremove, removable = true, project = '', listNames = [], listsDenied = false }: Props = $props()
 
 	const fieldMeta = $derived(getField(condition.field))
 	const fieldType = $derived(fieldMeta?.type ?? 'string')
@@ -36,6 +41,22 @@
 		!!fieldMeta?.suggestions &&
 		(condition.operator === 'equals' || condition.operator === 'not_equals')
 	)
+	// Named-IP-list membership — the value is a list name picked from the
+	// project's wafList.list result rather than free text.
+	const isListName = $derived(
+		operators.find((o) => o.value === condition.operator)?.valueKind === 'listName'
+	)
+	// Keep an already-referenced name selectable even when it's missing from the
+	// fetched set (e.g. still loading, or the caller can't list) so opening an
+	// existing rule never silently rewrites its list reference. Only a valid
+	// list NAME is injected — a leftover value from another operator (e.g. a
+	// CIDR) must not masquerade as a list.
+	const listOptions = $derived.by(() => {
+		const names = [...listNames]
+		const v = (condition.value ?? '').trim()
+		if (v && validListName(v) && !names.includes(v)) names.unshift(v)
+		return names.map((n) => ({ value: n, label: n }))
+	})
 
 	const fieldOptions = fields.map((f) => ({ value: f.value, label: f.label }))
 	const operatorOptions = $derived(operators.map((o) => ({ value: o.value, label: o.label })))
@@ -127,6 +148,25 @@
 						placeholder={fieldType === 'asn'
 							? 'e.g. 13335, press Enter to add'
 							: 'Type a value, press Enter to add'} />
+				</div>
+			{:else if isListName}
+				<div class="field">
+					<label for="waf-list-name">IP list</label>
+					{#if listsDenied}
+						<span class="inline-flex" title={denyTooltip('wafList.list')}>
+							<Select id="waf-list-name" disabled options={[]} placeholder="No permission to view IP lists" />
+						</span>
+					{:else}
+						<Select id="waf-list-name" value={condition.value ?? ''}
+							options={listOptions}
+							disabled={listOptions.length === 0}
+							placeholder={listOptions.length ? 'Select an IP list' : 'No IP lists yet'}
+							onchange={(v) => (condition.value = String(v))} />
+						<p class="helper">
+							Reusable named lists, managed on the
+							<a class="link" href={`/waf/lists?project=${project}`}>IP lists</a> page.
+						</p>
+					{/if}
 				</div>
 			{:else if useCombobox}
 				<div class="field">
