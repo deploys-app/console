@@ -1,4 +1,4 @@
-import { test, expect, setMocks, getRequestLog } from './helpers.js'
+import { test, expect, setMocks, getRequestLog, pickSelect } from './helpers.js'
 import { defaultLocation } from './fixtures/mocks.js'
 
 // A WAF-capable location (the default fixture location has no `waf` feature).
@@ -11,6 +11,7 @@ function wafZone (overrides = {}) {
 		location: 'gke',
 		description: '',
 		rules: [],
+		limits: [],
 		status: 'success',
 		action: 'create',
 		createdAt: '2024-01-01T00:00:00Z',
@@ -78,8 +79,9 @@ test.describe('firewall list', () => {
 test.describe('firewall create', () => {
 	test('offers only unconfigured WAF locations and saves an empty zone', async ({ page }) => {
 		await setMocks({
-			'location.list': { ok: true, result: { items: [wafLocation] } }
-			// waf.get is unmocked → 404 (notFound) → the location is unconfigured/available.
+			'location.list': { ok: true, result: { items: [wafLocation] } },
+			// No zones anywhere → every supported location is available.
+			'waf.list': { ok: true, result: { project: 'test-project', items: [] } }
 		})
 
 		await page.goto('/waf/create?project=test-project')
@@ -108,11 +110,198 @@ test.describe('firewall create', () => {
 		await setMocks({
 			'location.list': { ok: true, result: { items: [wafLocation] } },
 			// The only supported location already has a zone → nothing to create.
+			'waf.list': { ok: true, result: { project: 'test-project', items: [wafZone({ location: 'gke' })] } }
+		})
+
+		await page.goto('/waf/create?project=test-project')
+		await expect(page.getByText('Every location already has a firewall configured')).toBeVisible()
+	})
+
+	test('falls back to the waf.get fan-out when waf.list is forbidden', async ({ page }) => {
+		await setMocks({
+			'location.list': { ok: true, result: { items: [wafLocation] } },
+			// A role with waf.get but not waf.list still gets an accurately
+			// filtered page: the loader falls back to per-location waf.get.
+			'waf.list': { ok: false, error: { message: 'iam: forbidden' } },
 			'waf.get': { ok: true, result: wafZone({ location: 'gke' }) }
 		})
 
 		await page.goto('/waf/create?project=test-project')
 		await expect(page.getByText('Every location already has a firewall configured')).toBeVisible()
+
+		const log = await getRequestLog()
+		expect(log.some((r) => r.path === '/waf.get')).toBe(true)
+	})
+})
+
+test.describe('firewall copy', () => {
+	const gkeWaf = { ...defaultLocation, id: 'gke', features: { waf: true } }
+	const sgpWaf = { ...defaultLocation, id: 'sgp', features: { waf: true } }
+	const osaka = { ...defaultLocation, id: 'osaka', features: {} } // no waf
+
+	/** The source zone used across the copy tests: one rule + one rate limit. */
+	function sourceZone () {
+		return wafZone({
+			location: 'gke',
+			description: 'prod edge',
+			rules: [wafRule({ id: 'rule-aaaaaa' })],
+			limits: [{
+				id: 'lim-bbbbbb',
+				description: '',
+				key: ['ip'],
+				rate: 100,
+				window: '1m',
+				algorithm: 'sliding',
+				mode: 'enforce'
+			}]
+		})
+	}
+
+	test('copies a zone to an empty waf location with fresh ids', async ({ page }) => {
+		await setMocks({
+			'location.list': { ok: true, result: { items: [gkeWaf, sgpWaf, osaka] } },
+			'waf.list': { ok: true, result: { project: 'test-project', items: [sourceZone()] } },
+			'waf.metrics': { ok: true, result: { series: [], total: 0 } },
+			'waf.set': { ok: true, result: {} }
+		})
+
+		await page.goto('/waf?project=test-project')
+		await page.getByRole('button', { name: 'Copy firewall in gke' }).click()
+
+		const panel = page.locator('.modal.is-active .modal-panel')
+		await expect(panel.getByText('1 rule', { exact: true })).toBeVisible()
+		await expect(panel.getByText('1 rate limit', { exact: true })).toBeVisible()
+
+		// Only sgp is eligible: gke is the source, osaka lacks the waf feature.
+		await panel.locator('#copy-target-location').click()
+		await expect(page.getByRole('option', { name: 'sgp', exact: true })).toBeVisible()
+		await expect(page.getByRole('option', { name: 'gke', exact: true })).toHaveCount(0)
+		await expect(page.getByRole('option', { name: 'osaka', exact: true })).toHaveCount(0)
+		await page.getByRole('option', { name: 'sgp', exact: true }).click()
+
+		// The description is prefilled from the source zone.
+		await expect(panel.locator('#copy-description')).toHaveValue('prod edge')
+
+		await panel.getByRole('button', { name: 'Copy firewall', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/waf.set')
+		}).toBe(true)
+
+		const setReq = (await getRequestLog()).find((r) => r.path === '/waf.set')
+		const body = JSON.parse(setReq?.body ?? '{}')
+		expect(body.location).toBe('sgp')
+		expect(body.description).toBe('prod edge')
+		expect(body.rules[0].id).toBe('')
+		expect(body.rules[0].expression).toBe('request.path == "/admin"')
+		expect(body.limits[0].id).toBe('')
+		expect(body.limits[0].rate).toBe(100)
+	})
+
+	test('reports when no empty waf location exists', async ({ page }) => {
+		await setMocks({
+			'location.list': { ok: true, result: { items: [gkeWaf, sgpWaf] } },
+			'waf.list': {
+				ok: true,
+				result: {
+					project: 'test-project',
+					items: [sourceZone(), wafZone({ location: 'sgp' })]
+				}
+			},
+			'waf.metrics': { ok: true, result: { series: [], total: 0 } }
+		})
+
+		await page.goto('/waf?project=test-project')
+		await page.getByRole('button', { name: 'Copy firewall in gke' }).click()
+
+		const panel = page.locator('.modal.is-active .modal-panel')
+		await expect(panel.getByText('Every WAF-capable location already has a firewall')).toBeVisible()
+		await expect(panel.getByRole('button', { name: 'Copy firewall', exact: true })).toHaveCount(0)
+	})
+
+	test('copy is available from the manage page', async ({ page }) => {
+		await setMocks({
+			'waf.get': { ok: true, result: sourceZone() },
+			'location.list': { ok: true, result: { items: [gkeWaf, sgpWaf] } },
+			'waf.list': { ok: true, result: { project: 'test-project', items: [sourceZone()] } },
+			'waf.set': { ok: true, result: {} }
+		})
+
+		await page.goto('/waf/manage?project=test-project&location=gke')
+		await page.getByRole('button', { name: 'Copy to location' }).click()
+
+		await pickSelect(page, 'copy-target-location', 'sgp')
+		await page.getByRole('button', { name: 'Copy firewall', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/waf.set')
+		}).toBe(true)
+
+		const setReq = (await getRequestLog()).find((r) => r.path === '/waf.set')
+		expect(JSON.parse(setReq?.body ?? '{}').location).toBe('sgp')
+	})
+
+	test('copy is gated on waf.set', async ({ page }) => {
+		await setMocks({
+			'location.list': { ok: true, result: { items: [gkeWaf, sgpWaf, osaka] } },
+			'waf.list': { ok: true, result: { project: 'test-project', items: [sourceZone()] } },
+			'waf.metrics': { ok: true, result: { series: [], total: 0 } },
+			'me.permissions': { ok: true, result: { permissions: ['waf.list', 'waf.get'], admin: false } }
+		})
+
+		await page.goto('/waf?project=test-project')
+
+		const copyButton = page.getByRole('button', { name: 'Copy firewall in gke' })
+		await expect(copyButton).toBeDisabled()
+		// The wrapping span carries the deny tooltip naming the missing grant.
+		await expect(page.locator('span.inline-flex', { has: copyButton }))
+			.toHaveAttribute('title', "You don't have permission to do this (requires waf.set).")
+
+		// A click never opens the modal.
+		await copyButton.click({ force: true })
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+
+		// Both permissions are required: waf.set alone (no waf.list) is denied too.
+		await setMocks({
+			'me.permissions': { ok: true, result: { permissions: ['waf.get', 'waf.set'], admin: false } }
+		})
+		await page.goto('/waf?project=test-project')
+		await expect(page.getByRole('button', { name: 'Copy firewall in gke' })).toBeDisabled()
+	})
+
+	test('aborts when the target gains a zone before confirm', async ({ page }) => {
+		await setMocks({
+			'location.list': { ok: true, result: { items: [gkeWaf, sgpWaf, osaka] } },
+			'waf.list': { ok: true, result: { project: 'test-project', items: [sourceZone()] } },
+			'waf.metrics': { ok: true, result: { series: [], total: 0 } },
+			'waf.set': { ok: true, result: {} }
+		})
+
+		await page.goto('/waf?project=test-project')
+		await page.getByRole('button', { name: 'Copy firewall in gke' }).click()
+
+		const panel = page.locator('.modal.is-active .modal-panel')
+		await pickSelect(page, 'copy-target-location', 'sgp')
+
+		// Someone creates a zone on sgp while the modal sits open.
+		await setMocks({
+			'waf.list': {
+				ok: true,
+				result: {
+					project: 'test-project',
+					items: [sourceZone(), wafZone({ location: 'sgp' })]
+				}
+			}
+		})
+
+		await panel.getByRole('button', { name: 'Copy firewall', exact: true }).click()
+
+		// The confirm-time re-check catches the occupied target: no waf.set fires.
+		await expect(page.getByText('A firewall was just created in sgp.')).toBeVisible()
+		const log = await getRequestLog()
+		expect(log.some((r) => r.path === '/waf.set')).toBe(false)
 	})
 })
 
