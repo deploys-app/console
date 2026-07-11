@@ -907,6 +907,7 @@ declare namespace Api {
     export type WafListListResult = {
         project: string
         items: WafListItem[]
+    }
 
     // waf.events request — recent sampled match events for a zone, newest
     // first. Events are SAMPLES (bounded capture per controller pod) retained

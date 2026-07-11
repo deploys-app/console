@@ -304,6 +304,12 @@
 			events = reset ? items : [...events, ...items]
 			eventsNext = res.result?.next ?? ''
 			eventsError = null
+		} catch (e) {
+			// api.invoke synthesizes an error envelope for non-JSON bodies but still
+			// rejects when fetch itself fails (offline, connection reset). Without
+			// this, the empty state would claim "No events in the last 3 days" —
+			// a false statement about the data — on a plain network failure.
+			if (token === eventsToken) eventsError = e
 		} finally {
 			if (token === eventsToken) {
 				eventsLoading = false
@@ -355,7 +361,7 @@
 		...EVENT_ACTIONS.map((a) => ({ value: a, label: actionLabels[a] ?? a }))
 	]
 
-	const eventsSpinner = $derived(eventsLoading && events.length === 0)
+	const eventsSpinner = $derived(eventsLoading && events.length === 0 && !eventsError)
 	const eventsEmpty = $derived(!eventsLoading && !eventsError && events.length === 0)
 </script>
 
@@ -578,11 +584,13 @@
 						<div class="events-error" title={(eventsError as { message?: string })?.message ?? ''}>
 							<i class="fa-solid fa-exclamation-triangle text-warning"></i>
 							<p class="text-content/70">Something went wrong while loading events. Please try again later.</p>
+							<!-- When pages are already loaded the failure was a "Load more" —
+							     retry re-issues the cursor fetch instead of discarding them. -->
 							<button
 								type="button"
 								class="button is-variant-secondary is-size-small"
-								class:is-loading={eventsLoading}
-								onclick={() => fetchEvents(true)}>
+								class:is-loading={eventsLoading || eventsMoreLoading}
+								onclick={() => fetchEvents(events.length === 0)}>
 								Try again
 							</button>
 						</div>
@@ -595,7 +603,10 @@
 		</table>
 	</div>
 
-	{#if eventsNext}
+	<!-- Suppressed while the error row shows: a failed "Load more" keeps the old
+	     cursor, and two competing buttons (one of which used to discard every
+	     loaded page) is worse than the single retry affordance. -->
+	{#if eventsNext && !eventsError}
 		<div class="events-more">
 			<button
 				type="button"

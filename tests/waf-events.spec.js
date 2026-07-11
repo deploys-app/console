@@ -236,4 +236,115 @@ test.describe('firewall recent events', () => {
 		// Exhausted → the button goes away.
 		await expect(page.getByRole('button', { name: 'Load more' })).toHaveCount(0)
 	})
+
+	test('refetches when navigating between locations without a remount', async ({ page }) => {
+		// The WAF list links here per location, so ?location=A -> ?location=B is a
+		// client-side navigation that REUSES this component (console#303 bug
+		// class): an onMount-only fetch would keep A's events under B's header.
+		const zone = wafZone({ rules: [wafRule()] })
+		const locB = { ...wafLocation, id: 'sgp' }
+		await setMocks({
+			...metricsMocks(zone, {
+				items: [wafEvent({ id: eventId(2), path: '/from-location-a' })],
+				next: ''
+			}),
+			'location.list': { ok: true, result: { items: [wafLocation, locB] } }
+		})
+
+		await page.goto('/waf/metrics?project=test-project&location=gke')
+		const panel = page.locator('.events-panel')
+		await expect(panel.getByText('/from-location-a')).toBeVisible()
+
+		await setMocks({
+			'waf.events': {
+				ok: true,
+				result: { items: [wafEvent({ id: eventId(3), path: '/from-location-b' })], next: '' }
+			}
+		})
+
+		// Navigate via an in-page anchor click so SvelteKit's router handles it
+		// client-side (goto would be a full document load — a remount). The click
+		// is dispatched in-page — the layout's menu overlays a body-appended
+		// element, so a pointer click can't reach it; SvelteKit's document-level
+		// click handler intercepts the synthetic event all the same. The marker
+		// surviving the navigation proves the document was reused.
+		await page.evaluate(() => {
+			/** @type {any} */ (window).__wafSpaMarker = true
+			const a = document.createElement('a')
+			a.href = '/waf/metrics?project=test-project&location=sgp'
+			a.textContent = 'location b'
+			document.body.appendChild(a)
+			a.click()
+		})
+
+		await expect(panel.getByText('/from-location-b')).toBeVisible()
+		await expect(panel.getByText('/from-location-a')).toHaveCount(0)
+		expect(await page.evaluate(() => /** @type {any} */ (window).__wafSpaMarker)).toBe(true)
+
+		// The refetch carried the new location.
+		const reqs = (await getRequestLog()).filter((r) => r.path === '/waf.events')
+		expect(JSON.parse(reqs[reqs.length - 1].body || '{}').location).toBe('sgp')
+	})
+
+	test('shows the error row on failure — never the empty state — and Try again recovers', async ({ page }) => {
+		const zone = wafZone({ rules: [wafRule()] })
+		await setMocks({
+			...metricsMocks(zone, { items: [], next: '' }),
+			'waf.events': { ok: false, error: { message: 'boom' } }
+		})
+
+		await page.goto('/waf/metrics?project=test-project&location=gke')
+		const panel = page.locator('.events-panel')
+
+		// A failed fetch must read as a failure, not as verified absence of events.
+		await expect(panel.getByText('Something went wrong while loading events. Please try again later.')).toBeVisible()
+		await expect(panel.getByText('No events in the last 3 days.')).toHaveCount(0)
+
+		await setMocks({
+			'waf.events': { ok: true, result: { items: [wafEvent({ id: eventId(1) })], next: '' } }
+		})
+		await panel.getByRole('button', { name: 'Try again' }).click()
+
+		await expect(panel.getByText('203.0.113.9')).toBeVisible()
+		await expect(panel.getByText('Something went wrong while loading events. Please try again later.')).toHaveCount(0)
+	})
+
+	test('a failed load more keeps loaded pages and retries the cursor fetch', async ({ page }) => {
+		const zone = wafZone({ rules: [wafRule()] })
+		const first = Array.from({ length: 50 }, (_, i) => wafEvent({
+			id: eventId(100 - i),
+			path: `/admin/page-${i}`
+		}))
+		await setMocks(metricsMocks(zone, { items: first, next: first[first.length - 1].id }))
+
+		await page.goto('/waf/metrics?project=test-project&location=gke')
+		const panel = page.locator('.events-panel')
+		await expect(panel.getByText('/admin/page-0')).toBeVisible()
+
+		await setMocks({ 'waf.events': { ok: false, error: { message: 'boom' } } })
+		await page.getByRole('button', { name: 'Load more' }).click()
+
+		// One affordance, not two: the error row's retry — Load more is suppressed
+		// while the error shows, and the loaded pages stay on screen.
+		await expect(panel.getByText('Something went wrong while loading events. Please try again later.')).toBeVisible()
+		await expect(page.getByRole('button', { name: 'Load more' })).toHaveCount(0)
+		await expect(panel.getByText('/admin/page-0')).toBeVisible()
+
+		await setMocks({
+			'waf.events': {
+				ok: true,
+				result: { items: [wafEvent({ id: eventId(1), path: '/admin/last' })], next: '' }
+			}
+		})
+		await panel.getByRole('button', { name: 'Try again' }).click()
+
+		// Retry resumed from the cursor: pages preserved, next page appended.
+		await expect(panel.getByText('/admin/last')).toBeVisible()
+		await expect(panel.getByText('/admin/page-0')).toBeVisible()
+
+		const reqs = (await getRequestLog()).filter((r) => r.path === '/waf.events')
+		expect(reqs.length).toBe(3)
+		expect(JSON.parse(reqs[1].body || '{}').before).toBe(eventId(51))
+		expect(JSON.parse(reqs[2].body || '{}').before).toBe(eventId(51))
+	})
 })
