@@ -8,16 +8,20 @@
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import WafTestPanel from '$lib/components/WafTestPanel.svelte'
 	import WafCopyModal from '$lib/components/WafCopyModal.svelte'
+	import Select from '$lib/components/Select.svelte'
+	import TagInput from '$lib/components/TagInput.svelte'
 	import type { RuleForm } from '$lib/waf/rules'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 	import type { LimitForm } from '$lib/waf/limits'
 	import { describeKey, keyRowToApi, modeLabels, normalizeLimits, toApiLimits } from '$lib/waf/limits'
 	import { wafListRefs } from '$lib/waf/expression'
+	import { managedForm, managedFormError, modeOptions, paranoiaLevels, toApiManaged } from '$lib/waf/managed'
 
 	const { data }: { data: PageData } = $props()
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
+	const managedRulesSupported = $derived(data.managedRulesSupported)
 
 	let copyModal = $state<WafCopyModal>()
 
@@ -26,6 +30,11 @@
 	let description = $state(untrack(() => data.zone?.description ?? ''))
 	let rules = $state(untrack(() => normalizeRules(data.zone?.rules)))
 	let limits = $state(untrack(() => normalizeLimits(data.zone?.limits)))
+	let managed = $state(untrack(() => managedForm(data.zone?.managedRules)))
+	// Last-saved managed block, echoed on every rule/limit write so an unsaved
+	// card edit never rides along a rule save (waf.set replaces the whole zone,
+	// so SOMETHING must always be sent for managed rules — the server state).
+	let savedManaged = $state<Api.WafManagedRules | null>(untrack(() => data.zone?.managedRules ?? null))
 
 	let loadedLocation = untrack(() => data.location ?? '')
 
@@ -40,6 +49,8 @@
 				description = next.zone?.description ?? ''
 				rules = normalizeRules(next.zone?.rules)
 				limits = normalizeLimits(next.zone?.limits)
+				managed = managedForm(next.zone?.managedRules)
+				savedManaged = next.zone?.managedRules ?? null
 			}
 		})
 	})
@@ -66,18 +77,24 @@
 		description = zone?.description ?? ''
 		rules = normalizeRules(zone?.rules)
 		limits = normalizeLimits(zone?.limits)
+		managed = managedForm(zone?.managedRules)
+		savedManaged = zone?.managedRules ?? null
 	}
 
 	// Persist the whole zone (priority follows row order). waf.set replaces the
-	// entire zone, so rules and limits must always travel together. On error,
-	// surface it and reload from the server so the UI matches reality.
-	async function persistZone (nextRules: RuleForm[], nextLimits: LimitForm[] = limits) {
+	// entire zone, so rules, limits, and the managed-rules block must always
+	// travel together. On error, surface it and reload from the server so the
+	// UI matches reality.
+	async function persistZone (nextRules: RuleForm[], nextLimits: LimitForm[] = limits, nextManaged: Api.WafManagedRules | null = savedManaged) {
 		const resp = await api.invoke('waf.set', {
 			project,
 			location,
 			description,
 			rules: toApiRules(nextRules),
-			limits: toApiLimits(nextLimits)
+			limits: toApiLimits(nextLimits),
+			// Omitted (undefined) = cleared server-side, which is exactly the
+			// state a null savedManaged mirrors.
+			managedRules: nextManaged ?? undefined
 		}, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
@@ -85,6 +102,26 @@
 			return false
 		}
 		return true
+	}
+
+	let savingManaged = $state(false)
+	const managedError = $derived(managedFormError(managed))
+	// Nothing to save while the block is off and the server has none — saving
+	// would only persist untouched defaults as tuning.
+	const managedSaveDisabled = $derived((!managed.enabled && savedManaged == null) || managedError !== '')
+
+	async function saveManagedRules () {
+		if (savingManaged || managedSaveDisabled) return
+		savingManaged = true
+		try {
+			const block = toApiManaged(managed)
+			if (await persistZone(rules, limits, block)) {
+				savedManaged = block
+				managed = managedForm(block)
+			}
+		} finally {
+			savingManaged = false
+		}
 	}
 
 	async function moveRule (i: number, dir: -1 | 1) {
@@ -319,6 +356,99 @@
 		<hr>
 		<br>
 
+		<div>
+			<h6><strong>Managed rules</strong> <span class="text-content/50">(OWASP Core Rule Set)</span></h6>
+			<p class="text-content/50 text-sm mt-1">
+				Curated signatures for SQL injection, XSS, path traversal, and
+				scanner traffic. Runs after your rules, before rate limits — a
+				managed-rule block never consumes rate budget.
+			</p>
+		</div>
+
+		{#if !managedRulesSupported}
+			<div class="managed-unavailable">
+				<i class="fa-solid fa-circle-info"></i>
+				<span>Not available in this location</span>
+			</div>
+		{:else}
+			<label class="checkbox">
+				<input id="managed-enabled" type="checkbox" bind:checked={managed.enabled}>
+				Enabled
+			</label>
+
+			{#if !managed.enabled && savedManaged != null}
+				<p class="text-content/60 text-sm">
+					Disabled — your tuning is kept for re-enable.
+				</p>
+			{/if}
+
+			<div class="grid gap-4 lg:grid-cols-2">
+				<div class="field">
+					<label for="managed-mode">Mode</label>
+					<Select id="managed-mode" bind:value={managed.mode} options={modeOptions}
+						disabled={!managed.enabled} />
+					<p class="text-content/50 text-sm mt-2">
+						Detect-only matches are currently visible to platform operators
+						only (ask support for your zone’s match report); per-project
+						match metrics arrive in a later release.
+					</p>
+				</div>
+
+				<div class="field">
+					<label for="managed-threshold">Anomaly threshold</label>
+					<div class="input">
+						<input id="managed-threshold" type="number" min="1" max="100"
+							bind:value={managed.anomalyThreshold} disabled={!managed.enabled}>
+					</div>
+					<p class="text-content/50 text-sm mt-2">
+						Each critical match scores 5; lower = stricter. Default 5.
+					</p>
+				</div>
+			</div>
+
+			<div class="field">
+				<span class="label">Paranoia level</span>
+				<div class="paranoia-switch" role="group" aria-label="Paranoia level">
+					{#each paranoiaLevels as pl (pl.value)}
+						<button type="button" class="paranoia-btn"
+							class:is-active={managed.paranoiaLevel === pl.value}
+							aria-pressed={managed.paranoiaLevel === pl.value}
+							disabled={!managed.enabled}
+							onclick={() => { managed.paranoiaLevel = pl.value }}>{pl.label}</button>
+					{/each}
+				</div>
+				<p class="text-content/50 text-sm mt-2">
+					{paranoiaLevels.find((pl) => pl.value === managed.paranoiaLevel)?.description}
+				</p>
+			</div>
+
+			<div class="field">
+				<label for="managed-excluded">Excluded rules</label>
+				<div class="managed-excluded" class:is-disabled={!managed.enabled}>
+					<TagInput id="managed-excluded" bind:tags={managed.excludedRules}
+						placeholder="CRS rule id, e.g. 942100" />
+				</div>
+				<p class="text-content/50 text-sm mt-2">
+					CRS rule ids to disable for false-positive relief
+					(<a class="link" href="https://coreruleset.org/docs/" target="_blank" rel="noreferrer">CRS rule reference</a>).
+				</p>
+				{#if managedError}
+					<p class="text-negative text-sm mt-1">{managedError}</p>
+				{/if}
+			</div>
+
+			<div class="flex justify-self-start">
+				<GuardedButton permission="waf.set" class="button is-variant-secondary is-size-small"
+					loading={savingManaged} disabled={managedSaveDisabled} onclick={saveManagedRules}>
+					Save managed rules
+				</GuardedButton>
+			</div>
+		{/if}
+
+		<br>
+		<hr>
+		<br>
+
 		<div class="flex items-center justify-between">
 			<div>
 				<h6><strong>Rate limits</strong></h6>
@@ -480,5 +610,60 @@
 
 	.list-chip:hover {
 		background-color: hsl(var(--hsl-primary) / 0.18);
+	}
+
+	/* Managed rules aren't offered here — an informative dead-end, not an error. */
+	.managed-unavailable {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		padding: 0.75rem 1rem;
+		border-radius: 0.625rem;
+		border: 1px dashed hsl(var(--hsl-line));
+		color: hsl(var(--hsl-content) / 0.55);
+		font-size: 0.875rem;
+	}
+
+	/* Segmented 1–4 picker, visually matching RangeSwitch (which is hardwired
+	   to the metrics time ranges, so it can't be reused directly). */
+	.paranoia-switch {
+		display: inline-flex;
+		padding: 0.1875rem;
+		gap: 0.125rem;
+		border-radius: 0.625rem;
+		background: hsl(var(--hsl-base-200));
+		border: 1px solid hsl(var(--hsl-line) / 0.7);
+		width: fit-content;
+	}
+
+	.paranoia-btn {
+		padding: 0.3125rem 0.875rem;
+		border-radius: 0.4375rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: hsl(var(--hsl-content) / 0.6);
+		transition: color var(--timing-fastest) ease, background var(--timing-fastest) ease;
+	}
+
+	.paranoia-btn:hover:not(:disabled) {
+		color: hsl(var(--hsl-content) / 0.9);
+	}
+
+	.paranoia-btn.is-active {
+		color: hsl(var(--hsl-primary-content));
+		background: hsl(var(--hsl-primary));
+	}
+
+	.paranoia-btn:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	/* TagInput has no disabled mode; freeze it while the block is off so the
+	   kept tuning stays visible but not editable. */
+	.managed-excluded.is-disabled {
+		pointer-events: none;
+		opacity: 0.55;
 	}
 </style>
