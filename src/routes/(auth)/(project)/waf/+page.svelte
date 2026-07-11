@@ -4,6 +4,7 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import Sparkline from '$lib/components/Sparkline.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import WafCopyModal from '$lib/components/WafCopyModal.svelte'
 	import { onMount, untrack } from 'svelte'
 	import api from '$lib/api'
 	import * as format from '$lib/format'
@@ -15,6 +16,8 @@
 	const project = $derived(data.project)
 	const firewalls = $derived(data.firewalls)
 	const error = $derived(data.error)
+
+	let copyModal = $state<WafCopyModal>()
 
 	const { can } = getPermissionContext()
 	$effect(() => {
@@ -177,6 +180,11 @@
 						</td>
 						<td>
 							<div class="flex gap-1 justify-end">
+								<GuardedButton permission={['waf.set', 'waf.list']} class="button is-variant-secondary is-size-small"
+									aria-label={`Copy firewall in ${fw.location}`}
+									onclick={() => copyModal?.open(fw.location)}>
+									Copy
+								</GuardedButton>
 								<a class="button is-variant-secondary is-size-small"
 									href={`/waf/manage?project=${project}&location=${encodeURIComponent(fw.location)}`}>
 									Manage
@@ -199,6 +207,8 @@
 		</table>
 	</div>
 </div>
+
+<WafCopyModal bind:this={copyModal} {project} locations={data.locations} />
 
 <style>
 	/* Hold a fixed box across the loading / loaded / empty states: min-height

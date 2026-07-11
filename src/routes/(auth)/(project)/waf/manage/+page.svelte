@@ -7,6 +7,7 @@
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import WafTestPanel from '$lib/components/WafTestPanel.svelte'
+	import WafCopyModal from '$lib/components/WafCopyModal.svelte'
 	import type { RuleForm } from '$lib/waf/rules'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 	import type { LimitForm } from '$lib/waf/limits'
@@ -16,6 +17,8 @@
 
 	const project = $derived(data.project)
 	const location = $derived(data.location)
+
+	let copyModal = $state<WafCopyModal>()
 
 	// The list reflects SERVER state for this location. Navigating away and back
 	// (e.g. from the edit page) reloads the loader, which re-seeds this copy.
@@ -183,11 +186,18 @@
 			Rules that filter incoming traffic in <span class="font-mono">{location}</span>
 		</p>
 	</div>
-	<a class="button is-variant-secondary is-icon-left"
-		href={`/waf/metrics?project=${project}&location=${encodeURIComponent(location)}`}>
-		<i class="fa-solid fa-chart-simple"></i>
-		View metrics
-	</a>
+	<div class="flex gap-3">
+		<GuardedButton permission={['waf.set', 'waf.list']} class="button is-variant-secondary is-icon-left"
+			onclick={() => copyModal?.open(location)}>
+			<i class="fa-solid fa-copy"></i>
+			Copy to location
+		</GuardedButton>
+		<a class="button is-variant-secondary is-icon-left"
+			href={`/waf/metrics?project=${project}&location=${encodeURIComponent(location)}`}>
+			<i class="fa-solid fa-chart-simple"></i>
+			View metrics
+		</a>
+	</div>
 </div>
 
 <div class="panel is-level-300 grid gap-6">
@@ -394,6 +404,8 @@
 		</DangerZone>
 	</div>
 </div>
+
+<WafCopyModal bind:this={copyModal} {project} locations={data.locations} />
 
 <style>
 	.action-badge {
