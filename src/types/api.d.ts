@@ -825,6 +825,63 @@ declare namespace Api {
         total: number
     }
 
+    // waf.test's synthetic sample request. country/asn are simulation inputs
+    // taken verbatim — the server performs NO GeoIP lookup.
+    export type WafTestRequest = {
+        method: string // '' = GET
+        path: string // required, must start with '/'
+        query: string // raw query string, no leading '?'
+        host: string
+        scheme: string // '' = https
+        headers: Record<string, string> // single value per name
+        cookies: Record<string, string>
+        ip: string // request.remote_ip
+        country: string // request.country, e.g. 'TH'; '' = unresolved
+        asn: number // request.asn, e.g. 13335; 0 = unresolved
+    }
+
+    export type WafTestRuleResult = {
+        // echoed input id, or '#<index>' when empty; 'expression' in
+        // expression mode
+        id: string
+        action: WafAction
+        priority: number
+        matched: boolean
+        // false for rules after the terminating allow/block — the engine
+        // short-circuits there; matched is still reported (the dry run
+        // evaluates every rule independently).
+        evaluated: boolean
+        terminal: boolean // this rule decided the outcome
+        error: string // compile or eval error; empty = ok
+    }
+
+    export type WafTestLimitResult = {
+        id: string // echoed input id, or '#<index>'
+        mode: 'enforce' | 'shadow'
+        // the limit's filter selects this request — true when the filter is
+        // empty (limit covers everything) or the filter matches
+        filterMatched: boolean
+        // filterMatched && outcome != 'block' — a rule-blocked request never
+        // reaches the rate limiter, so it burns no rate budget
+        counted: boolean
+        error: string
+    }
+
+    // waf.test dry-run report. Rules come back in evaluation order (ascending
+    // priority, stable) — the same order the engine runs them.
+    export type WafTestResult = {
+        // never 'error': per-rule errors fail open, like the engine
+        outcome: 'pass' | 'allow' | 'block'
+        winningRuleId: string // '' on pass
+        status: number // block only: response status (default 403); else 0
+        message: string // block only: response body; else ''
+        rules: WafTestRuleResult[]
+        limits: WafTestLimitResult[] // input order
+        // false when any rule/limit failed to compile — the same draft would
+        // be rejected by waf.set
+        valid: boolean
+    }
+
     export type CacheAction = 'cache' | 'bypass'
 
     export type CacheOverride = {

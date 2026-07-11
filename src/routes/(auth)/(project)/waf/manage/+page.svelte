@@ -6,6 +6,7 @@
 	import api from '$lib/api'
 	import DangerZone from '$lib/components/DangerZone.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
+	import WafTestPanel from '$lib/components/WafTestPanel.svelte'
 	import type { RuleForm } from '$lib/waf/rules'
 	import { actionLabels, normalizeRules, toApiRules } from '$lib/waf/rules'
 	import type { LimitForm } from '$lib/waf/limits'
@@ -40,6 +41,11 @@
 	})
 
 	let savingDescription = $state(false)
+
+	// The test panel dry-runs the zone AS SAVED (the same rows the tables
+	// show), mapped back to the API shape waf.test expects.
+	const testRules = $derived(toApiRules(rules))
+	const testLimits = $derived(toApiLimits(limits))
 
 	async function reloadZone () {
 		const resp = await api.invoke<Api.WafZone>('waf.get', { project, location }, fetch)
@@ -376,6 +382,12 @@
 				</tfoot>
 			</table>
 		</div>
+
+		<br>
+		<hr>
+		<br>
+
+		<WafTestPanel {project} {location} rules={testRules} limits={testLimits} />
 
 		<DangerZone description="Disable the firewall in this location and permanently remove all of its rules and rate limits.">
 			<GuardedButton permission="waf.delete" class="button is-variant-negative" onclick={deleteZone}>Disable firewall</GuardedButton>
