@@ -575,6 +575,12 @@ function parseMethodCall (s: string): ExpressionSpec | null {
  * spec. Strict, mirroring the generator: ip-type accessor only, plain
  * double-quoted valid list name, no extra whitespace. Returns the spec or
  * `null`.
+ *
+ * Deliberately stricter than the chip scanner (`parseWafListMacro` below),
+ * which tolerates arbitrary whitespace and any operand: a valid raw-authored
+ * usage like `ipInList(request.remote_ip,"x")` still shows a list chip on the
+ * manage page but keeps the edit page in Raw mode — the same round-trip
+ * fidelity bar as `in_cidr`.
  */
 function matchIpInList (part: string): ExpressionSpec | null {
 	let negate = false
@@ -778,7 +784,11 @@ export function parseExpression (cel: string): ExpressionGroup | null {
 // ---------------------------------------------------------------------------
 // ipInList macro scanner — TS mirror of the api package's waflistmacro.go.
 // Used to decorate rules/limits that reference a named IP list; the server
-// remains authoritative for validation. Keep the two implementations in sync.
+// remains authoritative for validation. Keep the two implementations in sync —
+// the one behavior that must match exactly is never treating an `ipInList`
+// token INSIDE a string literal as a reference (string-skipping rules);
+// divergence on malformed input (e.g. a raw newline in a single-quoted
+// literal, which cel-go rejects outright) is cosmetic, chips only.
 
 function isMacroIdentStart (c: string): boolean {
 	return c === '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')

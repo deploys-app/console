@@ -9,7 +9,7 @@
 	import api from '$lib/api'
 	import * as format from '$lib/format'
 	import { getPermissionContext } from '$lib/permission'
-	import { registerPageActions } from '$lib/pageactions/store.svelte'
+	import { registerPageActions, type PageAction } from '$lib/pageactions/store.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -21,13 +21,16 @@
 
 	const { can } = getPermissionContext()
 	$effect(() => {
-		const actions = [{
-			id: 'waf-list:lists',
-			label: 'IP lists',
-			icon: 'fa-list',
-			keywords: 'waf firewall ip lists allowlist blocklist cidr',
-			href: `/waf/lists?project=${project}`
-		}]
+		const actions: PageAction[] = []
+		if (can('wafList.list')) {
+			actions.push({
+				id: 'waf-list:lists',
+				label: 'IP lists',
+				icon: 'fa-list',
+				keywords: 'waf firewall ip lists allowlist blocklist cidr',
+				href: `/waf/lists?project=${project}`
+			})
+		}
 		if (can('waf.set')) {
 			actions.unshift({
 				id: 'waf-list:create',
@@ -115,10 +118,11 @@
 		</p>
 	</div>
 	<div class="flex flex-wrap gap-2">
-		<a class="button is-variant-secondary is-icon-left" href={`/waf/lists?project=${project}`}>
+		<GuardedButton permission="wafList.list" class="button is-variant-secondary is-icon-left"
+			href={`/waf/lists?project=${project}`}>
 			<i class="fa-solid fa-list"></i>
 			IP lists
-		</a>
+		</GuardedButton>
 		<GuardedButton permission="waf.set" class="button is-icon-left" href={`/waf/create?project=${project}`}>
 			<i class="fa-solid fa-plus"></i>
 			Create firewall

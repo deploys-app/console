@@ -20,14 +20,24 @@
 
 	// The project's named IP lists, feeding the in_ip_list / not_in_ip_list
 	// value Select. Keyed on `project` (not fetched in onMount) so an SPA
-	// project switch refetches instead of showing the previous project's lists.
+	// project switch refetches instead of showing the previous project's lists;
+	// the cleanup flag drops an out-of-order response from the previous project.
 	let listNames = $state<string[]>([])
 	$effect(() => {
 		const p = project
+		listNames = []
 		if (!p || listsDenied) return
+		let stale = false
 		api.invoke<Api.WafListListResult>('wafList.list', { project: p }, fetch).then((res) => {
+			if (stale) return
 			listNames = (res.result?.items ?? []).map((it) => it.name)
+		}).catch(() => {
+			// network-level failure — best-effort picker stays empty (a name an
+			// existing rule already references remains selectable via listOptions).
 		})
+		return () => {
+			stale = true
+		}
 	})
 
 	/** A fresh blank condition row. */

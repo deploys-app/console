@@ -77,6 +77,10 @@
 			}
 			close()
 			onsaved()
+		} catch {
+			// api.invoke only rejects on a network-level fetch failure (non-JSON
+			// bodies are already normalized into an error envelope).
+			errorMessage = 'Failed to save the list — network error. Try again.'
 		} finally {
 			saving = false
 		}
