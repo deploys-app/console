@@ -124,6 +124,25 @@
 		}
 	}
 
+	// A location can lose the managed-rules feature flag while a zone still
+	// carries an ENABLED block (ops un-flagging, or a block set via CLI). The
+	// server rejects any save echoing enabled:true in an un-flagged location,
+	// which would make every rule/limit save on this page fail — so offer the
+	// one write the gate does accept: enabled:false with the tuning kept.
+	async function disableManagedRules () {
+		if (savingManaged || !savedManaged) return
+		savingManaged = true
+		try {
+			const block = { ...savedManaged, enabled: false }
+			if (await persistZone(rules, limits, block)) {
+				savedManaged = block
+				managed = managedForm(block)
+			}
+		} finally {
+			savingManaged = false
+		}
+	}
+
 	async function moveRule (i: number, dir: -1 | 1) {
 		const j = i + dir
 		if (j < 0 || j >= rules.length) return
@@ -370,6 +389,31 @@
 				<i class="fa-solid fa-circle-info"></i>
 				<span>Not available in this location</span>
 			</div>
+			{#if savedManaged}
+				<p class="text-content/60 text-sm">
+					This zone still carries a stored managed-rules block:
+					<span class="font-mono">{savedManaged.enabled ? 'enabled' : 'disabled'}</span>
+					· {savedManaged.mode === 'detect' ? 'detect' : 'enforce'}
+					· paranoia level {savedManaged.paranoiaLevel || 1}
+					· threshold {savedManaged.anomalyThreshold || 5}
+					{#if savedManaged.excludedRules?.length}
+						· {savedManaged.excludedRules.length} excluded rule{savedManaged.excludedRules.length === 1 ? '' : 's'}
+					{/if}
+				</p>
+				{#if savedManaged.enabled}
+					<p class="text-content/60 text-sm">
+						While the block stays enabled, saves in this location are
+						rejected. Disable it (your tuning is kept) to keep managing
+						rules and rate limits here.
+					</p>
+					<div class="flex justify-self-start">
+						<GuardedButton permission="waf.set" class="button is-variant-secondary is-size-small"
+							loading={savingManaged} onclick={disableManagedRules}>
+							Disable managed rules
+						</GuardedButton>
+					</div>
+				{/if}
+			{/if}
 		{:else}
 			<label class="checkbox">
 				<input id="managed-enabled" type="checkbox" bind:checked={managed.enabled}>
@@ -426,6 +470,7 @@
 				<label for="managed-excluded">Excluded rules</label>
 				<div class="managed-excluded" class:is-disabled={!managed.enabled}>
 					<TagInput id="managed-excluded" bind:tags={managed.excludedRules}
+						disabled={!managed.enabled}
 						placeholder="CRS rule id, e.g. 942100" />
 				</div>
 				<p class="text-content/50 text-sm mt-2">
@@ -660,10 +705,9 @@
 		opacity: 0.5;
 	}
 
-	/* TagInput has no disabled mode; freeze it while the block is off so the
-	   kept tuning stays visible but not editable. */
+	/* The TagInput itself is disabled while the block is off (mouse AND
+	   keyboard); this only mutes the kept-but-frozen tuning visually. */
 	.managed-excluded.is-disabled {
-		pointer-events: none;
 		opacity: 0.55;
 	}
 </style>
