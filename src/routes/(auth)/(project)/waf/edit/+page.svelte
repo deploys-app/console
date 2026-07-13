@@ -213,7 +213,7 @@
 			</div>
 
 			{#if mode === 'visual'}
-				<WafConditionBuilder bind:this={builder} bind:expression={draft.expression} />
+				<WafConditionBuilder bind:this={builder} bind:expression={draft.expression} {project} />
 			{:else}
 				<p class="text-content/60 text-sm">
 					Match on

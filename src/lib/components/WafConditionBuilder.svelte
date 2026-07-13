@@ -1,14 +1,44 @@
 <script lang="ts">
 	import { untrack } from 'svelte'
+	import api from '$lib/api'
+	import { getPermissionContext } from '$lib/permission'
 	import WafConditionRow from '$lib/components/WafConditionRow.svelte'
 	import { buildGroup, parseExpression } from '$lib/waf/expression'
 	import type { ExpressionSpec, Combinator } from '$lib/waf/expression'
 
 	interface Props {
 		expression?: string // bindable CEL expression — kept in two-way sync with the rows
+		project?: string // enables the named-IP-list picker (fed by wafList.list)
 	}
 
-	let { expression = $bindable('') }: Props = $props()
+	let { expression = $bindable(''), project = '' }: Props = $props()
+
+	const { can } = getPermissionContext()
+	// Console permission pre-flight: without wafList.list the picker renders
+	// disabled with a permission hint instead of failing the fetch.
+	const listsDenied = $derived(!can('wafList.list'))
+
+	// The project's named IP lists, feeding the in_ip_list / not_in_ip_list
+	// value Select. Keyed on `project` (not fetched in onMount) so an SPA
+	// project switch refetches instead of showing the previous project's lists;
+	// the cleanup flag drops an out-of-order response from the previous project.
+	let listNames = $state<string[]>([])
+	$effect(() => {
+		const p = project
+		listNames = []
+		if (!p || listsDenied) return
+		let stale = false
+		api.invoke<Api.WafListListResult>('wafList.list', { project: p }, fetch).then((res) => {
+			if (stale) return
+			listNames = (res.result?.items ?? []).map((it) => it.name)
+		}).catch(() => {
+			// network-level failure — best-effort picker stays empty (a name an
+			// existing rule already references remains selectable via listOptions).
+		})
+		return () => {
+			stale = true
+		}
+	})
 
 	/** A fresh blank condition row. */
 	function blankCondition (): ExpressionSpec {
@@ -114,7 +144,8 @@
 							{combinator === 'or' ? 'OR' : 'AND'}
 						</div>
 					{/if}
-					<WafConditionRow bind:condition={conditions[i]} onremove={() => removeCondition(i)} />
+					<WafConditionRow bind:condition={conditions[i]} onremove={() => removeCondition(i)}
+						{project} {listNames} {listsDenied} />
 				</div>
 			{/each}
 		</div>

@@ -240,7 +240,7 @@
 			</div>
 
 			{#if filterMode === 'visual'}
-				<WafConditionBuilder bind:this={filterBuilder} bind:expression={draft.filter} />
+				<WafConditionBuilder bind:this={filterBuilder} bind:expression={draft.filter} {project} />
 			{:else}
 				<p class="text-content/60 text-sm">
 					Match on

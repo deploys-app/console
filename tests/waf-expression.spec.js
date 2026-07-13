@@ -16,8 +16,14 @@ import {
 	buildExpression,
 	combineExpression,
 	buildGroup,
-	parseExpression
+	parseExpression,
+	wafListRefs
 } from '../src/lib/waf/expression.js'
+import {
+	parseIPListEntries,
+	validIPListEntry,
+	validListName
+} from '../src/lib/waf/lists.js'
 import {
 	ruleForm,
 	genId,
@@ -66,7 +72,7 @@ test.describe('waf expression: operatorsForField', () => {
 
 	test('ip / numeric / membership / tls field types map to their operator sets', () => {
 		expect(operatorsForField(getField('remote_ip')).map((o) => o.value))
-			.toEqual(['in_cidr', 'ip_equals'])
+			.toEqual(['in_cidr', 'ip_equals', 'in_ip_list', 'not_in_ip_list'])
 		expect(operatorsForField(getField('content_length')).map((o) => o.value))
 			.toEqual(['num_eq', 'num_ne', 'num_lt', 'num_gt', 'num_le', 'num_ge'])
 		expect(operatorsForField(getField('country')).map((o) => o.value))
@@ -135,6 +141,19 @@ test.describe('waf expression: buildExpression', () => {
 			.toBe('ipInCidr(request.remote_ip, "10.0.0.0/8")')
 		expect(buildExpression({ field: 'remote_ip', operator: 'ip_equals', value: '1.2.3.4' }))
 			.toBe('request.remote_ip == "1.2.3.4"')
+	})
+
+	test('named IP list operators emit the ipInList platform macro', () => {
+		expect(buildExpression({ field: 'remote_ip', operator: 'in_ip_list', value: 'office-ips' }))
+			.toBe('ipInList(request.remote_ip, "office-ips")')
+		expect(buildExpression({ field: 'remote_ip', operator: 'not_in_ip_list', value: 'office-ips' }))
+			.toBe('!ipInList(request.remote_ip, "office-ips")')
+		// The macro's name literal admits no escapes — only a valid list name may
+		// be spliced (same grammar wafList.set accepts).
+		expect(buildExpression({ field: 'remote_ip', operator: 'in_ip_list', value: 'a"b' })).toBe('')
+		expect(buildExpression({ field: 'remote_ip', operator: 'in_ip_list', value: 'ab' })).toBe('') // too short
+		expect(buildExpression({ field: 'remote_ip', operator: 'in_ip_list', value: 'Office' })).toBe('') // uppercase
+		expect(buildExpression({ field: 'remote_ip', operator: 'in_ip_list', value: '' })).toBe('')
 	})
 
 	test('numeric operators', () => {
@@ -226,6 +245,10 @@ test.describe('waf expression: parseExpression round-trips', () => {
 		// ip
 		'ipInCidr(request.remote_ip, "10.0.0.0/8")',
 		'request.remote_ip == "1.2.3.4"',
+		// named IP lists (platform macro)
+		'ipInList(request.remote_ip, "office-ips")',
+		'!ipInList(request.remote_ip, "office-ips")',
+		'ipInList(request.remote_ip, "office-ips") && request.path == "/admin"',
 		// numeric
 		'request.content_length > 1048576',
 		'request.content_length <= 0',
@@ -281,7 +304,11 @@ test.describe('waf expression: parseExpression rejects non-representable input',
 		'request.path = "/a"', // not a valid operator
 		'request.unknown == "x"', // unknown accessor
 		'request.path in []', // empty list never emitted
-		'request.asn == abc' // non-numeric asn operand
+		'request.asn == abc', // non-numeric asn operand
+		'ipInList(request.path, "office-ips")', // non-ip accessor
+		'ipInList(request.remote_ip, "ab")', // list name too short
+		'ipInList(request.remote_ip, "a\\"b")', // escaped name never emitted
+		'ipInList(request.remote_ip, "office-ips", "extra")' // extra argument
 	]
 
 	for (const cel of complex) {
@@ -352,5 +379,124 @@ test.describe('waf rules helpers', () => {
 		// Block rules fall back to the defaults when unset.
 		expect(blockDefault.status).toBe(DEFAULT_STATUS)
 		expect(blockDefault.message).toBe(DEFAULT_MESSAGE)
+	})
+})
+
+test.describe('waf lists: wafListRefs (macro scanner)', () => {
+	test('extracts, de-duplicates, and sorts referenced names', () => {
+		expect(wafListRefs('ipInList(request.remote_ip, "office-ips")'))
+			.toEqual(['office-ips'])
+		expect(wafListRefs(
+			'ipInList(request.remote_ip, "zeta") && !ipInList(request.remote_ip, "alpha") || ipInList(request.headers["x-real-ip"], "zeta")'
+		)).toEqual(['alpha', 'zeta'])
+		expect(wafListRefs('request.path == "/admin"')).toEqual([])
+		expect(wafListRefs('')).toEqual([])
+	})
+
+	test('tolerates whitespace inside the macro punctuation', () => {
+		expect(wafListRefs('ipInList( request.remote_ip ,\n\t"office-ips" )'))
+			.toEqual(['office-ips'])
+	})
+
+	test('ignores the token inside string literals and comments', () => {
+		// double- and single-quoted literals
+		expect(wafListRefs('request.query == "ipInList(a, \\"office-ips\\")"')).toEqual([])
+		expect(wafListRefs("request.query == 'ipInList(request.remote_ip, \"office-ips\")'")).toEqual([])
+		// raw string literal (no escape processing)
+		expect(wafListRefs('regexMatch(request.path, r"ipInList(request.remote_ip, \\"office-ips\\")")')).toEqual([])
+		// triple-quoted literal
+		expect(wafListRefs('request.query == """ipInList(request.remote_ip, "office-ips")"""')).toEqual([])
+		// comment to end of line
+		expect(wafListRefs('// ipInList(request.remote_ip, "office-ips")\nrequest.path == "/"')).toEqual([])
+	})
+
+	test('a longer identifier containing the token is not a macro', () => {
+		expect(wafListRefs('myipInList(request.remote_ip, "office-ips")')).toEqual([])
+		expect(wafListRefs('ipInListX(request.remote_ip, "office-ips")')).toEqual([])
+	})
+
+	test('malformed usages carry no resolvable ref', () => {
+		expect(wafListRefs('ipInList(request.remote_ip)')).toEqual([]) // missing name
+		expect(wafListRefs('ipInList(request.remote_ip, office)')).toEqual([]) // unquoted name
+		expect(wafListRefs('ipInList(lower(request.path), "office-ips")')).toEqual([]) // call operand
+		expect(wafListRefs('ipInList(request.remote_ip, "ab")')).toEqual([]) // name too short
+		expect(wafListRefs('ipInList')).toEqual([]) // bare token
+	})
+})
+
+test.describe('waf lists: validListName', () => {
+	test('accepts the wafList.set name grammar (3..26, lowercase/digits/hyphens)', () => {
+		expect(validListName('office-ips')).toBe(true)
+		expect(validListName('abc')).toBe(true)
+		expect(validListName('a2c')).toBe(true)
+		expect(validListName('ab')).toBe(false) // too short
+		expect(validListName('a'.repeat(27))).toBe(false) // too long
+		expect(validListName('Office')).toBe(false) // uppercase
+		expect(validListName('1abc')).toBe(false) // starts with a digit
+		expect(validListName('abc-')).toBe(false) // ends with a hyphen
+		expect(validListName('a b')).toBe(false)
+	})
+})
+
+test.describe('waf lists: entry validation', () => {
+	test('accepts IPv4/IPv6 addresses and CIDRs', () => {
+		expect(validIPListEntry('203.0.113.7')).toBe(true)
+		expect(validIPListEntry('203.0.113.0/24')).toBe(true)
+		expect(validIPListEntry('0.0.0.0/0')).toBe(true)
+		expect(validIPListEntry('2001:db8::1')).toBe(true)
+		expect(validIPListEntry('2001:db8::/48')).toBe(true)
+		expect(validIPListEntry('::1')).toBe(true)
+		expect(validIPListEntry('::')).toBe(true)
+		expect(validIPListEntry('::ffff:192.0.2.1')).toBe(true)
+		expect(validIPListEntry('1:2:3:4:5:6:7:8')).toBe(true)
+	})
+
+	test('rejects garbage, zoned addresses, and out-of-range prefixes', () => {
+		expect(validIPListEntry('not-an-ip')).toBe(false)
+		expect(validIPListEntry('256.1.1.1')).toBe(false)
+		expect(validIPListEntry('01.2.3.4')).toBe(false) // leading zero (netip-strict)
+		expect(validIPListEntry('1.2.3')).toBe(false)
+		expect(validIPListEntry('fe80::1%eth0')).toBe(false) // zoned
+		expect(validIPListEntry('10.0.0.0/33')).toBe(false)
+		expect(validIPListEntry('2001:db8::/129')).toBe(false)
+		expect(validIPListEntry('10.0.0.0/08')).toBe(false) // leading-zero bits
+		expect(validIPListEntry('1:2:3:4:5:6:7:8:9')).toBe(false) // too many groups
+		expect(validIPListEntry('1::2::3')).toBe(false) // double '::'
+	})
+})
+
+test.describe('waf lists: parseIPListEntries', () => {
+	test('splits lines, trims, drops empties, keeps input order', () => {
+		const { entries, errors } = parseIPListEntries('  203.0.113.7 \n\n2001:db8::/48\n')
+		expect(entries).toEqual(['203.0.113.7', '2001:db8::/48'])
+		expect(errors).toEqual([])
+	})
+
+	test('reports invalid lines by line number', () => {
+		const { entries, errors } = parseIPListEntries('203.0.113.7\nnope\n10.0.0.0/8')
+		expect(entries).toEqual(['203.0.113.7', 'nope', '10.0.0.0/8'])
+		expect(errors).toHaveLength(1)
+		expect(errors[0]).toContain('line 2')
+		expect(errors[0]).toContain('nope')
+	})
+
+	test('flags duplicates against the first occurrence', () => {
+		const { errors } = parseIPListEntries('203.0.113.7\n10.0.0.0/8\n203.0.113.7')
+		expect(errors).toHaveLength(1)
+		expect(errors[0]).toContain('line 3')
+		expect(errors[0]).toContain('line 1')
+	})
+
+	test('flags over-long entries and oversize lists', () => {
+		const long = '1'.repeat(65)
+		expect(parseIPListEntries(long).errors[0]).toContain('64')
+		const big = Array.from({ length: 1001 }, (_, i) => `10.${Math.floor(i / 250)}.${Math.floor(i / 10) % 25}.${(i % 10) + 1}/32`).join('\n')
+		const { errors } = parseIPListEntries(big)
+		expect(errors.some((e) => e.includes('1000'))).toBe(true)
+	})
+
+	test('empty input parses to an empty, error-free list', () => {
+		expect(parseIPListEntries('')).toEqual({ entries: [], errors: [] })
+		expect(parseIPListEntries('  \n ')).toEqual({ entries: [], errors: [] })
 	})
 })

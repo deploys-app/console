@@ -7,6 +7,14 @@
 //
 // This module is a pure, side-effect-free helper so it can be unit-tested and
 // the modal UI stays thin.
+//
+// `ipInList(<field>, "<list-name>")` is a PLATFORM macro (see SPEC-waf-ip-lists),
+// not engine CEL: the apiserver expands it into an ipInCidr || chain at
+// materialization time, and the stored form is always the unexpanded macro.
+// This module mirrors the api package's macro scanner (`wafListRefs`) and
+// builds/parses the macro form like any other operator.
+
+import { validListName } from '$lib/waf/lists'
 
 /**
  * Escape a JS string for use inside a CEL double-quoted string literal. Returns
@@ -65,6 +73,7 @@ export interface OperatorMeta {
 	value: string
 	label: string
 	multi?: boolean // true → operand is a list of values (textarea)
+	valueKind?: 'listName' // operand is a named WAF IP list (Select fed by wafList.list)
 }
 
 const stringOperators: OperatorMeta[] = [
@@ -99,7 +108,10 @@ const operatorByMethod: Record<string, string> = Object.fromEntries(
 
 const ipOperators: OperatorMeta[] = [
 	{ value: 'in_cidr', label: 'in CIDR' },
-	{ value: 'ip_equals', label: 'equals' }
+	{ value: 'ip_equals', label: 'equals' },
+	// Named-list membership via the platform macro ipInList(<field>, "<name>").
+	{ value: 'in_ip_list', label: 'in IP list', valueKind: 'listName' },
+	{ value: 'not_in_ip_list', label: 'not in IP list', valueKind: 'listName' }
 ]
 
 /**
@@ -226,6 +238,12 @@ export function buildExpression (spec: ExpressionSpec): string {
 			snippet = `ipInCidr(${accessor}, ${quote(v)})`
 		} else if (spec.operator === 'ip_equals') {
 			snippet = `${accessor} == ${quote(v)}`
+		} else if (spec.operator === 'in_ip_list' || spec.operator === 'not_in_ip_list') {
+			// The macro's name literal admits no escapes — only a valid list name
+			// (the same grammar wafList.set accepts) may be spliced.
+			if (!validListName(v)) return ''
+			const call = `ipInList(${accessor}, "${v}")`
+			snippet = spec.operator === 'not_in_ip_list' ? `!${call}` : call
 		} else {
 			return ''
 		}
@@ -552,6 +570,46 @@ function parseMethodCall (s: string): ExpressionSpec | null {
 }
 
 /**
+ * Parse the `ipInList(<accessor>, "<name>")` platform-macro form — optionally
+ * negated with a leading `!` — back into an `in_ip_list` / `not_in_ip_list`
+ * spec. Strict, mirroring the generator: ip-type accessor only, plain
+ * double-quoted valid list name, no extra whitespace. Returns the spec or
+ * `null`.
+ *
+ * Deliberately stricter than the chip scanner (`parseWafListMacro` below),
+ * which tolerates arbitrary whitespace and any operand: a valid raw-authored
+ * usage like `ipInList(request.remote_ip,"x")` still shows a list chip on the
+ * manage page but keeps the edit page in Raw mode — the same round-trip
+ * fidelity bar as `in_cidr`.
+ */
+function matchIpInList (part: string): ExpressionSpec | null {
+	let negate = false
+	let body = part
+	if (body.startsWith('!')) {
+		negate = true
+		body = body.slice(1)
+	}
+	const head = 'ipInList('
+	if (!body.startsWith(head)) return null
+	const acc = matchAccessor(body.slice(head.length))
+	if (!acc) return null
+	const field = getField(acc.field)
+	if (!field || field.type !== 'ip') return null
+	let i = head.length + acc.end
+	if (body.slice(i, i + 2) !== ', ') return null
+	i += 2
+	// Name literal: plain double-quoted, no escapes (the macro grammar; a valid
+	// list name can't contain a quote or backslash anyway).
+	if (body[i] !== '"') return null
+	const close = body.indexOf('"', i + 1)
+	if (close < 0) return null
+	const name = body.slice(i + 1, close)
+	if (!validListName(name)) return null
+	if (body.slice(close + 1) !== ')') return null
+	return { field: acc.field, operator: negate ? 'not_in_ip_list' : 'in_ip_list', value: name }
+}
+
+/**
  * Parse exactly one CEL condition (a single conjunct) back into an
  * `ExpressionSpec`. Strict: only forms `buildExpression` can emit are accepted.
  * Returns `null` for anything else.
@@ -564,6 +622,10 @@ function parseCondition (part: string): ExpressionSpec | null {
 	// optionally negated with a leading `!`.
 	const method = parseMethodCall(s)
 	if (method) return method
+
+	// Platform-macro form: `ipInList(<accessor>, "<name>")`, optionally negated.
+	const ipList = matchIpInList(s)
+	if (ipList) return ipList
 
 	// Negated membership: `!(<accessor> in [...])` → `not_in_list`.
 	if (s.startsWith('!(') && s.endsWith(')')) {
@@ -717,4 +779,180 @@ export function parseExpression (cel: string): ExpressionGroup | null {
 	}
 
 	return { combinator: split.op ?? 'and', conditions }
+}
+
+// ---------------------------------------------------------------------------
+// ipInList macro scanner — TS mirror of the api package's waflistmacro.go.
+// Used to decorate rules/limits that reference a named IP list; the server
+// remains authoritative for validation. Keep the two implementations in sync —
+// the one behavior that must match exactly is never treating an `ipInList`
+// token INSIDE a string literal as a reference (string-skipping rules);
+// divergence on malformed input (e.g. a raw newline in a single-quoted
+// literal, which cel-go rejects outright) is cosmetic, chips only.
+
+function isMacroIdentStart (c: string): boolean {
+	return c === '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
+function isMacroIdentChar (c: string): boolean {
+	return isMacroIdentStart(c) || (c >= '0' && c <= '9')
+}
+
+/** CEL string-literal prefix: r/R (raw), b/B (bytes), or one of each in either order. */
+function isCelStringPrefix (ident: string): boolean {
+	if (ident.length === 1) return /[rRbB]/.test(ident)
+	if (ident.length === 2) {
+		return (/[rR]/.test(ident[0]) && /[bB]/.test(ident[1])) ||
+			(/[bB]/.test(ident[0]) && /[rR]/.test(ident[1]))
+	}
+	return false
+}
+
+/**
+ * Index just past the CEL string literal starting at `expr[i]` (a quote).
+ * Handles single- and triple-quoted forms; escapes honored unless `raw`. An
+ * unterminated literal consumes to end of input — the scanner is structural,
+ * it only must never find the token inside literal text.
+ */
+function skipCelStringLiteral (expr: string, i: number, raw: boolean): number {
+	const n = expr.length
+	const q = expr[i]
+	if (i + 2 < n && expr[i + 1] === q && expr[i + 2] === q) {
+		// triple-quoted
+		i += 3
+		while (i < n) {
+			if (!raw && expr[i] === '\\') {
+				i += 2
+				continue
+			}
+			if (expr[i] === q && i + 2 < n && expr[i + 1] === q && expr[i + 2] === q) return i + 3
+			i++
+		}
+		return n
+	}
+	i++
+	while (i < n) {
+		if (!raw && expr[i] === '\\') {
+			i += 2
+		} else if (expr[i] === q) {
+			return i + 1
+		} else if (expr[i] === '\n') {
+			// single-line literal cannot span a newline; resume scanning after it
+			return i + 1
+		} else {
+			i++
+		}
+	}
+	return n
+}
+
+/**
+ * Parse one macro immediately after its identifier token (`i` points just past
+ * "ipInList"). Grammar (whitespace allowed between the punctuation):
+ *
+ *	ipInList( <ident>(.<ident> | ["<key>"])* , "<list-name>" )
+ *
+ * Returns the list name and the index just past the closing paren, or `null`
+ * when the usage doesn't match (the server rejects such expressions; here a
+ * malformed usage simply carries no resolvable ref).
+ */
+function parseWafListMacro (expr: string, i: number): { name: string, end: number } | null {
+	const n = expr.length
+	const skipWS = (j: number): number => {
+		while (j < n && (expr[j] === ' ' || expr[j] === '\t' || expr[j] === '\n' || expr[j] === '\r')) j++
+		return j
+	}
+
+	i = skipWS(i)
+	if (expr[i] !== '(') return null
+	i = skipWS(i + 1)
+
+	// operand := ident (("." ident) | ("[" dq-string "]"))* — no inner whitespace
+	if (i >= n || !isMacroIdentStart(expr[i])) return null
+	while (i < n && isMacroIdentChar(expr[i])) i++
+	let selectors = true
+	while (selectors && i < n) {
+		if (expr[i] === '.') {
+			i++
+			if (i >= n || !isMacroIdentStart(expr[i])) return null
+			while (i < n && isMacroIdentChar(expr[i])) i++
+		} else if (expr[i] === '[') {
+			i++
+			if (expr[i] !== '"') return null
+			i++
+			while (i < n && expr[i] !== '"') {
+				if (expr[i] === '\\' || expr[i] === '\n' || expr[i] === '\r') return null
+				i++
+			}
+			if (i >= n) return null
+			i++ // closing quote
+			if (expr[i] !== ']') return null
+			i++
+		} else {
+			selectors = false
+		}
+	}
+
+	i = skipWS(i)
+	if (expr[i] !== ',') return null
+	i = skipWS(i + 1)
+
+	// name := plain double-quoted valid list name, no escapes
+	if (expr[i] !== '"') return null
+	i++
+	const nameStart = i
+	while (i < n && expr[i] !== '"') {
+		if (expr[i] === '\\' || expr[i] === '\n' || expr[i] === '\r') return null
+		i++
+	}
+	if (i >= n) return null
+	const name = expr.slice(nameStart, i)
+	i++ // closing quote
+	if (!validListName(name)) return null
+
+	i = skipWS(i)
+	if (expr[i] !== ')') return null
+	return { name, end: i + 1 }
+}
+
+/**
+ * The sorted, de-duplicated list names referenced by well-formed ipInList
+ * macros in a rule expression or limit filter. Skips string literals (all CEL
+ * forms: `"…"`, `'…'`, triple-quoted, with r/R raw and b/B bytes prefixes,
+ * honoring escapes in non-raw forms) and `//` comments, so a token inside
+ * literal text is never a reference.
+ */
+export function wafListRefs (expr: string): string[] {
+	const names = new Set<string>()
+	const s = String(expr ?? '')
+	const n = s.length
+	let i = 0
+	while (i < n) {
+		const c = s[i]
+		if (c === '/' && s[i + 1] === '/') {
+			const j = s.indexOf('\n', i)
+			if (j < 0) break
+			i = j + 1
+		} else if (c === '"' || c === '\'') {
+			i = skipCelStringLiteral(s, i, false)
+		} else if (isMacroIdentStart(c)) {
+			const start = i
+			while (i < n && isMacroIdentChar(s[i])) i++
+			const ident = s.slice(start, i)
+			if (i < n && (s[i] === '"' || s[i] === '\'') && isCelStringPrefix(ident)) {
+				i = skipCelStringLiteral(s, i, /[rR]/.test(ident))
+				continue
+			}
+			if (ident === 'ipInList') {
+				const m = parseWafListMacro(s, i)
+				if (m) {
+					names.add(m.name)
+					i = m.end
+				}
+			}
+		} else {
+			i++
+		}
+	}
+	return [...names].sort()
 }
