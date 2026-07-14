@@ -6,9 +6,11 @@
 		placeholder?: string
 		/** id for the inner input (label association) */
 		id?: string
+		/** freeze the control — chips stay visible but nothing is editable */
+		disabled?: boolean
 	}
 
-	let { tags = $bindable([]), placeholder = '', id }: Props = $props()
+	let { tags = $bindable([]), placeholder = '', id, disabled = false }: Props = $props()
 
 	let draft = $state('')
 
@@ -16,6 +18,7 @@
 
 	// Commit the current draft as a chip: trim, ignore empties, de-dupe.
 	function commit () {
+		if (disabled) return
 		const v = draft.trim()
 		draft = ''
 		if (!v) return
@@ -45,7 +48,7 @@
 	{#each tags as tag, i (tag)}
 		<span class="chip">
 			<span class="chip-label">{tag}</span>
-			<button type="button" class="chip-remove" aria-label={`Remove ${tag}`} onclick={(e) => { e.stopPropagation(); remove(i) }}>
+			<button type="button" class="chip-remove" aria-label={`Remove ${tag}`} {disabled} onclick={(e) => { e.stopPropagation(); remove(i) }}>
 				<i class="fa-solid fa-xmark"></i>
 			</button>
 		</span>
@@ -53,6 +56,7 @@
 	<input
 		bind:this={inputEl}
 		{id}
+		{disabled}
 		class="chip-field"
 		bind:value={draft}
 		placeholder={tags.length === 0 ? placeholder : ''}
@@ -104,9 +108,13 @@
 		transition: background-color var(--timing-faster) ease, color var(--timing-faster) ease;
 	}
 
-	.chip-remove:hover {
+	.chip-remove:hover:not(:disabled) {
 		background-color: hsl(var(--hsl-content) / 0.12);
 		color: hsl(var(--hsl-content));
+	}
+
+	.chip-remove:disabled {
+		cursor: default;
 	}
 
 	.chip-field {
