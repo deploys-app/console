@@ -249,7 +249,8 @@
 				</thead>
 				<tbody>
 					{#each rules as rule, i (rule.id)}
-						<tr>
+						<!-- Anchor target for the metrics page's event-table rule links. -->
+						<tr id={`waf-rule-${rule.id}`}>
 							<td>
 								<span class="font-mono text-sm text-content/60">{rule.id}</span>
 							</td>

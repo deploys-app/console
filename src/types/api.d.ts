@@ -909,6 +909,48 @@ declare namespace Api {
         items: WafListItem[]
     }
 
+    // waf.events request — recent sampled match events for a zone, newest
+    // first. Events are SAMPLES (bounded capture per controller pod) retained
+    // 3 days; waf.metrics remains the exact count.
+    export type WafEventsRequest = {
+        project: string
+        location: string
+        // optional filter, short project-local rule id
+        ruleId?: string
+        // optional filter
+        action?: WafAction
+        // keyset cursor: events with id < before (ids are time-ordered ULIDs)
+        before?: string
+        // 0 = 50, max 200
+        limit?: number
+    }
+
+    export type WafEventsResult = {
+        items: WafEvent[]
+        // pass as `before` for the next page; '' = exhausted
+        next: string
+    }
+
+    // One sampled match. ruleId is the short, project-local id joining to
+    // WafRule.id — but events outlive rules by up to 3 days (and waf.set
+    // regenerates unknown ids), so it may match nothing in the current zone.
+    export type WafEvent = {
+        id: string
+        at: string
+        ruleId: string
+        action: WafAction
+        status: number
+        clientIp: string
+        // ISO 3166-1 alpha-2, '' if unresolved
+        country: string
+        // 0 if unresolved
+        asn: number
+        method: string
+        host: string
+        // URL path only (no query)
+        path: string
+    }
+
     export type CacheAction = 'cache' | 'bypass'
 
     export type CacheOverride = {
