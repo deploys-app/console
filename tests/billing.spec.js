@@ -213,6 +213,18 @@ test.describe('invoice detail', () => {
 		await expect(page.getByRole('button', { name: /Attach WHT certificate/ })).toBeVisible()
 	})
 
+	test('hides page-level Attach WHT on an open company invoice (use Pay for slip+cert together)', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice }, // company, open
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+		await page.goto('/billing/invoice?id=inv-1')
+		// Cert-only attach needs an existing slip; on an open invoice the cert rides
+		// along with the slip in the Pay modal instead of a separate button.
+		await expect(page.getByRole('button', { name: /^Attach WHT certificate$/ })).toHaveCount(0)
+		await expect(page.getByRole('button', { name: 'Pay' })).toBeVisible()
+	})
+
 	test('hides the Attach WHT certificate button for an individual invoice', async ({ page }) => {
 		await setMocks({
 			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, taxEntityType: 'individual' } },
