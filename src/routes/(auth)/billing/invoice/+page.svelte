@@ -65,15 +65,17 @@
 		}
 	}
 
-	// Attach a withholding-tax certificate after the fact (company invoices). Shown
-	// while the invoice is still open (may withhold) or once it was paid with
-	// withholding — for customers who send the 50 ทวิ certificate later.
+	// Attach a withholding-tax certificate after payment (company invoices paid
+	// with WHT). For an open invoice, attach the cert together with the payment
+	// slip in the Pay modal — billing.uploadWHTCertificate requires an existing
+	// slip, so showing this button before one is uploaded only produces
+	// "upload your payment slip before attaching a withholding tax certificate".
 	const MAX_CERT_SIZE = 10 * 1024 * 1024
 	let attachingCert = $state(false)
 	let elCert = $state<HTMLInputElement | null>(null)
 	const canAttachCert = $derived(
 		invoice.taxEntityType === 'company' &&
-		(invoice.status === 'open' || invoice.withholdingTaxAmount > 0)
+		invoice.withholdingTaxAmount > 0
 	)
 
 	async function onCertChange (e: Event) {
