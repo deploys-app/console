@@ -66,6 +66,31 @@ test.describe('billing accounts', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText(/don't have access to any billing accounts/)).toBeVisible()
 	})
+
+	test('create form labels tax name as Company Name when entity type is company', async ({ page }) => {
+		await page.goto('/billing/create')
+
+		const main = page.locator('.content-wrapper')
+		const taxNameLabel = main.locator('label[for="input-tax_name"]')
+		await expect(taxNameLabel).toHaveText('Name')
+
+		await main.locator('#input-type').selectOption('company')
+		await expect(taxNameLabel).toHaveText('Company Name')
+
+		await main.locator('#input-type').selectOption('individual')
+		await expect(taxNameLabel).toHaveText('Name')
+	})
+
+	test('update form labels tax name as Company Name for a company account', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: sampleBillingAccount } // type: company
+		})
+
+		await page.goto('/billing/create?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.locator('label[for="input-tax_name"]')).toHaveText('Company Name')
+	})
 })
 
 test.describe('invoice detail', () => {
