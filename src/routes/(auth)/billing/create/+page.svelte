@@ -104,7 +104,7 @@
 		</div>
 
 		<div class="field">
-			<label for="input-tax_name">Name</label>
+			<label for="input-tax_name">{form.type === 'company' ? 'Company Name' : 'Name'}</label>
 			<div class="input">
 				<input id="input-tax_name" bind:value={form.taxName} required>
 			</div>
