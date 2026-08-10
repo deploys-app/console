@@ -596,6 +596,129 @@ function wafLimitMetrics (timeRange?: string) {
 	return { series, total }
 }
 
+// Crockford base32 (the ULID alphabet — no I, L, O, U). Event ids must be
+// lexicographically time-ordered because waf.events pages with `id < before`.
+const ULID_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
+
+/** Mint a ULID-shaped id: 10 chars of ms timestamp + 16 random chars. */
+function mockUlid (ms: number): string {
+	let t = ''
+	let x = ms
+	for (let i = 0; i < 10; i++) {
+		t = ULID_ALPHABET[x % 32] + t
+		x = Math.floor(x / 32)
+	}
+	let r = ''
+	for (let i = 0; i < 16; i++) r += ULID_ALPHABET[Math.floor(Math.random() * 32)]
+	return t + r
+}
+
+type MockWafEvent = {
+	id: string
+	at: string
+	ruleId: string
+	action: string
+	status: number
+	clientIp: string
+	country: string
+	asn: number
+	method: string
+	host: string
+	path: string
+}
+
+// Sampled match events for the seed zone, generated once per dev session so
+// keyset pagination stays coherent across requests. Spread over the 3-day
+// retention window, newest first. IPs are documentation ranges (RFC 5737) —
+// realistic-looking, never real. Includes events for `old-block-php`, a rule
+// id that no longer exists in the zone, to exercise the deleted-rule fallback.
+let wafEventsSeed: MockWafEvent[] | undefined
+
+function wafEventsAll (): MockWafEvent[] {
+	if (wafEventsSeed) return wafEventsSeed
+
+	const now = Date.now()
+	const pick = <T>(xs: T[]): T => xs[Math.floor(Math.random() * xs.length)]
+	const events: MockWafEvent[] = []
+
+	const host = `acme.${DOMAIN_SUFFIX}`
+
+	// One noisy /24 probing admin paths (the "it's one /24 in RU" story).
+	for (let i = 0; i < 70; i++) {
+		const ms = now - Math.floor(Math.random() * 3 * 86400_000)
+		events.push({
+			id: mockUlid(ms),
+			at: new Date(ms).toISOString(),
+			ruleId: 'block-admin',
+			action: 'block',
+			status: 403,
+			clientIp: `203.0.113.${10 + Math.floor(Math.random() * 40)}`,
+			country: pick(['RU', 'RU', 'RU', 'CN', 'VN']),
+			asn: pick([12389, 4134, 45899]),
+			method: pick(['POST', 'GET', 'POST']),
+			host,
+			path: pick(['/admin', '/admin/login', '/admin/config.php', '/admin/.env'])
+		})
+	}
+	// Bot traffic that only gets logged.
+	for (let i = 0; i < 40; i++) {
+		const ms = now - Math.floor(Math.random() * 3 * 86400_000)
+		events.push({
+			id: mockUlid(ms),
+			at: new Date(ms).toISOString(),
+			ruleId: 'log-bots',
+			action: 'log',
+			status: 0,
+			clientIp: `198.51.100.${1 + Math.floor(Math.random() * 250)}`,
+			country: pick(['US', 'DE', 'SG', 'FR', '']),
+			asn: pick([15169, 16509, 14061, 0]),
+			method: 'GET',
+			host,
+			path: pick(['/', '/robots.txt', '/sitemap.xml', '/api/items', '/products'])
+		})
+	}
+	// The office allow rule firing.
+	for (let i = 0; i < 8; i++) {
+		const ms = now - Math.floor(Math.random() * 3 * 86400_000)
+		events.push({
+			id: mockUlid(ms),
+			at: new Date(ms).toISOString(),
+			ruleId: 'allow-office',
+			action: 'allow',
+			status: 0,
+			clientIp: '203.0.113.7',
+			country: 'TH',
+			asn: 7470,
+			method: pick(['GET', 'POST']),
+			host,
+			path: pick(['/admin', '/admin/metrics'])
+		})
+	}
+	// Events from a rule that was since deleted (waf.set regenerates unknown
+	// ids) — the console must render these unlinked with a tooltip.
+	for (let i = 0; i < 6; i++) {
+		const ms = now - Math.floor(Math.random() * 3 * 86400_000)
+		events.push({
+			id: mockUlid(ms),
+			at: new Date(ms).toISOString(),
+			ruleId: 'old-block-php',
+			action: 'block',
+			status: 403,
+			clientIp: `192.0.2.${1 + Math.floor(Math.random() * 250)}`,
+			country: pick(['BR', 'IN']),
+			asn: pick([26599, 9829]),
+			method: 'GET',
+			host,
+			path: pick(['/wp-login.php', '/xmlrpc.php'])
+		})
+	}
+
+	// Newest first — ULIDs are time-ordered, so id desc == time desc.
+	events.sort((a, b) => (a.id < b.id ? 1 : -1))
+	wafEventsSeed = events
+	return events
+}
+
 // Locations (besides the seed LOCATION_ID) that have had a firewall created in
 // this dev session, mapped to { description, polls }. `polls` counts how many
 // times the zone has been read while pending; the deployer is simulated by
@@ -2190,6 +2313,20 @@ const handlers: Record<string, (args: any) => object> = {
 		const location = args?.location ?? LOCATION_ID
 		if (location === LOCATION_ID) return ok(wafLimitMetrics(args?.timeRange))
 		return ok({ series: [], total: 0 })
+	},
+	// Mirrors the server's read semantics: newest first, rule/action filters,
+	// keyset `before` cursor (id < before), `next` set only when the page is
+	// exactly `limit` long.
+	'waf.events': (args) => {
+		const location = args?.location ?? LOCATION_ID
+		if (location !== LOCATION_ID) return ok({ items: [], next: '' })
+		let items = wafEventsAll()
+		if (args?.ruleId) items = items.filter((e) => e.ruleId === args.ruleId)
+		if (args?.action) items = items.filter((e) => e.action === args.action)
+		if (args?.before) items = items.filter((e) => e.id < args.before)
+		const limit = Math.min(Math.max(Number(args?.limit) || 50, 1), 200)
+		const page = items.slice(0, limit)
+		return ok({ items: page, next: page.length === limit ? page[page.length - 1].id : '' })
 	},
 	'waf.delete': (args) => {
 		if (args?.location) wafConfigured.delete(args.location)
