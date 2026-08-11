@@ -1135,6 +1135,62 @@ declare namespace Api {
         items: NotificationDelivery[]
     }
 
+    // Alert — metric alert rules on deployment usage (project-scoped,
+    // location-less at the resource level; Target carries the location, like
+    // Notification carries its delivery config). Evaluated by an apiserver cron
+    // tick against the existing per-minute deployment_usages table; delivery
+    // reuses the notification-channels feature entirely.
+    export type AlertTarget = {
+        location: string
+        deployment: string
+    }
+
+    // Threshold's unit depends on Metric: percent 0-100 for cpu/memory, req/min
+    // for requests, bytes/min for egress. Op defaults to ">=" server-side when
+    // left empty.
+    export type AlertCondition = {
+        metric: 'cpu' | 'memory' | 'requests' | 'egress'
+        op: '>=' | '<='
+        threshold: number
+        forMinutes: number
+    }
+
+    export type AlertItem = {
+        project: string
+        name: string
+        target: AlertTarget
+        condition: AlertCondition
+        // 0 = notify only on trigger/resolve transitions.
+        renotifyMinutes: number
+        disabled: boolean
+        // read-only evaluator state, set by the alert-tick cron.
+        status: 'ok' | 'firing' | 'nodata'
+        lastValue: number | null
+        firingSince: string | null
+        lastEvaluatedAt: string | null
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+        updatedBy: string
+    }
+
+    export type AlertListResult = {
+        project: string
+        items: AlertItem[]
+    }
+
+    export type AlertEvent = {
+        at: string
+        transition: 'trigger' | 'resolve' | 'renotify'
+        value: number | null
+    }
+
+    export type AlertEventsResult = {
+        project: string
+        name: string
+        items: AlertEvent[]
+    }
+
     // cache.metrics reuses WafMetricsTimeRange.
     export type CacheMetricsSeries = {
         overrideId: string

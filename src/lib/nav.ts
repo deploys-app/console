@@ -37,5 +37,6 @@ export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'github', title: 'GitHub', icon: 'fa-code-branch', link: '/github', preview: true },
 	{ id: 'scheduler', title: 'Scheduler', icon: 'fa-clock', link: '/scheduler', preview: true },
 	{ id: 'notification', title: 'Notifications', icon: 'fa-bell', link: '/notification', preview: true },
+	{ id: 'alert', title: 'Alerts', icon: 'fa-bell-exclamation', link: '/alert', preview: true },
 	{ id: 'audit-log', title: 'Audit Logs', icon: 'fa-clipboard-list', link: '/audit-log' }
 ]
