@@ -162,7 +162,10 @@ const locations = [
 		cname: 'rcf2.deploys.app.',
 		cpuAllocatable: ['100m', '250m', '500m', '1000m', '2000m'],
 		memoryAllocatable: ['128Mi', '256Mi', '512Mi', '1Gi', '2Gi'],
-		features: { workloadIdentity: true, disk: {}, waf: {}, cache: {}, transform: {} },
+		// Only the seed location offers managed rules (OWASP CRS); sg1 keeps the
+		// bare waf flag so the manage page's "Not available in this location"
+		// card state is reachable in dev.
+		features: { workloadIdentity: true, disk: {}, waf: { managedRules: true }, cache: {}, transform: {} },
 		createdAt: CREATED_AT
 	},
 	{
@@ -517,6 +520,17 @@ const wafZone = {
 	createdBy: USER_EMAIL
 }
 
+// Managed-rules (OWASP CRS) block for the seed zone. Session-mutable so the
+// manage page's card round-trips (enable → save → reload) within a dev
+// session; null = never configured / cleared by a set that omitted it.
+let wafSeedManagedRules: object | null = {
+	enabled: true,
+	mode: 'enforce',
+	paranoiaLevel: 1,
+	anomalyThreshold: 5,
+	excludedRules: [942100]
+}
+
 const wafRangeSeconds: Record<string, number> = { '1h': 3600, '6h': 21600, '12h': 43200, '1d': 86400, '7d': 604800, '30d': 2592000 }
 
 // Synthetic match metrics for the seed zone, so the firewall index sparkline +
@@ -601,7 +615,7 @@ function wafLimitMetrics (timeRange?: string) {
 // times the zone has been read while pending; the deployer is simulated by
 // flipping the zone from pending → success after the first poll, so the index
 // spinner visibly resolves on its own. Lets create → manage flow work too.
-const wafConfigured = new Map<string, { description: string, polls: number }>()
+const wafConfigured = new Map<string, { description: string, polls: number, managedRules?: object | null }>()
 
 /**
  * Build a WAF zone for a session-created location. `advance` simulates the
@@ -623,6 +637,7 @@ function wafConfiguredZone (location: string, advance = false) {
 		description: entry.description,
 		rules: [],
 		limits: [],
+		managedRules: entry.managedRules ?? null,
 		status,
 		action: 'create',
 		createdAt: CREATED_AT,
@@ -1671,7 +1686,9 @@ const handlers: Record<string, (args: any) => object> = {
 	},
 
 	'location.list': () => list(locations),
-	'location.get': (args) => ok(locations.find((l) => l.id === args?.location) ?? locations[0]),
+	// Callers pass the location as `id` (matching the real API); `location` is
+	// kept as a legacy fallback.
+	'location.get': (args) => ok(locations.find((l) => l.id === (args?.id ?? args?.location)) ?? locations[0]),
 
 	'deployment.list': () => list(deployments.map(toDeploymentListItem)),
 	// revision > 0 returns that revision's historical spec (like the real
@@ -2158,7 +2175,7 @@ const handlers: Record<string, (args: any) => object> = {
 	// wafConfiguredZone), so the index spinner resolves on its own. waf.set and
 	// waf.delete keep the index/create/manage flows coherent within a session.
 	'waf.list': () => {
-		const items = [{ ...wafZone, location: LOCATION_ID }]
+		const items = [{ ...wafZone, location: LOCATION_ID, managedRules: wafSeedManagedRules }]
 		for (const location of wafConfigured.keys()) {
 			items.push(wafConfiguredZone(location, true))
 		}
@@ -2166,7 +2183,7 @@ const handlers: Record<string, (args: any) => object> = {
 	},
 	'waf.get': (args) => {
 		const location = args?.location ?? LOCATION_ID
-		if (location === LOCATION_ID) return ok({ ...wafZone, location: LOCATION_ID })
+		if (location === LOCATION_ID) return ok({ ...wafZone, location: LOCATION_ID, managedRules: wafSeedManagedRules })
 		if (wafConfigured.has(location)) {
 			return ok(wafConfiguredZone(location))
 		}
@@ -2174,8 +2191,16 @@ const handlers: Record<string, (args: any) => object> = {
 	},
 	'waf.set': (args) => {
 		const location = args?.location
-		if (location && location !== LOCATION_ID) {
-			wafConfigured.set(location, { description: args?.description ?? '', polls: 0 })
+		// waf.set replaces the whole zone: an omitted managedRules clears the
+		// block (whole-replace semantics), so ?? null — not "keep".
+		if (location === LOCATION_ID) {
+			wafSeedManagedRules = args?.managedRules ?? null
+		} else if (location) {
+			wafConfigured.set(location, {
+				description: args?.description ?? '',
+				polls: 0,
+				managedRules: args?.managedRules ?? null
+			})
 		}
 		return ok({})
 	},

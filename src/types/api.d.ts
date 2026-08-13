@@ -170,7 +170,10 @@ declare namespace Api {
         features: {
             workloadIdentity?: boolean
             disk?: Record<string, never>
-            waf?: Record<string, never>
+            // Non-null = the location supports WAF zones. managedRules gates
+            // the managed-rules (OWASP CRS) block on waf.set — legacy "waf": {}
+            // means supported without managed rules.
+            waf?: { managedRules?: boolean }
             cache?: Record<string, never>
             transform?: Record<string, never>
         }
@@ -780,12 +783,32 @@ declare namespace Api {
         filter?: string
     }
 
+    // Managed signature ruleset (OWASP Core Rule Set via the parapet Coraza
+    // engine, evaluated after the zone's CEL rules and before its rate limits).
+    // waf.set follows the zone's whole-replace semantics: omitting the field
+    // clears the block; enabled:false keeps the tuning stored for re-enable.
+    export type WafManagedRules = {
+        enabled: boolean
+        // '' or 'enforce' = block over-threshold requests (403);
+        // 'detect' = rules evaluate and log but never block.
+        mode?: 'enforce' | 'detect' | ''
+        // 0 = default (1); 1..4. Higher = stricter, more false positives.
+        paranoiaLevel?: number
+        // 0 = default (5); 1..100. Each critical match scores 5.
+        anomalyThreshold?: number
+        // CRS detection-rule ids to disable (911100..948999, max 50).
+        excludedRules?: number[]
+    }
+
     export type WafZone = {
         project: string
         location: string
         description: string
         rules: WafRule[]
         limits: WafLimit[]
+        // null/absent = never configured (or cleared); a disabled block keeps
+        // its tuning and round-trips through waf.get → edit → waf.set.
+        managedRules?: WafManagedRules | null
         status: 'pending' | 'success' | 'error'
         action: 'create' | 'delete'
         createdAt: string
