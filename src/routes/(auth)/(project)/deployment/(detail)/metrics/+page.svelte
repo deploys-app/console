@@ -31,6 +31,7 @@
 	// Static deployments have no live metrics pipeline — the live and aggregate
 	// windows resolve to the same data, so the Live row is redundant noise.
 	const isStatic = $derived(deployment.type === 'Static')
+	const hasReplicas = $derived(deployment.type !== 'Static' && deployment.type !== 'CronJob')
 
 	const RELOAD_INTERVAL_MS = 60_000
 
@@ -47,6 +48,7 @@
 
 	let cpu = $state<MetricSeries[]>([])
 	let memory = $state<MetricSeries[]>([])
+	let replica = $state<MetricSeries[]>([])
 	let request = $state<MetricSeries[]>([])
 	let egress = $state<MetricSeries[]>([])
 	let storage = $state<MetricSeries[]>([])
@@ -77,6 +79,7 @@
 			if (clearFirst) {
 				cpu = []
 				memory = []
+				replica = []
 				request = []
 				egress = []
 				storage = []
@@ -92,6 +95,9 @@
 				{ prefix: 'Allocated', lines: resp.result.memory ?? [] },
 				{ prefix: 'Limit', lines: resp.result.memoryLimit ?? [], dashStyle: 'LongDash', color: 'red' }
 			]
+			if (hasReplicas) {
+				replica = [{ prefix: 'Replicas', lines: resp.result.replica ?? [] }]
+			}
 			if (deployment.type === 'WebService' || deployment.type === 'Static') {
 				request = [{ prefix: 'Requests', lines: resp.result.requests ?? [] }]
 			}
@@ -124,7 +130,7 @@
 		}
 	})
 
-	// Refetch all 5 charts when the deployment identity changes. A project switch
+	// Refetch all charts when the deployment identity changes. A project switch
 	// unmounts this (detail) page (overrideRedirect '/deployment'), but the tab
 	// bar / list link here per deployment, so /deployment/metrics?name=A ->
 	// ?name=B (or a ?location= change) reuses this component WITHOUT remounting —
@@ -344,6 +350,9 @@
 	{#if deployment.type !== 'Static'}
 		<Chart title="vCPU (second)" unit="seconds" series={cpu} range={filter.range} />
 		<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
+	{/if}
+	{#if hasReplicas}
+		<Chart title="Replicas" unit="count" series={replica} range={filter.range} />
 	{/if}
 	<!-- Static deployments have no pods, but the static-gateway reports their
 	     per-site request count, so Requests applies to them too. -->
