@@ -1754,6 +1754,7 @@ const handlers: Record<string, (args: any) => object> = {
 		memoryLimit: metricPodLines(536870912),
 		requests: metricPodLines(120),
 		egress: metricPodLines(1048576),
+		replica: metricLine('d128-77', 2),
 		storage: dailyMetricLine('static_storage', 1610612736)
 	}),
 

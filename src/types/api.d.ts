@@ -1201,6 +1201,7 @@ declare namespace Api {
         memoryLimit?: UsageMetricsLine[]
         requests?: UsageMetricsLine[]
         egress?: UsageMetricsLine[]
+        replica?: UsageMetricsLine[]
         storage?: UsageMetricsLine[]
     }
 

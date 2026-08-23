@@ -445,6 +445,7 @@ test.describe('deployment detail — static', () => {
 		await expect(main.getByText('Egress (bytes)')).toBeVisible()
 		await expect(main.getByText('vCPU (second)')).toHaveCount(0)
 		await expect(main.getByText('Memory (bytes)')).toHaveCount(0)
+		await expect(main.getByRole('heading', { name: 'Replicas' })).toHaveCount(0)
 	})
 
 	test('hides the container-only detail sections', async ({ page }) => {
@@ -470,7 +471,7 @@ test.describe('deployment detail — static', () => {
 })
 
 test.describe('deployment detail — non-static keeps pod surface', () => {
-	test('WebService keeps the Logs and Events tabs and the CPU/Memory charts', async ({ page }) => {
+	test('WebService keeps the Logs and Events tabs and the CPU/Memory/Replicas charts', async ({ page }) => {
 		await setMocks({
 			'deployment.get': { ok: true, result: sampleDeployment },
 			'location.get': { ok: true, result: defaultLocation },
@@ -486,6 +487,7 @@ test.describe('deployment detail — non-static keeps pod surface', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('vCPU (second)')).toBeVisible()
 		await expect(main.getByText('Memory (bytes)')).toBeVisible()
+		await expect(main.getByRole('heading', { name: 'Replicas' })).toBeVisible()
 	})
 
 	test('WebService keeps the container-only detail sections', async ({ page }) => {
