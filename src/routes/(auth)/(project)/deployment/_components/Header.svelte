@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DeploymentStatusIcon from '$lib/components/DeploymentStatusIcon.svelte'
 	import DeploymentPodErrors from '$lib/deployment/DeploymentPodErrors.svelte'
+	import { deploymentStatusPill } from '$lib/deployment/status'
 	import { page } from '$app/stores'
 	import api from '$lib/api'
 	import * as modal from '$lib/modal'
@@ -33,32 +34,7 @@
 	// apiserver rejects static, cronjob, paused, and mid-deploy.
 	const canRestart = $derived(canPause && deployment.type !== 'CronJob')
 
-	const statusTone = $derived(
-		deployment.status === 'success' && deployment.action === 'pause'
-			? 'warn'
-			: deployment.status === 'success'
-				? 'positive'
-				: deployment.status === 'pending'
-					? 'warn'
-					: 'negative'
-	)
-
-	const statusLabel = $derived.by(() => {
-		if (deployment.action === 'pause') return 'Paused'
-		if (deployment.action === 'delete') return 'Deleting'
-		if (deployment.status === 'pending') return 'Pending'
-		if (deployment.status === 'error') return 'Error'
-		if (deployment.status === 'cancelled') return 'Cancelled'
-		return 'Success'
-	})
-
-	// The DeploymentStatusIcon next to the name already carries the visual
-	// signal for a healthy running deployment. Only surface the status pill
-	// in the meta row when it tells you something the icon can't (paused,
-	// deleting, pending, error). Keeps the common running case clean.
-	const showStatusPill = $derived(
-		deployment.action !== 'deploy' || deployment.status !== 'success'
-	)
+	const statusPill = $derived(deploymentStatusPill(deployment))
 
 	function pause () {
 		modal.confirm({
@@ -302,7 +278,7 @@
 		font-weight: 600;
 	}
 
-	.status-pill[data-tone='warn'] {
+	.status-pill[data-tone='warning'] {
 		background: hsl(var(--hsl-warning) / 0.12);
 		color: hsl(var(--hsl-warning));
 	}
@@ -323,7 +299,7 @@
 		background: hsl(var(--hsl-positive));
 		animation: live-pulse 1.8s ease-out infinite;
 	}
-	.meta__dot[data-tone='warn'] { background: hsl(var(--hsl-warning)); }
+	.meta__dot[data-tone='warning'] { background: hsl(var(--hsl-warning)); }
 	.meta__dot[data-tone='negative'] { background: hsl(var(--hsl-negative)); }
 
 	@keyframes live-pulse {
@@ -401,10 +377,10 @@
 	</div>
 
 	<div class="masthead__meta">
-		{#if showStatusPill}
-			<span class="status-pill" data-tone={statusTone}>
-				<span class="meta__dot" data-tone={statusTone}></span>
-				{statusLabel}
+		{#if statusPill}
+			<span class="status-pill" data-tone={statusPill.tone}>
+				<span class="meta__dot" data-tone={statusPill.tone}></span>
+				{statusPill.label}
 			</span>
 			<span class="meta__divider"></span>
 		{/if}

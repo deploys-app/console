@@ -52,6 +52,67 @@ test.describe('deployments', () => {
 		await expect(main.getByText(/Something went wrong while loading this data/)).toBeVisible()
 		await expect(main.getByRole('button', { name: 'Try again' })).toBeVisible()
 	})
+
+	test('list status pills match the detail page', async ({ page }) => {
+		const cases = [
+			{ name: 'web', status: 'success', action: 'deploy', pill: null },
+			{ name: 'web-pending', status: 'pending', action: 'deploy', pill: 'Pending' },
+			{ name: 'web-error', status: 'error', action: 'deploy', pill: 'Error' },
+			{ name: 'web-paused', status: 'success', action: 'pause', pill: 'Paused' },
+			{ name: 'web-deleting', status: 'pending', action: 'delete', pill: 'Deleting' },
+			{ name: 'web-cancelled', status: 'cancelled', action: 'deploy', pill: 'Cancelled' }
+		]
+
+		await setMocks({
+			'deployment.list': {
+				ok: true,
+				result: {
+					items: cases.map((c) => ({
+						...sampleDeployment,
+						name: c.name,
+						status: c.status,
+						action: c.action
+					}))
+				}
+			}
+		})
+
+		await page.goto('/deployment?project=test-project')
+		const main = page.locator('.content-wrapper')
+
+		for (const c of cases) {
+			const row = main.locator('tr', { has: page.getByRole('link', { name: c.name, exact: true }) })
+			if (c.pill) {
+				await expect(row.locator('.status-pill')).toHaveText(c.pill)
+			} else {
+				await expect(row.locator('.status-pill')).toHaveCount(0)
+			}
+		}
+		await expect(main.getByText('Deploying')).toHaveCount(0)
+		await expect(main.getByText('Failed')).toHaveCount(0)
+
+		for (const c of cases) {
+			await setMocks({
+				'deployment.get': {
+					ok: true,
+					result: {
+						...sampleDeployment,
+						name: c.name,
+						status: c.status,
+						action: c.action
+					}
+				},
+				'location.get': { ok: true, result: defaultLocation }
+			})
+			await page.goto(`/deployment/detail?project=test-project&location=gke&name=${c.name}`)
+			const pill = page.locator('.masthead .status-pill')
+			if (c.pill) {
+				await expect(pill).toHaveText(c.pill)
+			} else {
+				await expect(pill).toHaveCount(0)
+			}
+		}
+	})
 })
 
 test.describe('deployment detail — sidecars', () => {

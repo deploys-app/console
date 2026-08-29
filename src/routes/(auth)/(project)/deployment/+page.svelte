@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte'
 	import { getPermissionContext } from '$lib/permission'
 	import { registerPageActions } from '$lib/pageactions/store.svelte'
+	import { deploymentStatusPill } from '$lib/deployment/status'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -54,31 +55,6 @@
 		InternalTCPService: { icon: 'fa-network-wired', label: 'Internal TCP' },
 		Worker: { icon: 'fa-gears', label: 'Worker' },
 		CronJob: { icon: 'fa-clock', label: 'Cron Job' }
-	}
-
-	/**
-	 * Static status label for the pill next to the name. A healthy running
-	 * deployment returns null so its row stays clean — only noteworthy states
-	 * (deleting / paused / deploying / failed / cancelled) get a labelled pill,
-	 * mirroring the live icon to its left.
-	 *
-	 * A pending delete reuses the same `status: 'pending'` as a fresh deploy, so
-	 * the action has to be checked first — otherwise a deployment being torn down
-	 * would mislabel as "Deploying".
-	 */
-	function statusPill (it: Api.DeploymentListItem): { label: string, tone: string } | null {
-		if (it.action === 'delete') {
-			return { label: 'Deleting', tone: 'negative' }
-		}
-		if (it.action === 'pause') {
-			return { label: 'Paused', tone: 'warning' }
-		}
-		switch (it.status) {
-		case 'pending': return { label: 'Deploying', tone: 'info' }
-		case 'error': return { label: 'Failed', tone: 'negative' }
-		case 'cancelled': return { label: 'Cancelled', tone: 'muted' }
-		default: return null
-		}
 	}
 </script>
 
@@ -139,7 +115,7 @@
 			<tbody>
 				{#each deployments as it (`${it.name}-${it.location}`)}
 					{@const type = typeMeta[it.type] ?? { icon: 'fa-cube', label: it.type }}
-					{@const pill = statusPill(it)}
+					{@const pill = deploymentStatusPill(it)}
 					{@const autoscale = it.minReplicas > 0 && it.minReplicas !== it.maxReplicas}
 					<tr>
 						<td>
