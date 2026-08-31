@@ -7,7 +7,7 @@
 
 	interface Props {
 		/** called after a slip is accepted */
-		onuploaded?: () => void
+		onuploaded?: () => void | Promise<void>
 	}
 
 	const { onuploaded }: Props = $props()
@@ -115,7 +115,7 @@
 				return
 			}
 			isActive = false
-			onuploaded?.()
+			await onuploaded?.()
 		} catch (err) {
 			error = err instanceof Error ? err.message : String(err)
 		} finally {

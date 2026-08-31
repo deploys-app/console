@@ -37,6 +37,28 @@ test.describe('billing accounts', () => {
 		await expect(main.getByText('Company', { exact: true })).toBeVisible()
 	})
 
+	test('counts pending invoices in amount due', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			'billing.listInvoices': {
+				ok: true,
+				result: {
+					items: [
+						{ ...sampleInvoice, id: 'inv-1', status: 'pending', total: 10.7, currency: 'USD' }
+					]
+				}
+			}
+		})
+
+		await page.goto('/billing/detail?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByText('Amount due')).toBeVisible()
+		await expect(main.locator('.hero-amount')).toHaveText('10.70 USD')
+		await expect(main.getByText('1 unpaid invoice')).toBeVisible()
+		await expect(main.getByRole('link', { name: 'Pay now' })).toBeVisible()
+	})
+
 	test('shows receipt numbers in the invoices list', async ({ page }) => {
 		await setMocks({
 			'billing.get': { ok: true, result: sampleBillingAccount },
@@ -59,6 +81,26 @@ test.describe('billing accounts', () => {
 		// Receipt no. is the 5th column (Number, Period, Total, Status, Receipt no., Issued, action).
 		const openRow = main.locator('table tbody tr', { hasText: 'INV-2024-002' })
 		await expect(openRow.locator('td').nth(4)).toHaveText('—')
+	})
+
+	test('shows pending in the invoices list and keeps Pay', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: sampleBillingAccount },
+			'billing.listInvoices': {
+				ok: true,
+				result: {
+					items: [
+						{ ...sampleInvoice, id: 'inv-1', status: 'pending', receiptNumber: '' }
+					]
+				}
+			}
+		})
+
+		await page.goto('/billing/invoices?id=ba-1')
+
+		const row = page.locator('.content-wrapper table tbody tr', { hasText: 'INV-2024-001' })
+		await expect(row.getByText('Pending', { exact: true })).toBeVisible()
+		await expect(row.getByRole('link', { name: 'Pay' })).toBeVisible()
 	})
 
 	test('empty state when no billing accounts', async ({ page }) => {
@@ -380,5 +422,58 @@ test.describe('invoice detail', () => {
 		await page.getByRole('button', { name: 'Download PDF' }).click()
 
 		await expect(page.locator('#app-modal')).toHaveText(/invoice pdf export is not available/)
+	})
+
+	test('shows pending while a payment slip awaits review', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: { ...sampleInvoice, status: 'pending' } },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+
+		await expect(page.getByText('Pending', { exact: true })).toBeVisible()
+		await expect(page.getByRole('button', { name: 'Pay' })).toBeVisible()
+		await expect(page.getByRole('heading', { name: 'How to pay' })).toBeVisible()
+		await expect(page.getByText(/received your payment slip/i)).toBeVisible()
+	})
+
+	test('flips the invoice to pending after a slip upload', async ({ page }) => {
+		await setMocks({
+			'billing.getInvoice': { ok: true, result: sampleInvoice },
+			'billing.get': { ok: true, result: sampleBillingAccount }
+		})
+
+		await page.route('**/api/billing.uploadTransferSlip', async (route) => {
+			await setMocks({
+				'billing.getInvoice': { ok: true, result: { ...sampleInvoice, status: 'pending' } },
+				'billing.get': { ok: true, result: sampleBillingAccount }
+			})
+			await route.fulfill({
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify({
+					ok: true,
+					result: {
+						downloadUrl: 'https://dropbox.example/slip.jpg',
+						expiresAt: '2026-06-02T00:00:00Z'
+					}
+				})
+			})
+		})
+
+		await page.goto('/billing/invoice?id=inv-1')
+		await expect(page.getByText('Open', { exact: true })).toBeVisible()
+
+		await page.getByRole('button', { name: 'Pay' }).click()
+		await page.locator('.modal.is-active input[type=file]').setInputFiles({
+			name: 'slip.pdf',
+			mimeType: 'application/pdf',
+			buffer: Buffer.from('%PDF-1.4 mock slip')
+		})
+		await page.getByRole('button', { name: 'Upload slip' }).click()
+
+		await expect(page.locator('#app-modal')).toHaveText(/Payment slip uploaded/)
+		await expect(page.getByText('Pending', { exact: true })).toBeVisible()
 	})
 })

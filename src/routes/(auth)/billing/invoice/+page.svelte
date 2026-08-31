@@ -5,6 +5,7 @@
 	import * as format from '$lib/format'
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
+	import { isInvoiceUnpaid } from '$lib/billing'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -16,7 +17,9 @@
 	let downloadingReceipt = $state(false)
 	let payModal = $state<ReturnType<typeof PayInvoiceModal> | null>(null)
 
-	function onSlipUploaded () {
+	async function onSlipUploaded () {
+		await api.invalidate('billing.getInvoice')
+		await api.invalidate('billing.listInvoices')
 		modal.success({ content: 'Payment slip uploaded. We\'ll verify it and mark the invoice as paid.' })
 	}
 
@@ -232,7 +235,7 @@
 					Attach WHT certificate
 				</button>
 			{/if}
-			{#if invoice.status === 'open'}
+			{#if isInvoiceUnpaid(invoice.status)}
 				<button class="button is-icon-left" onclick={() => payModal?.open(invoice)}>
 					<i class="fa-solid fa-receipt"></i>
 					Pay
@@ -323,15 +326,20 @@
 		</div>
 	</div>
 
-	{#if invoice.status === 'open' && invoice.payment?.accountNo}
+	{#if isInvoiceUnpaid(invoice.status) && invoice.payment?.accountNo}
 		<hr>
 
 		<div>
 			<h6 class="mb-3"><strong>How to pay</strong></h6>
 			<p class="mb-3 text-content/70">
-				Transfer {money(invoice.total)} to the account below, then use the
-				<strong>Pay</strong> button above to upload your slip. We'll verify it and
-				mark the invoice as paid.
+				{#if invoice.status === 'pending'}
+					We've received your payment slip and are verifying it. We'll mark the
+					invoice as paid once confirmed. You can re-upload a slip if needed.
+				{:else}
+					Transfer {money(invoice.total)} to the account below, then use the
+					<strong>Pay</strong> button above to upload your slip. We'll verify it and
+					mark the invoice as paid.
+				{/if}
 			</p>
 			<div class="meta">
 				<div class="key">Bank</div>

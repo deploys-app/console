@@ -4,7 +4,7 @@
 	import * as modal from '$lib/modal'
 	import api from '$lib/api'
 	import InvoiceStatusBadge from '$lib/components/InvoiceStatusBadge.svelte'
-	import { canManageBilling, canDeleteBilling } from '$lib/billing'
+	import { canManageBilling, canDeleteBilling, isInvoiceUnpaid } from '$lib/billing'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -15,11 +15,11 @@
 	const canManage = $derived(canManageBilling(billingAccount.role))
 	const canDelete = $derived(canDeleteBilling(billingAccount.role))
 
-	const openInvoices = $derived(invoices.filter((it) => it.status === 'open'))
-	const currency = $derived(openInvoices[0]?.currency ?? invoices[0]?.currency ?? 'THB')
-	const amountDue = $derived(openInvoices.reduce((sum, it) => sum + it.total, 0))
-	// The most recent open invoice is the one to settle first.
-	const payTarget = $derived(openInvoices[0])
+	const unpaidInvoices = $derived(invoices.filter((it) => isInvoiceUnpaid(it.status)))
+	const currency = $derived(unpaidInvoices[0]?.currency ?? invoices[0]?.currency ?? 'THB')
+	const amountDue = $derived(unpaidInvoices.reduce((sum, it) => sum + it.total, 0))
+	// The most recent unpaid invoice is the one to settle first.
+	const payTarget = $derived(unpaidInvoices[0])
 	const latest = $derived(invoices[0])
 
 	function money (v: number, cur = currency) {
@@ -62,7 +62,7 @@
 			<div class="hero-amount">{money(amountDue)}</div>
 			<div class="hero-sub">
 				{#if amountDue > 0}
-					{openInvoices.length} open {openInvoices.length === 1 ? 'invoice' : 'invoices'}
+					{unpaidInvoices.length} unpaid {unpaidInvoices.length === 1 ? 'invoice' : 'invoices'}
 				{:else}
 					<i class="fa-solid fa-circle-check text-positive"></i> You're all caught up
 				{/if}
