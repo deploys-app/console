@@ -140,6 +140,7 @@
 					<th>Description</th>
 					<th>Rules</th>
 					<th>Limits</th>
+					<th>CRS</th>
 					<th>Matches (24h)</th>
 					<th class="is-collapse is-align-right"></th>
 				</tr>
@@ -178,6 +179,17 @@
 						<td>{fw.rules?.length ?? 0}</td>
 						<td>{fw.limits?.length ?? 0}</td>
 						<td>
+							<!-- Mirrors the api Table() CRS column: on = managed rules
+							     enabled, off = disabled but tuning kept, — = never set. -->
+							{#if fw.managedRules?.enabled}
+								<span class="crs-badge is-on">on</span>
+							{:else if fw.managedRules}
+								<span class="crs-badge">off</span>
+							{:else}
+								<span class="text-content/40">—</span>
+							{/if}
+						</td>
+						<td>
 							<!-- Reserve the loaded size in every state so the row/column keeps
 							     its dimensions while the async sparkline fills in (no layout shift). -->
 							<div class="matches-cell">
@@ -213,7 +225,7 @@
 					</tr>
 				{/each}
 				<NoDataRow
-					span={7}
+					span={8}
 					list={firewalls}
 					icon="fa-shield-halved"
 					message="No firewalls yet"
@@ -221,7 +233,7 @@
 					ctaLabel="Create firewall"
 					ctaHref={`/waf/create?project=${project}`}
 					{error} />
-				<ErrorRow span={7} {error} />
+				<ErrorRow span={8} {error} />
 			</tbody>
 		</table>
 	</div>
@@ -250,5 +262,22 @@
 
 	.matches-link:hover {
 		color: hsl(var(--hsl-primary));
+	}
+
+	.crs-badge {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.125rem 0.625rem;
+		border-radius: 9999px;
+		font-size: 0.75rem;
+		font-weight: 600;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.55);
+		background-color: hsl(var(--hsl-content) / 0.06);
+	}
+
+	.crs-badge.is-on {
+		color: hsl(var(--hsl-positive));
+		background-color: hsl(var(--hsl-positive) / 0.12);
 	}
 </style>
