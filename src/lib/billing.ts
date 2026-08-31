@@ -28,3 +28,8 @@ export function canManageBilling (role?: string): boolean {
 export function canDeleteBilling (role?: string): boolean {
 	return role === 'owner'
 }
+
+/** Issued and still owing: open, or pending while a slip awaits review. */
+export function isInvoiceUnpaid (status?: Api.InvoiceStatus): boolean {
+	return status === 'open' || status === 'pending'
+}

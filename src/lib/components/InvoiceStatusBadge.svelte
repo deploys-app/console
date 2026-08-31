@@ -7,6 +7,7 @@
 
 	const badge = $derived.by(() => {
 		if (status === 'paid') return { icon: 'fa-circle-check', cls: 'is-positive', label: 'Paid' }
+		if (status === 'pending') return { icon: 'fa-hourglass-half', cls: 'is-info', label: 'Pending' }
 		if (status === 'open') return { icon: 'fa-clock', cls: 'is-warning', label: 'Open' }
 		if (status === 'void') return { icon: 'fa-ban', cls: 'is-muted', label: 'Void' }
 		if (status === 'draft') return { icon: 'fa-pen', cls: 'is-muted', label: 'Draft' }
@@ -34,6 +35,11 @@
 	.invoice-badge.is-warning {
 		color: hsl(var(--hsl-warning, var(--hsl-primary)));
 		background: hsl(var(--hsl-warning, var(--hsl-primary)) / 0.14);
+	}
+
+	.invoice-badge.is-info {
+		color: hsl(var(--hsl-primary));
+		background: hsl(var(--hsl-primary) / 0.12);
 	}
 
 	.invoice-badge.is-muted {

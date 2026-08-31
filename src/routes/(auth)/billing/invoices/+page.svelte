@@ -4,6 +4,7 @@
 	import ErrorRow from '$lib/components/ErrorRow.svelte'
 	import InvoiceStatusBadge from '$lib/components/InvoiceStatusBadge.svelte'
 	import * as format from '$lib/format'
+	import { isInvoiceUnpaid } from '$lib/billing'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
@@ -51,7 +52,7 @@
 						<td class="is-hide-mobile">{it.receiptNumber || '—'}</td>
 						<td class="is-hide-mobile">{format.datetime(it.issuedAt)}</td>
 						<td class="is-align-right">
-							{#if it.status === 'open'}
+							{#if isInvoiceUnpaid(it.status)}
 								<a class="button is-size-small is-icon-left" href={`/billing/invoice?id=${it.id}`}>
 									<i class="fa-solid fa-receipt"></i>
 									Pay

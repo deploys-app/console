@@ -1331,9 +1331,9 @@ const repositoryManifests = [
 	{ digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222', size: 156237824, createdAt: CREATED_AT }
 ]
 
-// Invoices covering every status the UI renders (paid / open / void / draft)
-// plus a foreign-currency + zero-tax case and a partial-period case, so the
-// status badge and detail layout can be exercised offline. period_end is the
+// Invoices covering every status the UI renders (paid / open / pending / void /
+// draft) plus a foreign-currency + zero-tax case and a partial-period case, so
+// the status badge and detail layout can be exercised offline. period_end is the
 // exclusive first instant of the next period, matching the real backend.
 // NOTE: the real billing.listInvoices hides drafts; this mock lists the draft
 // too so its badge is visible during dev.
@@ -1361,6 +1361,29 @@ const invoices = [
 			// One line per project: amount is the project's gross (VAT-inclusive) total.
 			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 900 },
 			{ projectId: '1002', project: 'api-service', description: 'API service', amount: 384 }
+		]
+	},
+	{
+		id: 'inv_mock_pending',
+		billingAccountId: 'ba_mock_1',
+		number: 'INV-2026-0010',
+		currency: 'THB',
+		periodStart: '2026-06-01T00:00:00Z',
+		periodEnd: '2026-07-01T00:00:00Z',
+		subtotal: 200,
+		taxRate: 0.07,
+		taxAmount: 14,
+		total: 214,
+		status: 'pending',
+		taxId: '0123456789012',
+		taxName: 'Acme Co., Ltd.',
+		taxAddress: '1 Mockingbird Lane, Bangkok 10110',
+		issuedAt: '2026-07-01T00:00:00Z',
+		paidAt: '',
+		voidedAt: '',
+		createdAt: '2026-07-01T00:00:00Z',
+		lineItems: [
+			{ projectId: '1001', project: 'web-frontend', description: 'Web frontend', amount: 214 }
 		]
 	},
 	{
@@ -1625,8 +1648,6 @@ const handlers: Record<string, (args: any) => object> = {
 			expiresAt: '2026-06-02T00:00:00Z'
 		})
 	},
-	// Multipart upload: the proxy can't JSON-parse the body in mock mode, so
-	// args is empty here — just acknowledge the upload.
 	'billing.listMembers': () => ok({ owner: billingOwnerEmail, items: billingMembers }),
 	'billing.addMember': (args) => {
 		const email = String(args?.email ?? '').toLowerCase()
@@ -1644,10 +1665,17 @@ const handlers: Record<string, (args: any) => object> = {
 		billingMembers = billingMembers.filter((m) => m.email !== email)
 		return ok({})
 	},
-	'billing.uploadTransferSlip': () => ok({
-		downloadUrl: 'https://dropbox.deploys.app/files/mock-slip.jpg',
-		expiresAt: '2026-06-02T00:00:00Z'
-	}),
+	// Multipart upload: the proxy can't JSON-parse the body in mock mode, so
+	// args is empty here. Flip the demo open invoice to pending so a refresh
+	// after Pay shows the awaiting-review state.
+	'billing.uploadTransferSlip': () => {
+		const inv = invoices.find((i) => i.id === 'inv_mock_9')
+		if (inv) inv.status = 'pending'
+		return ok({
+			downloadUrl: 'https://dropbox.deploys.app/files/mock-slip.jpg',
+			expiresAt: '2026-06-02T00:00:00Z'
+		})
+	},
 	'billing.uploadWHTCertificate': () => ok({
 		downloadUrl: 'https://dropbox.deploys.app/files/mock-whtcert.pdf',
 		expiresAt: '2027-05-31T00:00:00Z'

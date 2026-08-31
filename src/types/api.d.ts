@@ -657,7 +657,9 @@ declare namespace Api {
         createdAt: string
     }
 
-    export type InvoiceStatus = 'draft' | 'open' | 'paid' | 'void'
+    // pending is a customer-facing overlay: the invoice is still open in the
+    // ledger, but a transfer slip is awaiting operator review.
+    export type InvoiceStatus = 'draft' | 'open' | 'pending' | 'paid' | 'void'
 
     export type InvoiceListItem = {
         id: string
