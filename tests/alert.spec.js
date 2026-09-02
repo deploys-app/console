@@ -178,6 +178,17 @@ test.describe('alert — create', () => {
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('No notification channels exist yet')).toHaveCount(0)
 	})
+
+	test('resets the threshold when the metric unit changes', async ({ page }) => {
+		await page.goto('/alert/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.locator('#input-threshold')).toHaveValue('90')
+		await pickSelect(page, 'input-metric', 'Egress (bytes per minute)')
+		await expect(main.locator('#input-threshold')).toHaveValue(String(10 * 1024 * 1024))
+		await pickSelect(page, 'input-metric', 'CPU (% of limit)')
+		await expect(main.locator('#input-threshold')).toHaveValue('90')
+	})
 })
 
 test.describe('alert — edit', () => {
@@ -196,6 +207,9 @@ test.describe('alert — edit', () => {
 		await expect(main.locator('#input-name')).toHaveAttribute('readonly', '')
 		await expect(main.locator('#input-threshold')).toHaveValue('90')
 		await expect(main.locator('#input-for-minutes')).toHaveValue('10')
+		// A still-valid target must not flash/keep a "Not found" badge after the
+		// deployment list settles.
+		await expect(main.getByText('Not found')).toHaveCount(0)
 
 		await main.locator('#input-threshold').fill('95')
 		await main.getByRole('button', { name: 'Save', exact: true }).click()
@@ -211,6 +225,23 @@ test.describe('alert — edit', () => {
 		expect(body.name).toBe('web-cpu-high')
 		expect(body.condition.threshold).toBe(95)
 		await expect(page).toHaveURL(/\/alert\/detail\?project=test-project&name=web-cpu-high/)
+	})
+
+	test('keeps a missing deployment selectable and flags it Not found', async ({ page }) => {
+		await setMocks({
+			'alert.get': {
+				ok: true,
+				result: { ...sampleAlertRule, target: { location: 'gke', deployment: 'gone' } }
+			},
+			'deployment.list': { ok: true, result: { items: [sampleDeployment] } }
+		})
+
+		await page.goto('/alert/create?project=test-project&name=web-cpu-high')
+
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Edit alert rule' })).toBeVisible()
+		await expect(main.getByText('Not found')).toBeVisible()
+		await expect(main.locator('#input-deployment')).toContainText('gone')
 	})
 })
 

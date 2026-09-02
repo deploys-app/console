@@ -165,6 +165,17 @@ export function defaultMocks () {
 		'/alert.list': {
 			ok: true,
 			result: { items: [] }
+		},
+		// The alert create form reads this to warn when delivery would reach
+		// nobody. Default empty so the warning is the honest empty-project state;
+		// tests that need channels override it.
+		'/notification.list': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/alert.events': {
+			ok: true,
+			result: { items: [] }
 		}
 	}
 }

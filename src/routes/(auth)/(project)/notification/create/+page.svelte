@@ -27,9 +27,9 @@
 	// action wildcards, and a couple of exact pairs.
 	const EVENT_SUGGESTIONS = [
 		'*',
-		'deployment.*', 'route.*', 'domain.*', 'role.*', 'scheduler.*',
+		'deployment.*', 'route.*', 'domain.*', 'role.*', 'scheduler.*', 'alert.*',
 		'*.create', '*.update', '*.delete',
-		'deployment.deploy', 'role.grant'
+		'deployment.deploy', 'role.grant', 'alert.trigger', 'alert.resolve'
 	]
 	const OUTCOME_SUGGESTIONS = ['success', 'failure']
 

@@ -39,6 +39,9 @@
 	)
 
 	let deployments = $state<{ name: string, paused: boolean }[]>([])
+	// Stay false until deployment.list settles so an edit of a still-valid
+	// target doesn't flash "Not found" while the picker is empty.
+	let deploymentsLoaded = $state(false)
 
 	// The paired deployment picker: location narrows the deployment list, mirroring
 	// the route create form. Paused deployments stay selectable (a rule can be
@@ -50,7 +53,7 @@
 	// rule. Matches the "nodata" story in the SPEC: a missing target is a valid
 	// (if unhealthy) state, not an error.
 	const deploymentOptions = $derived([
-		...(form.deployment && !deployments.some((d) => d.name === form.deployment)
+		...(form.deployment && deploymentsLoaded && !deployments.some((d) => d.name === form.deployment)
 			? [{ value: form.deployment, label: form.deployment, dot: 'negative' as const, badge: 'Not found', badgeTone: 'negative' as const }]
 			: []),
 		...deployments.map((d) => ({
@@ -64,10 +67,12 @@
 
 	async function fetchDeployments () {
 		deployments = []
+		deploymentsLoaded = false
 
 		const resp = await api.invoke<Api.List<Api.DeploymentListItem>>('deployment.list', { project }, fetch)
 		if (!resp.ok) {
 			modal.error({ error: resp.error })
+			deploymentsLoaded = true
 			return
 		}
 		const list = resp.result?.items ?? []
@@ -75,11 +80,37 @@
 			.filter((x) => x.location === form.location)
 			.filter((x) => x.ttl === 0)
 			.map((x) => ({ name: x.name, paused: x.action === 'pause' }))
+		deploymentsLoaded = true
 	}
 
 	function onLocationChange () {
 		form.deployment = ''
 		fetchDeployments()
+	}
+
+	// Threshold units change with the metric (percent vs req/min vs bytes/min).
+	// Keep the number when the unit stays the same (cpu ↔ memory); otherwise
+	// replace it with a unit-appropriate default so switching cpu→egress
+	// doesn't silently create a 90 bytes/min rule.
+	function defaultThreshold (metric: string): number {
+		if (metric === 'cpu' || metric === 'memory') return 90
+		if (metric === 'egress') return 10 * 1024 * 1024
+		return 100
+	}
+
+	function metricUnitKind (metric: string): 'percent' | 'bytes' | 'count' {
+		if (metric === 'cpu' || metric === 'memory') return 'percent'
+		if (metric === 'egress') return 'bytes'
+		return 'count'
+	}
+
+	let prevMetric: string = form.metric
+	function onMetricChange (metric: string | number) {
+		const next = String(metric)
+		if (metricUnitKind(next) !== metricUnitKind(prevMetric)) {
+			form.threshold = defaultThreshold(next)
+		}
+		prevMetric = next
 	}
 
 	onMount(() => {
@@ -198,7 +229,7 @@
 
 		<div class="field">
 			<label for="input-metric">Metric</label>
-			<Select id="input-metric" bind:value={form.metric} options={metricOptions} />
+			<Select id="input-metric" bind:value={form.metric} onchange={onMetricChange} options={metricOptions} />
 		</div>
 
 		<div class="grid gap-4 sm:grid-cols-3">
@@ -209,7 +240,14 @@
 			<div class="field">
 				<label for="input-threshold">Threshold ({metricUnit})</label>
 				<div class="input">
-					<input id="input-threshold" type="number" min="0" step="any" bind:value={form.threshold} required>
+					<input
+						id="input-threshold"
+						type="number"
+						min="0"
+						max={form.metric === 'cpu' || form.metric === 'memory' ? 1000 : undefined}
+						step="any"
+						bind:value={form.threshold}
+						required>
 				</div>
 			</div>
 			<div class="field">
