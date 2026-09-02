@@ -23,9 +23,12 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 	const channels = await api.invoke<Api.List<Api.NotificationItem>>('notification.list', { project }, fetch)
 	const hasChannels = channels.ok ? (channels.result?.items.length ?? 0) > 0 : true
 
+	const sources = await api.invoke<Api.List<Api.MetricSourceItem>>('metricSource.list', { project }, fetch)
+
 	return {
 		menu: 'alert',
 		alert,
-		hasChannels
+		hasChannels,
+		metricSources: sources.ok ? (sources.result?.items ?? []) : []
 	}
 }

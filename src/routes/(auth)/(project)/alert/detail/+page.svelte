@@ -78,9 +78,15 @@
 		<div class="field">
 			<span class="label">Target</span>
 			<p>
-				<a class="link font-mono text-sm" href={`/deployment/metrics?project=${project}&location=${alert.target.location}&name=${alert.target.deployment}`}>
-					{alert.target.location} / {alert.target.deployment}
-				</a>
+				{#if alert.target.kind === 'custom'}
+					<a class="link font-mono text-sm" href={`/metrics-sources/detail?project=${project}&name=${encodeURIComponent(alert.target.source ?? '')}`}>
+						{alert.target.source} / {alert.target.series}
+					</a>
+				{:else}
+					<a class="link font-mono text-sm" href={`/deployment/metrics?project=${project}&location=${alert.target.location}&name=${alert.target.deployment}`}>
+						{alert.target.location} / {alert.target.deployment}
+					</a>
+				{/if}
 			</p>
 		</div>
 

@@ -4,6 +4,8 @@
 	import api from '$lib/api'
 	import { onMount, tick, untrack } from 'svelte'
 	import Chart from '$lib/components/Chart.svelte'
+	import CustomMetricsChart from '$lib/components/CustomMetricsChart.svelte'
+	import Select from '$lib/components/Select.svelte'
 	import type { PageData } from './$types'
 	import type { MetricSeries } from '$lib/charts/util'
 
@@ -27,6 +29,14 @@
 	]
 
 	const deployment = $derived(data.deployment)
+	const metricSources = $derived(data.metricSources ?? [])
+	const project = $derived(data.project)
+
+	let metricsView = $state<'platform' | 'custom'>('platform')
+	let customSourceName = $state(untrack(() => data.metricSources?.[0]?.name ?? ''))
+	const customSource = $derived(
+		metricSources.find((s) => s.name === customSourceName) ?? metricSources[0]
+	)
 
 	// Static deployments have no live metrics pipeline — the live and aggregate
 	// windows resolve to the same data, so the Live row is redundant noise.
@@ -301,6 +311,35 @@
 	}
 </style>
 
+{#if metricSources.length > 0}
+	<div class="tabs is-variant-underline mb-4" role="tablist" aria-label="Metrics kind">
+		<button type="button" class="tab-button" class:is-active={metricsView === 'platform'}
+			role="tab" aria-selected={metricsView === 'platform'}
+			onclick={() => (metricsView = 'platform')}>
+			Platform
+		</button>
+		<button type="button" class="tab-button" class:is-active={metricsView === 'custom'}
+			role="tab" aria-selected={metricsView === 'custom'}
+			onclick={() => (metricsView = 'custom')}>
+			Custom
+		</button>
+	</div>
+{/if}
+
+{#if metricsView === 'custom' && customSource}
+	{#if metricSources.length > 1}
+		<div class="field sm:w-64 mb-4">
+			<label for="input-custom-source">Source</label>
+			<Select
+				id="input-custom-source"
+				bind:value={customSourceName}
+				options={metricSources.map((s) => ({ value: s.name, label: s.name }))} />
+		</div>
+	{/if}
+	{#key customSource.name}
+		<CustomMetricsChart {project} source={customSource} />
+	{/key}
+{:else}
 <header class="metric-rail">
 	<h6 class="metric-rail__brand">Metrics</h6>
 
@@ -370,3 +409,4 @@
 		<Chart title="Storage (bytes)" unit="bytes" series={storage} range={filter.range} />
 	{/if}
 </div>
+{/if}

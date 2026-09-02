@@ -1,5 +1,11 @@
 import { test, expect, setMocks, getRequestLog, pickSelect } from './helpers.js'
-import { sampleAlertRule, sampleAlertEvent, sampleDeployment } from './fixtures/mocks.js'
+import {
+	sampleAlertRule,
+	sampleAlertEvent,
+	sampleDeployment,
+	sampleMetricSource,
+	sampleMetricSourceSeries
+} from './fixtures/mocks.js'
 
 test.describe('alerts', () => {
 	test('lists alert rules with status badges', async ({ page }) => {
@@ -177,6 +183,52 @@ test.describe('alert — create', () => {
 		await page.goto('/alert/create?project=test-project')
 		const main = page.locator('.content-wrapper')
 		await expect(main.getByText('No notification channels exist yet')).toHaveCount(0)
+	})
+
+	test('submits alert.create with a custom source and series and no deployment', async ({ page }) => {
+		await setMocks({
+			'metricSource.list': { ok: true, result: { items: [sampleMetricSource] } },
+			'metricSource.series': { ok: true, result: { items: sampleMetricSourceSeries } },
+			'alert.create': { ok: true, result: {} },
+			'alert.get': {
+				ok: true,
+				result: {
+					...sampleAlertRule,
+					name: 'web-queue-depth',
+					target: { kind: 'custom', source: 'web', series: 'queue_depth{queue="email"}' },
+					condition: { metric: 'value', op: '>=', threshold: 10, forMinutes: 5 }
+				}
+			},
+			'alert.events': { ok: true, result: { items: [] } }
+		})
+
+		await page.goto('/alert/create?project=test-project')
+
+		const main = page.locator('.content-wrapper')
+		await main.locator('#input-name').fill('web-queue-depth')
+		await main.getByRole('tab', { name: 'Custom' }).click()
+		await pickSelect(page, 'input-source', 'web')
+		await pickSelect(page, 'input-series', 'queue_depth{queue="email"}')
+		await expect(main.locator('#input-metric')).toContainText('Value (gauge)')
+		await main.locator('#input-threshold').fill('10')
+		await main.locator('#input-for-minutes').fill('5')
+		await main.getByRole('button', { name: 'Create', exact: true }).click()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/alert.create')
+		}).toBeTruthy()
+
+		const req = (await getRequestLog()).find((r) => r.path === '/alert.create')
+		if (!req) throw new Error('expected an alert.create request')
+		const body = JSON.parse(req.body)
+		expect(body.name).toBe('web-queue-depth')
+		expect(body.target).toEqual({ kind: 'custom', source: 'web', series: 'queue_depth{queue="email"}' })
+		expect(body.target).not.toHaveProperty('location')
+		expect(body.target).not.toHaveProperty('deployment')
+		expect(body.condition).toEqual({ metric: 'value', op: '>=', threshold: 10, forMinutes: 5 })
+
+		await expect(page).toHaveURL(/\/alert\/detail\?project=test-project&name=web-queue-depth/)
 	})
 
 	test('resets the threshold when the metric unit changes', async ({ page }) => {

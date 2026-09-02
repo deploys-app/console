@@ -176,6 +176,30 @@ export function defaultMocks () {
 		'/alert.events': {
 			ok: true,
 			result: { items: [] }
+		},
+		'/metricSource.list': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/metricSource.get': {
+			ok: false,
+			error: { message: 'api: metric source not found' }
+		},
+		'/metricSource.set': {
+			ok: true,
+			result: {}
+		},
+		'/metricSource.delete': {
+			ok: true,
+			result: {}
+		},
+		'/metricSource.series': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/metricSource.query': {
+			ok: true,
+			result: { items: [] }
 		}
 	}
 }
@@ -431,6 +455,64 @@ export const sampleAlertEvent = {
 	at: now,
 	transition: 'trigger',
 	value: 93.2
+}
+
+export const sampleMetricSource = {
+	project: 'test-project',
+	name: 'web',
+	location: 'gke',
+	deployment: 'web',
+	port: 9090,
+	path: '/metrics',
+	disabled: false,
+	truncated: false,
+	lastScrapedAt: now,
+	lastError: '',
+	createdAt: now,
+	createdBy: '[email protected]',
+	updatedAt: now,
+	updatedBy: '[email protected]'
+}
+
+export const sampleTruncatedMetricSource = {
+	...sampleMetricSource,
+	name: 'api-metrics',
+	deployment: 'api',
+	truncated: true
+}
+
+export const sampleErrorMetricSource = {
+	...sampleMetricSource,
+	name: 'worker-metrics',
+	deployment: 'worker',
+	lastError: 'scrape failed: connection refused'
+}
+
+export const sampleMetricSourceSeries = [
+	{ series: 'queue_depth{queue="email"}', type: 'gauge', lastSeenAt: now },
+	{ series: 'http_requests_total{code="200"}', type: 'counter', lastSeenAt: now },
+	{ series: 'up', type: 'untyped', lastSeenAt: now }
+]
+
+export const sampleMetricSourceQuery = {
+	items: [
+		{
+			name: 'queue_depth{queue="email"}',
+			points: [
+				[1704067200, 4],
+				[1704067260, 8],
+				[1704067320, 12]
+			]
+		},
+		{
+			name: 'http_requests_total{code="200"}',
+			points: [
+				[1704067200, 40],
+				[1704067260, 55],
+				[1704067320, 80]
+			]
+		}
+	]
 }
 
 export const sampleBillingAccount = {
