@@ -1142,6 +1142,109 @@ const notificationDeliveries = [
 	{ id: '1', startedAt: CREATED_AT, result: 'failed', httpStatus: 0, latencyMs: 30002, error: 'context deadline exceeded' }
 ]
 
+// Alert — metric alert rules (project-scoped, location-less at the resource
+// level; Target carries the location). Mutated by alert.create/update/delete
+// within a session, mirroring githubLinks, so the create -> detail redirect
+// and edit flows work offline.
+interface AlertRuleFixture {
+	project: string
+	name: string
+	target: { location: string, deployment: string }
+	condition: { metric: string, op: string, threshold: number, forMinutes: number }
+	renotifyMinutes: number
+	disabled: boolean
+	status: 'ok' | 'firing' | 'nodata'
+	lastValue: number | null
+	firingSince: string | null
+	lastEvaluatedAt: string | null
+	createdAt: string
+	createdBy: string
+	updatedAt: string
+	updatedBy: string
+}
+
+const alertRules: AlertRuleFixture[] = [
+	{
+		project: 'acme',
+		name: 'web-cpu-high',
+		target: { location: LOCATION_ID, deployment: 'web' },
+		condition: { metric: 'cpu', op: '>=', threshold: 90, forMinutes: 10 },
+		renotifyMinutes: 0,
+		disabled: false,
+		status: 'ok',
+		lastValue: 42.5,
+		firingSince: null,
+		lastEvaluatedAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'api-memory-high',
+		target: { location: LOCATION_ID, deployment: 'api' },
+		condition: { metric: 'memory', op: '>=', threshold: 85, forMinutes: 5 },
+		renotifyMinutes: 60,
+		disabled: false,
+		status: 'firing',
+		lastValue: 93.2,
+		firingSince: CREATED_AT,
+		lastEvaluatedAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		// Targets a deployment that doesn't exist in the fixtures — demonstrates
+		// the "nodata" state (deployment paused/deleted, or no limit set).
+		project: 'acme',
+		name: 'worker-requests-drop',
+		target: { location: LOCATION_ID, deployment: 'worker' },
+		condition: { metric: 'requests', op: '<=', threshold: 1, forMinutes: 15 },
+		renotifyMinutes: 0,
+		disabled: false,
+		status: 'nodata',
+		lastValue: null,
+		firingSince: null,
+		lastEvaluatedAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'website-egress-spike',
+		target: { location: LOCATION_ID, deployment: 'website' },
+		condition: { metric: 'egress', op: '>=', threshold: 524288000, forMinutes: 10 },
+		renotifyMinutes: 0,
+		disabled: true,
+		status: 'ok',
+		lastValue: 12345678,
+		firingSince: null,
+		lastEvaluatedAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	}
+]
+
+interface AlertEventFixture {
+	at: string
+	transition: 'trigger' | 'resolve' | 'renotify'
+	value: number | null
+}
+
+const alertEvents: AlertEventFixture[] = [
+	{ at: CREATED_AT, transition: 'renotify', value: 94.1 },
+	{ at: CREATED_AT, transition: 'trigger', value: 93.2 },
+	{ at: CREATED_AT, transition: 'resolve', value: 61.0 },
+	{ at: CREATED_AT, transition: 'trigger', value: 88.4 }
+]
+
 const roles = [
 	{
 		role: 'viewer',
@@ -2460,6 +2563,55 @@ const handlers: Record<string, (args: any) => object> = {
 	'notification.test': () => ok({ id: '', startedAt: CREATED_AT, result: 'success', httpStatus: 200, latencyMs: 73, error: '' }),
 	'notification.deliveries': () => list(notificationDeliveries),
 	'notification.pull': () => ok({ project: 'acme', name: 'local-agent', events: [], cursor: 0, hasMore: false }),
+
+	'alert.list': () => list(alertRules),
+	'alert.get': (args) => {
+		const item = alertRules.find((a) => a.name === args?.name)
+		if (!item) return err('api: alert not found')
+		return ok(item)
+	},
+	'alert.create': (args) => {
+		if (alertRules.some((a) => a.name === args?.name)) return err('api: alert already exists')
+		alertRules.push({
+			project: args?.project ?? 'acme',
+			name: args?.name ?? '',
+			target: args?.target ?? { location: LOCATION_ID, deployment: '' },
+			condition: args?.condition ?? { metric: 'cpu', op: '>=', threshold: 90, forMinutes: 10 },
+			renotifyMinutes: args?.renotifyMinutes ?? 0,
+			disabled: args?.disabled ?? false,
+			status: 'ok',
+			lastValue: null,
+			firingSince: null,
+			lastEvaluatedAt: null,
+			createdAt: CREATED_AT,
+			createdBy: USER_EMAIL,
+			updatedAt: CREATED_AT,
+			updatedBy: USER_EMAIL
+		})
+		return ok({})
+	},
+	'alert.update': (args) => {
+		const item = alertRules.find((a) => a.name === args?.name)
+		if (!item) return err('api: alert not found')
+		item.target = args?.target ?? item.target
+		item.condition = args?.condition ?? item.condition
+		item.renotifyMinutes = args?.renotifyMinutes ?? item.renotifyMinutes
+		item.disabled = args?.disabled ?? item.disabled
+		item.updatedAt = CREATED_AT
+		item.updatedBy = USER_EMAIL
+		return ok({})
+	},
+	'alert.delete': (args) => {
+		const i = alertRules.findIndex((a) => a.name === args?.name)
+		if (i < 0) return err('api: alert not found')
+		alertRules.splice(i, 1)
+		return ok({})
+	},
+	'alert.events': (args) => {
+		const item = alertRules.find((a) => a.name === args?.name)
+		if (!item) return err('api: alert not found')
+		return list(alertEvents)
+	},
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
 

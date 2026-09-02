@@ -161,6 +161,21 @@ export function defaultMocks () {
 		'/dropbox.list': {
 			ok: true,
 			result: { items: [] }
+		},
+		'/alert.list': {
+			ok: true,
+			result: { items: [] }
+		},
+		// The alert create form reads this to warn when delivery would reach
+		// nobody. Default empty so the warning is the honest empty-project state;
+		// tests that need channels override it.
+		'/notification.list': {
+			ok: true,
+			result: { items: [] }
+		},
+		'/alert.events': {
+			ok: true,
+			result: { items: [] }
 		}
 	}
 }
@@ -393,6 +408,29 @@ export const sampleSchedulerJob = {
 	createdBy: '[email protected]',
 	updatedAt: now,
 	updatedBy: '[email protected]'
+}
+
+export const sampleAlertRule = {
+	project: 'test-project',
+	name: 'web-cpu-high',
+	target: { location: 'gke', deployment: 'web' },
+	condition: { metric: 'cpu', op: '>=', threshold: 90, forMinutes: 10 },
+	renotifyMinutes: 0,
+	disabled: false,
+	status: 'ok',
+	lastValue: 42.5,
+	firingSince: null,
+	lastEvaluatedAt: now,
+	createdAt: now,
+	createdBy: '[email protected]',
+	updatedAt: now,
+	updatedBy: '[email protected]'
+}
+
+export const sampleAlertEvent = {
+	at: now,
+	transition: 'trigger',
+	value: 93.2
 }
 
 export const sampleBillingAccount = {
