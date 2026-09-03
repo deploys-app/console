@@ -6,7 +6,7 @@
 	import api from '$lib/api'
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
-	import { ALERT_METRICS, ALERT_OPS, alertMetricLabel } from '$lib/alert'
+	import { ALERT_CUSTOM_METRICS, ALERT_METRICS, ALERT_OPS, alertMetricLabel } from '$lib/alert'
 
 	const { data }: { data: PageData } = $props()
 
@@ -15,14 +15,17 @@
 	const alert = $derived(data.alert)
 	const isEdit = $derived(!!data.alert)
 	const hasChannels = $derived(data.hasChannels)
+	const metricSources = $derived(data.metricSources)
 
-	const metricOptions = ALERT_METRICS.map((m) => ({ value: m.value, label: m.label }))
 	const opOptions = ALERT_OPS
 
 	const form = $state(untrack(() => ({
 		name: alert?.name ?? '',
+		kind: (alert?.target.kind === 'custom' ? 'custom' : 'deployment') as 'deployment' | 'custom',
 		location: alert?.target.location ?? '',
 		deployment: alert?.target.deployment ?? '',
+		source: alert?.target.source ?? '',
+		series: alert?.target.series ?? '',
 		metric: alert?.condition.metric ?? 'cpu',
 		op: alert?.condition.op ?? '>=',
 		threshold: alert?.condition.threshold ?? 90,
@@ -32,11 +35,18 @@
 		disabled: alert?.disabled ?? false
 	})))
 
-	const metricUnit = $derived(
-		form.metric === 'cpu' || form.metric === 'memory'
-			? '%'
-			: form.metric === 'egress' ? 'bytes/min' : 'req/min'
+	const metricOptions = $derived(
+		(form.kind === 'custom' ? ALERT_CUSTOM_METRICS : ALERT_METRICS)
+			.map((m) => ({ value: m.value, label: m.label }))
 	)
+
+	const metricUnit = $derived((() => {
+		if (form.metric === 'cpu' || form.metric === 'memory') return '%'
+		if (form.metric === 'egress') return 'bytes/min'
+		if (form.metric === 'value') return 'value'
+		if (form.metric === 'rate') return 'per min'
+		return 'req/min'
+	})())
 
 	let deployments = $state<{ name: string, paused: boolean }[]>([])
 	// Stay false until deployment.list settles so an edit of a still-valid
@@ -65,6 +75,29 @@
 		}))
 	])
 
+	let seriesItems = $state<Api.MetricSourceSeriesItem[]>([])
+	let seriesLoaded = $state(false)
+
+	const sourceOptions = $derived([
+		...(form.source && !metricSources.some((s) => s.name === form.source)
+			? [{ value: form.source, label: form.source, dot: 'negative' as const, badge: 'Not found', badgeTone: 'negative' as const }]
+			: []),
+		...metricSources.map((s) => ({
+			value: s.name,
+			label: s.name
+		}))
+	])
+
+	const seriesOptions = $derived([
+		...(form.series && seriesLoaded && !seriesItems.some((s) => s.series === form.series)
+			? [{ value: form.series, label: form.series, dot: 'negative' as const, badge: 'Not found', badgeTone: 'negative' as const }]
+			: []),
+		...seriesItems.map((s) => ({
+			value: s.series,
+			label: s.series
+		}))
+	])
+
 	async function fetchDeployments () {
 		deployments = []
 		deploymentsLoaded = false
@@ -88,6 +121,51 @@
 		fetchDeployments()
 	}
 
+	async function fetchSeries () {
+		seriesItems = []
+		seriesLoaded = false
+		if (!form.source) {
+			seriesLoaded = true
+			return
+		}
+		const resp = await api.invoke<Api.MetricSourceSeriesResult>('metricSource.series', {
+			project,
+			name: form.source
+		}, fetch)
+		if (!resp.ok) {
+			modal.error({ error: resp.error })
+			seriesLoaded = true
+			return
+		}
+		seriesItems = resp.result?.items ?? []
+		seriesLoaded = true
+	}
+
+	function onSourceChange () {
+		form.series = ''
+		fetchSeries()
+	}
+
+	function setKind (kind: 'deployment' | 'custom') {
+		if (form.kind === kind) return
+		form.kind = kind
+		if (kind === 'custom') {
+			if (form.metric !== 'value' && form.metric !== 'rate') {
+				form.metric = 'value'
+				form.threshold = 10
+				prevMetric = 'value'
+			}
+			if (form.source) fetchSeries()
+		} else {
+			if (form.metric === 'value' || form.metric === 'rate') {
+				form.metric = 'cpu'
+				form.threshold = 90
+				prevMetric = 'cpu'
+			}
+			if (form.location) fetchDeployments()
+		}
+	}
+
 	// Threshold units change with the metric (percent vs req/min vs bytes/min).
 	// Keep the number when the unit stays the same (cpu ↔ memory); otherwise
 	// replace it with a unit-appropriate default so switching cpu→egress
@@ -95,12 +173,15 @@
 	function defaultThreshold (metric: string): number {
 		if (metric === 'cpu' || metric === 'memory') return 90
 		if (metric === 'egress') return 10 * 1024 * 1024
+		if (metric === 'value' || metric === 'rate') return 10
 		return 100
 	}
 
-	function metricUnitKind (metric: string): 'percent' | 'bytes' | 'count' {
+	function metricUnitKind (metric: string): 'percent' | 'bytes' | 'count' | 'value' | 'rate' {
 		if (metric === 'cpu' || metric === 'memory') return 'percent'
 		if (metric === 'egress') return 'bytes'
+		if (metric === 'value') return 'value'
+		if (metric === 'rate') return 'rate'
 		return 'count'
 	}
 
@@ -114,7 +195,8 @@
 	}
 
 	onMount(() => {
-		if (form.location) fetchDeployments()
+		if (form.kind === 'deployment' && form.location) fetchDeployments()
+		if (form.kind === 'custom' && form.source) fetchSeries()
 	})
 
 	let saving = $state(false)
@@ -126,13 +208,13 @@
 		saving = true
 		try {
 			const fn = isEdit ? 'alert.update' : 'alert.create'
+			const target = form.kind === 'custom'
+				? { kind: 'custom' as const, source: form.source, series: form.series }
+				: { location: form.location, deployment: form.deployment }
 			const args = {
 				project,
 				name: form.name,
-				target: {
-					location: form.location,
-					deployment: form.deployment
-				},
+				target,
 				condition: {
 					metric: form.metric,
 					op: form.op,
@@ -178,7 +260,7 @@
 <div class="page-head">
 	<div>
 		<h4><strong>{isEdit ? 'Edit alert rule' : 'Create alert rule'}</strong></h4>
-		<p class="page-sub">Notify when a deployment metric crosses a threshold for a sustained period.</p>
+		<p class="page-sub">Notify when a deployment or custom metric crosses a threshold for a sustained period.</p>
 	</div>
 </div>
 
@@ -197,29 +279,68 @@
 
 		<h6><strong>Target</strong></h6>
 
-		<div class="grid gap-4 sm:grid-cols-2">
-			<div class="field">
-				<label for="input-location">Location</label>
-				<Select
-					id="input-location"
-					bind:value={form.location}
-					onchange={onLocationChange}
-					required
-					placeholder="Select Location"
-					options={locations.map((it) => ({ value: it.id, label: it.id }))} />
-			</div>
-			{#if form.location}
-				<div class="field">
-					<label for="input-deployment">Deployment</label>
-					<Select
-						id="input-deployment"
-						bind:value={form.deployment}
-						required
-						placeholder="Select Deployment"
-						options={deploymentOptions} />
-				</div>
-			{/if}
+		<div class="tabs is-variant-underline" role="tablist" aria-label="Target kind">
+			<button type="button" class="tab-button" class:is-active={form.kind === 'deployment'}
+				role="tab" aria-selected={form.kind === 'deployment'}
+				onclick={() => setKind('deployment')}>
+				Deployment
+			</button>
+			<button type="button" class="tab-button" class:is-active={form.kind === 'custom'}
+				role="tab" aria-selected={form.kind === 'custom'}
+				onclick={() => setKind('custom')}>
+				Custom
+			</button>
 		</div>
+
+		{#if form.kind === 'custom'}
+			<div class="grid gap-4 sm:grid-cols-2">
+				<div class="field">
+					<label for="input-source">Source</label>
+					<Select
+						id="input-source"
+						bind:value={form.source}
+						onchange={onSourceChange}
+						required
+						placeholder="Select source"
+						options={sourceOptions} />
+				</div>
+				{#if form.source}
+					<div class="field">
+						<label for="input-series">Series</label>
+						<Select
+							id="input-series"
+							bind:value={form.series}
+							required
+							placeholder="Select series"
+							options={seriesOptions} />
+					</div>
+				{/if}
+			</div>
+		{:else}
+			<div class="grid gap-4 sm:grid-cols-2">
+				<div class="field">
+					<label for="input-location">Location</label>
+					<Select
+						id="input-location"
+						bind:value={form.location}
+						onchange={onLocationChange}
+						required
+						placeholder="Select Location"
+						options={locations.map((it) => ({ value: it.id, label: it.id }))} />
+				</div>
+				{#if form.location}
+					<div class="field">
+						<label for="input-deployment">Deployment</label>
+						<Select
+							id="input-deployment"
+							bind:value={form.deployment}
+							required
+							placeholder="Select Deployment"
+							options={deploymentOptions} />
+					</div>
+				{/if}
+			</div>
+		{/if}
 
 		<br>
 		<hr>

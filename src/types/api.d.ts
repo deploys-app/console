@@ -1140,16 +1140,22 @@ declare namespace Api {
     // Notification carries its delivery config). Evaluated by an apiserver cron
     // tick against the existing per-minute deployment_usages table; delivery
     // reuses the notification-channels feature entirely.
+    // Empty Kind is treated as deployment. kind=custom targets a metricSource
+    // series; Location and Deployment must be empty (omit them or send "").
     export type AlertTarget = {
-        location: string
-        deployment: string
+        kind?: '' | 'deployment' | 'custom'
+        location?: string
+        deployment?: string
+        source?: string
+        series?: string
     }
 
     // Threshold's unit depends on Metric: percent 0-100 for cpu/memory, req/min
-    // for requests, bytes/min for egress. Op defaults to ">=" server-side when
-    // left empty.
+    // for requests, bytes/min for egress, the gauge value for kind=custom
+    // Metric=value, or per-minute increase for kind=custom Metric=rate. Op
+    // defaults to ">=" server-side when left empty.
     export type AlertCondition = {
-        metric: 'cpu' | 'memory' | 'requests' | 'egress'
+        metric: 'cpu' | 'memory' | 'requests' | 'egress' | 'value' | 'rate'
         op: '>=' | '<='
         threshold: number
         forMinutes: number
@@ -1189,6 +1195,50 @@ declare namespace Api {
         project: string
         name: string
         items: AlertEvent[]
+    }
+
+    // MetricSource — Prometheus scrape targets on the project's own deployments
+    // (port+path, never a free-form URL). Project-scoped; location lives in the
+    // config. Set is a full upsert. Query reuses the DeploymentMetricsLine /
+    // UsageMetricsLine shape so Chart.svelte consumes it unmodified.
+    export type MetricSourceItem = {
+        project: string
+        name: string
+        location: string
+        deployment: string
+        port: number
+        path: string
+        disabled: boolean
+        truncated: boolean
+        lastScrapedAt: string | null
+        lastError: string
+        createdAt: string
+        createdBy: string
+        updatedAt: string
+        updatedBy: string
+    }
+
+    export type MetricSourceListResult = {
+        project: string
+        items: MetricSourceItem[]
+    }
+
+    export type MetricSourceSeriesType = 'gauge' | 'counter' | 'untyped'
+
+    export type MetricSourceSeriesItem = {
+        series: string
+        type: MetricSourceSeriesType
+        lastSeenAt: string
+    }
+
+    export type MetricSourceSeriesResult = {
+        project: string
+        name: string
+        items: MetricSourceSeriesItem[]
+    }
+
+    export type MetricSourceQueryResult = {
+        items: UsageMetricsLine[]
     }
 
     // cache.metrics reuses WafMetricsTimeRange.

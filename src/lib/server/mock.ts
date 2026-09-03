@@ -1149,7 +1149,7 @@ const notificationDeliveries = [
 interface AlertRuleFixture {
 	project: string
 	name: string
-	target: { location: string, deployment: string }
+	target: { kind?: string, location?: string, deployment?: string, source?: string, series?: string }
 	condition: { metric: string, op: string, threshold: number, forMinutes: number }
 	renotifyMinutes: number
 	disabled: boolean
@@ -1216,6 +1216,22 @@ const alertRules: AlertRuleFixture[] = [
 	},
 	{
 		project: 'acme',
+		name: 'web-queue-depth',
+		target: { kind: 'custom', source: 'web', series: 'queue_depth{queue="email"}' },
+		condition: { metric: 'value', op: '>=', threshold: 10, forMinutes: 5 },
+		renotifyMinutes: 0,
+		disabled: false,
+		status: 'ok',
+		lastValue: 4,
+		firingSince: null,
+		lastEvaluatedAt: CREATED_AT,
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
 		name: 'website-egress-spike',
 		target: { location: LOCATION_ID, deployment: 'website' },
 		condition: { metric: 'egress', op: '>=', threshold: 524288000, forMinutes: 10 },
@@ -1244,6 +1260,92 @@ const alertEvents: AlertEventFixture[] = [
 	{ at: CREATED_AT, transition: 'resolve', value: 61.0 },
 	{ at: CREATED_AT, transition: 'trigger', value: 88.4 }
 ]
+
+interface MetricSourceFixture {
+	project: string
+	name: string
+	location: string
+	deployment: string
+	port: number
+	path: string
+	disabled: boolean
+	truncated: boolean
+	lastScrapedAt: string | null
+	lastError: string
+	createdAt: string
+	createdBy: string
+	updatedAt: string
+	updatedBy: string
+}
+
+interface MetricSourceSeriesFixture {
+	series: string
+	type: 'gauge' | 'counter' | 'untyped'
+	lastSeenAt: string
+}
+
+const defaultMetricSourceSeries: MetricSourceSeriesFixture[] = [
+	{ series: 'queue_depth{queue="email"}', type: 'gauge', lastSeenAt: CREATED_AT },
+	{ series: 'http_requests_total{code="200"}', type: 'counter', lastSeenAt: CREATED_AT },
+	{ series: 'up', type: 'untyped', lastSeenAt: CREATED_AT }
+]
+
+const metricSources: MetricSourceFixture[] = [
+	{
+		project: 'acme',
+		name: 'web',
+		location: LOCATION_ID,
+		deployment: 'web',
+		port: 9090,
+		path: '/metrics',
+		disabled: false,
+		truncated: false,
+		lastScrapedAt: CREATED_AT,
+		lastError: '',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'api-metrics',
+		location: LOCATION_ID,
+		deployment: 'api',
+		port: 9090,
+		path: '/metrics',
+		disabled: false,
+		truncated: true,
+		lastScrapedAt: CREATED_AT,
+		lastError: '',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	},
+	{
+		project: 'acme',
+		name: 'worker-metrics',
+		location: LOCATION_ID,
+		deployment: 'worker',
+		port: 9090,
+		path: '/metrics',
+		disabled: false,
+		truncated: false,
+		lastScrapedAt: CREATED_AT,
+		lastError: 'scrape failed: connection refused',
+		createdAt: CREATED_AT,
+		createdBy: USER_EMAIL,
+		updatedAt: CREATED_AT,
+		updatedBy: USER_EMAIL
+	}
+]
+
+const metricSourceSeriesByName: Record<string, MetricSourceSeriesFixture[]> = {
+	web: defaultMetricSourceSeries,
+	'api-metrics': defaultMetricSourceSeries,
+	'worker-metrics': defaultMetricSourceSeries
+}
 
 const roles = [
 	{
@@ -2611,6 +2713,64 @@ const handlers: Record<string, (args: any) => object> = {
 		const item = alertRules.find((a) => a.name === args?.name)
 		if (!item) return err('api: alert not found')
 		return list(alertEvents)
+	},
+
+	'metricSource.list': () => list(metricSources),
+	'metricSource.get': (args) => {
+		const item = metricSources.find((s) => s.name === args?.name)
+		if (!item) return err('api: metric source not found')
+		return ok(item)
+	},
+	'metricSource.set': (args) => {
+		const name = String(args?.name ?? '')
+		const existing = metricSources.find((s) => s.name === name)
+		const next: MetricSourceFixture = {
+			project: args?.project ?? 'acme',
+			name,
+			location: args?.location ?? '',
+			deployment: args?.deployment ?? '',
+			port: args?.port ?? 9090,
+			path: args?.path || '/metrics',
+			disabled: args?.disabled ?? false,
+			truncated: existing?.truncated ?? false,
+			lastScrapedAt: existing?.lastScrapedAt ?? null,
+			lastError: existing?.lastError ?? '',
+			createdAt: existing?.createdAt ?? CREATED_AT,
+			createdBy: existing?.createdBy ?? USER_EMAIL,
+			updatedAt: CREATED_AT,
+			updatedBy: USER_EMAIL
+		}
+		if (existing) {
+			Object.assign(existing, next)
+		} else {
+			metricSources.push(next)
+			metricSourceSeriesByName[name] = defaultMetricSourceSeries
+		}
+		return ok({})
+	},
+	'metricSource.delete': (args) => {
+		const i = metricSources.findIndex((s) => s.name === args?.name)
+		if (i < 0) return err('api: metric source not found')
+		metricSources.splice(i, 1)
+		delete metricSourceSeriesByName[String(args?.name ?? '')]
+		return ok({})
+	},
+	'metricSource.series': (args) => {
+		const item = metricSources.find((s) => s.name === args?.name)
+		if (!item) return err('api: metric source not found')
+		const items = metricSourceSeriesByName[item.name] ?? defaultMetricSourceSeries
+		return ok({ project: item.project, name: item.name, items })
+	},
+	'metricSource.query': (args) => {
+		const item = metricSources.find((s) => s.name === args?.name)
+		if (!item) return err('api: metric source not found')
+		const requested: string[] = (args?.series ?? []).filter(Boolean)
+		const names = requested.length
+			? requested
+			: (metricSourceSeriesByName[item.name] ?? defaultMetricSourceSeries).slice(0, 2).map((s) => s.series)
+		return ok({
+			items: names.map((name, i) => metricLine(name, i === 0 ? 12 : 80)[0])
+		})
 	},
 
 	'email.list': () => list([{ domain: 'mail.acme.example.com', createdAt: CREATED_AT }]),
