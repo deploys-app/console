@@ -13,7 +13,7 @@ RUN bun run build
 # entrypoint. server.js lives next to handler.js/env.js inside the build output.
 RUN cp server.js build/server.js
 
-FROM oven/bun:1.4.0-distroless
+FROM oven/bun:1.4.1-distroless
 
 ENV NODE_ENV=production
 ENV BODY_SIZE_LIMIT=Infinity
