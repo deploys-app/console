@@ -44,11 +44,14 @@
 		{ value: 503, label: '503 Service Unavailable' }
 	]
 
-	// The whole loaded zone (rules + limits) is held in memory so Save can
-	// rewrite the entire zone with the edited limit in place — waf.set replaces
-	// the zone, so rules must be echoed back untouched.
+	// The whole loaded zone (rules + limits + managed rules) is held in memory
+	// so Save can rewrite the entire zone with the edited limit in place —
+	// waf.set replaces the zone, so rules and the managed-rules block must be
+	// echoed back untouched (an omitted managedRules means "disabled and
+	// cleared" server-side).
 	const rules = untrack(() => normalizeRules(data.zone?.rules))
 	const limits = untrack(() => normalizeLimits(data.zone?.limits))
+	const managedRules = untrack(() => data.zone?.managedRules ?? null)
 	const description = untrack(() => data.zone?.description ?? '')
 	// Index of the limit being edited, or -1 when adding a brand-new limit.
 	const editIndex = untrack(() => (data.limitId ? limits.findIndex((l) => l.id === data.limitId) : -1))
@@ -136,7 +139,8 @@
 				location,
 				description,
 				rules: toApiRules(rules),
-				limits: toApiLimits(nextLimits)
+				limits: toApiLimits(nextLimits),
+				managedRules: managedRules ?? undefined
 			}, fetch)
 			if (!resp.ok) {
 				modal.error({ error: resp.error })
