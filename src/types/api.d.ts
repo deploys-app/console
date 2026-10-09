@@ -1298,6 +1298,16 @@ declare namespace Api {
         staticStorage: UsageMetricsLine[]
     }
 
+    // Result of project.metricsByDeployment. One line per deployment. History
+    // is 30 days (7d or 30d). Disk, replicas, and cache egress are not included.
+    export type ProjectMetricsByDeploymentResult = {
+        cpuUsage: UsageMetricsLine[]
+        memory: UsageMetricsLine[]
+        egress: UsageMetricsLine[]
+        requests: UsageMetricsLine[]
+        staticStorage: UsageMetricsLine[]
+    }
+
     // Result of deployment.metrics. Every series is optional — the backend only
     // returns the metrics relevant to the deployment type (e.g. requests for
     // WebService/Static, storage for Static).
