@@ -208,6 +208,8 @@ export const sampleDeployment = {
 	project: 'test-project',
 	location: 'gke',
 	name: 'web',
+	// String-encoded int64 past Number.MAX_SAFE_INTEGER (2^53+1).
+	id: '9007199254740993',
 	type: 'WebService',
 	revision: 1,
 	image: 'nginx:latest',
