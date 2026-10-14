@@ -28,7 +28,21 @@ interface ResourceSource {
 	group: string
 	icon: string
 	fn: string // api function name
-	map: (it: any, project: string) => { key: string, label: string, sublabel?: string, href: string }
+	map: (it: any, project: string) => { key: string, label: string, sublabel?: string, keywords?: string, href: string }
+}
+
+/**
+ * Search text for a deployment's numeric id. The id is a string-encoded int64
+ * (a JSON number would lose digits past 2^53). Also index `d<id>`, the
+ * id-based Kubernetes resource name users see on pods and services. Hidden
+ * from the row, same as a project's numeric id.
+ */
+function deploymentIdKeywords (id: unknown): string | undefined {
+	const s = typeof id === 'string'
+		? id.trim()
+		: typeof id === 'number' && Number.isSafeInteger(id) ? String(id) : ''
+	if (!/^\d+$/.test(s) || s === '0') return undefined
+	return `${s} d${s}`
 }
 
 const resourceSources: ResourceSource[] = [
@@ -40,6 +54,7 @@ const resourceSources: ResourceSource[] = [
 			key: `${it.location}/${it.name}`,
 			label: it.name,
 			sublabel: it.location,
+			keywords: deploymentIdKeywords(it.id),
 			href: `/deployment/metrics?project=${p}&location=${enc(it.location)}&name=${enc(it.name)}`
 		})
 	},
@@ -256,6 +271,7 @@ export async function fetchResourceEntries (project: string, fetch: typeof globa
 					icon: src.icon,
 					label: m.label,
 					sublabel: m.sublabel,
+					keywords: m.keywords,
 					href: m.href
 				} as SearchEntry)
 			})
@@ -267,14 +283,24 @@ export async function fetchResourceEntries (project: string, fetch: typeof globa
 }
 
 /**
- * Token AND-match over label + sublabel + group, mirroring the project picker:
- * every whitespace-separated token must appear somewhere in the haystack.
+ * Token AND-match over label + sublabel + keywords + group, mirroring the
+ * project picker: every whitespace-separated token must appear somewhere in
+ * the haystack.
+ *
+ * A pod or service name is `d<id>-<projectId>-…`. The palette indexes `d<id>`,
+ * so pasting the longer name still finds that deployment.
  */
 export function filterEntries (entries: SearchEntry[], query: string): SearchEntry[] {
 	const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
 	if (!tokens.length) return entries
 	return entries.filter((e) => {
 		const haystack = `${e.label} ${e.sublabel ?? ''} ${e.keywords ?? ''} ${e.group}`.toLowerCase()
-		return tokens.every((t) => haystack.includes(t))
+		return tokens.every((t) => tokenIn(haystack, t))
 	})
+}
+
+function tokenIn (haystack: string, token: string): boolean {
+	if (haystack.includes(token)) return true
+	const m = /^d(\d+)-\d/.exec(token)
+	return !!m && haystack.includes(`d${m[1]}`)
 }

@@ -399,6 +399,9 @@ declare namespace Api {
         project: string
         location: string
         name: string
+        // Numeric deployment id, string-encoded so it keeps the full int64.
+        // The id-based Kubernetes resource name is `d` + id.
+        id: string
         type: DeploymentType
         revision: number
         image: string
@@ -457,6 +460,9 @@ declare namespace Api {
         project: string
         location: string
         name: string
+        // Numeric deployment id, string-encoded so it keeps the full int64.
+        // The id-based Kubernetes resource name is `d` + id.
+        id: string
         type: DeploymentType
         revision: number
         image: string

@@ -44,6 +44,39 @@ test.describe('global search palette', () => {
 		await expect(page.locator('.modal.is-active')).toHaveCount(0)
 	})
 
+	test('typing a deployment id, or its d<id> resource name, opens that deployment', async ({ page }) => {
+		await setMocks({
+			'deployment.list': { ok: true, result: { items: [sampleDeployment] } },
+			'deployment.get': { ok: true, result: sampleDeployment }
+		})
+
+		await page.goto('/deployment?project=test-project')
+		await page.keyboard.press('/')
+		const dialog = page.locator('.modal.is-active')
+		const box = dialog.getByPlaceholder(/Search projects, deployments/)
+
+		// The id is not shown on the row; matching it still surfaces the deployment.
+		await box.fill(sampleDeployment.id)
+		const webRow = dialog.getByRole('link', { name: /web/ }).first()
+		await expect(webRow).toBeVisible()
+		await expect(dialog.getByText('gke', { exact: false })).toBeVisible()
+
+		// A different id matches nothing.
+		await box.fill('9007199254740994')
+		await expect(dialog.getByText(/No matches/)).toBeVisible()
+
+		// Pod and service names use the id-based resource name `d<id>`,
+		// then `-<projectId>-<pod suffix>`.
+		await box.fill(`d${sampleDeployment.id}`)
+		await expect(webRow).toBeVisible()
+		await box.fill(`d${sampleDeployment.id}-486418960667672577-7f8c9d-abcde`)
+		await expect(webRow).toBeVisible()
+
+		await webRow.click()
+		await expect(page).toHaveURL(/\/deployment\/metrics\?project=test-project&location=gke&name=web/)
+		await expect(page.locator('.modal.is-active')).toHaveCount(0)
+	})
+
 	test('"/" is ignored while typing in a text field', async ({ page }) => {
 		await page.goto('/deployment?project=test-project')
 		// Inject a focused text field so the global "/" handler sees a typing target.
