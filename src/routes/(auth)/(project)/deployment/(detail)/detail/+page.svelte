@@ -980,7 +980,9 @@
 		<p class="mt-2 text-sm text-content/60">Re-stamp the window so this deployment auto-deletes that many hours from now. It does not redeploy.</p>
 		<div class="field mt-4">
 			<label class="label" for="extend-hours">Hours from now</label>
-			<input id="extend-hours" class="input" type="number" min="0.25" step="0.25" bind:value={extendHours} />
+			<div class="input">
+				<input id="extend-hours" type="number" min="0.25" step="0.25" bind:value={extendHours} />
+			</div>
 		</div>
 		<div class="mt-6 flex justify-end gap-3">
 			<button class="button is-variant-tertiary" type="button" onclick={() => (extendOpen = false)}>Cancel</button>
