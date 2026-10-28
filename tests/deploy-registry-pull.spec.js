@@ -108,16 +108,16 @@ unit.describe('sameProjectRegistryImage', () => {
 })
 
 test.describe('deploy form — registry pull secret', () => {
-	test('New is enabled for the owner and disabled until a location is selected', async ({ page }) => {
+	test('the pull secret field stays hidden until a location is selected, then New is enabled', async ({ page }) => {
 		await page.goto('/deployment/deploy?project=test-project')
 		const main = page.locator('.content-wrapper')
-		const button = main.getByRole('button', { name: 'New' })
-		await expect(button).toBeVisible()
-		await expect(button).toBeDisabled()
-		await expect(main.getByText('For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.')).toBeVisible()
+		await expect(main.getByText('Pull Secret', { exact: true })).toHaveCount(0)
+		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
 
 		await pickSelect(page, 'input-location', 'gke')
-		await expect(button).toBeEnabled()
+		await expect(main.getByText('Pull Secret', { exact: true })).toBeVisible()
+		await expect(main.getByRole('button', { name: 'New' })).toBeEnabled()
+		await expect(main.getByText('For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.')).toBeVisible()
 	})
 
 	test('New is disabled when pullsecret.create is missing, with that deny tooltip', async ({ page }) => {
@@ -230,6 +230,7 @@ test.describe('deploy form — registry pull secret', () => {
 		])
 		expect(calls(log, 'serviceAccount.get').some((body) => body.id === 'registry-pull')).toBe(true)
 		expect(calls(log, 'serviceAccount.createKey')).toHaveLength(0)
+		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
 		await expect(main).not.toContainText(NEWER_SECRET)
 		await expect(main).not.toContainText(OLDER_SECRET)
 	})
@@ -282,19 +283,18 @@ test.describe('deploy form — registry pull secret', () => {
 		await expect(main).not.toContainText('create-key-must-not-render')
 	})
 
-	test('New only selects registry-pull when that secret is already in the location', async ({ page }) => {
+	test('New is hidden when registry-pull is already in the location', async ({ page }) => {
 		await setMocks({
 			'pullSecret.list': { ok: true, result: { items: [pullSecretItem('registry-pull'), pullSecretItem('ghcr')] } }
 		})
 		await page.goto('/deployment/deploy?project=test-project')
 		const main = page.locator('.content-wrapper')
 		await pickSelect(page, 'input-location', 'gke')
+		await expect(page.locator('#input-pull_secret')).toBeVisible()
 		await page.locator('#input-pull_secret').click()
 		await expect(page.getByRole('option', { name: 'registry-pull', exact: true })).toBeVisible()
-		await page.keyboard.press('Escape')
-		await main.getByRole('button', { name: 'New' }).click()
+		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
 
-		await expect(page.locator('#input-pull_secret')).toContainText('registry-pull')
 		const log = await getRequestLog()
 		expect(calls(log, 'serviceAccount.create')).toHaveLength(0)
 		expect(calls(log, 'pullSecret.create')).toHaveLength(0)

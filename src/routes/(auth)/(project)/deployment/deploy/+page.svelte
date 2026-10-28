@@ -63,6 +63,7 @@
 	})
 
 	let pullSecrets = $state<Api.PullSecret[]>([])
+	let pullSecretListReady = $state(false)
 	let creatingRegistryPull = $state(false)
 	let registryPullError = $state('')
 	// Set when the user clears the field, so a same-project image does not put
@@ -113,6 +114,11 @@
 		// unit in seconds; '0' means no auto-delete
 		ttlUnit: '0'
 	})
+
+	const registryPullSecretExists = $derived(
+		!!form.location && pullSecrets.some((p) => p.name === REGISTRY_PULL_NAME && p.location === form.location)
+	)
+	const showRegistryPullNew = $derived(pullSecretListReady && !registryPullSecretExists)
 
 	// Access (Google-login gate) is kept OUTSIDE `form` on purpose: save() spreads
 	// `...form` into the deploy payload, so flat access keys living in `form` would
@@ -189,6 +195,7 @@
 	async function fetchPullSecrets () {
 		if (!selectedLocation) {
 			pullSecrets = []
+			pullSecretListReady = false
 			return
 		}
 
@@ -196,6 +203,7 @@
 		const resp = await api.invoke<Api.List<Api.PullSecret>>('pullSecret.list', { project, location }, fetch)
 		// A list started for a previous location must not replace the current one.
 		if (form.location !== location) return
+		pullSecretListReady = true
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.pullSecrets = false
@@ -416,6 +424,7 @@
 
 	async function changeLocation () {
 		pullSecrets = []
+		pullSecretListReady = false
 		workloadIdentities = []
 		disks = []
 
@@ -645,7 +654,6 @@
 				<input id="input-image" placeholder="image" bind:value={form.image} oninput={onImageInput}>
 			</div>
 		</div>
-		{/if}
 
 		<div class="field">
 			<label for={permission.pullSecrets ? 'input-pull_secret' : 'input-pull_secret-text'}>Pull Secret</label>
@@ -665,24 +673,26 @@
 						</div>
 					{/if}
 				</div>
-				{#if canProvisionRegistryPull}
-					<button
-						class="button is-variant-secondary"
-						class:is-loading={creatingRegistryPull}
-						disabled={creatingRegistryPull || !form.location}
-						onclick={createRegistryPullSecret}
-						title="Create a registry-pull service account and pull secret in this location"
-						type="button">
-						<i class="fa-solid fa-plus mr-2"></i>
-						New
-					</button>
-				{:else}
-					<span class="inline-flex" title={denyTooltip(registryPullMissingPermission)}>
-						<button class="button is-variant-secondary" type="button" disabled aria-disabled="true">
+				{#if showRegistryPullNew}
+					{#if canProvisionRegistryPull}
+						<button
+							class="button is-variant-secondary"
+							class:is-loading={creatingRegistryPull}
+							disabled={creatingRegistryPull}
+							onclick={createRegistryPullSecret}
+							title="Create a registry-pull service account and pull secret in this location"
+							type="button">
 							<i class="fa-solid fa-plus mr-2"></i>
 							New
 						</button>
-					</span>
+					{:else}
+						<span class="inline-flex" title={denyTooltip(registryPullMissingPermission)}>
+							<button class="button is-variant-secondary" type="button" disabled aria-disabled="true">
+								<i class="fa-solid fa-plus mr-2"></i>
+								New
+							</button>
+						</span>
+					{/if}
 				{/if}
 			</div>
 			{#if registryPullError}
@@ -694,7 +704,6 @@
 			{/if}
 		</div>
 
-		{#if selectedLocation}
 		{#if selectedLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
 				<div class="field">
