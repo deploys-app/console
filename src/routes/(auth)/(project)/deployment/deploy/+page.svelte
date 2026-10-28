@@ -698,7 +698,9 @@
 			{#if registryPullError}
 				<p class="text-negative text-sm mt-1">{registryPullError}</p>
 			{/if}
-			<span class="helper">For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.</span>
+			{#if showRegistryPullNew}
+				<span class="helper">For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.</span>
+			{/if}
 			{#if !permission.pullSecrets}
 				<p class="text-xs">* You don't have permission to list pull secrets</p>
 			{/if}

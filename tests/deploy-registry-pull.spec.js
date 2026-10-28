@@ -6,6 +6,7 @@ import { sameProjectRegistryImage } from '../src/lib/registry-image.js'
 const PULL_EMAIL = 'registry-pull@test-project.serviceaccount.deploys.app'
 const OLDER_SECRET = 'older-pull-key-secret'
 const NEWER_SECRET = 'newer-pull-key-secret'
+const REGISTRY_PULL_HELPER = 'For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.'
 
 const PROVISION = [
 	'serviceaccount.create',
@@ -117,7 +118,7 @@ test.describe('deploy form — registry pull secret', () => {
 		await pickSelect(page, 'input-location', 'gke')
 		await expect(main.getByText('Pull Secret', { exact: true })).toBeVisible()
 		await expect(main.getByRole('button', { name: 'New' })).toBeEnabled()
-		await expect(main.getByText('For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.')).toBeVisible()
+		await expect(main.getByText(REGISTRY_PULL_HELPER)).toBeVisible()
 	})
 
 	test('New is disabled when pullsecret.create is missing, with that deny tooltip', async ({ page }) => {
@@ -231,6 +232,7 @@ test.describe('deploy form — registry pull secret', () => {
 		expect(calls(log, 'serviceAccount.get').some((body) => body.id === 'registry-pull')).toBe(true)
 		expect(calls(log, 'serviceAccount.createKey')).toHaveLength(0)
 		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
+		await expect(main.getByText(REGISTRY_PULL_HELPER)).toHaveCount(0)
 		await expect(main).not.toContainText(NEWER_SECRET)
 		await expect(main).not.toContainText(OLDER_SECRET)
 	})
@@ -294,6 +296,7 @@ test.describe('deploy form — registry pull secret', () => {
 		await page.locator('#input-pull_secret').click()
 		await expect(page.getByRole('option', { name: 'registry-pull', exact: true })).toBeVisible()
 		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
+		await expect(main.getByText(REGISTRY_PULL_HELPER)).toHaveCount(0)
 
 		const log = await getRequestLog()
 		expect(calls(log, 'serviceAccount.create')).toHaveLength(0)
@@ -310,8 +313,10 @@ test.describe('deploy form — registry pull secret', () => {
 		const main = page.locator('.content-wrapper')
 		await pickSelect(page, 'input-location', 'gke')
 		await expect(page.locator('#input-pull_secret-text')).toBeVisible()
+		await expect(main.getByText(REGISTRY_PULL_HELPER)).toBeVisible()
 		await main.getByRole('button', { name: 'New' }).click()
 		await expect(page.locator('#input-pull_secret-text')).toHaveValue('registry-pull')
+		await expect(main.getByText(REGISTRY_PULL_HELPER)).toHaveCount(0)
 		await expect(main).not.toContainText(NEWER_SECRET)
 	})
 
