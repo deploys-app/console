@@ -256,6 +256,17 @@
 		return /already exist/i.test(message ?? '')
 	}
 
+	// A taken service-account sid is "api: sid not available", not "already exists".
+	function serviceAccountTaken (message: string | undefined) {
+		return alreadyExists(message) || /sid not available/i.test(message ?? '')
+	}
+
+	// Empty, or only the dedicated registry-pull role. Anything else would be
+	// wiped by role.bind, which replaces the account's whole role set.
+	function registryPullAccountUsable (roles: string[]) {
+		return roles.every((role) => role === REGISTRY_PULL_NAME)
+	}
+
 	function newestKey (keys: Api.ServiceAccountKey[]) {
 		return keys.reduce((a, b) => (new Date(b.createdAt) > new Date(a.createdAt) ? b : a))
 	}
@@ -279,7 +290,8 @@
 				sid: REGISTRY_PULL_NAME,
 				name: REGISTRY_PULL_DISPLAY
 			}, fetch)
-			if (!saResp.ok && !alreadyExists(saResp.error?.message)) {
+			const saExisted = !saResp.ok && serviceAccountTaken(saResp.error?.message)
+			if (!saResp.ok && !saExisted) {
 				registryPullError = saResp.error?.message ?? 'Failed to create the pull service account.'
 				return
 			}
@@ -295,8 +307,37 @@
 				return
 			}
 
+			// The account can outlive its pull secret. Reuse it only when its
+			// roles are already empty or exactly registry-pull. Any other role
+			// means this sid belongs to something else — do not bind over it.
+			if (saExisted) {
+				const usersResp = await api.invoke<Api.List<Api.RoleUser>>('role.users', { project }, fetch)
+				if (!usersResp.ok) {
+					await modal.error({ error: usersResp.error ?? 'Failed to read the service account roles.' })
+					return
+				}
+				const bound = usersResp.result?.items?.find((user) => user.email === email)
+				const roles = bound?.roles ?? []
+				if (!registryPullAccountUsable(roles)) {
+					await modal.error({
+						error: `The registry-pull service account already exists, but it is bound to ${roles.join(', ')}. It can't be used for a pull secret without replacing those roles.`
+					})
+					return
+				}
+			}
+
 			const roleResp = await api.invoke<Api.Role>('role.get', { project, role: REGISTRY_PULL_NAME }, fetch)
 			const roleExists = roleResp.ok && roleResp.result?.role === REGISTRY_PULL_NAME
+			if (saExisted && roleExists) {
+				const perms = roleResp.result?.permissions ?? []
+				const pullOnly = perms.length === 1 && perms[0] === 'registry.pull'
+				if (!pullOnly) {
+					await modal.error({
+						error: 'The registry-pull service account already exists, but its role is not limited to registry.pull.'
+					})
+					return
+				}
+			}
 			if (!roleExists) {
 				if (!roleResp.ok && !roleResp.error?.notFound) {
 					registryPullError = roleResp.error?.message ?? 'Failed to read the registry-pull role.'

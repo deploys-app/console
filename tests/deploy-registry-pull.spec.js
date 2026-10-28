@@ -231,10 +231,155 @@ test.describe('deploy form — registry pull secret', () => {
 		])
 		expect(calls(log, 'serviceAccount.get').some((body) => body.id === 'registry-pull')).toBe(true)
 		expect(calls(log, 'serviceAccount.createKey')).toHaveLength(0)
+		expect(calls(log, 'role.users')).toHaveLength(0)
 		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
 		await expect(main.getByText(REGISTRY_PULL_HELPER)).toHaveCount(0)
 		await expect(main).not.toContainText(NEWER_SECRET)
 		await expect(main).not.toContainText(OLDER_SECRET)
+	})
+
+	test('New reuses an existing registry-pull account that is already bound to that role', async ({ page }) => {
+		await setMocks({
+			...provisionOk(),
+			'serviceAccount.create': { ok: false, error: { message: 'api: sid not available' } },
+			...roleNamed('registry-pull'),
+			'role.users': {
+				ok: true,
+				result: { items: [{ email: PULL_EMAIL, roles: ['registry-pull'] }] }
+			}
+		})
+		await page.goto('/deployment/deploy?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'New' }).click()
+
+		await expect(page.locator('#input-pull_secret')).toContainText('registry-pull')
+		await expect(page.locator('#app-modal')).not.toBeVisible()
+		const log = await getRequestLog()
+		expect(calls(log, 'role.users')).toEqual([{ project: 'test-project' }])
+		expect(calls(log, 'role.create')).toHaveLength(0)
+		expect(calls(log, 'role.bind')).toEqual([
+			{ project: 'test-project', email: PULL_EMAIL, roles: ['registry-pull'] }
+		])
+		expect(calls(log, 'pullSecret.create')).toEqual([
+			{
+				project: 'test-project',
+				location: 'gke',
+				name: 'registry-pull',
+				spec: {
+					server: 'https://registry.deploys.app',
+					username: PULL_EMAIL,
+					password: NEWER_SECRET
+				}
+			}
+		])
+		await expect(main).not.toContainText(NEWER_SECRET)
+		await expect(main.getByText('api: sid not available')).toHaveCount(0)
+	})
+
+	test('New binds an existing registry-pull account that has no roles yet', async ({ page }) => {
+		await setMocks({
+			...provisionOk(),
+			'serviceAccount.create': { ok: false, error: { message: 'api: sid not available' } },
+			'role.users': {
+				ok: true,
+				result: { items: [{ email: 'other@example.com', roles: ['admin'] }] }
+			}
+		})
+		await page.goto('/deployment/deploy?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'New' }).click()
+
+		await expect(page.locator('#input-pull_secret')).toContainText('registry-pull')
+		await expect(page.locator('#app-modal')).not.toBeVisible()
+		const log = await getRequestLog()
+		expect(calls(log, 'role.create')).toHaveLength(1)
+		expect(calls(log, 'role.bind')).toEqual([
+			{ project: 'test-project', email: PULL_EMAIL, roles: ['registry-pull'] }
+		])
+		expect(calls(log, 'pullSecret.create')).toHaveLength(1)
+	})
+
+	test('New shows an error modal when the existing account role is not registry.pull only', async ({ page }) => {
+		await setMocks({
+			...provisionOk(),
+			'serviceAccount.create': { ok: false, error: { message: 'api: sid not available' } },
+			'role.get': {
+				ok: true,
+				result: {
+					role: 'registry-pull',
+					name: 'Registry Pull',
+					permissions: ['registry.pull', 'deployment.get'],
+					createdAt: '2024-01-01T00:00:00Z',
+					createdBy: 'owner@example.com'
+				}
+			},
+			'role.users': {
+				ok: true,
+				result: { items: [{ email: PULL_EMAIL, roles: ['registry-pull'] }] }
+			}
+		})
+		await page.goto('/deployment/deploy?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'New' }).click()
+
+		const dialog = page.locator('#app-modal')
+		await expect(dialog).toBeVisible()
+		await expect(dialog).toContainText('its role is not limited to registry.pull')
+		const log = await getRequestLog()
+		expect(calls(log, 'role.bind')).toHaveLength(0)
+		expect(calls(log, 'role.create')).toHaveLength(0)
+		expect(calls(log, 'pullSecret.create')).toHaveLength(0)
+		await expect(main).not.toContainText(NEWER_SECRET)
+	})
+
+	test('New shows an error modal when the existing registry-pull account has another role', async ({ page }) => {
+		await setMocks({
+			...provisionOk(),
+			'serviceAccount.create': { ok: false, error: { message: 'api: sid not available' } },
+			'role.users': {
+				ok: true,
+				result: { items: [{ email: PULL_EMAIL, roles: ['admin', 'registry-pull'] }] }
+			}
+		})
+		await page.goto('/deployment/deploy?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'New' }).click()
+
+		const dialog = page.locator('#app-modal')
+		await expect(dialog).toBeVisible()
+		await expect(dialog).toContainText('The registry-pull service account already exists, but it is bound to admin, registry-pull.')
+		await expect(dialog).toContainText("It can't be used for a pull secret without replacing those roles.")
+		const log = await getRequestLog()
+		expect(calls(log, 'role.bind')).toHaveLength(0)
+		expect(calls(log, 'role.create')).toHaveLength(0)
+		expect(calls(log, 'pullSecret.create')).toHaveLength(0)
+		expect(calls(log, 'serviceAccount.createKey')).toHaveLength(0)
+		await expect(main).not.toContainText(NEWER_SECRET)
+		await expect(main.getByRole('button', { name: 'New' })).toBeVisible()
+	})
+
+	test('New shows an error modal when the existing account roles cannot be read', async ({ page }) => {
+		await setMocks({
+			...provisionOk(),
+			'serviceAccount.create': { ok: false, error: { message: 'api: sid not available' } },
+			'role.users': { ok: false, error: { message: 'iam: forbidden' } }
+		})
+		await page.goto('/deployment/deploy?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await pickSelect(page, 'input-location', 'gke')
+		await main.getByRole('button', { name: 'New' }).click()
+
+		const dialog = page.locator('#app-modal')
+		await expect(dialog).toBeVisible()
+		await expect(dialog).toContainText('iam: forbidden')
+		const log = await getRequestLog()
+		expect(calls(log, 'role.bind')).toHaveLength(0)
+		expect(calls(log, 'pullSecret.create')).toHaveLength(0)
+		await expect(main).not.toContainText(NEWER_SECRET)
 	})
 
 	test('New shows the API error and clears it on the next click', async ({ page }) => {
