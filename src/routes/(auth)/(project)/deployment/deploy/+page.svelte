@@ -267,6 +267,11 @@
 		return roles.every((role) => role === REGISTRY_PULL_NAME)
 	}
 
+	async function refuseRegistryPull (error: unknown) {
+		creatingRegistryPull = false
+		await modal.error({ error })
+	}
+
 	function newestKey (keys: Api.ServiceAccountKey[]) {
 		return keys.reduce((a, b) => (new Date(b.createdAt) > new Date(a.createdAt) ? b : a))
 	}
@@ -313,15 +318,13 @@
 			if (saExisted) {
 				const usersResp = await api.invoke<Api.List<Api.RoleUser>>('role.users', { project }, fetch)
 				if (!usersResp.ok) {
-					await modal.error({ error: usersResp.error ?? 'Failed to read the service account roles.' })
+					await refuseRegistryPull(usersResp.error ?? 'Failed to read the service account roles.')
 					return
 				}
 				const bound = usersResp.result?.items?.find((user) => user.email === email)
 				const roles = bound?.roles ?? []
 				if (!registryPullAccountUsable(roles)) {
-					await modal.error({
-						error: `The registry-pull service account already exists, but it is bound to ${roles.join(', ')}. It can't be used for a pull secret without replacing those roles.`
-					})
+					await refuseRegistryPull(`The registry-pull service account already exists, but it is bound to ${roles.join(', ')}. It can't be used for a pull secret without replacing those roles.`)
 					return
 				}
 			}
@@ -332,9 +335,7 @@
 				const perms = roleResp.result?.permissions ?? []
 				const pullOnly = perms.length === 1 && perms[0] === 'registry.pull'
 				if (!pullOnly) {
-					await modal.error({
-						error: 'The registry-pull service account already exists, but its role is not limited to registry.pull.'
-					})
+					await refuseRegistryPull('The registry-pull service account already exists, but its role is not limited to registry.pull.')
 					return
 				}
 			}
