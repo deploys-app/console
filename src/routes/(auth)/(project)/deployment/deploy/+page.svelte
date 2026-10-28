@@ -8,7 +8,13 @@
 	import Select from '$lib/components/Select.svelte'
 	import GuardedButton from '$lib/components/GuardedButton.svelte'
 	import EnvVarEditor from '$lib/components/EnvVarEditor.svelte'
+	import { denyTooltip } from '$lib/permission'
+	import { sameProjectRegistryImage } from '$lib/registry-image'
 	import type { PageData } from './$types'
+
+	const REGISTRY_PULL_NAME = 'registry-pull'
+	const REGISTRY_PULL_DISPLAY = 'Registry Pull'
+	const REGISTRY_SERVER = 'https://registry.deploys.app'
 
 	// Editable sidecar shape used by the form. Mirrors Api.SidecarForm but keeps
 	// `type` as a plain string so the <Select> two-way binding (value:
@@ -44,6 +50,8 @@
 	const quota = $derived(data.projectInfo.quota)
 
 	const project = $derived(data.project)
+	const canProvisionRegistryPull = $derived(data.canProvisionRegistryPull)
+	const registryPullMissingPermission = $derived(data.registryPullMissingPermission)
 
 	const deployment = untrack(() => data.deployment)
 
@@ -55,6 +63,13 @@
 	})
 
 	let pullSecrets = $state<Api.PullSecret[]>([])
+	let creatingRegistryPull = $state(false)
+	let registryPullError = $state('')
+	// Set when the user clears the field, so a same-project image does not put
+	// registry-pull back while the image and location stay on the same side of
+	// the match boundary.
+	let registryPullPreselectSkipped = false
+	let registryPullPreselectScope = ''
 
 	let workloadIdentities = $state<Api.WorkloadIdentity[]>([])
 
@@ -177,7 +192,10 @@
 			return
 		}
 
-		const resp = await api.invoke<Api.List<Api.PullSecret>>('pullSecret.list', { project, location: selectedLocation.id }, fetch)
+		const location = selectedLocation.id
+		const resp = await api.invoke<Api.List<Api.PullSecret>>('pullSecret.list', { project, location }, fetch)
+		// A list started for a previous location must not replace the current one.
+		if (form.location !== location) return
 		if (!resp.ok) {
 			if (resp.error?.forbidden) {
 				permission.pullSecrets = false
@@ -186,7 +204,165 @@
 			modal.error({ error: resp.error })
 			return
 		}
-		pullSecrets = resp.result.items ?? []
+		let items = resp.result.items ?? []
+		// New appends registry-pull locally before this list (started earlier) returns.
+		// Keep that option, or the select drops it while the field still points at it.
+		const created = pullSecrets.find((p) => p.name === REGISTRY_PULL_NAME && p.location === location)
+		if (created && !items.some((p) => p.name === REGISTRY_PULL_NAME)) {
+			items = [...items, created]
+		}
+		pullSecrets = items
+		maybePreselectRegistryPull()
+	}
+
+	function preselectScopeFor (image: string, location: string) {
+		const matched = sameProjectRegistryImage(image, project) ? '1' : '0'
+		return `${location}\0${matched}`
+	}
+
+	function maybePreselectRegistryPull (image = form.image) {
+		if (registryPullPreselectSkipped) return
+		if (!permission.pullSecrets) return
+		if (!sameProjectRegistryImage(image, project)) return
+		if (form.pullSecret !== '') return
+		if (!pullSecrets.some((p) => p.name === REGISTRY_PULL_NAME)) return
+		form.pullSecret = REGISTRY_PULL_NAME
+	}
+
+	function onImageInput (e: Event) {
+		const image = e.currentTarget instanceof HTMLInputElement ? e.currentTarget.value : form.image
+		const scope = preselectScopeFor(image, form.location)
+		if (scope !== registryPullPreselectScope) {
+			registryPullPreselectScope = scope
+			registryPullPreselectSkipped = false
+		}
+		maybePreselectRegistryPull(image)
+	}
+
+	function onPullSecretChange (value: string | number) {
+		if (String(value) !== '') return
+		registryPullPreselectSkipped = true
+	}
+
+	function alreadyExists (message: string | undefined) {
+		return /already exist/i.test(message ?? '')
+	}
+
+	function newestKey (keys: Api.ServiceAccountKey[]) {
+		return keys.reduce((a, b) => (new Date(b.createdAt) > new Date(a.createdAt) ? b : a))
+	}
+
+	async function createRegistryPullSecret () {
+		if (creatingRegistryPull) return
+		registryPullError = ''
+		const location = form.location
+		if (!location) return
+
+		creatingRegistryPull = true
+		try {
+			const existing = pullSecrets.find((p) => p.name === REGISTRY_PULL_NAME && p.location === location)
+			if (existing) {
+				form.pullSecret = existing.name
+				return
+			}
+
+			const saResp = await api.invoke('serviceAccount.create', {
+				project,
+				sid: REGISTRY_PULL_NAME,
+				name: REGISTRY_PULL_DISPLAY
+			}, fetch)
+			if (!saResp.ok && !alreadyExists(saResp.error?.message)) {
+				registryPullError = saResp.error?.message ?? 'Failed to create the pull service account.'
+				return
+			}
+
+			let getResp = await api.invoke<Api.ServiceAccount>('serviceAccount.get', { project, id: REGISTRY_PULL_NAME }, fetch)
+			if (!getResp.ok) {
+				registryPullError = getResp.error?.message ?? 'Failed to read the pull service account.'
+				return
+			}
+			const email = getResp.result?.email
+			if (!email) {
+				registryPullError = 'The pull service account has no email.'
+				return
+			}
+
+			const roleResp = await api.invoke<Api.Role>('role.get', { project, role: REGISTRY_PULL_NAME }, fetch)
+			const roleExists = roleResp.ok && roleResp.result?.role === REGISTRY_PULL_NAME
+			if (!roleExists) {
+				if (!roleResp.ok && !roleResp.error?.notFound) {
+					registryPullError = roleResp.error?.message ?? 'Failed to read the registry-pull role.'
+					return
+				}
+				const roleCreate = await api.invoke('role.create', {
+					project,
+					role: REGISTRY_PULL_NAME,
+					name: REGISTRY_PULL_DISPLAY,
+					permissions: ['registry.pull']
+				}, fetch)
+				if (!roleCreate.ok && !alreadyExists(roleCreate.error?.message)) {
+					registryPullError = roleCreate.error?.message ?? 'Failed to create the registry-pull role.'
+					return
+				}
+			}
+
+			// role.bind replaces the account's entire role set. Only this
+			// dedicated account, and only the registry-pull role.
+			const bindResp = await api.invoke('role.bind', { project, email, roles: [REGISTRY_PULL_NAME] }, fetch)
+			if (!bindResp.ok) {
+				registryPullError = bindResp.error?.message ?? 'Failed to bind the registry-pull role.'
+				return
+			}
+
+			let keys = getResp.result?.keys ?? []
+			if (keys.length === 0) {
+				const keyResp = await api.invoke('serviceAccount.createKey', { project, id: REGISTRY_PULL_NAME }, fetch)
+				if (!keyResp.ok) {
+					registryPullError = keyResp.error?.message ?? 'Failed to create a service account key.'
+					return
+				}
+				getResp = await api.invoke<Api.ServiceAccount>('serviceAccount.get', { project, id: REGISTRY_PULL_NAME }, fetch)
+				if (!getResp.ok) {
+					registryPullError = getResp.error?.message ?? 'Failed to read the new key.'
+					return
+				}
+				keys = getResp.result?.keys ?? []
+			}
+			const secret = keys.length > 0 ? newestKey(keys)?.secret : ''
+			if (!secret) {
+				registryPullError = 'Could not read the service account key secret.'
+				return
+			}
+
+			const psResp = await api.invoke('pullSecret.create', {
+				project,
+				location,
+				name: REGISTRY_PULL_NAME,
+				spec: { server: REGISTRY_SERVER, username: email, password: secret }
+			}, fetch)
+			if (!psResp.ok && !alreadyExists(psResp.error?.message)) {
+				registryPullError = psResp.error?.message ?? 'Failed to create the pull secret.'
+				return
+			}
+
+			if (!pullSecrets.some((p) => p.name === REGISTRY_PULL_NAME && p.location === location)) {
+				pullSecrets = [...pullSecrets, {
+					name: REGISTRY_PULL_NAME,
+					value: '',
+					spec: { server: REGISTRY_SERVER, username: email, password: '' },
+					location,
+					action: 'create',
+					status: 'success',
+					createdAt: '',
+					createdBy: ''
+				}]
+			}
+			form.pullSecret = REGISTRY_PULL_NAME
+		} catch (e) {
+			registryPullError = e instanceof Error ? e.message : 'Failed to create the pull secret.'
+		} finally {
+			creatingRegistryPull = false
+		}
 	}
 
 	async function fetchWorkloadIdentities () {
@@ -244,6 +420,14 @@
 		disks = []
 
 		await tick()
+		// Reset the clear-latch only when the location (or the image's match
+		// bit, if it changed with it) actually changed. A reset after tick must
+		// not undo a clear that landed once this scope was already current.
+		const scope = preselectScopeFor(form.image, form.location)
+		if (scope !== registryPullPreselectScope) {
+			registryPullPreselectScope = scope
+			registryPullPreselectSkipped = false
+		}
 		if (!selectedLocation) {
 			return
 		}
@@ -458,30 +642,59 @@
 		<div class="field">
 			<label for="input-image">Image</label>
 			<div class="input">
-				<input id="input-image" placeholder="image" bind:value={form.image}>
+				<input id="input-image" placeholder="image" bind:value={form.image} oninput={onImageInput}>
 			</div>
 		</div>
-
-		{#if permission.pullSecrets}
-			<div class="field">
-				<label for="input-pull_secret">Pull Secret</label>
-				{#key pullSecrets}
-					<Select
-						id="input-pull_secret"
-						bind:value={form.pullSecret}
-						options={[{ value: '', label: 'No Pull Secret' }, ...pullSecrets.map((it) => ({ value: it.name, label: it.name }))]} />
-				{/key}
-			</div>
-		{:else}
-			<div class="field">
-				<label for="input-pull_secret-text">Pull Secret</label>
-				<div class="input">
-					<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
-				</div>
-				<p class="text-xs">* You don't have permission to list pull secrets</p>
-			</div>
 		{/if}
 
+		<div class="field">
+			<label for={permission.pullSecrets ? 'input-pull_secret' : 'input-pull_secret-text'}>Pull Secret</label>
+			<div class="flex items-center gap-2">
+				<div class="flex-1">
+					{#if permission.pullSecrets}
+						{#key pullSecrets}
+							<Select
+								id="input-pull_secret"
+								bind:value={form.pullSecret}
+								onchange={onPullSecretChange}
+								options={[{ value: '', label: 'No Pull Secret' }, ...pullSecrets.map((it) => ({ value: it.name, label: it.name }))]} />
+						{/key}
+					{:else}
+						<div class="input">
+							<input id="input-pull_secret-text" placeholder="Pull Secret Name" bind:value={form.pullSecret}>
+						</div>
+					{/if}
+				</div>
+				{#if canProvisionRegistryPull}
+					<button
+						class="button is-variant-secondary"
+						class:is-loading={creatingRegistryPull}
+						disabled={creatingRegistryPull || !form.location}
+						onclick={createRegistryPullSecret}
+						title="Create a registry-pull service account and pull secret in this location"
+						type="button">
+						<i class="fa-solid fa-plus mr-2"></i>
+						New
+					</button>
+				{:else}
+					<span class="inline-flex" title={denyTooltip(registryPullMissingPermission)}>
+						<button class="button is-variant-secondary" type="button" disabled aria-disabled="true">
+							<i class="fa-solid fa-plus mr-2"></i>
+							New
+						</button>
+					</span>
+				{/if}
+			</div>
+			{#if registryPullError}
+				<p class="text-negative text-sm mt-1">{registryPullError}</p>
+			{/if}
+			<span class="helper">For a private registry. New creates a registry-pull service account (registry.pull only) and a pull secret for registry.deploys.app in this location.</span>
+			{#if !permission.pullSecrets}
+				<p class="text-xs">* You don't have permission to list pull secrets</p>
+			{/if}
+		</div>
+
+		{#if selectedLocation}
 		{#if selectedLocation?.features.workloadIdentity}
 			{#if permission.workloadIdentities}
 				<div class="field">
