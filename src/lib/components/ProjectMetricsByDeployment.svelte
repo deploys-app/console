@@ -82,11 +82,6 @@
 	})
 </script>
 
-<p class="text-sm text-content/60 mb-4">
-	CPU and memory are each day's average, summed across a deployment's pods. Egress and requests are daily totals.
-	Samples are kept for 30 days. Cache egress, replicas, and disk are not recorded per deployment.
-</p>
-
 <div class="w-44 max-w-full">
 	<Select
 		bind:value={filter.range}
