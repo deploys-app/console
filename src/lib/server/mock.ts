@@ -1796,6 +1796,27 @@ const handlers: Record<string, (args: any) => object> = {
 		replica: dailyMetricLine('replica', 3),
 		staticStorage: dailyMetricLine('static_storage', 1610612736)
 	}),
+	'project.metricsByDeployment': () => ok({
+		cpuUsage: [
+			dailyMetricLine('web', 1.1)[0],
+			dailyMetricLine('worker', 0.35)[0]
+		],
+		memory: [
+			dailyMetricLine('web', 536870912)[0],
+			dailyMetricLine('worker', 268435456)[0]
+		],
+		egress: [
+			dailyMetricLine('web', 800000000)[0],
+			dailyMetricLine('worker', 120000000)[0]
+		],
+		requests: [
+			dailyMetricLine('web', 42000)[0],
+			dailyMetricLine('site', 18000)[0]
+		],
+		staticStorage: [
+			dailyMetricLine('site', 1610612736)[0]
+		]
+	}),
 
 	'billing.list': () => list(billingAccounts),
 	'billing.get': (args) => ok(billingAccounts.find((b) => b.id === args?.id) ?? { ...billingAccounts[0], id: args?.id ?? 'ba_mock_1' }),
