@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { tick, untrack } from 'svelte'
+	import { untrack } from 'svelte'
 	import { page } from '$app/stores'
 	import { replaceState } from '$app/navigation'
 	import api from '$lib/api'
 	import Chart from '$lib/components/Chart.svelte'
+	import MetricsLoading from '$lib/components/MetricsLoading.svelte'
 	import Select from '$lib/components/Select.svelte'
 	import type { MetricSeries } from '$lib/charts/util'
 
@@ -35,6 +36,8 @@
 	let egress = $state<MetricSeries[]>([])
 	let requests = $state<MetricSeries[]>([])
 	let storage = $state<MetricSeries[]>([])
+	let loading = $state(true)
+	let requestID = 0
 
 	function seriesOf (lines: Api.UsageMetricsLine[] | null | undefined): MetricSeries[] {
 		return (lines ?? []).map((line) => ({
@@ -43,42 +46,43 @@
 		}))
 	}
 
-	async function fetchMetrics (clear = false) {
+	async function fetchMetrics () {
+		const id = ++requestID
 		const range = untrack(() => filter.range)
-		const resp: Api.Response<Api.ProjectMetricsByDeploymentResult> = await api.invoke(
-			'project.metricsByDeployment',
-			{ project, timeRange: range },
-			fetch
-		)
-		if (!resp.ok) {
-			return
-		}
+		loading = true
+		try {
+			const resp: Api.Response<Api.ProjectMetricsByDeploymentResult> = await api.invoke(
+				'project.metricsByDeployment',
+				{ project, timeRange: range },
+				fetch
+			)
+			if (id !== requestID || !resp.ok) return
 
-		if (clear) {
-			cpu = []
-			memory = []
-			egress = []
-			requests = []
-			storage = []
-			await tick()
+			cpu = seriesOf(resp.result.cpuUsage)
+			memory = seriesOf(resp.result.memory)
+			egress = seriesOf(resp.result.egress)
+			requests = seriesOf(resp.result.requests)
+			storage = seriesOf(resp.result.staticStorage)
+		} finally {
+			if (id === requestID) loading = false
 		}
-
-		cpu = seriesOf(resp.result.cpuUsage)
-		memory = seriesOf(resp.result.memory)
-		egress = seriesOf(resp.result.egress)
-		requests = seriesOf(resp.result.requests)
-		storage = seriesOf(resp.result.staticStorage)
 	}
 
 	function selectRange () {
 		const u = new URL($page.url)
 		u.searchParams.set('range', filter.range)
 		replaceState(u, {})
-		fetchMetrics(true)
+		fetchMetrics()
 	}
 
+	// `fetchMetrics` reads `project` before the request, so this re-runs on a
+	// project switch. The cleanup drops a response that lands after the switch
+	// or after leaving this tab.
 	$effect(() => {
-		fetchMetrics(true)
+		fetchMetrics()
+		return () => {
+			requestID += 1
+		}
 	})
 </script>
 
@@ -89,10 +93,14 @@
 		onchange={selectRange} />
 </div>
 
-<div class="grid gap-4 mt-4 lg:grid-cols-2">
-	<Chart title="CPU (vCPU)" unit="count" series={cpu} range={filter.range} />
-	<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
-	<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
-	<Chart title="Requests" unit="count" series={requests} range={filter.range} />
-	<Chart title="Static Storage (bytes)" unit="bytes" series={storage} range={filter.range} />
-</div>
+{#if loading}
+	<MetricsLoading />
+{:else}
+	<div class="grid gap-4 mt-4 lg:grid-cols-2">
+		<Chart title="CPU (vCPU)" unit="count" series={cpu} range={filter.range} />
+		<Chart title="Memory (bytes)" unit="bytes" series={memory} range={filter.range} />
+		<Chart title="Egress (bytes)" unit="bytes" series={egress} range={filter.range} />
+		<Chart title="Requests" unit="count" series={requests} range={filter.range} />
+		<Chart title="Static Storage (bytes)" unit="bytes" series={storage} range={filter.range} />
+	</div>
+{/if}
