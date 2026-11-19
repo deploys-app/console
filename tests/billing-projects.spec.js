@@ -1,4 +1,4 @@
-import { test, expect, setMocks } from './helpers.js'
+import { test, expect, setMocks, getRequestLog } from './helpers.js'
 import { sampleBillingAccount } from './fixtures/mocks.js'
 
 const ownerAccount = { ...sampleBillingAccount, role: 'owner' }
@@ -47,6 +47,55 @@ test.describe('billing account projects', () => {
 		await expect(main.getByRole('link', { name: 'New project' })).toHaveAttribute('href', '/project/create?billingAccount=ba-1')
 	})
 
+	test('an owner confirms unlink and the project leaves the account', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: ownerAccount },
+			'billing.listProjects': boundProjects,
+			'billing.unlinkProject': { ok: true, result: {} }
+		})
+
+		await page.goto('/billing/projects?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		await main.getByRole('button', { name: 'Unlink Test Project' }).click()
+
+		const dialog = page.locator('#app-modal')
+		await expect(dialog).toBeVisible()
+		await expect(dialog).toContainText('stay paused')
+		await expect(dialog).toContainText('resumes each resource')
+		await expect(dialog).toContainText('keep running')
+		await page.locator('#app-modal-confirm').click()
+
+		await expect(main.getByText('Test Project')).toHaveCount(0)
+		await expect(main.getByText('Other Project')).toBeVisible()
+
+		await expect.poll(async () => {
+			const log = await getRequestLog()
+			return log.some((r) => r.path === '/billing.unlinkProject')
+		}).toBe(true)
+		const req = JSON.parse((await getRequestLog()).find((r) => r.path === '/billing.unlinkProject')?.body ?? '{}')
+		expect(req).toMatchObject({ id: 'ba-1', project: 'test-project' })
+	})
+
+	test('cancel leaves the project bound and does not call unlink', async ({ page }) => {
+		await setMocks({
+			'billing.get': { ok: true, result: ownerAccount },
+			'billing.listProjects': boundProjects,
+			'billing.unlinkProject': { ok: true, result: {} }
+		})
+
+		await page.goto('/billing/projects?id=ba-1')
+
+		const main = page.locator('.content-wrapper')
+		await main.getByRole('button', { name: 'Unlink Test Project' }).click()
+		await expect(page.locator('#app-modal')).toBeVisible()
+		await page.getByRole('button', { name: 'Cancel' }).click()
+		await expect(page.locator('#app-modal')).toBeHidden()
+
+		await expect(main.getByText('Test Project')).toBeVisible()
+		expect((await getRequestLog()).some((r) => r.path === '/billing.unlinkProject')).toBe(false)
+	})
+
 	test('an accountant sees the projects but not New project', async ({ page }) => {
 		await setMocks({
 			'billing.get': { ok: true, result: accountantAccount },
@@ -65,6 +114,7 @@ test.describe('billing account projects', () => {
 		await expect(main.getByText('Test Project')).toBeVisible()
 		await expect(main.getByText('Other Project')).toBeVisible()
 		await expect(main.getByRole('link', { name: 'New project' })).toHaveCount(0)
+		await expect(main.getByRole('button', { name: /Unlink/ })).toHaveCount(0)
 	})
 
 	test('new project from this account pre-selects it on the create form', async ({ page }) => {

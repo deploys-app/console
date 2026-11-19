@@ -28,14 +28,18 @@ import { defaultMocks } from './fixtures/mocks.js'
 
 const PORT = Number(process.env.MOCK_PORT || 9999)
 
-/** @type {Map<string, { responses: Record<string, any>, requestLog: { path: string, method: string, body: string }[] }>} */
+/** @type {Map<string, { responses: Record<string, any>, requestLog: { path: string, method: string, body: string }[], unlinkedProjects: Set<string> }>} */
 const buckets = new Map()
+
+function newBucket () {
+	return { responses: defaultMocks(), requestLog: [], unlinkedProjects: new Set() }
+}
 
 /** Get (lazily creating) the state bucket for a test key. */
 function bucket (key) {
 	let b = buckets.get(key)
 	if (!b) {
-		b = { responses: defaultMocks(), requestLog: [] }
+		b = newBucket()
 		buckets.set(key, b)
 	}
 	return b
@@ -57,7 +61,7 @@ const server = http.createServer(async (req, res) => {
 
 		if (path === '/__reset' && req.method === 'POST') {
 			const key = url.searchParams.get('key') || 'default'
-			buckets.set(key, { responses: defaultMocks(), requestLog: [] })
+			buckets.set(key, newBucket())
 			res.writeHead(200, { 'content-type': 'application/json' })
 			res.end(JSON.stringify({ ok: true }))
 			return
@@ -108,11 +112,19 @@ const server = http.createServer(async (req, res) => {
 			return
 		}
 
-		const { responses, requestLog } = bucket(key)
+		const state = bucket(key)
+		const { responses, requestLog } = state
 		const body = await readBody(req)
 		requestLog.push({ path, method: req.method, body })
 
 		const response = responses[path]
+
+		if (path === '/billing.unlinkProject' && response && response.ok) {
+			try {
+				const project = JSON.parse(body || '{}').project
+				if (project) state.unlinkedProjects.add(String(project))
+			} catch { /* a malformed body does not detach anything */ }
+		}
 
 		// Body-aware authorization probe: `me.authorized` is a logical AND over the
 		// requested permissions. A response of { __authorizedDeny: [perms] } denies
@@ -144,8 +156,18 @@ const server = http.createServer(async (req, res) => {
 		const { __status, ...payload } = response
 		// eslint-disable-next-line no-unused-vars
 		const _omit = __status
+		let outgoing = payload
+		if (path === '/billing.listProjects' && state.unlinkedProjects.size > 0 && Array.isArray(payload?.result?.items)) {
+			outgoing = {
+				...payload,
+				result: {
+					...payload.result,
+					items: payload.result.items.filter((it) => !state.unlinkedProjects.has(it?.project))
+				}
+			}
+		}
 		res.writeHead(status, { 'content-type': 'application/json' })
-		res.end(JSON.stringify(payload))
+		res.end(JSON.stringify(outgoing))
 	} catch (err) {
 		res.writeHead(500, { 'content-type': 'application/json' })
 		res.end(JSON.stringify({ ok: false, error: { message: String(err) } }))
