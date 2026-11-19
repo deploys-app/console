@@ -14,7 +14,7 @@
 	const form = $state(untrack(() => ({
 		sid: project?.project || '',
 		name: project?.name || '',
-		billingAccount: project?.billingAccount || ''
+		billingAccount: project?.billingAccount || data.prefillBillingAccount || ''
 	})))
 
 	let saving = $state(false)
