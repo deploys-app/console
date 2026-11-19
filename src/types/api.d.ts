@@ -80,6 +80,16 @@ declare namespace Api {
         role: BillingRole
     }
 
+    // BillingBoundProject is a project attached to a billing account.
+    // Smaller than Project: a billing member may not hold project.get, so
+    // quota and config are not included.
+    export type BillingBoundProject = {
+        id: string
+        project: string
+        name: string
+        createdAt: string
+    }
+
     // BillingMember is an invited (non-owner) user on a billing account.
     export type BillingMember = {
         email: string

@@ -109,6 +109,11 @@
 		<div class="panel is-level-300">
 			<h5 class="mb-4"><strong>Quick links</strong></h5>
 			<div class="grid gap-2">
+				<a class="quick" href={`/billing/projects?id=${billingAccount.id}`}>
+					<i class="fa-solid fa-diagram-project"></i>
+					<span>Projects</span>
+					<i class="fa-solid fa-chevron-right chevron"></i>
+				</a>
 				<a class="quick" href={`/billing/receipts?id=${billingAccount.id}`}>
 					<i class="fa-solid fa-receipt"></i>
 					<span>Receipts</span>

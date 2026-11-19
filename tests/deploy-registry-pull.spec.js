@@ -89,6 +89,15 @@ function calls (log, path) {
 	return log.filter((entry) => entry.path === `/${path}`).map((entry) => JSON.parse(entry.body))
 }
 
+// The pull-secret Select remounts when its option list arrives (`{#key pullSecrets}`).
+// Opening it before that list is bound shows only "No Pull Secret", then the remount
+// closes the menu, so a later option assertion never sees the row.
+async function openPullSecret (page, name) {
+	const box = page.locator('.select-box').filter({ has: page.locator('#input-pull_secret') })
+	await expect(box.locator(`select option[value="${name}"]`)).toHaveCount(1)
+	await page.locator('#input-pull_secret').click()
+}
+
 unit.describe('sameProjectRegistryImage', () => {
 	unit('matches a same-project repository, including nested names, a port, and a digest', () => {
 		unitExpect(sameProjectRegistryImage('registry.deploys.app/acme/team/web:v1', 'acme')).toBe(true)
@@ -438,7 +447,7 @@ test.describe('deploy form — registry pull secret', () => {
 		const main = page.locator('.content-wrapper')
 		await pickSelect(page, 'input-location', 'gke')
 		await expect(page.locator('#input-pull_secret')).toBeVisible()
-		await page.locator('#input-pull_secret').click()
+		await openPullSecret(page, 'registry-pull')
 		await expect(page.getByRole('option', { name: 'registry-pull', exact: true })).toBeVisible()
 		await expect(main.getByRole('button', { name: 'New' })).toHaveCount(0)
 		await expect(main.getByText(REGISTRY_PULL_HELPER)).toHaveCount(0)
@@ -482,7 +491,7 @@ test.describe('deploy form — registry pull secret', () => {
 		await page.goto('/deployment/deploy?project=test-project')
 		await pickSelect(page, 'input-location', 'gke')
 		await page.locator('#input-image').fill('ghcr.io/acme/web:v1')
-		await page.locator('#input-pull_secret').click()
+		await openPullSecret(page, 'registry-pull')
 		await expect(page.getByRole('option', { name: 'registry-pull', exact: true })).toBeVisible()
 		await expect(page.locator('#input-pull_secret')).toContainText('No Pull Secret')
 	})

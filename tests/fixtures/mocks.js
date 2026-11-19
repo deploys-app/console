@@ -92,6 +92,10 @@ export function defaultMocks () {
 			ok: true,
 			result: { items: [] }
 		},
+		'/billing.listProjects': {
+			ok: true,
+			result: { items: [] }
+		},
 		'/deployment.list': {
 			ok: true,
 			result: { items: [] }

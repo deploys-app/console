@@ -21,8 +21,15 @@ export const load: PageLoad = async ({ url, fetch }) => {
 	// Attaching a project to a billing account is an owner/admin action, so only
 	// offer accounts the user can actually manage — an accountant sees invoices
 	// for an account but can't bill projects to it (the server refuses too).
+	const accounts = (billingAccounts.result?.items ?? []).filter((a) => canManageBilling(a.role))
+	// The billing Projects tab links here with ?billingAccount= so the new
+	// project is attached to that account. Ignore an id the caller cannot manage.
+	const requested = url.searchParams.get('billingAccount') ?? ''
+	const prefillBillingAccount = accounts.some((a) => a.id === requested) ? requested : ''
+
 	return {
 		project: projectInfo?.result,
-		billingAccounts: (billingAccounts.result?.items ?? []).filter((a) => canManageBilling(a.role))
+		billingAccounts: accounts,
+		prefillBillingAccount
 	}
 }

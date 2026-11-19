@@ -17,6 +17,7 @@
 		const id = account.id
 		return [
 			{ label: 'Overview', icon: 'fa-gauge-high', path: `/billing/detail?id=${id}`, match: ['/billing/detail'], show: true },
+			{ label: 'Projects', icon: 'fa-diagram-project', path: `/billing/projects?id=${id}`, match: ['/billing/projects'], show: true },
 			{ label: 'Invoices', icon: 'fa-file-invoice-dollar', path: `/billing/invoices?id=${id}`, match: ['/billing/invoices', '/billing/invoice'], show: true },
 			{ label: 'Receipts', icon: 'fa-receipt', path: `/billing/receipts?id=${id}`, match: ['/billing/receipts'], show: true },
 			{ label: 'Usage', icon: 'fa-chart-line', path: `/billing/report?id=${id}`, match: ['/billing/report'], show: true },

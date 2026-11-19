@@ -1874,6 +1874,16 @@ const handlers: Record<string, (args: any) => object> = {
 			expiresAt: '2026-06-02T00:00:00Z'
 		})
 	},
+	'billing.listProjects': (args) => {
+		const id = String(args?.id ?? '')
+		const bound = projects.filter((p) => !id || p.billingAccount === id)
+		return list(bound.map((p) => ({
+			id: p.id,
+			project: p.project,
+			name: p.name,
+			createdAt: p.createdAt
+		})))
+	},
 	'billing.listMembers': () => ok({ owner: billingOwnerEmail, items: billingMembers }),
 	'billing.addMember': (args) => {
 		const email = String(args?.email ?? '').toLowerCase()
