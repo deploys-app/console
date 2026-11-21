@@ -270,3 +270,12 @@ export function countryLabel (code: string): string {
 	const name = nameByCode[c]
 	return name ? `${c} — ${name}` : code
 }
+
+/**
+ * English short name only, e.g. `"Thailand"`. Falls back to the bare code for
+ * unknown values (and '' for unresolved).
+ */
+export function countryName (code: string): string {
+	const c = String(code ?? '').toUpperCase()
+	return nameByCode[c] ?? code
+}

@@ -9,10 +9,13 @@
 	import * as format from '$lib/format'
 	import { actionLabels } from '$lib/waf/rules'
 	import { describeKey, modeLabels } from '$lib/waf/limits'
+	import { countryName } from '$lib/waf/countries'
 	import { RANGE_SECONDS, RANGE_LABEL, BUCKET_SECONDS } from '$lib/metrics'
 	import RangeSwitch from '$lib/components/RangeSwitch.svelte'
 	import WafActivityChart from '$lib/components/WafActivityChart.svelte'
 	import LineChart from '$lib/components/LineChart.svelte'
+	import Select from '$lib/components/Select.svelte'
+	import NoDataRow from '$lib/components/NoDataRow.svelte'
 
 	const { data }: { data: PageData } = $props()
 
@@ -242,6 +245,124 @@
 	const isEmpty = $derived(!loading && total === 0)
 	const limitSpinner = $derived(loading && !limitResult)
 	const limitEmpty = $derived(!limitSpinner && limitShareSeries.length === 0)
+
+	// --- Recent events -------------------------------------------------------
+	// Sampled match events (waf.events), newest first, keyset-paginated with
+	// `before`. Fetched client-side after hydration; filters are server-side
+	// and mirrored in the query string (?ruleId=&action=) so a filtered view is
+	// shareable — and so a DELETED rule's events stay reachable by hand-editing
+	// ?ruleId=, which the rule select can't offer (it lists current rules only).
+
+	const EVENTS_PAGE_SIZE = 50
+	const EVENT_ACTIONS: Api.WafAction[] = ['log', 'allow', 'block']
+
+	function isWafAction (s: string): s is Api.WafAction {
+		return (EVENT_ACTIONS as string[]).includes(s)
+	}
+
+	// Writable $deriveds (admin#18 pattern): editable locally by the filter
+	// selects, re-seeded whenever navigation changes the URL params.
+	let eventRule = $derived($page.url.searchParams.get('ruleId') ?? '')
+	let eventAction = $derived.by(() => {
+		const a = $page.url.searchParams.get('action') ?? ''
+		return isWafAction(a) ? a : ''
+	})
+
+	let events = $state<Api.WafEvent[]>([])
+	let eventsNext = $state('')
+	let eventsLoading = $state(true)
+	let eventsMoreLoading = $state(false)
+	let eventsError = $state<unknown>(null)
+	// Bumped on every (re)fetch so a stale in-flight response (filter or
+	// project/location changed underneath it) is discarded, not appended.
+	let eventsToken = 0
+
+	async function fetchEvents (reset: boolean) {
+		const token = ++eventsToken
+		if (reset) {
+			eventsLoading = true
+		} else {
+			eventsMoreLoading = true
+		}
+		// Filters are read untracked: the events $effect below must key on
+		// project+location only (filter changes refetch via applyEventFilters,
+		// and range changes also rewrite $page.url — they must not refetch this).
+		const ruleId = untrack(() => eventRule)
+		const action = untrack(() => eventAction)
+		const args: Api.WafEventsRequest = { project, location, limit: EVENTS_PAGE_SIZE }
+		if (ruleId) args.ruleId = ruleId
+		if (action && isWafAction(action)) args.action = action
+		if (!reset && eventsNext) args.before = eventsNext
+		try {
+			const res = await api.invoke<Api.WafEventsResult>('waf.events', args, fetch)
+			if (token !== eventsToken) return
+			if (!res.ok) {
+				eventsError = res.error
+				return
+			}
+			const items = res.result?.items ?? []
+			events = reset ? items : [...events, ...items]
+			eventsNext = res.result?.next ?? ''
+			eventsError = null
+		} catch (e) {
+			// api.invoke synthesizes an error envelope for non-JSON bodies but still
+			// rejects when fetch itself fails (offline, connection reset). Without
+			// this, the empty state would claim "No events in the last 3 days" —
+			// a false statement about the data — on a plain network failure.
+			if (token === eventsToken) eventsError = e
+		} finally {
+			if (token === eventsToken) {
+				eventsLoading = false
+				eventsMoreLoading = false
+			}
+		}
+	}
+
+	// Same params-keyed pattern as fetchMetrics: refetch when project/location
+	// change (this page is reused across ?location= navigations without a
+	// remount). fetchEvents reads project + location synchronously before its
+	// first await, so the effect tracks them.
+	$effect(() => {
+		events = []
+		eventsNext = ''
+		fetchEvents(true)
+	})
+
+	// Reflect the filters into the URL, then refetch page 1. replaceState (not
+	// goto): a filter tweak shouldn't grow history or re-run load().
+	function applyEventFilters () {
+		const u = new URL($page.url)
+		if (eventRule) u.searchParams.set('ruleId', eventRule)
+		else u.searchParams.delete('ruleId')
+		if (eventAction) u.searchParams.set('action', eventAction)
+		else u.searchParams.delete('action')
+		replaceState(u, {})
+		events = []
+		eventsNext = ''
+		fetchEvents(true)
+	}
+
+	const eventRuleOptions = $derived.by(() => {
+		const opts = [{ value: '', label: 'All rules' }]
+		const rules = (data.zone?.rules ?? []) as Api.WafRule[]
+		for (const r of rules) {
+			opts.push({ value: r.id, label: r.description || r.id })
+		}
+		// A hand-edited ?ruleId= may name a rule that no longer exists — keep the
+		// active filter visible in the select instead of showing a blank trigger.
+		if (eventRule && !rules.some((r) => r.id === eventRule)) {
+			opts.push({ value: eventRule, label: `${eventRule} (deleted)` })
+		}
+		return opts
+	})
+
+	const eventActionOptions = [
+		{ value: '', label: 'All actions' },
+		...EVENT_ACTIONS.map((a) => ({ value: a, label: actionLabels[a] ?? a }))
+	]
+
+	const eventsSpinner = $derived(eventsLoading && events.length === 0 && !eventsError)
+	const eventsEmpty = $derived(!eventsLoading && !eventsError && events.length === 0)
 </script>
 
 <div class="breadcrumb">
@@ -380,6 +501,123 @@
 		</div>
 	</div>
 {/if}
+
+<div class="panel is-level-300 events-panel">
+	<div class="panel-head events-head">
+		<div>
+			<h6><strong>Recent events</strong></h6>
+			<p class="page-sub">
+				Sampled — a bounded number of events per firewall (up to 60/min per
+				ingress instance) is kept for 3 days. Counts in the chart above are exact.
+			</p>
+		</div>
+		<div class="events-filters">
+			<Select
+				id="events-filter-rule"
+				bind:value={eventRule}
+				options={eventRuleOptions}
+				onchange={applyEventFilters} />
+			<Select
+				id="events-filter-action"
+				bind:value={eventAction}
+				options={eventActionOptions}
+				onchange={applyEventFilters} />
+		</div>
+	</div>
+
+	<div class="table-container">
+		<table class="table is-variant-compact">
+			<thead>
+				<tr>
+					<th>Time</th>
+					<th>Action</th>
+					<th>Rule</th>
+					<th>IP</th>
+					<th>Country</th>
+					<th>Method</th>
+					<th>Host</th>
+					<th>Path</th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each events as ev (ev.id)}
+					{@const meta = ruleMeta.get(ev.ruleId)}
+					<tr>
+						<td class="whitespace-nowrap" title={format.datetime(ev.at)}>{format.fromNow(ev.at)}</td>
+						<td>
+							<span class="act-badge" data-action={ev.action}>{actionLabels[ev.action] ?? ev.action}</span>
+						</td>
+						<td>
+							{#if meta}
+								<a
+									class="link font-mono text-sm"
+									href={`${managePath}#waf-rule-${encodeURIComponent(ev.ruleId)}`}
+									title={meta.description || ev.ruleId}>{ev.ruleId}</a>
+							{:else}
+								<!-- Events outlive rules by up to 3 days (and waf.set
+								     regenerates unknown ids) — never a dead link. -->
+								<span class="font-mono text-sm text-content/55" title="rule no longer exists">{ev.ruleId}</span>
+							{/if}
+						</td>
+						<td class="font-mono text-sm whitespace-nowrap">{ev.clientIp}</td>
+						<td class="whitespace-nowrap">
+							{#if ev.country}
+								{countryName(ev.country)}
+							{:else}
+								<span class="text-content/40">—</span>
+							{/if}
+						</td>
+						<td class="font-mono text-sm">{ev.method}</td>
+						<td class="font-mono text-sm event-trunc" title={ev.host}>{ev.host}</td>
+						<td class="font-mono text-sm event-trunc" title={ev.path}>{ev.path}</td>
+					</tr>
+				{/each}
+				{#if eventsSpinner}
+					<tr><td colspan="8" class="text-center text-content/40">
+						<i class="fa-solid fa-spinner-third fa-spin"></i>
+					</td></tr>
+				{/if}
+				<!-- Not ErrorRow: its retry re-runs load(), which can't reach this
+				     client-side fetch — retry here re-invokes waf.events directly. -->
+				{#if eventsError}
+					<tr><td colspan="8">
+						<div class="events-error" title={(eventsError as { message?: string })?.message ?? ''}>
+							<i class="fa-solid fa-exclamation-triangle text-warning"></i>
+							<p class="text-content/70">Something went wrong while loading events. Please try again later.</p>
+							<!-- When pages are already loaded the failure was a "Load more" —
+							     retry re-issues the cursor fetch instead of discarding them. -->
+							<button
+								type="button"
+								class="button is-variant-secondary is-size-small"
+								class:is-loading={eventsLoading || eventsMoreLoading}
+								onclick={() => fetchEvents(events.length === 0)}>
+								Try again
+							</button>
+						</div>
+					</td></tr>
+				{/if}
+				{#if eventsEmpty}
+					<NoDataRow span={8} icon="fa-shield-halved" message="No events in the last 3 days." />
+				{/if}
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Suppressed while the error row shows: a failed "Load more" keeps the old
+	     cursor, and two competing buttons (one of which used to discard every
+	     loaded page) is worse than the single retry affordance. -->
+	{#if eventsNext && !eventsError}
+		<div class="events-more">
+			<button
+				type="button"
+				class="button is-variant-secondary is-size-small"
+				class:is-loading={eventsMoreLoading}
+				onclick={() => fetchEvents(false)}>
+				Load more
+			</button>
+		</div>
+	{/if}
+</div>
 
 {#if hasLimits}
 	<div class="panel is-level-300 limit-panel">
@@ -709,6 +947,51 @@
 	.act-badge[data-action='allow'] {
 		color: hsl(var(--hsl-positive));
 		background-color: hsl(var(--hsl-positive) / 0.12);
+	}
+
+	/* Recent events */
+	.events-panel {
+		margin-top: 1rem;
+	}
+
+	.events-head {
+		align-items: flex-start;
+	}
+
+	.events-filters {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	/* Select defaults to width:100% (form layouts) — pin the filters to a
+	   readable fixed width so they sit side by side in the panel head. */
+	.events-filters :global(.select-box) {
+		width: 12rem;
+	}
+
+	/* Attacker-chosen strings — cap the cell, full value in the title. */
+	.event-trunc {
+		max-width: 16rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.events-more {
+		display: flex;
+		justify-content: center;
+		margin-top: 0.75rem;
+	}
+
+	.events-error {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 1.5rem 1rem;
+		text-align: center;
 	}
 
 	/* Rate limit activity */
