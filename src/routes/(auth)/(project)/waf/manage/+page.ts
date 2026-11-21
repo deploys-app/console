@@ -10,7 +10,16 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 		redirect(302, `/waf?project=${project}`)
 	}
 
-	const res = await api.invoke<Api.WafZone>('waf.get', { project, location }, fetch)
+	// location.get pre-flight: managed rules (OWASP CRS) are gated per location
+	// (features.waf.managedRules), so the card renders a disabled "Not available
+	// in this location" state instead of letting the user fill it in and hit the
+	// server-side reject on save. Same convention as the me.authorized/can()
+	// permission pre-flight. Best-effort: a lookup failure fails closed to the
+	// unavailable state (the server still enforces the gate).
+	const [res, locRes] = await Promise.all([
+		api.invoke<Api.WafZone>('waf.get', { project, location }, fetch),
+		api.invoke<Api.Location>('location.get', { project, id: location }, fetch)
+	])
 	// You only reach manage for a configured location — a missing zone means the
 	// firewall isn't configured here, so send the user back to the index.
 	if (!res.ok) {
@@ -22,6 +31,7 @@ export const load: PageLoad = async ({ url, parent, fetch }) => {
 	return {
 		project,
 		location,
-		zone: res.result
+		zone: res.result,
+		managedRulesSupported: (locRes.ok && locRes.result?.features?.waf?.managedRules) ?? false
 	}
 }
