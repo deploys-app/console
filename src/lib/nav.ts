@@ -21,7 +21,7 @@ export const projectMenu: ProjectMenuItem[] = [
 	{ id: 'errors', title: 'Errors', icon: 'fa-bug', link: '/errors', preview: true },
 	{ id: 'domain', title: 'Domains', icon: 'fa-globe', link: '/domain' },
 	{ id: 'route', title: 'Routes', icon: 'fa-router', link: '/route' },
-	{ id: 'waf', title: 'Firewall', icon: 'fa-shield-halved', link: '/waf', preview: true },
+	{ id: 'waf', title: 'Firewall', icon: 'fa-shield-halved', link: '/waf' },
 	{ id: 'cache', title: 'Cache', icon: 'fa-bolt', link: '/cache', preview: true },
 	{ id: 'transform', title: 'Transform', icon: 'fa-wand-magic-sparkles', link: '/transform', preview: true },
 	{ id: 'workload-identity', title: 'Workload Identities', icon: 'fa-network-wired', link: '/workload-identity' },
