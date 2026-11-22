@@ -67,6 +67,7 @@
 		return `${r.full} ${r.unit}`
 	}
 	const projectInfo = $derived(data.projectInfo)
+	const invoiceNotice = $derived(data.invoiceNotice)
 	const usage = $derived(data.usage)
 	const price = $derived(data.price)
 	const auditLog = $derived(data.auditLog)
@@ -162,6 +163,30 @@
 		<p class="page-sub">{projectInfo.name}</p>
 	</div>
 </div>
+{#if invoiceNotice}
+	<div
+		class="invoice-notice"
+		class:is-alert={invoiceNotice.tone === 'alert'}
+		role={invoiceNotice.tone === 'alert' ? 'alert' : 'status'}
+	>
+		<i class="fa-solid {invoiceNotice.tone === 'alert' ? 'fa-circle-exclamation' : 'fa-triangle-exclamation'}" aria-hidden="true"></i>
+		<div class="invoice-notice-body">
+			<strong>{invoiceNotice.title}</strong>
+			<p>{invoiceNotice.body}</p>
+		</div>
+		<div class="invoice-notice-actions">
+			{#if invoiceNotice.payInvoiceId}
+				<a class="button is-size-small is-icon-left" href="/billing/invoice?id={invoiceNotice.payInvoiceId}">
+					<i class="fa-solid fa-receipt"></i>
+					Pay now
+				</a>
+			{/if}
+			<a class="button is-variant-secondary is-size-small" href="/billing/invoices?id={projectInfo.billingAccount}">
+				View invoices
+			</a>
+		</div>
+	</div>
+{/if}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 	<div class="flex flex-col gap-6">
 		<div class="panel is-level-300 gap-6 dashboard-panel">
@@ -301,6 +326,55 @@
 </div>
 
 <style>
+	.invoice-notice {
+		--tone: var(--hsl-warning);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 0.85rem 1rem;
+		margin-bottom: 1.5rem;
+		padding: 0.9rem 1rem;
+		border: 1px solid hsl(var(--tone) / 0.35);
+		border-left-width: 3px;
+		border-radius: 0.625rem;
+		background: hsl(var(--tone) / 0.08);
+	}
+
+	.invoice-notice.is-alert {
+		--tone: var(--hsl-negative);
+	}
+
+	.invoice-notice > i {
+		margin-top: 0.15rem;
+		color: hsl(var(--tone));
+		font-size: 1.05rem;
+	}
+
+	.invoice-notice-body {
+		flex: 1;
+		min-width: 12rem;
+	}
+
+	.invoice-notice-body strong {
+		display: block;
+		color: hsl(var(--tone));
+		font-size: 0.9375rem;
+	}
+
+	.invoice-notice-body p {
+		margin: 0.25rem 0 0;
+		font-size: 0.8125rem;
+		line-height: 1.5;
+		color: hsl(var(--hsl-content) / 0.8);
+	}
+
+	.invoice-notice-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+
 	.dashboard-panel {
 		display: flex;
 		flex-direction: column;

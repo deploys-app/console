@@ -133,9 +133,139 @@ test.describe('project delete (type-to-confirm)', () => {
 	})
 })
 
+// Issue date is the 1st UTC of a month relative to now. Due date is the 1st of
+// the following month, so monthsAgo 0 is still awaiting payment, monthsAgo 1+
+// is overdue, and monthsAgo 7 has been overdue for 6 months.
+function issuedMonthsAgo (monthsAgo) {
+	const now = new Date()
+	return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - monthsAgo, 1)).toISOString()
+}
+
+function invoiceItem ({ id, status, monthsAgo }) {
+	const issuedAt = issuedMonthsAgo(monthsAgo)
+	return {
+		id,
+		number: id,
+		receiptNumber: '',
+		currency: 'THB',
+		periodStart: issuedAt,
+		periodEnd: issuedAt,
+		subtotal: 100,
+		taxAmount: 7,
+		total: 107,
+		status,
+		issuedAt,
+		paidAt: '',
+		voidedAt: '',
+		createdAt: issuedAt
+	}
+}
+
 test.describe('project dashboard', () => {
 	test('renders when a project is selected', async ({ page }) => {
 		await page.goto('/?project=test-project')
 		await expect(page).toHaveURL(/\?project=test-project/)
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
+		await expect(main.getByRole('status')).toHaveCount(0)
+		await expect(main.getByRole('alert')).toHaveCount(0)
+	})
+
+	test('warns when an invoice is awaiting payment', async ({ page }) => {
+		await setMocks({
+			'billing.listInvoices': {
+				ok: true,
+				result: { items: [invoiceItem({ id: 'inv-new', status: 'pending', monthsAgo: 0 })] }
+			}
+		})
+		await page.goto('/?project=test-project')
+		const main = page.locator('.content-wrapper')
+		const notice = main.getByRole('status')
+		await expect(notice).toBeVisible()
+		await expect(notice).toContainText('1 invoice is awaiting payment')
+		await expect(notice).toContainText('An invoice overdue for 6 months will pause this project.')
+		await expect(notice).not.toContainText('has been overdue for 6 months')
+		await expect(main.getByRole('alert')).toHaveCount(0)
+		await expect(notice.getByRole('link', { name: 'Pay now' })).toHaveAttribute('href', '/billing/invoice?id=inv-new')
+		await expect(notice.getByRole('link', { name: 'View invoices' })).toHaveAttribute('href', '/billing/invoices?id=ba-1')
+	})
+
+	test('warns for up to three overdue invoices and links the oldest', async ({ page }) => {
+		await setMocks({
+			'billing.listInvoices': {
+				ok: true,
+				result: {
+					items: [
+						invoiceItem({ id: 'inv-current', status: 'open', monthsAgo: 0 }),
+						invoiceItem({ id: 'inv-newer', status: 'open', monthsAgo: 1 }),
+						invoiceItem({ id: 'inv-oldest', status: 'pending', monthsAgo: 3 }),
+						invoiceItem({ id: 'inv-mid', status: 'open', monthsAgo: 2 }),
+						invoiceItem({ id: 'inv-paid', status: 'paid', monthsAgo: 4 })
+					]
+				}
+			}
+		})
+		await page.goto('/?project=test-project')
+		const main = page.locator('.content-wrapper')
+		const notice = main.getByRole('status')
+		await expect(notice).toContainText('3 invoices are overdue')
+		await expect(notice).toContainText('1 invoice is still awaiting payment.')
+		await expect(notice).toContainText('An invoice overdue for 6 months will pause this project.')
+		await expect(notice.getByRole('link', { name: 'Pay now' })).toHaveAttribute('href', '/billing/invoice?id=inv-oldest')
+		await expect(main.getByRole('alert')).toHaveCount(0)
+	})
+
+	test('alerts when more than three invoices are overdue', async ({ page }) => {
+		await setMocks({
+			'billing.listInvoices': {
+				ok: true,
+				result: {
+					items: [1, 2, 3, 4].map((n) => invoiceItem({ id: `inv-${n}`, status: 'open', monthsAgo: n }))
+				}
+			}
+		})
+		await page.goto('/?project=test-project')
+		const main = page.locator('.content-wrapper')
+		const notice = main.getByRole('alert')
+		await expect(notice).toBeVisible()
+		await expect(notice).toContainText('4 invoices are overdue')
+		await expect(notice).toContainText('Pay them to keep this project running.')
+		await expect(notice).toContainText('An invoice overdue for 6 months will pause this project.')
+		await expect(main.getByRole('status')).toHaveCount(0)
+	})
+
+	test('says the project will be paused once an invoice is 6 months overdue', async ({ page }) => {
+		await setMocks({
+			'billing.listInvoices': {
+				ok: true,
+				result: { items: [invoiceItem({ id: 'inv-old', status: 'open', monthsAgo: 7 })] }
+			}
+		})
+		await page.goto('/?project=test-project')
+		const notice = page.locator('.content-wrapper').getByRole('status')
+		await expect(notice).toContainText('1 invoice is overdue')
+		await expect(notice).toContainText('An invoice has been overdue for 6 months and will pause this project.')
+	})
+
+	test('stays quiet when invoices are paid or cannot be loaded', async ({ page }) => {
+		await setMocks({
+			'billing.listInvoices': {
+				ok: true,
+				result: { items: [invoiceItem({ id: 'inv-paid', status: 'paid', monthsAgo: 8 })] }
+			}
+		})
+		await page.goto('/?project=test-project')
+		const main = page.locator('.content-wrapper')
+		await expect(main.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
+		await expect(main.getByRole('status')).toHaveCount(0)
+		await expect(main.getByRole('alert')).toHaveCount(0)
+
+		await setMocks({
+			'billing.listInvoices': { ok: false, error: { message: 'api: billing account not found' } }
+		})
+		await page.goto('/?project=test-project')
+		await expect(main.getByRole('heading', { name: 'Dashboard' })).toBeVisible()
+		await expect(main.getByRole('status')).toHaveCount(0)
+		await expect(main.getByRole('alert')).toHaveCount(0)
 	})
 })
