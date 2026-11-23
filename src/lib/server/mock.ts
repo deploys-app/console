@@ -1884,6 +1884,12 @@ const handlers: Record<string, (args: any) => object> = {
 			createdAt: p.createdAt
 		})))
 	},
+	'billing.unlinkProject': (args) => {
+		const sid = String(args?.project ?? '')
+		const project = projects.find((p) => p.project === sid)
+		if (project) project.billingAccount = ''
+		return ok({})
+	},
 	'billing.listMembers': () => ok({ owner: billingOwnerEmail, items: billingMembers }),
 	'billing.addMember': (args) => {
 		const email = String(args?.email ?? '').toLowerCase()
