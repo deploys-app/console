@@ -4,7 +4,7 @@ on:
   pull_request:
 jobs:
   e2e:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     name: Playwright
     timeout-minutes: 20
     env:
@@ -30,8 +30,6 @@ jobs:
             playwright-${{ runner.os }}-
 
       - name: Install Playwright browsers
-        # The self-hosted runner is Ubuntu 20.04. Playwright 1.63+ removed the
-        # ubuntu20.04 Chromium build, so @playwright/test stays on 1.62.x.
         run: bunx playwright install --with-deps chromium
 
       - name: Run Playwright tests
